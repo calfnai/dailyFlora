@@ -1,7 +1,9 @@
-export type QualityName = 'auto' | 'low' | 'medium' | 'high';
+export type DensityName = 'low' | 'medium' | 'high';
+export type RenderQualityName = 'auto' | 'low' | 'medium' | 'high';
 
 export interface QualityProfile {
-  name: Exclude<QualityName, 'auto'>;
+  densityName: DensityName;
+  renderName: Exclude<RenderQualityName, 'auto'>;
   particleCount: number;
   flowerCount: number;
   leafCount: number;
@@ -23,6 +25,10 @@ export interface BouquetTheme {
   densityBias: number;
   verticalBias: number;
   wildness: number;
+  branchBias?: number;
+  leafBias?: number;
+  flowerBias?: number;
+  outerLineBias?: number;
 }
 
 export interface DailyBouquetSpec {

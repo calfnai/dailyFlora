@@ -1,20 +1,37 @@
 import './styles.css';
-import type { QualityName } from './types';
+import type { DensityName, RenderQualityName } from './types';
 import { todayKey } from './random';
 import { createDailySpec, readParams } from './spec';
 import { resolveQuality } from './quality';
 import { BouquetScene } from './bouquetScene';
 
 type RotationDirection = 1 | -1;
+type RotationMode = 'steady' | 'breath' | 'high-sweep' | 'low-sweep' | 'figure-eight';
 
 const minRotationSpeed = 0.012;
 const maxRotationSpeed = 0.13;
-const rotationPresets: Array<{ speed: number; direction: RotationDirection; tilt: number }> = [
-  { speed: 0.038, direction: 1, tilt: -0.28 },
-  { speed: 0.052, direction: -1, tilt: 0.18 },
-  { speed: 0.072, direction: 1, tilt: -0.42 },
-  { speed: 0.046, direction: -1, tilt: 0.36 },
-  { speed: 0.092, direction: 1, tilt: -0.12 }
+const densityLabels: Record<DensityName, string> = {
+  low: '疏',
+  medium: '中',
+  high: '密'
+};
+const renderLabels: Record<Exclude<RenderQualityName, 'auto'>, string> = {
+  low: '省',
+  medium: '清',
+  high: '精'
+};
+const rotationPresets: Array<{
+  speed: number;
+  direction: RotationDirection;
+  tilt: number;
+  mode: RotationMode;
+  tiltAmplitude: number;
+}> = [
+  { speed: 0.038, direction: 1, tilt: -0.18, mode: 'breath', tiltAmplitude: 0.16 },
+  { speed: 0.058, direction: -1, tilt: -0.42, mode: 'high-sweep', tiltAmplitude: 0.24 },
+  { speed: 0.082, direction: 1, tilt: 0.28, mode: 'low-sweep', tiltAmplitude: 0.2 },
+  { speed: 0.048, direction: -1, tilt: -0.08, mode: 'figure-eight', tiltAmplitude: 0.3 },
+  { speed: 0.098, direction: 1, tilt: -0.3, mode: 'steady', tiltAmplitude: 0 }
 ];
 
 const canvas = document.querySelector<HTMLCanvasElement>('#flora-canvas');
@@ -27,7 +44,8 @@ const pauseButton = document.querySelector<HTMLButtonElement>('#pause-button');
 const todayButton = document.querySelector<HTMLButtonElement>('#today-button');
 const shuffleButton = document.querySelector<HTMLButtonElement>('#shuffle-button');
 const fullscreenButton = document.querySelector<HTMLButtonElement>('#fullscreen-button');
-const qualityButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-quality-choice]'));
+const densityButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-density-choice]'));
+const renderButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-render-choice]'));
 const rotationSpeedInput = document.querySelector<HTMLInputElement>('#rotation-speed');
 const rotationDirectionButton = document.querySelector<HTMLButtonElement>('#rotation-direction-button');
 const rotationPresetButton = document.querySelector<HTMLButtonElement>('#rotation-preset-button');
@@ -46,14 +64,17 @@ const ui = {
 };
 
 let params = readParams();
-let selectedQuality = normalizeQuality(params.quality);
-let quality = resolveQuality(selectedQuality);
+let selectedDensity = normalizeDensity(params.density);
+let selectedRender = normalizeRender(params.render);
+let quality = resolveQuality(selectedDensity, selectedRender);
 let spec = createDailySpec(params.date, params.seed);
 let scene = new BouquetScene(ui.canvas, spec, quality);
 let hideTimer = 0;
 let previewCount = 0;
 let rotationSpeed = THREEClamp(spec.rotationSpeed, minRotationSpeed, maxRotationSpeed);
 let rotationDirection: RotationDirection = 1;
+let rotationMode: RotationMode = 'steady';
+let tiltAmplitude = 0;
 let presetIndex = 0;
 let manualRotation = false;
 
@@ -61,7 +82,11 @@ function THREEClamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-function normalizeQuality(value: string): QualityName {
+function normalizeDensity(value: string): DensityName {
+  return value === 'low' || value === 'medium' || value === 'high' ? value : 'medium';
+}
+
+function normalizeRender(value: string): RenderQualityName {
   return value === 'low' || value === 'medium' || value === 'high' || value === 'auto' ? value : 'auto';
 }
 
@@ -77,13 +102,21 @@ function sliderToSpeed(value: string) {
 function setLabels() {
   ui.dateLabel.textContent = spec.dateLabel;
   ui.themeLabel.textContent = spec.theme.name;
-  ui.qualityLabel.textContent = selectedQuality === 'auto' ? `auto/${quality.name}` : quality.name;
+  const renderLabel =
+    selectedRender === 'auto' ? `自/${renderLabels[quality.renderName]}` : renderLabels[quality.renderName];
+  ui.qualityLabel.textContent = `${densityLabels[quality.densityName]} · ${renderLabel}`;
   document.title = `DailyFlora - ${spec.theme.name}`;
 }
 
 function syncControls() {
-  qualityButtons.forEach((button) => {
-    const active = button.dataset.qualityChoice === selectedQuality;
+  densityButtons.forEach((button) => {
+    const active = button.dataset.densityChoice === selectedDensity;
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+
+  renderButtons.forEach((button) => {
+    const active = button.dataset.renderChoice === selectedRender;
     button.classList.toggle('is-active', active);
     button.setAttribute('aria-pressed', String(active));
   });
@@ -123,16 +156,22 @@ function updateUrl(date: string, seed: string) {
   } else {
     next.searchParams.set('seed', seed);
   }
-  if (selectedQuality === 'auto') {
-    next.searchParams.delete('quality');
+  next.searchParams.delete('quality');
+  if (selectedDensity === 'medium') {
+    next.searchParams.delete('density');
   } else {
-    next.searchParams.set('quality', selectedQuality);
+    next.searchParams.set('density', selectedDensity);
+  }
+  if (selectedRender === 'auto') {
+    next.searchParams.delete('render');
+  } else {
+    next.searchParams.set('render', selectedRender);
   }
   window.history.replaceState({}, '', next);
 }
 
 function applyRotationSettings(tilt?: number) {
-  scene.setRotationSettings({ speed: rotationSpeed, direction: rotationDirection, tilt });
+  scene.setRotationSettings({ speed: rotationSpeed, direction: rotationDirection, tilt, mode: rotationMode, tiltAmplitude });
   syncControls();
 }
 
@@ -140,19 +179,20 @@ function rebuild(date: string, seed: string) {
   spec = createDailySpec(date, seed);
   if (!manualRotation) {
     rotationSpeed = THREEClamp(spec.rotationSpeed, minRotationSpeed, maxRotationSpeed);
+    rotationMode = 'steady';
+    tiltAmplitude = 0;
   }
   scene.rebuild(spec, quality);
   applyRotationSettings();
   setLabels();
   updateUrl(date, seed);
-  params = { date, seed, quality: selectedQuality };
+  params = { date, seed, density: selectedDensity, render: selectedRender };
   revealUi();
 }
 
-function setQuality(nextQuality: QualityName) {
-  selectedQuality = nextQuality;
-  const next = resolveQuality(selectedQuality);
-  const changed = next.name !== quality.name;
+function rebuildQuality(nextDensity = selectedDensity, nextRender = selectedRender) {
+  const next = resolveQuality(nextDensity, nextRender);
+  const changed = next.densityName !== quality.densityName || next.renderName !== quality.renderName;
   quality = next;
   if (changed) {
     scene.rebuild(spec, quality);
@@ -162,6 +202,16 @@ function setQuality(nextQuality: QualityName) {
   syncControls();
   updateUrl(spec.dateLabel, spec.seed);
   revealUi();
+}
+
+function setDensity(nextDensity: DensityName) {
+  selectedDensity = nextDensity;
+  rebuildQuality();
+}
+
+function setRender(nextRender: RenderQualityName) {
+  selectedRender = nextRender;
+  rebuildQuality();
 }
 
 pauseButton?.addEventListener('click', () => {
@@ -195,9 +245,15 @@ fullscreenButton?.addEventListener('click', async () => {
   revealUi();
 });
 
-qualityButtons.forEach((button) => {
+densityButtons.forEach((button) => {
   button.addEventListener('click', () => {
-    setQuality(normalizeQuality(button.dataset.qualityChoice || 'auto'));
+    setDensity(normalizeDensity(button.dataset.densityChoice || 'medium'));
+  });
+});
+
+renderButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    setRender(normalizeRender(button.dataset.renderChoice || 'auto'));
   });
 });
 
@@ -221,13 +277,15 @@ rotationPresetButton?.addEventListener('click', () => {
   presetIndex += 1;
   rotationSpeed = preset.speed;
   rotationDirection = preset.direction;
+  rotationMode = preset.mode;
+  tiltAmplitude = preset.tiltAmplitude;
   applyRotationSettings(preset.tilt);
   revealUi();
 });
 
 window.addEventListener('resize', () => {
-  const nextQuality = resolveQuality(selectedQuality);
-  const qualityChanged = nextQuality.name !== quality.name;
+  const nextQuality = resolveQuality(selectedDensity, selectedRender);
+  const qualityChanged = nextQuality.densityName !== quality.densityName || nextQuality.renderName !== quality.renderName;
   quality = nextQuality;
   scene.resize();
   if (qualityChanged) {

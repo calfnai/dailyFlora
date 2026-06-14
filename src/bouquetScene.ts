@@ -8,6 +8,8 @@ const up = new THREE.Vector3(0, 1, 0);
 const minViewTilt = -0.95;
 const maxViewTilt = 0.82;
 
+type RotationMode = 'steady' | 'breath' | 'high-sweep' | 'low-sweep' | 'figure-eight';
+
 function pickColor(colors: readonly string[], value: number) {
   return colors[Math.floor(value * colors.length) % colors.length];
 }
@@ -95,7 +97,7 @@ function buildOuterLines(spec: DailyBouquetSpec, quality: QualityProfile) {
   const rng = createRng(`${spec.seed}:outer-lines`);
   const positions: number[] = [];
   const colors: number[] = [];
-  const count = Math.floor(quality.outerLineCount * spec.theme.wildness);
+  const count = Math.floor(quality.outerLineCount * spec.theme.wildness * (spec.theme.outerLineBias ?? 1));
   const color = new THREE.Color(spec.theme.glow);
 
   for (let i = 0; i < count; i += 1) {
@@ -170,7 +172,7 @@ function buildParticles(spec: DailyBouquetSpec, quality: QualityProfile) {
 
 function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   const rng = createRng(`${spec.seed}:flowers`);
-  const geometry = new THREE.IcosahedronGeometry(0.055, quality.name === 'low' ? 0 : 1);
+  const geometry = new THREE.IcosahedronGeometry(0.055, quality.renderName === 'low' ? 0 : 1);
   const material = new THREE.MeshStandardMaterial({
     roughness: 0.82,
     metalness: 0.0,
@@ -298,6 +300,10 @@ export class BouquetScene {
   private targetRotationX = -0.14;
   private rotationSpeed: number;
   private rotationDirection: 1 | -1 = 1;
+  private rotationMode: RotationMode = 'steady';
+  private modeTime = 0;
+  private baseTilt = -0.14;
+  private tiltAmplitude = 0;
   private floorMaterial?: THREE.MeshBasicMaterial;
   private animationId = 0;
 
@@ -309,9 +315,9 @@ export class BouquetScene {
     this.frameInterval = 1 / quality.targetFps;
     this.renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: quality.name !== 'low',
+      antialias: true,
       alpha: false,
-      powerPreference: quality.name === 'low' ? 'low-power' : 'high-performance'
+      powerPreference: quality.renderName === 'low' ? 'low-power' : 'high-performance'
     });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.setClearColor(spec.theme.background);
@@ -378,7 +384,13 @@ export class BouquetScene {
     return this.isPaused;
   }
 
-  setRotationSettings(settings: { speed?: number; direction?: 1 | -1; tilt?: number }) {
+  setRotationSettings(settings: {
+    speed?: number;
+    direction?: 1 | -1;
+    tilt?: number;
+    mode?: RotationMode;
+    tiltAmplitude?: number;
+  }) {
     if (settings.speed !== undefined) {
       this.rotationSpeed = THREE.MathUtils.clamp(settings.speed, 0.006, 0.16);
     }
@@ -386,7 +398,15 @@ export class BouquetScene {
       this.rotationDirection = settings.direction;
     }
     if (settings.tilt !== undefined) {
-      this.targetRotationX = THREE.MathUtils.clamp(settings.tilt, minViewTilt, maxViewTilt);
+      this.baseTilt = THREE.MathUtils.clamp(settings.tilt, minViewTilt, maxViewTilt);
+      this.targetRotationX = this.baseTilt;
+    }
+    if (settings.mode !== undefined) {
+      this.rotationMode = settings.mode;
+      this.modeTime = 0;
+    }
+    if (settings.tiltAmplitude !== undefined) {
+      this.tiltAmplitude = THREE.MathUtils.clamp(settings.tiltAmplitude, 0, 0.38);
     }
   }
 
@@ -406,12 +426,43 @@ export class BouquetScene {
 
   private tick(delta: number) {
     if (!this.isPaused && !this.isDragging) {
-      this.targetRotationY += this.rotationSpeed * this.rotationDirection * delta;
+      this.modeTime += delta;
+      const pulse = this.rotationPulse();
+      this.targetRotationY += this.rotationSpeed * this.rotationDirection * pulse * delta;
+      this.targetRotationX = this.nextAutoTilt();
     }
     this.bouquet.rotation.y += (this.targetRotationY - this.bouquet.rotation.y) * 0.08;
     this.bouquet.rotation.x += (this.targetRotationX - this.bouquet.rotation.x) * 0.07;
     this.bouquet.position.y = 0.06 + Math.sin(performance.now() * 0.00025) * 0.026;
     this.renderer.render(this.scene, this.camera);
+  }
+
+  private rotationPulse() {
+    if (this.rotationMode === 'breath') {
+      return 0.74 + Math.sin(this.modeTime * 0.72) * 0.2;
+    }
+    if (this.rotationMode === 'figure-eight') {
+      return 0.62 + Math.sin(this.modeTime * 1.05) * 0.18 + Math.sin(this.modeTime * 0.37) * 0.12;
+    }
+    if (this.rotationMode === 'high-sweep') {
+      return 0.82 + Math.sin(this.modeTime * 0.48) * 0.1;
+    }
+    if (this.rotationMode === 'low-sweep') {
+      return 0.68 + Math.cos(this.modeTime * 0.54) * 0.12;
+    }
+    return 1;
+  }
+
+  private nextAutoTilt() {
+    if (this.rotationMode === 'steady') return this.baseTilt;
+
+    const primary = Math.sin(this.modeTime * 0.42) * this.tiltAmplitude;
+    const secondary =
+      this.rotationMode === 'figure-eight'
+        ? Math.sin(this.modeTime * 0.9 + Math.PI / 3) * this.tiltAmplitude * 0.46
+        : Math.cos(this.modeTime * 0.28) * this.tiltAmplitude * 0.22;
+
+    return THREE.MathUtils.clamp(this.baseTilt + primary + secondary, minViewTilt, maxViewTilt);
   }
 
   private addLights() {
