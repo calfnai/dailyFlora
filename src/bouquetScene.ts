@@ -5,10 +5,24 @@ import { createRng, hashString } from './random';
 const tempObject = new THREE.Object3D();
 const tempColor = new THREE.Color();
 const up = new THREE.Vector3(0, 1, 0);
-const minViewTilt = -0.95;
-const maxViewTilt = 0.82;
+const minCameraPitch = 0.03;
+const maxCameraPitch = 1.34;
 
-type RotationMode = 'steady' | 'breath' | 'high-sweep' | 'low-sweep' | 'figure-eight';
+type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
+
+type CameraRouteOffsets = {
+  yaw: number;
+  pitch: number;
+  distance: number;
+  targetY: number;
+};
+
+const emptyRouteOffsets: CameraRouteOffsets = {
+  yaw: 0,
+  pitch: 0,
+  distance: 0,
+  targetY: 0
+};
 
 function pickColor(colors: readonly string[], value: number) {
   return colors[Math.floor(value * colors.length) % colors.length];
@@ -296,14 +310,26 @@ export class BouquetScene {
   private isDragging = false;
   private dragX = 0;
   private dragY = 0;
-  private targetRotationY = 0;
-  private targetRotationX = -0.14;
-  private rotationSpeed: number;
-  private rotationDirection: 1 | -1 = 1;
-  private rotationMode: RotationMode = 'steady';
-  private modeTime = 0;
-  private baseTilt = -0.14;
-  private tiltAmplitude = 0;
+  private routeSpeed: number;
+  private routeDirection: 1 | -1 = 1;
+  private routeMode: CameraRouteMode = 'orbit';
+  private routeTime = 0;
+  private routePausedByDrag = false;
+  private cameraYaw = 0;
+  private targetCameraYaw = 0;
+  private cameraPitch = 0.38;
+  private targetCameraPitch = 0.38;
+  private baseCameraPitch = 0.38;
+  private pitchAmplitude = 0;
+  private yawAmplitude = 0;
+  private distanceAmplitude = 0;
+  private targetYAmplitude = 0;
+  private cameraDistance = 5.36;
+  private baseCameraDistance = 5.36;
+  private targetCameraDistance = 5.36;
+  private cameraTargetY = 0.7;
+  private baseCameraTargetY = 0.7;
+  private targetCameraTargetY = 0.7;
   private floorMaterial?: THREE.MeshBasicMaterial;
   private animationId = 0;
 
@@ -311,7 +337,7 @@ export class BouquetScene {
     this.canvas = canvas;
     this.spec = spec;
     this.quality = quality;
-    this.rotationSpeed = spec.rotationSpeed;
+    this.routeSpeed = spec.rotationSpeed;
     this.frameInterval = 1 / quality.targetFps;
     this.renderer = new THREE.WebGLRenderer({
       canvas,
@@ -323,7 +349,8 @@ export class BouquetScene {
     this.renderer.setClearColor(spec.theme.background);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality.pixelRatio));
     this.scene.fog = new THREE.Fog(spec.theme.background, 4.8, 9.2);
-    this.camera.position.set(0, 1.52, 5.45);
+    this.cameraYaw = (hashString(spec.seed) % 628) / 100;
+    this.targetCameraYaw = this.cameraYaw;
     this.scene.add(this.camera);
     this.scene.add(this.bouquet);
     this.addLights();
@@ -350,8 +377,6 @@ export class BouquetScene {
     }
 
     this.bouquet.rotation.set(0, (hashString(spec.seed) % 628) / 100, 0);
-    this.targetRotationY = this.bouquet.rotation.y;
-    this.targetRotationX = THREE.MathUtils.clamp(this.targetRotationX, minViewTilt, maxViewTilt);
     this.bouquet.add(
       buildStemBundle(spec),
       buildBranches(spec, quality),
@@ -387,26 +412,39 @@ export class BouquetScene {
   setRotationSettings(settings: {
     speed?: number;
     direction?: 1 | -1;
-    tilt?: number;
-    mode?: RotationMode;
-    tiltAmplitude?: number;
+    pitch?: number;
+    mode?: CameraRouteMode;
+    pitchAmplitude?: number;
+    yawAmplitude?: number;
+    distanceAmplitude?: number;
+    targetYAmplitude?: number;
   }) {
     if (settings.speed !== undefined) {
-      this.rotationSpeed = THREE.MathUtils.clamp(settings.speed, 0.006, 0.16);
+      this.routeSpeed = THREE.MathUtils.clamp(settings.speed, 0.006, 0.16);
     }
     if (settings.direction !== undefined) {
-      this.rotationDirection = settings.direction;
+      this.routeDirection = settings.direction;
     }
-    if (settings.tilt !== undefined) {
-      this.baseTilt = THREE.MathUtils.clamp(settings.tilt, minViewTilt, maxViewTilt);
-      this.targetRotationX = this.baseTilt;
+    if (settings.pitch !== undefined) {
+      this.baseCameraPitch = THREE.MathUtils.clamp(settings.pitch, minCameraPitch, maxCameraPitch);
+      this.targetCameraPitch = this.baseCameraPitch;
     }
     if (settings.mode !== undefined) {
-      this.rotationMode = settings.mode;
-      this.modeTime = 0;
+      this.routeMode = settings.mode;
+      this.routeTime = 0;
+      this.routePausedByDrag = false;
     }
-    if (settings.tiltAmplitude !== undefined) {
-      this.tiltAmplitude = THREE.MathUtils.clamp(settings.tiltAmplitude, 0, 0.38);
+    if (settings.pitchAmplitude !== undefined) {
+      this.pitchAmplitude = THREE.MathUtils.clamp(settings.pitchAmplitude, 0, 0.42);
+    }
+    if (settings.yawAmplitude !== undefined) {
+      this.yawAmplitude = THREE.MathUtils.clamp(settings.yawAmplitude, 0, 0.58);
+    }
+    if (settings.distanceAmplitude !== undefined) {
+      this.distanceAmplitude = THREE.MathUtils.clamp(settings.distanceAmplitude, 0, 0.62);
+    }
+    if (settings.targetYAmplitude !== undefined) {
+      this.targetYAmplitude = THREE.MathUtils.clamp(settings.targetYAmplitude, 0, 0.2);
     }
   }
 
@@ -418,51 +456,105 @@ export class BouquetScene {
     const wide = ratio > 1.65;
     this.camera.aspect = width / height;
     this.camera.fov = phone ? 42 : wide ? 32 : 34;
-    this.camera.position.set(0, phone ? 1.38 : wide ? 1.68 : 1.52, phone ? 5.82 : wide ? 5.08 : 5.36);
-    this.camera.lookAt(0, phone ? 0.66 : wide ? 0.74 : 0.7, 0);
+    this.baseCameraDistance = phone ? 5.82 : wide ? 5.08 : 5.36;
+    this.targetCameraDistance = this.baseCameraDistance;
+    this.cameraDistance = this.baseCameraDistance;
+    this.baseCameraTargetY = phone ? 0.66 : wide ? 0.74 : 0.7;
+    this.targetCameraTargetY = this.baseCameraTargetY;
+    this.cameraTargetY = this.baseCameraTargetY;
+    this.updateCamera(emptyRouteOffsets);
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height, false);
   }
 
   private tick(delta: number) {
-    if (!this.isPaused && !this.isDragging) {
-      this.modeTime += delta;
-      const pulse = this.rotationPulse();
-      this.targetRotationY += this.rotationSpeed * this.rotationDirection * pulse * delta;
-      this.targetRotationX = this.nextAutoTilt();
+    let routeOffsets = emptyRouteOffsets;
+    if (!this.isPaused && !this.isDragging && !this.routePausedByDrag) {
+      this.routeTime += delta;
+      routeOffsets = this.routeOffsets();
+      this.targetCameraYaw += this.routeSpeed * this.routeDirection * this.routePulse() * delta;
+      this.targetCameraPitch = THREE.MathUtils.clamp(this.baseCameraPitch + routeOffsets.pitch, minCameraPitch, maxCameraPitch);
+      this.targetCameraDistance = this.baseCameraDistance + routeOffsets.distance;
+      this.targetCameraTargetY = this.baseCameraTargetY + routeOffsets.targetY;
     }
-    this.bouquet.rotation.y += (this.targetRotationY - this.bouquet.rotation.y) * 0.08;
-    this.bouquet.rotation.x += (this.targetRotationX - this.bouquet.rotation.x) * 0.07;
+    this.cameraYaw += (this.targetCameraYaw - this.cameraYaw) * 0.1;
+    this.cameraPitch += (this.targetCameraPitch - this.cameraPitch) * 0.1;
+    this.cameraDistance += (this.targetCameraDistance - this.cameraDistance) * 0.08;
+    this.cameraTargetY += (this.targetCameraTargetY - this.cameraTargetY) * 0.08;
     this.bouquet.position.y = 0.06 + Math.sin(performance.now() * 0.00025) * 0.026;
+    this.updateCamera(routeOffsets);
     this.renderer.render(this.scene, this.camera);
   }
 
-  private rotationPulse() {
-    if (this.rotationMode === 'breath') {
-      return 0.74 + Math.sin(this.modeTime * 0.72) * 0.2;
+  private updateCamera(routeOffsets: CameraRouteOffsets) {
+    const yaw = this.cameraYaw + routeOffsets.yaw;
+    const pitch = THREE.MathUtils.clamp(this.cameraPitch, minCameraPitch, maxCameraPitch);
+    const distance = Math.max(3.8, this.cameraDistance);
+    const target = new THREE.Vector3(0, this.cameraTargetY, 0);
+    const horizontal = Math.cos(pitch) * distance;
+
+    this.camera.position.set(
+      Math.sin(yaw) * horizontal,
+      target.y + Math.sin(pitch) * distance,
+      Math.cos(yaw) * horizontal
+    );
+    this.camera.lookAt(target);
+  }
+
+  private routePulse() {
+    if (this.routeMode === 'near-far') {
+      return 0.78 + Math.sin(this.routeTime * 0.82) * 0.2;
     }
-    if (this.rotationMode === 'figure-eight') {
-      return 0.62 + Math.sin(this.modeTime * 1.05) * 0.18 + Math.sin(this.modeTime * 0.37) * 0.12;
+    if (this.routeMode === 'figure-eight') {
+      return 0.54 + Math.sin(this.routeTime * 1.05) * 0.16 + Math.sin(this.routeTime * 0.37) * 0.12;
     }
-    if (this.rotationMode === 'high-sweep') {
-      return 0.82 + Math.sin(this.modeTime * 0.48) * 0.1;
+    if (this.routeMode === 'high-arc') {
+      return 0.74 + Math.sin(this.routeTime * 0.48) * 0.12;
     }
-    if (this.rotationMode === 'low-sweep') {
-      return 0.68 + Math.cos(this.modeTime * 0.54) * 0.12;
+    if (this.routeMode === 'low-arc') {
+      return 0.64 + Math.cos(this.routeTime * 0.54) * 0.12;
     }
     return 1;
   }
 
-  private nextAutoTilt() {
-    if (this.rotationMode === 'steady') return this.baseTilt;
+  private routeOffsets(): CameraRouteOffsets {
+    if (this.routeMode === 'orbit') return emptyRouteOffsets;
 
-    const primary = Math.sin(this.modeTime * 0.42) * this.tiltAmplitude;
-    const secondary =
-      this.rotationMode === 'figure-eight'
-        ? Math.sin(this.modeTime * 0.9 + Math.PI / 3) * this.tiltAmplitude * 0.46
-        : Math.cos(this.modeTime * 0.28) * this.tiltAmplitude * 0.22;
+    if (this.routeMode === 'figure-eight') {
+      return {
+        yaw: Math.sin(this.routeTime * 0.55) * this.yawAmplitude,
+        pitch:
+          Math.sin(this.routeTime * 0.42) * this.pitchAmplitude +
+          Math.sin(this.routeTime * 0.9 + Math.PI / 3) * this.pitchAmplitude * 0.42,
+        distance: Math.cos(this.routeTime * 0.38) * this.distanceAmplitude,
+        targetY: Math.sin(this.routeTime * 0.31) * this.targetYAmplitude
+      };
+    }
 
-    return THREE.MathUtils.clamp(this.baseTilt + primary + secondary, minViewTilt, maxViewTilt);
+    if (this.routeMode === 'near-far') {
+      return {
+        yaw: Math.sin(this.routeTime * 0.34) * this.yawAmplitude,
+        pitch: Math.sin(this.routeTime * 0.5) * this.pitchAmplitude,
+        distance: Math.sin(this.routeTime * 0.72) * this.distanceAmplitude,
+        targetY: Math.cos(this.routeTime * 0.44) * this.targetYAmplitude
+      };
+    }
+
+    if (this.routeMode === 'high-arc') {
+      return {
+        yaw: Math.sin(this.routeTime * 0.28) * this.yawAmplitude,
+        pitch: Math.sin(this.routeTime * 0.36) * this.pitchAmplitude,
+        distance: Math.cos(this.routeTime * 0.26) * this.distanceAmplitude,
+        targetY: Math.sin(this.routeTime * 0.22) * this.targetYAmplitude
+      };
+    }
+
+    return {
+      yaw: Math.sin(this.routeTime * 0.38) * this.yawAmplitude,
+      pitch: Math.sin(this.routeTime * 0.44) * this.pitchAmplitude,
+      distance: Math.cos(this.routeTime * 0.48) * this.distanceAmplitude,
+      targetY: Math.sin(this.routeTime * 0.3) * this.targetYAmplitude
+    };
   }
 
   private addLights() {
@@ -495,9 +587,14 @@ export class BouquetScene {
   private bindPointer() {
     this.canvas.addEventListener('pointerdown', (event) => {
       this.isDragging = true;
+      this.routePausedByDrag = true;
       this.canvas.setPointerCapture(event.pointerId);
       this.dragX = event.clientX;
       this.dragY = event.clientY;
+      this.targetCameraYaw = this.cameraYaw;
+      this.targetCameraPitch = this.cameraPitch;
+      this.targetCameraDistance = this.cameraDistance;
+      this.targetCameraTargetY = this.cameraTargetY;
     });
 
     this.canvas.addEventListener('pointermove', (event) => {
@@ -506,8 +603,13 @@ export class BouquetScene {
       const dy = event.clientY - this.dragY;
       this.dragX = event.clientX;
       this.dragY = event.clientY;
-      this.targetRotationY += dx * 0.008;
-      this.targetRotationX = THREE.MathUtils.clamp(this.targetRotationX + dy * 0.0054, minViewTilt, maxViewTilt);
+      this.targetCameraYaw -= dx * 0.008;
+      this.targetCameraPitch = THREE.MathUtils.clamp(
+        this.targetCameraPitch - dy * 0.0058,
+        minCameraPitch,
+        maxCameraPitch
+      );
+      this.baseCameraPitch = this.targetCameraPitch;
     });
 
     const release = (event: PointerEvent) => {

@@ -6,7 +6,7 @@ import { resolveQuality } from './quality';
 import { BouquetScene } from './bouquetScene';
 
 type RotationDirection = 1 | -1;
-type RotationMode = 'steady' | 'breath' | 'high-sweep' | 'low-sweep' | 'figure-eight';
+type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
 
 const minRotationSpeed = 0.012;
 const maxRotationSpeed = 0.13;
@@ -23,15 +23,63 @@ const renderLabels: Record<Exclude<RenderQualityName, 'auto'>, string> = {
 const rotationPresets: Array<{
   speed: number;
   direction: RotationDirection;
-  tilt: number;
-  mode: RotationMode;
-  tiltAmplitude: number;
+  pitch: number;
+  mode: CameraRouteMode;
+  pitchAmplitude: number;
+  yawAmplitude: number;
+  distanceAmplitude: number;
+  targetYAmplitude: number;
 }> = [
-  { speed: 0.038, direction: 1, tilt: -0.18, mode: 'breath', tiltAmplitude: 0.16 },
-  { speed: 0.058, direction: -1, tilt: -0.42, mode: 'high-sweep', tiltAmplitude: 0.24 },
-  { speed: 0.082, direction: 1, tilt: 0.28, mode: 'low-sweep', tiltAmplitude: 0.2 },
-  { speed: 0.048, direction: -1, tilt: -0.08, mode: 'figure-eight', tiltAmplitude: 0.3 },
-  { speed: 0.098, direction: 1, tilt: -0.3, mode: 'steady', tiltAmplitude: 0 }
+  {
+    speed: 0.036,
+    direction: 1,
+    pitch: 0.38,
+    mode: 'orbit',
+    pitchAmplitude: 0,
+    yawAmplitude: 0,
+    distanceAmplitude: 0,
+    targetYAmplitude: 0
+  },
+  {
+    speed: 0.052,
+    direction: 1,
+    pitch: 0.78,
+    mode: 'high-arc',
+    pitchAmplitude: 0.28,
+    yawAmplitude: 0.16,
+    distanceAmplitude: 0.16,
+    targetYAmplitude: 0.08
+  },
+  {
+    speed: 0.044,
+    direction: -1,
+    pitch: 0.24,
+    mode: 'low-arc',
+    pitchAmplitude: 0.18,
+    yawAmplitude: 0.2,
+    distanceAmplitude: 0.24,
+    targetYAmplitude: 0.06
+  },
+  {
+    speed: 0.064,
+    direction: 1,
+    pitch: 0.52,
+    mode: 'near-far',
+    pitchAmplitude: 0.18,
+    yawAmplitude: 0.24,
+    distanceAmplitude: 0.52,
+    targetYAmplitude: 0.12
+  },
+  {
+    speed: 0.046,
+    direction: -1,
+    pitch: 0.62,
+    mode: 'figure-eight',
+    pitchAmplitude: 0.26,
+    yawAmplitude: 0.48,
+    distanceAmplitude: 0.32,
+    targetYAmplitude: 0.1
+  }
 ];
 
 const canvas = document.querySelector<HTMLCanvasElement>('#flora-canvas');
@@ -66,15 +114,19 @@ const ui = {
 let params = readParams();
 let selectedDensity = normalizeDensity(params.density);
 let selectedRender = normalizeRender(params.render);
+let selectedTheme = params.theme;
 let quality = resolveQuality(selectedDensity, selectedRender);
-let spec = createDailySpec(params.date, params.seed);
+let spec = createDailySpec(params.date, params.seed, selectedTheme);
 let scene = new BouquetScene(ui.canvas, spec, quality);
 let hideTimer = 0;
 let previewCount = 0;
 let rotationSpeed = THREEClamp(spec.rotationSpeed, minRotationSpeed, maxRotationSpeed);
 let rotationDirection: RotationDirection = 1;
-let rotationMode: RotationMode = 'steady';
-let tiltAmplitude = 0;
+let cameraRouteMode: CameraRouteMode = 'orbit';
+let pitchAmplitude = 0;
+let yawAmplitude = 0;
+let distanceAmplitude = 0;
+let targetYAmplitude = 0;
 let presetIndex = 0;
 let manualRotation = false;
 
@@ -129,8 +181,8 @@ function syncControls() {
   if (rotationDirectionButton) {
     const reverse = rotationDirection === -1;
     rotationDirectionButton.classList.toggle('is-reverse', reverse);
-    rotationDirectionButton.setAttribute('aria-label', reverse ? 'Clockwise rotation' : 'Counterclockwise rotation');
-    rotationDirectionButton.title = reverse ? 'Clockwise rotation' : 'Counterclockwise rotation';
+    rotationDirectionButton.setAttribute('aria-label', reverse ? 'Forward camera route' : 'Reverse camera route');
+    rotationDirectionButton.title = reverse ? 'Forward camera route' : 'Reverse camera route';
   }
 }
 
@@ -167,26 +219,43 @@ function updateUrl(date: string, seed: string) {
   } else {
     next.searchParams.set('render', selectedRender);
   }
+  if (selectedTheme === 'dopamine-field') {
+    next.searchParams.delete('theme');
+  } else {
+    next.searchParams.set('theme', selectedTheme);
+  }
   window.history.replaceState({}, '', next);
 }
 
-function applyRotationSettings(tilt?: number) {
-  scene.setRotationSettings({ speed: rotationSpeed, direction: rotationDirection, tilt, mode: rotationMode, tiltAmplitude });
+function applyRotationSettings(pitch?: number) {
+  scene.setRotationSettings({
+    speed: rotationSpeed,
+    direction: rotationDirection,
+    pitch,
+    mode: cameraRouteMode,
+    pitchAmplitude,
+    yawAmplitude,
+    distanceAmplitude,
+    targetYAmplitude
+  });
   syncControls();
 }
 
 function rebuild(date: string, seed: string) {
-  spec = createDailySpec(date, seed);
+  spec = createDailySpec(date, seed, selectedTheme);
   if (!manualRotation) {
     rotationSpeed = THREEClamp(spec.rotationSpeed, minRotationSpeed, maxRotationSpeed);
-    rotationMode = 'steady';
-    tiltAmplitude = 0;
+    cameraRouteMode = 'orbit';
+    pitchAmplitude = 0;
+    yawAmplitude = 0;
+    distanceAmplitude = 0;
+    targetYAmplitude = 0;
   }
   scene.rebuild(spec, quality);
   applyRotationSettings();
   setLabels();
   updateUrl(date, seed);
-  params = { date, seed, density: selectedDensity, render: selectedRender };
+  params = { date, seed, density: selectedDensity, render: selectedRender, theme: selectedTheme };
   revealUi();
 }
 
@@ -277,9 +346,12 @@ rotationPresetButton?.addEventListener('click', () => {
   presetIndex += 1;
   rotationSpeed = preset.speed;
   rotationDirection = preset.direction;
-  rotationMode = preset.mode;
-  tiltAmplitude = preset.tiltAmplitude;
-  applyRotationSettings(preset.tilt);
+  cameraRouteMode = preset.mode;
+  pitchAmplitude = preset.pitchAmplitude;
+  yawAmplitude = preset.yawAmplitude;
+  distanceAmplitude = preset.distanceAmplitude;
+  targetYAmplitude = preset.targetYAmplitude;
+  applyRotationSettings(preset.pitch);
   revealUi();
 });
 
