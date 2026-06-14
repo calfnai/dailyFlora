@@ -8,8 +8,8 @@
       content="DailyFlora creates a low-power 3D particle bouquet that changes every day."
     />
     <title>DailyFlora</title>
-    <script type="module" crossorigin src="./assets/index-DdrdxYjh.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-uWCr3Uj7.css">
+    <script type="module" crossorigin src="./assets/index-B1OrkkGq.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CflRzYTC.css">
   </head>
   <body>
     <main class="app-shell" aria-label="DailyFlora 3D bouquet screensaver">
@@ -36,6 +36,21 @@
         <button class="icon-button" id="fullscreen-button" type="button" title="Fullscreen" aria-label="Fullscreen">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v2H6v4H4zM14 4h6v6h-2V6h-4zM4 14h2v4h4v2H4zM18 18v-4h2v6h-6v-2z" /></svg>
         </button>
+        <div class="segmented quality-control" aria-label="Quality">
+          <button class="segment-button" type="button" data-quality-choice="auto" aria-pressed="true" title="Auto quality">自动</button>
+          <button class="segment-button" type="button" data-quality-choice="low" aria-pressed="false" title="Low quality">低</button>
+          <button class="segment-button" type="button" data-quality-choice="medium" aria-pressed="false" title="Medium quality">中</button>
+          <button class="segment-button" type="button" data-quality-choice="high" aria-pressed="false" title="High quality">高</button>
+        </div>
+        <div class="rotation-control" aria-label="Rotation">
+          <button class="icon-button compact-button" id="rotation-direction-button" type="button" title="Counterclockwise rotation" aria-label="Counterclockwise rotation">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a8 8 0 1 1-7.2 4.5l1.8.9A6 6 0 1 0 12 6H8.8l2.6 2.6L10 10 5 5l5-5 1.4 1.4L8.8 4z" /></svg>
+          </button>
+          <input class="rotation-slider" id="rotation-speed" type="range" min="0" max="100" value="45" aria-label="Rotation speed" />
+          <button class="icon-button compact-button" id="rotation-preset-button" type="button" title="Rotation preset" aria-label="Rotation preset">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l1.4 5.1L18 4.6l-2.4 4.7 5.1 1.4-5.1 1.4 2.4 4.7-4.6-2.5L12 19.4l-1.4-5.1L6 16.8l2.4-4.7-5.1-1.4 5.1-1.4L6 4.6l4.6 2.5z" /></svg>
+          </button>
+        </div>
       </nav>
     </main>
   </body>
