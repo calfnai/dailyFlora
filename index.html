@@ -8,7 +8,7 @@
       content="DailyFlora creates a low-power 3D particle bouquet that changes every day."
     />
     <title>DailyFlora</title>
-    <script type="module" crossorigin src="./assets/index-B1OrkkGq.js"></script>
+    <script type="module" crossorigin src="./assets/index-DKO5k4td.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-CflRzYTC.css">
   </head>
   <body>
@@ -36,11 +36,16 @@
         <button class="icon-button" id="fullscreen-button" type="button" title="Fullscreen" aria-label="Fullscreen">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v2H6v4H4zM14 4h6v6h-2V6h-4zM4 14h2v4h4v2H4zM18 18v-4h2v6h-6v-2z" /></svg>
         </button>
-        <div class="segmented quality-control" aria-label="Quality">
-          <button class="segment-button" type="button" data-quality-choice="auto" aria-pressed="true" title="Auto quality">自动</button>
-          <button class="segment-button" type="button" data-quality-choice="low" aria-pressed="false" title="Low quality">低</button>
-          <button class="segment-button" type="button" data-quality-choice="medium" aria-pressed="false" title="Medium quality">中</button>
-          <button class="segment-button" type="button" data-quality-choice="high" aria-pressed="false" title="High quality">高</button>
+        <div class="segmented density-control" aria-label="Bouquet density">
+          <button class="segment-button" type="button" data-density-choice="low" aria-pressed="false" title="Sparse bouquet">疏</button>
+          <button class="segment-button" type="button" data-density-choice="medium" aria-pressed="true" title="Medium bouquet">中</button>
+          <button class="segment-button" type="button" data-density-choice="high" aria-pressed="false" title="Dense bouquet">密</button>
+        </div>
+        <div class="segmented render-control" aria-label="Render precision">
+          <button class="segment-button" type="button" data-render-choice="auto" aria-pressed="true" title="Auto render">自</button>
+          <button class="segment-button" type="button" data-render-choice="low" aria-pressed="false" title="Low render">省</button>
+          <button class="segment-button" type="button" data-render-choice="medium" aria-pressed="false" title="Medium render">清</button>
+          <button class="segment-button" type="button" data-render-choice="high" aria-pressed="false" title="High render">精</button>
         </div>
         <div class="rotation-control" aria-label="Rotation">
           <button class="icon-button compact-button" id="rotation-direction-button" type="button" title="Counterclockwise rotation" aria-label="Counterclockwise rotation">
