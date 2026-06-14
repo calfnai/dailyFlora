@@ -5,6 +5,8 @@ import { createRng, hashString } from './random';
 const tempObject = new THREE.Object3D();
 const tempColor = new THREE.Color();
 const up = new THREE.Vector3(0, 1, 0);
+const minViewTilt = -0.95;
+const maxViewTilt = 0.82;
 
 function pickColor(colors: readonly string[], value: number) {
   return colors[Math.floor(value * colors.length) % colors.length];
@@ -14,7 +16,7 @@ function ellipsoidPoint(radius: number, height: number, theta: number, phi: numb
   const sideLean = Math.sin(theta * 2.0) * asymmetry;
   const x = Math.cos(theta) * Math.sin(phi) * radius * (1 + sideLean);
   const z = Math.sin(theta) * Math.sin(phi) * radius * (1 - sideLean * 0.45);
-  const y = Math.cos(phi) * height + 0.25;
+  const y = Math.cos(phi) * height + 0.12;
   return new THREE.Vector3(x, y, z);
 }
 
@@ -47,13 +49,13 @@ function buildBranches(spec: DailyBouquetSpec, quality: QualityProfile) {
   for (let i = 0; i < branchCount; i += 1) {
     const theta = rng.range(0, Math.PI * 2);
     const phi = rng.range(0.35, 1.42);
-    const radius = rng.range(1.15, 2.12) * spec.theme.wildness;
-    const end = ellipsoidPoint(radius, rng.range(1.15, 1.85), theta, phi, spec.asymmetry);
-    end.y += spec.haloLift + rng.range(-0.12, 0.5);
-    const start = new THREE.Vector3(rng.range(-0.12, 0.12), -1.58 + rng.range(-0.1, 0.08), rng.range(-0.12, 0.12));
+    const radius = rng.range(1.05, 2.02) * spec.theme.wildness;
+    const end = ellipsoidPoint(radius, rng.range(1.0, 1.62), theta, phi, spec.asymmetry);
+    end.y += spec.haloLift + rng.range(-0.18, 0.44);
+    const start = new THREE.Vector3(rng.range(-0.1, 0.1), -0.58 + rng.range(-0.08, 0.06), rng.range(-0.1, 0.1));
     const bend = new THREE.Vector3(
       Math.cos(theta + rng.range(-0.45, 0.45)) * rng.range(0.28, 0.78),
-      rng.range(-0.58, 0.38),
+      rng.range(-0.24, 0.42),
       Math.sin(theta + rng.range(-0.45, 0.45)) * rng.range(0.28, 0.78)
     );
 
@@ -83,8 +85,7 @@ function buildBranches(spec: DailyBouquetSpec, quality: QualityProfile) {
   const material = new THREE.LineBasicMaterial({
     vertexColors: true,
     transparent: true,
-    opacity: 0.52,
-    blending: THREE.AdditiveBlending,
+    opacity: 0.24,
     depthWrite: false
   });
   return new THREE.LineSegments(geometry, material);
@@ -133,10 +134,10 @@ function buildParticles(spec: DailyBouquetSpec, quality: QualityProfile) {
 
   for (let i = 0; i < count; i += 1) {
     const theta = rng.range(0, Math.PI * 2);
-    const phi = rng.range(0.22, 1.75);
+    const phi = rng.range(0.28, 1.82);
     const shell = rng.value() ** 0.32;
-    const radius = rng.range(0.42, 2.0) * shell;
-    const p = ellipsoidPoint(radius, rng.range(0.8, 1.62), theta, phi, spec.asymmetry);
+    const radius = rng.range(0.38, 1.92) * shell;
+    const p = ellipsoidPoint(radius, rng.range(0.72, 1.48), theta, phi, spec.asymmetry);
     p.y += spec.haloLift + rng.range(-0.28, 0.36);
     const airy = rng.value();
     if (airy > 0.72) {
@@ -155,7 +156,7 @@ function buildParticles(spec: DailyBouquetSpec, quality: QualityProfile) {
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   const material = new THREE.PointsMaterial({
-    size: 0.028,
+    size: 0.026,
     map: makeRadialTexture() ?? undefined,
     vertexColors: true,
     transparent: true,
@@ -174,7 +175,7 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
     roughness: 0.82,
     metalness: 0.0,
     emissive: new THREE.Color(spec.theme.glow),
-    emissiveIntensity: 0.04
+    emissiveIntensity: 0.08
   });
   const count = Math.floor(quality.flowerCount * spec.flowerDensity);
   const mesh = new THREE.InstancedMesh(geometry, material, count);
@@ -182,16 +183,16 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
 
   for (let i = 0; i < count; i += 1) {
     const theta = rng.range(0, Math.PI * 2);
-    const phi = rng.range(0.28, 1.5);
-    const p = ellipsoidPoint(rng.range(0.58, 1.88), rng.range(0.92, 1.62), theta, phi, spec.asymmetry);
-    p.y += spec.haloLift + rng.range(-0.22, 0.42);
-    const scale = rng.range(0.42, 0.98) * (rng.value() > 0.94 ? 1.18 : 1);
+    const phi = rng.range(0.36, 1.66);
+    const p = ellipsoidPoint(rng.range(0.5, 1.78), rng.range(0.82, 1.46), theta, phi, spec.asymmetry);
+    p.y += spec.haloLift + rng.range(-0.26, 0.36);
+    const scale = rng.range(0.46, 0.9) * (rng.value() > 0.96 ? 1.08 : 1);
     tempObject.position.copy(p);
     tempObject.rotation.set(rng.range(-0.7, 0.7), theta, rng.range(-0.7, 0.7));
     tempObject.scale.setScalar(scale);
     tempObject.updateMatrix();
     mesh.setMatrixAt(i, tempObject.matrix);
-    mesh.setColorAt(i, tempColor.set(pickColor(spec.theme.palette, rng.value())).lerp(new THREE.Color('#ffffff'), rng.range(0.0, 0.16)));
+    mesh.setColorAt(i, tempColor.set(pickColor(spec.theme.palette, rng.value())).lerp(new THREE.Color('#ffffff'), rng.range(0.0, 0.1)));
   }
   if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   return mesh;
@@ -209,16 +210,18 @@ function buildLeaves(spec: DailyBouquetSpec, quality: QualityProfile) {
     metalness: 0,
     side: THREE.DoubleSide,
     transparent: true,
-    opacity: 0.82
+    opacity: 0.9,
+    emissive: new THREE.Color('#123d28'),
+    emissiveIntensity: 0.05
   });
   const count = Math.floor(quality.leafCount * spec.leafDensity);
   const mesh = new THREE.InstancedMesh(geometry, material, count);
 
   for (let i = 0; i < count; i += 1) {
     const theta = rng.range(0, Math.PI * 2);
-    const phi = rng.range(0.42, 1.78);
-    const p = ellipsoidPoint(rng.range(0.46, 1.75), rng.range(0.75, 1.48), theta, phi, spec.asymmetry);
-    p.y += spec.haloLift + rng.range(-0.46, 0.18);
+    const phi = rng.range(0.38, 1.82);
+    const p = ellipsoidPoint(rng.range(0.44, 1.78), rng.range(0.7, 1.38), theta, phi, spec.asymmetry);
+    p.y += spec.haloLift + rng.range(-0.38, 0.24);
     const size = rng.range(0.55, 1.28);
     tempObject.position.copy(p);
     tempObject.quaternion.setFromUnitVectors(up, p.clone().normalize());
@@ -238,12 +241,12 @@ function buildStemBundle(spec: DailyBouquetSpec) {
   const positions: number[] = [];
   const colors: number[] = [];
   const stem = new THREE.Color(spec.theme.stem);
-  const count = 32;
+  const count = 24;
 
   for (let i = 0; i < count; i += 1) {
     const theta = rng.range(0, Math.PI * 2);
-    const bottom = new THREE.Vector3(Math.cos(theta) * rng.range(0.04, 0.14), -2.05, Math.sin(theta) * rng.range(0.04, 0.14));
-    const top = new THREE.Vector3(Math.cos(theta) * rng.range(0.16, 0.34), -0.66 + rng.range(-0.12, 0.08), Math.sin(theta) * rng.range(0.16, 0.34));
+    const bottom = new THREE.Vector3(Math.cos(theta) * rng.range(0.04, 0.11), -1.24, Math.sin(theta) * rng.range(0.04, 0.11));
+    const top = new THREE.Vector3(Math.cos(theta) * rng.range(0.14, 0.3), -0.44 + rng.range(-0.1, 0.08), Math.sin(theta) * rng.range(0.14, 0.3));
     positions.push(bottom.x, bottom.y, bottom.z, top.x, top.y, top.z);
     const c = stem.clone().lerp(new THREE.Color('#d5d09b'), rng.range(0, 0.24));
     for (let k = 0; k < 2; k += 1) colors.push(c.r, c.g, c.b);
@@ -255,21 +258,21 @@ function buildStemBundle(spec: DailyBouquetSpec) {
   const material = new THREE.LineBasicMaterial({
     vertexColors: true,
     transparent: true,
-    opacity: 0.68
+    opacity: 0.24
   });
   const lines = new THREE.LineSegments(geometry, material);
 
-  const bandGeometry = new THREE.CylinderGeometry(0.2, 0.16, 0.22, 20, 1, true);
+  const bandGeometry = new THREE.CylinderGeometry(0.13, 0.11, 0.08, 20, 1, true);
   const bandMaterial = new THREE.MeshStandardMaterial({
-    color: '#d8d2b2',
+    color: '#b8b08d',
     roughness: 0.86,
     metalness: 0,
     transparent: true,
-    opacity: 0.54,
+    opacity: 0.07,
     side: THREE.DoubleSide
   });
   const band = new THREE.Mesh(bandGeometry, bandMaterial);
-  band.position.y = -1.78;
+  band.position.y = -1.0;
   const group = new THREE.Group();
   group.add(lines, band);
   return group;
@@ -292,13 +295,17 @@ export class BouquetScene {
   private dragX = 0;
   private dragY = 0;
   private targetRotationY = 0;
-  private targetRotationX = 0;
+  private targetRotationX = -0.14;
+  private rotationSpeed: number;
+  private rotationDirection: 1 | -1 = 1;
+  private floorMaterial?: THREE.MeshBasicMaterial;
   private animationId = 0;
 
   constructor(canvas: HTMLCanvasElement, spec: DailyBouquetSpec, quality: QualityProfile) {
     this.canvas = canvas;
     this.spec = spec;
     this.quality = quality;
+    this.rotationSpeed = spec.rotationSpeed;
     this.frameInterval = 1 / quality.targetFps;
     this.renderer = new THREE.WebGLRenderer({
       canvas,
@@ -309,8 +316,8 @@ export class BouquetScene {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.setClearColor(spec.theme.background);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality.pixelRatio));
-    this.scene.fog = new THREE.Fog(spec.theme.background, 5.2, 9.5);
-    this.camera.position.set(0, 0.2, 6.2);
+    this.scene.fog = new THREE.Fog(spec.theme.background, 4.8, 9.2);
+    this.camera.position.set(0, 1.52, 5.45);
     this.scene.add(this.camera);
     this.scene.add(this.bouquet);
     this.addLights();
@@ -326,7 +333,10 @@ export class BouquetScene {
     this.frameInterval = 1 / quality.targetFps;
     this.renderer.setClearColor(spec.theme.background);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality.pixelRatio));
-    this.scene.fog = new THREE.Fog(spec.theme.background, 5.2, 9.5);
+    this.scene.fog = new THREE.Fog(spec.theme.background, 4.8, 9.2);
+    if (this.floorMaterial) {
+      this.floorMaterial.color.set(spec.theme.floor);
+    }
 
     while (this.bouquet.children.length) {
       const child = this.bouquet.children.pop();
@@ -335,7 +345,7 @@ export class BouquetScene {
 
     this.bouquet.rotation.set(0, (hashString(spec.seed) % 628) / 100, 0);
     this.targetRotationY = this.bouquet.rotation.y;
-    this.targetRotationX = 0;
+    this.targetRotationX = THREE.MathUtils.clamp(this.targetRotationX, minViewTilt, maxViewTilt);
     this.bouquet.add(
       buildStemBundle(spec),
       buildBranches(spec, quality),
@@ -368,46 +378,66 @@ export class BouquetScene {
     return this.isPaused;
   }
 
+  setRotationSettings(settings: { speed?: number; direction?: 1 | -1; tilt?: number }) {
+    if (settings.speed !== undefined) {
+      this.rotationSpeed = THREE.MathUtils.clamp(settings.speed, 0.006, 0.16);
+    }
+    if (settings.direction !== undefined) {
+      this.rotationDirection = settings.direction;
+    }
+    if (settings.tilt !== undefined) {
+      this.targetRotationX = THREE.MathUtils.clamp(settings.tilt, minViewTilt, maxViewTilt);
+    }
+  }
+
   resize() {
     const width = window.innerWidth;
     const height = window.innerHeight;
+    const ratio = width / height;
+    const phone = width < 720;
+    const wide = ratio > 1.65;
     this.camera.aspect = width / height;
-    this.camera.fov = width < 720 ? 46 : 38;
-    this.camera.position.z = width < 720 ? 7.3 : 6.2;
+    this.camera.fov = phone ? 42 : wide ? 32 : 34;
+    this.camera.position.set(0, phone ? 1.38 : wide ? 1.68 : 1.52, phone ? 5.82 : wide ? 5.08 : 5.36);
+    this.camera.lookAt(0, phone ? 0.66 : wide ? 0.74 : 0.7, 0);
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height, false);
   }
 
   private tick(delta: number) {
     if (!this.isPaused && !this.isDragging) {
-      this.targetRotationY += this.spec.rotationSpeed * delta;
+      this.targetRotationY += this.rotationSpeed * this.rotationDirection * delta;
     }
     this.bouquet.rotation.y += (this.targetRotationY - this.bouquet.rotation.y) * 0.08;
     this.bouquet.rotation.x += (this.targetRotationX - this.bouquet.rotation.x) * 0.07;
-    this.bouquet.position.y = Math.sin(performance.now() * 0.00025) * 0.035;
+    this.bouquet.position.y = 0.06 + Math.sin(performance.now() * 0.00025) * 0.026;
     this.renderer.render(this.scene, this.camera);
   }
 
   private addLights() {
-    const ambient = new THREE.AmbientLight('#dfe8ff', 0.62);
-    const key = new THREE.DirectionalLight('#fff4dc', 2.4);
-    key.position.set(2.8, 4.5, 4.5);
-    const rim = new THREE.DirectionalLight('#8ab7ff', 1.4);
-    rim.position.set(-4, 2, -3.5);
-    this.scene.add(ambient, key, rim);
+    const ambient = new THREE.AmbientLight('#fff7e4', 0.96);
+    const hemi = new THREE.HemisphereLight('#f4fff2', '#17402d', 0.72);
+    const key = new THREE.DirectionalLight('#fff0c8', 1.7);
+    key.position.set(2.4, 4.2, 3.4);
+    const fill = new THREE.DirectionalLight('#eadcff', 0.82);
+    fill.position.set(-3.2, 2.6, 2.2);
+    const rim = new THREE.DirectionalLight('#9cf7d2', 0.72);
+    rim.position.set(-4, 2.2, -3.5);
+    this.scene.add(ambient, hemi, key, fill, rim);
   }
 
   private addStage() {
-    const floorGeometry = new THREE.CircleGeometry(2.1, 80);
+    const floorGeometry = new THREE.CircleGeometry(1.16, 80);
     const floorMaterial = new THREE.MeshBasicMaterial({
       color: this.spec.theme.floor,
       transparent: true,
-      opacity: 0.26,
+      opacity: 0.035,
       depthWrite: false
     });
+    this.floorMaterial = floorMaterial;
     const floor = new THREE.Mesh(floorGeometry, floorMaterial);
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -2.2;
+    floor.position.y = -1.38;
     this.scene.add(floor);
   }
 
@@ -426,7 +456,7 @@ export class BouquetScene {
       this.dragX = event.clientX;
       this.dragY = event.clientY;
       this.targetRotationY += dx * 0.008;
-      this.targetRotationX = THREE.MathUtils.clamp(this.targetRotationX + dy * 0.004, -0.45, 0.34);
+      this.targetRotationX = THREE.MathUtils.clamp(this.targetRotationX + dy * 0.0054, minViewTilt, maxViewTilt);
     });
 
     const release = (event: PointerEvent) => {

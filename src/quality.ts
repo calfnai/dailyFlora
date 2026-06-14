@@ -3,31 +3,31 @@ import type { QualityName, QualityProfile } from './types';
 export const qualityProfiles: Record<Exclude<QualityName, 'auto'>, QualityProfile> = {
   low: {
     name: 'low',
-    particleCount: 2600,
-    flowerCount: 96,
-    leafCount: 120,
-    branchCount: 72,
-    outerLineCount: 24,
+    particleCount: 4200,
+    flowerCount: 180,
+    leafCount: 260,
+    branchCount: 86,
+    outerLineCount: 28,
     pixelRatio: 0.9,
     targetFps: 30
   },
   medium: {
     name: 'medium',
-    particleCount: 5600,
-    flowerCount: 180,
-    leafCount: 220,
-    branchCount: 112,
-    outerLineCount: 42,
+    particleCount: 7600,
+    flowerCount: 285,
+    leafCount: 390,
+    branchCount: 124,
+    outerLineCount: 46,
     pixelRatio: 1.1,
     targetFps: 40
   },
   high: {
     name: 'high',
-    particleCount: 9800,
-    flowerCount: 300,
-    leafCount: 360,
-    branchCount: 168,
-    outerLineCount: 68,
+    particleCount: 12800,
+    flowerCount: 430,
+    leafCount: 560,
+    branchCount: 166,
+    outerLineCount: 72,
     pixelRatio: 1.35,
     targetFps: 50
   }
