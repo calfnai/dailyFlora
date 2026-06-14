@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "policy": {
+    "sourceHandling": "Use Xiaohongshu references for observation only. Do not publish copied images in the web app.",
+    "confirmationGate": "New inspiration remains pending until the owner confirms it should change generation rules.",
+    "defaultCheckTime": "21:00 Asia/Shanghai"
+  },
+  "creators": [
+    {
+      "id": "5cf91ecd0000000016029124",
+      "name": "柏恩花室",
+      "source": "xiaohongshu",
+      "notes": "Natural floral arrangements with tropical greenery, wind-shaped branches, and small bright color accents."
+    },
+    {
+      "id": "63690d32000000001f017b63",
+      "name": "早春的树EarlySpring",
+      "source": "xiaohongshu",
+      "notes": "Natural bouquet structures, airy branches, hand-tied shapes, and blind-box flower combinations."
+    },
+    {
+      "id": "655c17b70000000004039e98",
+      "name": "Césped",
+      "source": "xiaohongshu",
+      "notes": "Light, atmospheric arrangements with soft color fields and small-scale floral rhythm."
+    },
+    {
+      "id": "5fb9ef600000000001000de9",
+      "name": "大兜花园DorBeetleGarden",
+      "source": "xiaohongshu",
+      "notes": "Garden-like wildness, starry small flowers, and loose natural edges."
+    },
+    {
+      "id": "65f8141a000000000600f47c",
+      "name": "Dreamseeker寻梦",
+      "source": "xiaohongshu",
+      "notes": "Dreamlike bouquet styling with misty points, light color transitions, and spatial softness."
+    }
+  ],
+  "entries": [
+    {
+      "id": "seed-reference-2026-06-14",
+      "creatorId": "mixed-initial-links",
+      "creatorName": "Initial reference set",
+      "sourceUrl": "user-provided-links",
+      "title": "Initial DailyFlora aesthetic anchor",
+      "observedAt": "2026-06-14",
+      "colorNotes": [
+        "Dark stage backgrounds make pale flowers and star points glow.",
+        "Green, lemon yellow, violet, moon white, coral, and sky blue can rotate as daily themes."
+      ],
+      "spatialNotes": [
+        "Bouquets should be volumetric, with stems radiating from a lower grip into a rounded but irregular crown.",
+        "Back and side views need real branches, small flowers, and leaf clusters instead of a flat billboard."
+      ],
+      "materialNotes": [
+        "No single oversized focal flower.",
+        "Use many small blooms, berries, twig tips, grasses, and floating pollen-like dots."
+      ],
+      "parameterSuggestions": [
+        "Favor medium and small flower instances.",
+        "Use outer halo lines and point particles for starry edges.",
+        "Keep a hand-tied floating base instead of a vase for v1."
+      ],
+      "status": "accepted"
+    }
+  ],
+  "pendingRecommendations": []
+}

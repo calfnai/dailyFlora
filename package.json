@@ -1,0 +1,21 @@
+{
+  "name": "daily-flora",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "lobster:plan": "node scripts/lobster-xhs-plan.mjs",
+    "inspiration:ingest": "node scripts/ingest-lobster-inbox.mjs"
+  },
+  "dependencies": {
+    "three": "^0.171.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.184.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5"
+  }
+}
