@@ -8,12 +8,14 @@ export function readParams() {
   const seed = params.get('seed') || date;
   const density = params.get('density') || params.get('quality') || 'medium';
   const render = params.get('render') || 'auto';
-  return { date, seed, density, render };
+  const theme = params.get('theme') || 'dopamine-field';
+  return { date, seed, density, render, theme };
 }
 
-export function createDailySpec(dateLabel: string, seed: string): DailyBouquetSpec {
+export function createDailySpec(dateLabel: string, seed: string, themeId?: string): DailyBouquetSpec {
   const rng = createRng(`daily-flora:${seed}`);
-  const theme = themes[Math.floor(rng.value() * themes.length)];
+  const requestedTheme = themes.find((entry) => entry.id === themeId);
+  const theme = requestedTheme || themes[Math.floor(rng.value() * themes.length)];
 
   return {
     seed,
