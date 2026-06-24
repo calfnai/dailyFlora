@@ -113,6 +113,13 @@ button {
   letter-spacing: 0;
 }
 
+.flower-plan-mark {
+  max-width: min(560px, calc(100vw - 34px));
+  color: rgb(255 250 235 / 58%);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
 .quality-mark {
   min-width: 42px;
   padding: 5px 9px 6px;

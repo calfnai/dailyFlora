@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DailyFlora 精度花型样例</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #080b07;
+        --panel: rgb(18 23 16 / 88%);
+        --line: rgb(255 246 220 / 14%);
+        --text: #f7efe2;
+        --muted: rgb(247 239 226 / 68%);
+        --accent: #f3d35f;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 18% 0%, rgb(243 211 95 / 12%), transparent 30%),
+          radial-gradient(circle at 82% 10%, rgb(116 190 119 / 10%), transparent 24%),
+          var(--bg);
+      }
+
+      main {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 28px 18px 48px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(30px, 4vw, 54px);
+        line-height: 1;
+      }
+
+      .lead {
+        max-width: 76ch;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: linear-gradient(180deg, var(--panel), rgb(10 13 10 / 92%));
+        box-shadow: 0 24px 70px rgb(0 0 0 / 34%);
+      }
+
+      .body {
+        display: grid;
+        gap: 10px;
+        padding: 16px 18px 18px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .tag {
+        padding: 6px 9px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: rgb(255 248 226 / 78%);
+        background: rgb(255 255 255 / 5%);
+        font-size: 12px;
+      }
+
+      iframe {
+        display: block;
+        width: 100%;
+        height: 460px;
+        border: 0;
+        background: #050609;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      @media (max-width: 860px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        iframe {
+          height: 380px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>DailyFlora 精度花型样例</h1>
+      <p class="lead">
+        这些不是随机截图，而是用固定日期和主题生成的可复查样例。每束都对应一个 flowerPlan：
+        先写明要用什么花型，再由 <code>render=high</code> 调用模型。这样你可以直接判断“计划写得对不对、模型像不像、该改哪一种花型”。
+      </p>
+
+      <section class="grid">
+        <article class="card">
+          <iframe src="https://calfnai.github.io/dailyFlora/?date=2026-07-11&amp;seed=summer-pinwheel-detail&amp;theme=summer-pinwheel&amp;render=high&amp;density=medium" title="夏日风车细节束"></iframe>
+          <div class="body">
+            <h2>夏日风车细节束 / Summer Pinwheel Detail</h2>
+            <p>参考：夏日风车、多色花束。目标是多色但不乱，外圈有上扬线，中心不能被单朵大花压住。</p>
+            <div class="tags">
+              <span class="tag">蝴蝶兰形</span>
+              <span class="tag">洋甘菊形</span>
+              <span class="tag">玫瑰层叠形</span>
+              <span class="tag">金鱼草穗形</span>
+              <span class="tag">绣球簇形</span>
+              <span class="tag">风铃果形</span>
+            </div>
+            <p><a href="https://calfnai.github.io/dailyFlora/?date=2026-07-11&amp;seed=summer-pinwheel-detail&amp;theme=summer-pinwheel&amp;render=high&amp;density=medium" target="_blank">打开单独页面</a></p>
+          </div>
+        </article>
+
+        <article class="card">
+          <iframe src="https://calfnai.github.io/dailyFlora/?date=2026-08-03&amp;seed=fairy-violet-air&amp;theme=fairy-violet&amp;render=high&amp;density=medium" title="梦幻紫空气束"></iframe>
+          <div class="body">
+            <h2>梦幻紫空气束 / Fairy Violet Air</h2>
+            <p>参考：梦幻紫。目标是蓝紫统一但不闷，靠细长穗线、小花雾气和少量不对称花瓣拉开空气。</p>
+            <div class="tags">
+              <span class="tag">风信子穗形</span>
+              <span class="tag">蛇鞭菊线形</span>
+              <span class="tag">蝴蝶兰形</span>
+              <span class="tag">小雏菊形</span>
+              <span class="tag">山茶牡丹形</span>
+              <span class="tag">绣球雾团形</span>
+            </div>
+            <p><a href="https://calfnai.github.io/dailyFlora/?date=2026-08-03&amp;seed=fairy-violet-air&amp;theme=fairy-violet&amp;render=high&amp;density=medium" target="_blank">打开单独页面</a></p>
+          </div>
+        </article>
+
+        <article class="card">
+          <iframe src="https://calfnai.github.io/dailyFlora/?date=2026-09-18&amp;seed=foxtail-lily-vertical&amp;theme=hillside-wild&amp;render=high&amp;density=medium" title="狐尾百合竖线束"></iframe>
+          <div class="body">
+            <h2>狐尾百合竖线束 / Foxtail Lily Vertical</h2>
+            <p>参考：狐尾百合。目标是强竖向线条，但底部需要小花和簇团支撑，不能变成僵硬柱子。</p>
+            <div class="tags">
+              <span class="tag">蛇鞭菊线形</span>
+              <span class="tag">风信子穗形</span>
+              <span class="tag">金鱼草穗形</span>
+              <span class="tag">洋甘菊形</span>
+              <span class="tag">风铃果形</span>
+              <span class="tag">绣球簇形</span>
+            </div>
+            <p><a href="https://calfnai.github.io/dailyFlora/?date=2026-09-18&amp;seed=foxtail-lily-vertical&amp;theme=hillside-wild&amp;render=high&amp;density=medium" target="_blank">打开单独页面</a></p>
+          </div>
+        </article>
+
+        <article class="card">
+          <iframe src="https://calfnai.github.io/dailyFlora/?date=2026-10-06&amp;seed=berry-grove&amp;theme=tropical-forest&amp;render=high&amp;density=medium" title="浆果森林束"></iframe>
+          <div class="body">
+            <h2>浆果森林束 / Berry Grove</h2>
+            <p>参考：浆果森林、蓝莓形状参考。目标是小果、小花、枝叶混合的童话感，减少端庄大花。</p>
+            <div class="tags">
+              <span class="tag">浆果风铃果形</span>
+              <span class="tag">小绣球簇形</span>
+              <span class="tag">小雏菊形</span>
+              <span class="tag">细线花材</span>
+              <span class="tag">小蝴蝶兰形</span>
+              <span class="tag">乒乓菊球形</span>
+            </div>
+            <p><a href="https://calfnai.github.io/dailyFlora/?date=2026-10-06&amp;seed=berry-grove&amp;theme=tropical-forest&amp;render=high&amp;density=medium" target="_blank">打开单独页面</a></p>
+          </div>
+        </article>
+
+        <article class="card">
+          <iframe src="https://calfnai.github.io/dailyFlora/?date=2026-11-12&amp;seed=autumn-juice&amp;theme=sea-salt-lemon&amp;render=high&amp;density=medium" title="秋日果汁束"></iframe>
+          <div class="body">
+            <h2>秋日果汁束 / Autumn Juice Bouquet</h2>
+            <p>参考：秋日果汁、浪漫具象化。目标是暖橙黄、饱满但不沉，有层叠主花和果感跳点。</p>
+            <div class="tags">
+              <span class="tag">玫瑰形</span>
+              <span class="tag">山茶牡丹形</span>
+              <span class="tag">洋甘菊形</span>
+              <span class="tag">风铃果形</span>
+              <span class="tag">金鱼草形</span>
+              <span class="tag">绣球簇形</span>
+            </div>
+            <p><a href="https://calfnai.github.io/dailyFlora/?date=2026-11-12&amp;seed=autumn-juice&amp;theme=sea-salt-lemon&amp;render=high&amp;density=medium" target="_blank">打开单独页面</a></p>
+          </div>
+        </article>
+
+        <article class="card">
+          <iframe src="https://calfnai.github.io/dailyFlora/?date=2026-12-05&amp;seed=breathing-landscape&amp;theme=moon-white&amp;render=high&amp;density=medium" title="会呼吸的风景束"></iframe>
+          <div class="body">
+            <h2>会呼吸的风景束 / Breathing Landscape Bouquet</h2>
+            <p>参考：会呼吸的风景、洋水仙。目标是主体留空、前后层次和白黄季节感。</p>
+            <div class="tags">
+              <span class="tag">洋水仙/蝴蝶兰开口形</span>
+              <span class="tag">洋甘菊形</span>
+              <span class="tag">细线花材</span>
+              <span class="tag">风信子穗形</span>
+              <span class="tag">风铃果形</span>
+              <span class="tag">小绣球簇</span>
+            </div>
+            <p><a href="https://calfnai.github.io/dailyFlora/?date=2026-12-05&amp;seed=breathing-landscape&amp;theme=moon-white&amp;render=high&amp;density=medium" target="_blank">打开单独页面</a></p>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,5 +1,6 @@
 import { createRng, todayKey } from './random';
 import { themes } from './themes';
+import { createFlowerPlan } from './flowerPlans';
 import type { DailyBouquetSpec } from './types';
 
 const defaultThemeId = 'random';
@@ -31,6 +32,7 @@ export function createDailySpec(dateLabel: string, seed: string, themeId = defau
     leafDensity: rng.range(0.75, 1.25) * (theme.leafBias ?? 1),
     rotationSpeed: rng.range(0.045, 0.085),
     asymmetry: rng.range(0.08, 0.26),
-    haloLift: rng.range(0.05, 0.36) * theme.verticalBias
+    haloLift: rng.range(0.05, 0.36) * theme.verticalBias,
+    flowerPlan: createFlowerPlan(seed, theme)
   };
 }

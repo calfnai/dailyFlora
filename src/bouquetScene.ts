@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { DailyBouquetSpec, QualityProfile } from './types';
+import type { DailyBouquetSpec, FlowerPlanItem, FlowerTypeId, QualityProfile } from './types';
 import { createRng, hashString } from './random';
 import { withBasePath } from './special';
 
@@ -288,6 +288,19 @@ function makeRoseGeometry(radius: number) {
   return geometry;
 }
 
+function makePeonyGeometry(radius: number) {
+  const geometry = makeRoseGeometry(radius * 1.08);
+  const position = geometry.getAttribute('position');
+  for (let i = 0; i < position.count; i += 1) {
+    const x = position.getX(i);
+    const y = position.getY(i);
+    const z = position.getZ(i);
+    position.setXYZ(i, x * 1.12, y * 1.02, z * 0.72);
+  }
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
 function makeOrchidGeometry(radius: number) {
   const positions: number[] = [];
   const addTriangle = (a: THREE.Vector3, b: THREE.Vector3, c: THREE.Vector3) => {
@@ -350,6 +363,28 @@ function makeSpikeFlowerGeometry(radius: number) {
   return geometry;
 }
 
+function makeLiatrisGeometry(radius: number) {
+  const geometry = makeSpikeFlowerGeometry(radius);
+  const position = geometry.getAttribute('position');
+  for (let i = 0; i < position.count; i += 1) {
+    position.setXYZ(i, position.getX(i) * 0.62, position.getY(i) * 1.22, position.getZ(i) * 0.62);
+  }
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function makeHyacinthGeometry(radius: number) {
+  const geometry = makeSpikeFlowerGeometry(radius);
+  const position = geometry.getAttribute('position');
+  for (let i = 0; i < position.count; i += 1) {
+    const y = position.getY(i);
+    const taper = 0.82 + Math.max(0, y / radius) * 0.12;
+    position.setXYZ(i, position.getX(i) * taper, y * 0.96, position.getZ(i) * taper);
+  }
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
 function makeHydrangeaGeometry(radius: number) {
   const positions: number[] = [];
   const addTriangle = (a: THREE.Vector3, b: THREE.Vector3, c: THREE.Vector3) => {
@@ -381,6 +416,10 @@ function makeHydrangeaGeometry(radius: number) {
   return geometry;
 }
 
+function makePomponGeometry(radius: number) {
+  return new THREE.DodecahedronGeometry(radius * 0.72, 1);
+}
+
 function makeBellFruitGeometry(radius: number) {
   const geometry = new THREE.BufferGeometry();
   const positions: number[] = [];
@@ -400,6 +439,82 @@ function makeBellFruitGeometry(radius: number) {
   return geometry;
 }
 
+function geometryForFlowerType(typeId: FlowerTypeId, radius: number) {
+  switch (typeId) {
+    case 'lowPolyMass':
+      return new THREE.IcosahedronGeometry(radius * 0.86, 0);
+    case 'fivePetal':
+      return makeLowPolyFlowerGeometry(5, radius);
+    case 'rose':
+      return makeRoseGeometry(radius);
+    case 'camelliaPeony':
+      return makePeonyGeometry(radius);
+    case 'chamomile':
+      return makeDaisyGeometry(radius);
+    case 'orchid':
+      return makeOrchidGeometry(radius);
+    case 'snapdragon':
+      return makeSpikeFlowerGeometry(radius);
+    case 'hyacinth':
+      return makeHyacinthGeometry(radius);
+    case 'liatris':
+      return makeLiatrisGeometry(radius);
+    case 'hydrangea':
+      return makeHydrangeaGeometry(radius);
+    case 'pompon':
+      return makePomponGeometry(radius);
+    case 'bellFruit':
+      return makeBellFruitGeometry(radius);
+  }
+}
+
+function placementPoint(
+  spec: DailyBouquetSpec,
+  rng: ReturnType<typeof createRng>,
+  placement: FlowerPlanItem['placement']
+) {
+  const theta = rng.range(0, Math.PI * 2);
+  const phiRanges: Record<FlowerPlanItem['placement'], [number, number]> = {
+    center: [0.58, 1.34],
+    outer: [0.36, 1.6],
+    high: [0.2, 1.04],
+    low: [1.02, 1.78],
+    spray: [0.26, 1.7],
+    mixed: [0.36, 1.66]
+  };
+  const radiusRanges: Record<FlowerPlanItem['placement'], [number, number]> = {
+    center: [0.42, 1.18],
+    outer: [0.92, 1.92],
+    high: [0.74, 1.82],
+    low: [0.46, 1.5],
+    spray: [1.02, 2.08],
+    mixed: [0.5, 1.78]
+  };
+  const heightRanges: Record<FlowerPlanItem['placement'], [number, number]> = {
+    center: [0.86, 1.36],
+    outer: [0.82, 1.5],
+    high: [1.08, 1.72],
+    low: [0.68, 1.18],
+    spray: [0.92, 1.62],
+    mixed: [0.82, 1.46]
+  };
+  const [phiMin, phiMax] = phiRanges[placement];
+  const [radiusMin, radiusMax] = radiusRanges[placement];
+  const [heightMin, heightMax] = heightRanges[placement];
+  const p = bouquetPoint(spec, rng.range(radiusMin, radiusMax), rng.range(heightMin, heightMax), theta, rng.range(phiMin, phiMax));
+  const liftRanges: Record<FlowerPlanItem['placement'], [number, number]> = {
+    center: [-0.18, 0.24],
+    outer: [-0.24, 0.34],
+    high: [0.12, 0.54],
+    low: [-0.46, 0.1],
+    spray: [-0.18, 0.46],
+    mixed: [-0.26, 0.36]
+  };
+  const [liftMin, liftMax] = liftRanges[placement];
+  p.y += spec.haloLift + rng.range(liftMin, liftMax);
+  return { p, theta };
+}
+
 function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   const rng = createRng(`${spec.seed}:flowers`);
   const count = Math.floor(quality.flowerCount * spec.flowerDensity);
@@ -412,12 +527,16 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
     emissiveIntensity: 0.08
   });
 
-  const place = (mesh: THREE.InstancedMesh, localRng: ReturnType<typeof createRng>, itemCount: number, scaleBias = 1, colorLift = 0.1) => {
+  const place = (
+    mesh: THREE.InstancedMesh,
+    localRng: ReturnType<typeof createRng>,
+    itemCount: number,
+    scaleBias = 1,
+    colorLift = 0.1,
+    placement: FlowerPlanItem['placement'] = 'mixed'
+  ) => {
     for (let i = 0; i < itemCount; i += 1) {
-      const theta = localRng.range(0, Math.PI * 2);
-      const phi = localRng.range(0.36, 1.66);
-      const p = bouquetPoint(spec, localRng.range(0.5, 1.78), localRng.range(0.82, 1.46), theta, phi);
-      p.y += spec.haloLift + localRng.range(-0.26, 0.36);
+      const { p, theta } = placementPoint(spec, localRng, placement);
       const bloom = spec.special?.bloomScale;
       const large = bloom && localRng.value() < bloom.largeBias;
       const scale = (bloom
@@ -456,22 +575,16 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   }
 
   const group = new THREE.Group();
-  const batches = [
-    { name: 'rose-camellia-peony', geometry: makeRoseGeometry(spec.special ? 0.084 : 0.074), share: 0.2, scale: 1.08 },
-    { name: 'chamomile', geometry: makeDaisyGeometry(spec.special ? 0.078 : 0.068), share: 0.18, scale: 0.94 },
-    { name: 'orchid', geometry: makeOrchidGeometry(spec.special ? 0.086 : 0.076), share: 0.16, scale: 1.04 },
-    { name: 'snapdragon-hyacinth-liatris', geometry: makeSpikeFlowerGeometry(spec.special ? 0.072 : 0.064), share: 0.18, scale: 1.08 },
-    { name: 'hydrangea-pompon-dianthus', geometry: makeHydrangeaGeometry(spec.special ? 0.088 : 0.078), share: 0.18, scale: 1.0 },
-    { name: 'bell-fruit', geometry: makeBellFruitGeometry(spec.special ? 0.076 : 0.068), share: 0.1, scale: 0.94 }
-  ];
+  const batches = spec.flowerPlan.items;
   let used = 0;
   batches.forEach((batch, index) => {
     const batchCount = index === batches.length - 1 ? count - used : Math.max(1, Math.floor(count * batch.share));
     used += batchCount;
-    const mesh = new THREE.InstancedMesh(batch.geometry, material.clone(), batchCount);
-    mesh.name = batch.name;
+    const geometry = geometryForFlowerType(batch.typeId, spec.special ? 0.084 : 0.074);
+    const mesh = new THREE.InstancedMesh(geometry, material.clone(), batchCount);
+    mesh.name = `${batch.typeId}:${batch.cn}`;
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    place(mesh, createRng(`${spec.seed}:flowers:${batch.name}`), batchCount, batch.scale, 0.12);
+    place(mesh, createRng(`${spec.seed}:flowers:${spec.flowerPlan.id}:${batch.typeId}`), batchCount, batch.scale, 0.12, batch.placement);
     group.add(mesh);
   });
   return group;

@@ -1,4 +1,5 @@
 import { herJanuarySkyReference } from './specialBouquetReference';
+import { getFlowerPlanById } from './flowerPlans';
 import type { DailyBouquetSpec, SpecialBouquetReference } from './types';
 
 export const specialReferences: Record<string, SpecialBouquetReference> = {
@@ -28,6 +29,7 @@ export function createSpecialSpec(reference: SpecialBouquetReference, dateOverri
     rotationSpeed: 0.025,
     asymmetry: reference.shape.asymmetry,
     haloLift: reference.shape.verticalLift,
+    flowerPlan: getFlowerPlanById('fairy-violet-air')!,
     special: reference
   };
 }

@@ -99,6 +99,7 @@ const hud = document.querySelector<HTMLElement>('#hud');
 const controls = document.querySelector<HTMLElement>('#controls');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
 const themeLabel = document.querySelector<HTMLElement>('#daily-theme');
+const flowerPlanLabel = document.querySelector<HTMLElement>('#flower-plan-mark');
 const qualityLabel = document.querySelector<HTMLElement>('#quality-mark');
 const pauseButton = document.querySelector<HTMLButtonElement>('#pause-button');
 const todayButton = document.querySelector<HTMLButtonElement>('#today-button');
@@ -111,7 +112,7 @@ const rotationSpeedInput = document.querySelector<HTMLInputElement>('#rotation-s
 const rotationDirectionButton = document.querySelector<HTMLButtonElement>('#rotation-direction-button');
 const rotationPresetButton = document.querySelector<HTMLButtonElement>('#rotation-preset-button');
 
-if (!canvas || !hud || !controls || !dateLabel || !themeLabel || !qualityLabel) {
+if (!canvas || !hud || !controls || !dateLabel || !themeLabel || !flowerPlanLabel || !qualityLabel) {
   throw new Error('DailyFlora could not find the required page elements.');
 }
 
@@ -121,6 +122,7 @@ const ui = {
   controls,
   dateLabel,
   themeLabel,
+  flowerPlanLabel,
   qualityLabel
 };
 
@@ -173,9 +175,15 @@ function bouquetHoverTitle() {
   return `${spec.theme.name} / ${english}`;
 }
 
+function flowerPlanText() {
+  return spec.flowerPlan.items.map((item) => item.cn).join(' / ');
+}
+
 function setLabels() {
   ui.dateLabel.textContent = spec.dateLabel;
   ui.themeLabel.textContent = spec.theme.name;
+  ui.flowerPlanLabel.textContent = `${spec.flowerPlan.cnName} · ${flowerPlanText()}`;
+  ui.flowerPlanLabel.title = `${spec.flowerPlan.reference}\n${spec.flowerPlan.silhouette}\n避免：${spec.flowerPlan.avoid}`;
   if (datePicker) datePicker.value = spec.dateLabel;
   ui.themeLabel.title = bouquetHoverTitle();
   ui.dateLabel.title = bouquetHoverTitle();

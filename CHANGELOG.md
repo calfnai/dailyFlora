@@ -1,5 +1,15 @@
 # DailyFlora Changelog
 
+## 0.12.3 - 2026-06-25
+
+Flower-plan layer for readable high-detail generation.
+
+- Added `src/flowerPlans.ts`, a pre-render flower plan catalog derived from the local reference gallery.
+- Daily bouquet specs now include `flowerPlan`, so high-detail rendering knows which named flower forms it is trying to generate before building geometry.
+- `精` rendering now reads `spec.flowerPlan.items` instead of using fixed anonymous model batches.
+- The HUD now displays the current flower plan and its named flower types, making it easier to judge whether the generated bouquet matches the stated intent.
+- Added `docs/dailyflora-flower-plan-samples.html` with several fixed high-detail bouquet samples for review.
+
 ## 0.12.2 - 2026-06-25
 
 Interaction and render-level correction.
