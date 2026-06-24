@@ -228,5 +228,18 @@
         </article>
       </section>
     </main>
+    <script>
+      if (window.location.protocol !== 'file:') {
+        const localApp = new URL('../index.html', window.location.href);
+        document
+          .querySelectorAll('iframe[src^="https://calfnai.github.io/dailyFlora/"], a[href^="https://calfnai.github.io/dailyFlora/"]')
+          .forEach((node) => {
+            const remote = new URL(node.getAttribute(node.tagName === 'IFRAME' ? 'src' : 'href'));
+            const next = new URL(localApp.href);
+            next.search = remote.search;
+            node.setAttribute(node.tagName === 'IFRAME' ? 'src' : 'href', next.href);
+          });
+      }
+    </script>
   </body>
 </html>
