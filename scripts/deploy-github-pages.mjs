@@ -262,6 +262,14 @@ function resolveMainFiles() {
 function treeEntries(gh, repo, files, stripPrefix = '') {
   return files.map((file) => {
     const repoPath = stripPrefix ? file.slice(stripPrefix.length).replace(/^\//, '') : file;
+    if (dryRun) {
+      return {
+        path: repoPath,
+        mode: '100644',
+        type: 'blob',
+        content: ''
+      };
+    }
     const content = fs.readFileSync(path.join(repoRoot, file)).toString('base64');
     const blob = ghApiJson(gh, ['-X', 'POST', `repos/${repo}/git/blobs`, '--input', '-'], {
       content,
