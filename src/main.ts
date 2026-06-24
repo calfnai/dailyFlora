@@ -4,6 +4,7 @@ import { todayKey } from './random';
 import { createDailySpec, readParams } from './spec';
 import { resolveQuality } from './quality';
 import { BouquetScene } from './bouquetScene';
+import { createSpecialSpec, readSpecialId, specialReferences, withBasePath } from './special';
 
 type RotationDirection = 1 | -1;
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
@@ -112,11 +113,15 @@ const ui = {
 };
 
 let params = readParams();
-let selectedDensity = normalizeDensity(params.density);
+const specialId = readSpecialId();
+const specialReference = specialId ? specialReferences[specialId] : null;
+let selectedDensity = specialReference ? 'medium' : normalizeDensity(params.density);
 let selectedRender = normalizeRender(params.render);
-let selectedTheme = params.theme;
+let selectedTheme = specialReference ? specialReference.theme.id : params.theme;
 let quality = resolveQuality(selectedDensity, selectedRender);
-let spec = createDailySpec(params.date, params.seed, selectedTheme);
+let spec = specialReference
+  ? createSpecialSpec(specialReference, new URLSearchParams(window.location.search).get('date') || undefined)
+  : createDailySpec(params.date, params.seed, selectedTheme);
 let scene = new BouquetScene(ui.canvas, spec, quality);
 let hideTimer = 0;
 let previewCount = 0;
@@ -129,6 +134,7 @@ let distanceAmplitude = 0;
 let targetYAmplitude = 0;
 let presetIndex = 0;
 let manualRotation = false;
+let specialAudio: HTMLAudioElement | null = null;
 
 function THREEClamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -224,6 +230,10 @@ function updateUrl(date: string, seed: string) {
   } else {
     next.searchParams.set('theme', selectedTheme);
   }
+  if (specialReference) {
+    next.searchParams.set('special', specialReference.id);
+    next.searchParams.set('date', date);
+  }
   window.history.replaceState({}, '', next);
 }
 
@@ -242,7 +252,7 @@ function applyRotationSettings(pitch?: number) {
 }
 
 function rebuild(date: string, seed: string) {
-  spec = createDailySpec(date, seed, selectedTheme);
+  spec = specialReference ? createSpecialSpec(specialReference, date) : createDailySpec(date, seed, selectedTheme);
   if (!manualRotation) {
     rotationSpeed = THREEClamp(spec.rotationSpeed, minRotationSpeed, maxRotationSpeed);
     cameraRouteMode = 'orbit';
@@ -257,6 +267,61 @@ function rebuild(date: string, seed: string) {
   updateUrl(date, seed);
   params = { date, seed, density: selectedDensity, render: selectedRender, theme: selectedTheme };
   revealUi();
+}
+
+function createSpecialOverlay() {
+  if (!specialReference) return;
+  document.body.classList.add('is-special');
+
+  const overlay = document.createElement('section');
+  overlay.className = 'special-start-overlay';
+  overlay.setAttribute('aria-label', 'Start special bouquet');
+  overlay.innerHTML = `
+    <div class="special-start-copy">
+      <p class="special-date">1997.01.29</p>
+      <h1>A galaxy, wound around its own light.</h1>
+      <button class="special-start-button" type="button">Start the bouquet</button>
+    </div>
+  `;
+
+  const caption = document.createElement('aside');
+  caption.className = 'special-caption';
+  caption.innerHTML = `
+    <p>NGC 2787 · seen by Hubble</p>
+    <p>A bouquet remembered for 2026.06.29</p>
+  `;
+
+  const quote = document.createElement('aside');
+  quote.className = 'special-quote';
+  quote.innerHTML = `
+    <p>Some flowers last for days.<br />Some light travels long enough to arrive as a memory.</p>
+    <p lang="zh-CN">有些花会谢。<br />有些光，会走很久才抵达。</p>
+  `;
+
+  const credit = document.createElement('aside');
+  credit.className = 'special-credit';
+  credit.textContent = 'Image source: NASA / ESA / Hubble';
+
+  document.body.append(overlay, caption, quote, credit);
+
+  try {
+    specialAudio = new Audio(withBasePath(specialReference.audioPath));
+    specialAudio.loop = true;
+    specialAudio.preload = 'auto';
+    specialAudio.volume = 0.42;
+  } catch {
+    specialAudio = null;
+  }
+
+  overlay.querySelector<HTMLButtonElement>('.special-start-button')?.addEventListener('click', async () => {
+    overlay.classList.add('is-dismissed');
+    try {
+      await specialAudio?.play();
+    } catch {
+      specialAudio = null;
+    }
+    window.setTimeout(() => overlay.remove(), 900);
+  });
 }
 
 function rebuildQuality(nextDensity = selectedDensity, nextRender = selectedRender) {
@@ -374,6 +439,15 @@ window.addEventListener('resize', () => {
 window.addEventListener('beforeunload', () => scene.stop());
 
 setLabels();
+if (specialReference) {
+  rotationSpeed = 0.024;
+  cameraRouteMode = 'figure-eight';
+  pitchAmplitude = 0.16;
+  yawAmplitude = 0.2;
+  distanceAmplitude = 0.18;
+  targetYAmplitude = 0.08;
+  createSpecialOverlay();
+}
 applyRotationSettings();
 revealUi();
 scene.start();

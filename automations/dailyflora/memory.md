@@ -1,0 +1,1 @@
+2026-06-23 run: Synced the reference names into data/inspiration-library.json via a new referenceDeck section and kept docs/dailyflora-reference-gallery.html as the visual reference page. JSON validated successfully. Runtime recorded at 2026-06-23T20:55:07Z.

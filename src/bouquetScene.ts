@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { DailyBouquetSpec, QualityProfile } from './types';
 import { createRng, hashString } from './random';
+import { withBasePath } from './special';
 
 const tempObject = new THREE.Object3D();
 const tempColor = new THREE.Color();
@@ -36,6 +37,23 @@ function ellipsoidPoint(radius: number, height: number, theta: number, phi: numb
   return new THREE.Vector3(x, y, z);
 }
 
+function bouquetPoint(spec: DailyBouquetSpec, radius: number, height: number, theta: number, phi: number) {
+  const shape = spec.special?.shape;
+  const point = ellipsoidPoint(
+    radius * (shape?.radius ?? 1),
+    height * (shape?.height ?? 1),
+    theta,
+    phi,
+    spec.asymmetry
+  );
+  if (shape) {
+    point.x += Math.sin(phi * 1.8 + theta) * 0.08;
+    point.z *= 0.92;
+    if (Math.cos(theta - 0.9) > 0.2) point.x += 0.18 * Math.cos(theta - 0.9);
+  }
+  return point;
+}
+
 function makeRadialTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 64;
@@ -66,7 +84,7 @@ function buildBranches(spec: DailyBouquetSpec, quality: QualityProfile) {
     const theta = rng.range(0, Math.PI * 2);
     const phi = rng.range(0.35, 1.42);
     const radius = rng.range(1.05, 2.02) * spec.theme.wildness;
-    const end = ellipsoidPoint(radius, rng.range(1.0, 1.62), theta, phi, spec.asymmetry);
+    const end = bouquetPoint(spec, radius, rng.range(1.0, 1.62), theta, phi);
     end.y += spec.haloLift + rng.range(-0.18, 0.44);
     const start = new THREE.Vector3(rng.range(-0.1, 0.1), -0.58 + rng.range(-0.08, 0.06), rng.range(-0.1, 0.1));
     const bend = new THREE.Vector3(
@@ -117,7 +135,7 @@ function buildOuterLines(spec: DailyBouquetSpec, quality: QualityProfile) {
   for (let i = 0; i < count; i += 1) {
     const theta = rng.range(0, Math.PI * 2);
     const phi = rng.range(0.32, 1.18);
-    const start = ellipsoidPoint(rng.range(1.0, 1.55), rng.range(0.9, 1.35), theta, phi, spec.asymmetry);
+    const start = bouquetPoint(spec, rng.range(1.0, 1.55), rng.range(0.9, 1.35), theta, phi);
     const end = start.clone().add(new THREE.Vector3(
       Math.cos(theta + rng.range(-0.9, 0.9)) * rng.range(0.28, 0.75),
       rng.range(0.08, 0.62),
@@ -153,7 +171,7 @@ function buildParticles(spec: DailyBouquetSpec, quality: QualityProfile) {
     const phi = rng.range(0.28, 1.82);
     const shell = rng.value() ** 0.32;
     const radius = rng.range(0.38, 1.92) * shell;
-    const p = ellipsoidPoint(radius, rng.range(0.72, 1.48), theta, phi, spec.asymmetry);
+    const p = bouquetPoint(spec, radius, rng.range(0.72, 1.48), theta, phi);
     p.y += spec.haloLift + rng.range(-0.28, 0.36);
     const airy = rng.value();
     if (airy > 0.72) {
@@ -184,12 +202,56 @@ function buildParticles(spec: DailyBouquetSpec, quality: QualityProfile) {
   return new THREE.Points(geometry, material);
 }
 
+function makeLowPolyFlowerGeometry(petalCount: number, radius: number) {
+  const positions: number[] = [];
+
+  const addTriangle = (a: THREE.Vector3, b: THREE.Vector3, c: THREE.Vector3) => {
+    positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+  };
+
+  for (let i = 0; i < petalCount; i += 1) {
+    const angle = (i / petalCount) * Math.PI * 2;
+    const length = radius * (0.9 + Math.sin(i * 1.7) * 0.08);
+    const width = radius * (0.26 + (i % 2) * 0.04);
+    const direction = new THREE.Vector3(Math.cos(angle), Math.sin(angle), 0);
+    const tangent = new THREE.Vector3(-Math.sin(angle), Math.cos(angle), 0);
+    const root = direction.clone().multiplyScalar(radius * 0.22).setZ(0.004);
+    const left = direction.clone().multiplyScalar(radius * 0.58).addScaledVector(tangent, width).setZ(-0.004);
+    const right = direction.clone().multiplyScalar(radius * 0.58).addScaledVector(tangent, -width).setZ(-0.004);
+    const ridge = direction.clone().multiplyScalar(radius * 0.66).setZ(0.02);
+    const tip = direction.clone().multiplyScalar(length).setZ(0.002);
+
+    addTriangle(root, left, ridge);
+    addTriangle(root, ridge, right);
+    addTriangle(left, tip, ridge);
+    addTriangle(ridge, tip, right);
+  }
+
+  const centerTop = new THREE.Vector3(0, 0, radius * 0.32);
+  const centerBase: THREE.Vector3[] = [];
+  for (let i = 0; i < petalCount; i += 1) {
+    const angle = (i / petalCount) * Math.PI * 2;
+    centerBase.push(new THREE.Vector3(Math.cos(angle) * radius * 0.25, Math.sin(angle) * radius * 0.25, radius * 0.05));
+  }
+  for (let i = 0; i < petalCount; i += 1) {
+    addTriangle(centerTop, centerBase[i], centerBase[(i + 1) % petalCount]);
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
 function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   const rng = createRng(`${spec.seed}:flowers`);
-  const geometry = new THREE.IcosahedronGeometry(0.055, quality.renderName === 'low' ? 0 : 1);
+  const petalCount = quality.renderName === 'low' ? 5 : spec.special ? 8 : 7;
+  const geometry = makeLowPolyFlowerGeometry(petalCount, spec.special ? 0.072 : 0.064);
   const material = new THREE.MeshStandardMaterial({
     roughness: 0.82,
     metalness: 0.0,
+    flatShading: true,
+    side: THREE.DoubleSide,
     emissive: new THREE.Color(spec.theme.glow),
     emissiveIntensity: 0.08
   });
@@ -200,12 +262,22 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   for (let i = 0; i < count; i += 1) {
     const theta = rng.range(0, Math.PI * 2);
     const phi = rng.range(0.36, 1.66);
-    const p = ellipsoidPoint(rng.range(0.5, 1.78), rng.range(0.82, 1.46), theta, phi, spec.asymmetry);
+    const p = bouquetPoint(spec, rng.range(0.5, 1.78), rng.range(0.82, 1.46), theta, phi);
     p.y += spec.haloLift + rng.range(-0.26, 0.36);
-    const scale = rng.range(0.46, 0.9) * (rng.value() > 0.96 ? 1.08 : 1);
+    const bloom = spec.special?.bloomScale;
+    const large = bloom && rng.value() < bloom.largeBias;
+    const scale = bloom
+      ? rng.range(bloom.small, large ? bloom.large : bloom.medium)
+      : rng.range(0.46, 0.9) * (rng.value() > 0.96 ? 1.08 : 1);
     tempObject.position.copy(p);
-    tempObject.rotation.set(rng.range(-0.7, 0.7), theta, rng.range(-0.7, 0.7));
-    tempObject.scale.setScalar(scale);
+    tempObject.quaternion.setFromUnitVectors(up, p.clone().normalize());
+    tempObject.rotateZ(rng.range(0, Math.PI * 2));
+    tempObject.rotateX(rng.range(-0.38, 0.38));
+    if (spec.special) {
+      tempObject.scale.set(scale * rng.range(0.9, 1.28), scale * rng.range(0.56, 0.82), scale * rng.range(0.9, 1.18));
+    } else {
+      tempObject.scale.set(scale * rng.range(0.82, 1.16), scale * rng.range(0.82, 1.12), scale * rng.range(0.72, 1.06));
+    }
     tempObject.updateMatrix();
     mesh.setMatrixAt(i, tempObject.matrix);
     mesh.setColorAt(i, tempColor.set(pickColor(spec.theme.palette, rng.value())).lerp(new THREE.Color('#ffffff'), rng.range(0.0, 0.1)));
@@ -230,20 +302,24 @@ function buildLeaves(spec: DailyBouquetSpec, quality: QualityProfile) {
     emissive: new THREE.Color('#123d28'),
     emissiveIntensity: 0.05
   });
-  const count = Math.floor(quality.leafCount * spec.leafDensity);
+  const count = Math.floor(quality.leafCount * spec.leafDensity * (spec.special ? 0.68 : 1));
   const mesh = new THREE.InstancedMesh(geometry, material, count);
 
   for (let i = 0; i < count; i += 1) {
     const theta = rng.range(0, Math.PI * 2);
     const phi = rng.range(0.38, 1.82);
-    const p = ellipsoidPoint(rng.range(0.44, 1.78), rng.range(0.7, 1.38), theta, phi, spec.asymmetry);
+    const p = bouquetPoint(spec, rng.range(0.44, 1.78), rng.range(0.7, 1.38), theta, phi);
     p.y += spec.haloLift + rng.range(-0.38, 0.24);
-    const size = rng.range(0.55, 1.28);
+    const size = spec.special ? rng.range(0.32, 0.82) : rng.range(0.55, 1.28);
     tempObject.position.copy(p);
     tempObject.quaternion.setFromUnitVectors(up, p.clone().normalize());
     tempObject.rotateY(theta + rng.range(-0.8, 0.8));
     tempObject.rotateX(rng.range(-0.8, 0.8));
-    tempObject.scale.set(size * rng.range(0.6, 0.92), size * rng.range(0.78, 1.45), size);
+    tempObject.scale.set(
+      size * rng.range(0.42, spec.special ? 0.7 : 0.92),
+      size * rng.range(0.72, spec.special ? 1.12 : 1.45),
+      size
+    );
     tempObject.updateMatrix();
     mesh.setMatrixAt(i, tempObject.matrix);
     mesh.setColorAt(i, tempColor.set(pickColor(spec.theme.leafPalette, rng.value())));
@@ -257,7 +333,7 @@ function buildStemBundle(spec: DailyBouquetSpec) {
   const positions: number[] = [];
   const colors: number[] = [];
   const stem = new THREE.Color(spec.theme.stem);
-  const count = 24;
+  const count = Math.floor(24 * (spec.special?.shape.stemVisibility ?? 1));
 
   for (let i = 0; i < count; i += 1) {
     const theta = rng.range(0, Math.PI * 2);
@@ -294,11 +370,204 @@ function buildStemBundle(spec: DailyBouquetSpec) {
   return group;
 }
 
+function buildSpecialBabyBreath(spec: DailyBouquetSpec, quality: QualityProfile) {
+  const rng = createRng(`${spec.seed}:baby-breath`);
+  const count = Math.floor(quality.particleCount * 0.22);
+  const positions: number[] = [];
+  const colors: number[] = [];
+  for (let i = 0; i < count; i += 1) {
+    const theta = rng.range(0, Math.PI * 2);
+    const phi = rng.range(0.18, 1.42);
+    const spray = rng.value() ** 0.18;
+    const p = bouquetPoint(spec, rng.range(1.0, 2.2) * spray, rng.range(1.04, 1.78), theta, phi);
+    p.y += spec.haloLift + rng.range(-0.08, 0.58);
+    if (rng.value() > 0.78) p.x -= rng.range(0.1, 0.52);
+    positions.push(p.x, p.y, p.z);
+    const color = new THREE.Color(rng.value() > 0.82 ? '#dbe9ff' : '#fffcef');
+    colors.push(color.r, color.g, color.b);
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  const material = new THREE.PointsMaterial({
+    size: 0.018,
+    map: makeRadialTexture() ?? undefined,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.82,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    sizeAttenuation: true
+  });
+  return new THREE.Points(geometry, material);
+}
+
+function buildSpecialWrapping(spec: DailyBouquetSpec) {
+  if (!spec.special) return new THREE.Group();
+  const { wrapping } = spec.special;
+  const group = new THREE.Group();
+  const material = new THREE.MeshStandardMaterial({
+    color: wrapping.color,
+    emissive: new THREE.Color(wrapping.edgeColor),
+    emissiveIntensity: 0.03,
+    roughness: 0.58,
+    metalness: 0,
+    transparent: true,
+    opacity: wrapping.opacity,
+    side: THREE.DoubleSide,
+    depthWrite: false
+  });
+  const edgeMaterial = new THREE.LineBasicMaterial({
+    color: wrapping.edgeColor,
+    transparent: true,
+    opacity: 0.16,
+    depthWrite: false
+  });
+  for (let i = 0; i < 7; i += 1) {
+    const angle = (i / 7) * Math.PI * 2 + (i % 2) * 0.16;
+    const width = 0.54 + (i % 3) * 0.08;
+    const height = 1.78 + (i % 2) * 0.34;
+    const shape = new THREE.Shape();
+    shape.moveTo(-width * 0.22, -1.1);
+    shape.lineTo(width, height - 1.14);
+    shape.lineTo(-width * 0.78, height - 1.32);
+    shape.lineTo(-width * 0.22, -1.1);
+    const geometry = new THREE.ShapeGeometry(shape);
+    const panel = new THREE.Mesh(geometry, material);
+    panel.position.set(Math.cos(angle) * 0.22, -0.1, Math.sin(angle) * 0.22);
+    panel.rotation.set(-0.12 + (i % 2) * 0.08, angle - Math.PI / 2, 0.12 - (i % 3) * 0.08);
+    group.add(panel);
+
+    const points = shape.getPoints();
+    const edgeGeometry = new THREE.BufferGeometry().setFromPoints(points);
+    const edge = new THREE.Line(edgeGeometry, edgeMaterial);
+    edge.position.copy(panel.position);
+    edge.rotation.copy(panel.rotation);
+    group.add(edge);
+  }
+
+  const ribbonGeometry = new THREE.TorusGeometry(0.2, 0.012, 8, 42);
+  const ribbonMaterial = new THREE.MeshStandardMaterial({
+    color: wrapping.ribbonColor,
+    roughness: 0.74,
+    transparent: true,
+    opacity: 0.58
+  });
+  const ribbon = new THREE.Mesh(ribbonGeometry, ribbonMaterial);
+  ribbon.position.y = -0.92;
+  ribbon.rotation.x = Math.PI / 2;
+  group.add(ribbon);
+  return group;
+}
+
+function buildSpecialDustRings(spec: DailyBouquetSpec, quality: QualityProfile) {
+  if (!spec.special) return new THREE.Group();
+  const rng = createRng(`${spec.seed}:dust-rings`);
+  const group = new THREE.Group();
+  group.userData.spin = 0.018;
+  const count = quality.renderName === 'low' ? 680 : quality.renderName === 'medium' ? 980 : 1320;
+  const positions: number[] = [];
+  const colors: number[] = [];
+  for (let i = 0; i < count; i += 1) {
+    const ring = rng.value() > 0.58 ? 1 : 0;
+    const theta = rng.range(0, Math.PI * 2);
+    const radius = rng.range(ring ? 1.38 : 0.82, ring ? 2.34 : 1.52);
+    positions.push(
+      Math.cos(theta) * radius * rng.range(0.88, 1.12),
+      rng.range(-0.18, 0.5) + Math.sin(theta * 2.0) * 0.05,
+      Math.sin(theta) * radius * rng.range(0.24, 0.4)
+    );
+    const color = new THREE.Color(pickColor(spec.special.cosmic.dustColors, rng.value()));
+    colors.push(color.r, color.g, color.b);
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  const material = new THREE.PointsMaterial({
+    size: 0.012,
+    map: makeRadialTexture() ?? undefined,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.52,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    sizeAttenuation: true
+  });
+  const points = new THREE.Points(geometry, material);
+  points.rotation.set(0.42, 0.1, -0.08);
+  group.add(points);
+  return group;
+}
+
+function buildSpecialCosmicLayer(spec: DailyBouquetSpec, quality: QualityProfile) {
+  const group = new THREE.Group();
+  if (!spec.special) return group;
+  const rng = createRng(`${spec.seed}:cosmic-sky`);
+  const starCount = quality.renderName === 'low' ? 260 : quality.renderName === 'medium' ? 420 : 620;
+  const positions: number[] = [];
+  const colors: number[] = [];
+  for (let i = 0; i < starCount; i += 1) {
+    const depth = rng.range(-10.8, -8.4);
+    positions.push(rng.range(-7.5, 7.5), rng.range(-4.3, 4.3), depth);
+    const color = new THREE.Color(pickColor(spec.special.cosmic.starColors, rng.value()));
+    colors.push(color.r, color.g, color.b);
+  }
+  const starGeometry = new THREE.BufferGeometry();
+  starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  const stars = new THREE.Points(
+    starGeometry,
+    new THREE.PointsMaterial({
+      size: 0.018,
+      map: makeRadialTexture() ?? undefined,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.62,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true
+    })
+  );
+  group.add(stars);
+
+  const galaxyTexture = new THREE.TextureLoader().load(withBasePath(spec.special.hubbleImagePath));
+  galaxyTexture.colorSpace = THREE.SRGBColorSpace;
+  const galaxy = new THREE.Mesh(
+    new THREE.PlaneGeometry(4.5, 4.4),
+    new THREE.MeshBasicMaterial({
+      map: galaxyTexture,
+      color: spec.special.cosmic.galaxyTint,
+      transparent: true,
+      opacity: 0.34,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    })
+  );
+  galaxy.position.set(0.42, 0.62, -9.1);
+  galaxy.rotation.z = -0.2;
+  group.add(galaxy);
+
+  const core = new THREE.Mesh(
+    new THREE.CircleGeometry(0.72, 48),
+    new THREE.MeshBasicMaterial({
+      color: spec.special.cosmic.warmCore,
+      transparent: true,
+      opacity: 0.16,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    })
+  );
+  core.position.set(0.24, 0.58, -9.05);
+  group.add(core);
+  return group;
+}
+
 export class BouquetScene {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
   readonly camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
   readonly bouquet = new THREE.Group();
+  readonly cosmicLayer = new THREE.Group();
 
   private readonly clock = new THREE.Clock();
   private readonly canvas: HTMLCanvasElement;
@@ -352,6 +621,7 @@ export class BouquetScene {
     this.cameraYaw = (hashString(spec.seed) % 628) / 100;
     this.targetCameraYaw = this.cameraYaw;
     this.scene.add(this.camera);
+    this.camera.add(this.cosmicLayer);
     this.scene.add(this.bouquet);
     this.addLights();
     this.addStage();
@@ -375,15 +645,25 @@ export class BouquetScene {
       const child = this.bouquet.children.pop();
       if (child) this.disposeObject(child);
     }
+    while (this.cosmicLayer.children.length) {
+      const child = this.cosmicLayer.children.pop();
+      if (child) this.disposeObject(child);
+    }
 
     this.bouquet.rotation.set(0, (hashString(spec.seed) % 628) / 100, 0);
+    if (spec.special) {
+      this.cosmicLayer.add(buildSpecialCosmicLayer(spec, quality));
+    }
     this.bouquet.add(
+      buildSpecialDustRings(spec, quality),
       buildStemBundle(spec),
+      buildSpecialWrapping(spec),
       buildBranches(spec, quality),
       buildOuterLines(spec, quality),
       buildLeaves(spec, quality),
       buildFlowers(spec, quality),
-      buildParticles(spec, quality)
+      buildParticles(spec, quality),
+      ...(spec.special ? [buildSpecialBabyBreath(spec, quality)] : [])
     );
   }
 
@@ -482,6 +762,12 @@ export class BouquetScene {
     this.cameraDistance += (this.targetCameraDistance - this.cameraDistance) * 0.08;
     this.cameraTargetY += (this.targetCameraTargetY - this.cameraTargetY) * 0.08;
     this.bouquet.position.y = 0.06 + Math.sin(performance.now() * 0.00025) * 0.026;
+    if (this.spec.special) {
+      const elapsed = performance.now() * 0.001;
+      this.bouquet.children.forEach((child) => {
+        if (child.userData.spin) child.rotation.y = elapsed * child.userData.spin;
+      });
+    }
     this.updateCamera(routeOffsets);
     this.renderer.render(this.scene, this.camera);
   }
@@ -627,10 +913,15 @@ export class BouquetScene {
       const mesh = node as THREE.Mesh;
       if (mesh.geometry) mesh.geometry.dispose();
       const material = mesh.material as THREE.Material | THREE.Material[] | undefined;
+      const disposeMaterial = (item: THREE.Material) => {
+        const mapped = item as THREE.Material & { map?: THREE.Texture };
+        if (mapped.map) mapped.map.dispose();
+        item.dispose();
+      };
       if (Array.isArray(material)) {
-        material.forEach((item) => item.dispose());
+        material.forEach(disposeMaterial);
       } else if (material) {
-        material.dispose();
+        disposeMaterial(material);
       }
     });
   }

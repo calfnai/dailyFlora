@@ -31,6 +31,52 @@ export interface BouquetTheme {
   outerLineBias?: number;
 }
 
+export interface SpecialBouquetReference {
+  id: string;
+  title: string;
+  date: string;
+  seed: string;
+  theme: BouquetTheme;
+  hubbleImagePath: string;
+  audioPath: string;
+  visualAnalysis: {
+    mainColors: string[];
+    accentColors: string[];
+    flowerShapes: string[];
+    silhouette: string;
+    wrapping: string;
+    emotionalTone: string;
+    particleTranslation: string;
+  };
+  shape: {
+    radius: number;
+    height: number;
+    verticalLift: number;
+    asymmetry: number;
+    airySprayBias: number;
+    centralFullness: number;
+    stemVisibility: number;
+  };
+  bloomScale: {
+    small: number;
+    medium: number;
+    large: number;
+    largeBias: number;
+  };
+  wrapping: {
+    color: string;
+    edgeColor: string;
+    ribbonColor: string;
+    opacity: number;
+  };
+  cosmic: {
+    starColors: string[];
+    dustColors: string[];
+    galaxyTint: string;
+    warmCore: string;
+  };
+}
+
 export interface DailyBouquetSpec {
   seed: string;
   dateLabel: string;
@@ -42,6 +88,7 @@ export interface DailyBouquetSpec {
   rotationSpeed: number;
   asymmetry: number;
   haloLift: number;
+  special?: SpecialBouquetReference;
 }
 
 export interface InspirationEntry {

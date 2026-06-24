@@ -2,18 +2,24 @@ import { createRng, todayKey } from './random';
 import { themes } from './themes';
 import type { DailyBouquetSpec } from './types';
 
+const defaultThemeId = 'dopamine-field';
+
 export function readParams() {
   const params = new URLSearchParams(window.location.search);
   const date = params.get('date') || todayKey();
   const seed = params.get('seed') || date;
   const density = params.get('density') || params.get('quality') || 'medium';
   const render = params.get('render') || 'auto';
-  return { date, seed, density, render };
+  const theme = params.get('theme') || defaultThemeId;
+  return { date, seed, density, render, theme };
 }
 
-export function createDailySpec(dateLabel: string, seed: string): DailyBouquetSpec {
+export function createDailySpec(dateLabel: string, seed: string, themeId = defaultThemeId): DailyBouquetSpec {
   const rng = createRng(`daily-flora:${seed}`);
-  const theme = themes[Math.floor(rng.value() * themes.length)];
+  const theme =
+    themeId === 'random'
+      ? themes[Math.floor(rng.value() * themes.length)]
+      : themes.find((item) => item.id === themeId) || themes.find((item) => item.id === defaultThemeId) || themes[0];
 
   return {
     seed,

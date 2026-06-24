@@ -1,5 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { createHash } from 'node:crypto';
 
 const root = process.cwd();
 const inputArg = process.argv[2];
@@ -23,13 +24,18 @@ const existingIds = new Set([
   ...library.entries.map((entry) => entry.id),
   ...library.pendingRecommendations.map((entry) => entry.id)
 ]);
+const existingSourceUrls = new Set([
+  ...library.entries.map((entry) => entry.sourceUrl).filter(Boolean),
+  ...library.pendingRecommendations.map((entry) => entry.sourceUrl).filter(Boolean)
+]);
 
 let added = 0;
 for (const note of notes) {
   const observedAt = note.observedAt || new Date().toISOString().slice(0, 10);
   const sourceUrl = note.sourceUrl || 'unknown-source';
-  const id = `lobster-${observedAt}-${Buffer.from(sourceUrl).toString('base64url').slice(0, 16)}`;
-  if (existingIds.has(id)) continue;
+  const sourceKey = note.evidence?.noteId || createHash('sha1').update(sourceUrl).digest('hex').slice(0, 16);
+  const id = `inspiration-${observedAt}-${sourceKey}`;
+  if (existingIds.has(id) || existingSourceUrls.has(sourceUrl)) continue;
 
   library.pendingRecommendations.push({
     id,
@@ -50,6 +56,7 @@ for (const note of notes) {
     }
   });
   existingIds.add(id);
+  existingSourceUrls.add(sourceUrl);
   added += 1;
 }
 

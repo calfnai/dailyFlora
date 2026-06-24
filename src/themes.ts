@@ -80,6 +80,23 @@ export const themes: BouquetTheme[] = [
     wildness: 1.18
   },
   {
+    id: 'dopamine-field',
+    name: '生命力花田',
+    palette: ['#ffcf3f', '#ff8fb3', '#ff6b45', '#7ed957', '#75d6ff', '#b69cff', '#fff6d1'],
+    leafPalette: ['#145a36', '#2d8b4f', '#68b85b', '#b8dc71'],
+    stem: '#66864a',
+    background: '#070a07',
+    floor: '#1c2a18',
+    glow: '#ffe66d',
+    densityBias: 1.08,
+    verticalBias: 1.08,
+    wildness: 1.32,
+    branchBias: 1.18,
+    leafBias: 1.12,
+    flowerBias: 1.04,
+    outerLineBias: 1.22
+  },
+  {
     id: 'starry-night',
     name: '繁星夜色',
     palette: ['#fefef5', '#c7d7ff', '#8c7dff', '#ff9fb6', '#f7dc7b', '#80f0bb'],

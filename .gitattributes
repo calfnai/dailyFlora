@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+# TouchDesigner project/component files are binary assets.
+*.toe binary
+*.tox binary
+*.tdz binary
+
