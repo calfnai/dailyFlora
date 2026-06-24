@@ -21,6 +21,17 @@ const renderLabels: Record<Exclude<RenderQualityName, 'auto'>, string> = {
   medium: '清',
   high: '精'
 };
+const themeEnglishNames: Record<string, string> = {
+  'tropical-forest': 'Tropical Forest',
+  'moon-white': 'Moon White Hand-Tied',
+  'fairy-violet': 'Fairy Violet Mist',
+  'sea-salt-lemon': 'Sea Salt Lemon',
+  'hillside-wild': 'Hillside Wildflowers',
+  'summer-pinwheel': 'Summer Pinwheel',
+  'dopamine-field': 'Dopamine Field',
+  'starry-night': 'Starry Night',
+  'her-january-sky': 'Her January Sky'
+};
 const rotationPresets: Array<{
   speed: number;
   direction: RotationDirection;
@@ -91,6 +102,7 @@ const themeLabel = document.querySelector<HTMLElement>('#daily-theme');
 const qualityLabel = document.querySelector<HTMLElement>('#quality-mark');
 const pauseButton = document.querySelector<HTMLButtonElement>('#pause-button');
 const todayButton = document.querySelector<HTMLButtonElement>('#today-button');
+const datePicker = document.querySelector<HTMLInputElement>('#date-picker');
 const shuffleButton = document.querySelector<HTMLButtonElement>('#shuffle-button');
 const fullscreenButton = document.querySelector<HTMLButtonElement>('#fullscreen-button');
 const densityButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-density-choice]'));
@@ -157,9 +169,20 @@ function sliderToSpeed(value: string) {
   return minRotationSpeed + (maxRotationSpeed - minRotationSpeed) * ratio;
 }
 
+function bouquetHoverTitle() {
+  const english = themeEnglishNames[spec.theme.id] || spec.theme.id;
+  return `${spec.theme.name} / ${english}`;
+}
+
 function setLabels() {
   ui.dateLabel.textContent = spec.dateLabel;
   ui.themeLabel.textContent = spec.theme.name;
+  if (datePicker) datePicker.value = spec.dateLabel;
+  ui.themeLabel.title = bouquetHoverTitle();
+  ui.dateLabel.title = bouquetHoverTitle();
+  todayButton?.setAttribute('title', `选择日期 · ${bouquetHoverTitle()}`);
+  todayButton?.setAttribute('aria-label', `Pick bouquet date: ${bouquetHoverTitle()}`);
+  shuffleButton?.setAttribute('title', `随机日期花束 · ${bouquetHoverTitle()}`);
   const renderLabel =
     selectedRender === 'auto' ? `自/${renderLabels[quality.renderName]}` : renderLabels[quality.renderName];
   ui.qualityLabel.textContent = `${densityLabels[quality.densityName]} · ${renderLabel}`;
@@ -185,10 +208,9 @@ function syncControls() {
   }
 
   if (rotationDirectionButton) {
-    const reverse = rotationDirection === -1;
-    rotationDirectionButton.classList.toggle('is-reverse', reverse);
-    rotationDirectionButton.setAttribute('aria-label', reverse ? 'Forward camera route' : 'Reverse camera route');
-    rotationDirectionButton.title = reverse ? 'Forward camera route' : 'Reverse camera route';
+    rotationDirectionButton.classList.toggle('is-reverse', rotationDirection === -1);
+    rotationDirectionButton.setAttribute('aria-label', 'Random camera route');
+    rotationDirectionButton.title = 'Random camera route';
   }
 }
 
@@ -249,6 +271,27 @@ function applyRotationSettings(pitch?: number) {
     targetYAmplitude
   });
   syncControls();
+}
+
+function applyRoutePreset(preset: (typeof rotationPresets)[number]) {
+  manualRotation = true;
+  rotationSpeed = preset.speed;
+  rotationDirection = preset.direction;
+  cameraRouteMode = preset.mode;
+  pitchAmplitude = preset.pitchAmplitude;
+  yawAmplitude = preset.yawAmplitude;
+  distanceAmplitude = preset.distanceAmplitude;
+  targetYAmplitude = preset.targetYAmplitude;
+  applyRotationSettings(preset.pitch);
+}
+
+function randomDateKey() {
+  const start = new Date('2026-01-01T00:00:00');
+  const end = new Date('2026-12-31T00:00:00');
+  const dayMs = 24 * 60 * 60 * 1000;
+  const days = Math.floor((end.getTime() - start.getTime()) / dayMs);
+  const date = new Date(start.getTime() + Math.floor(Math.random() * (days + 1)) * dayMs);
+  return date.toISOString().slice(0, 10);
 }
 
 function rebuild(date: string, seed: string) {
@@ -359,15 +402,27 @@ pauseButton?.addEventListener('click', () => {
 });
 
 todayButton?.addEventListener('click', () => {
-  const today = todayKey();
+  if (datePicker) {
+    datePicker.value = spec.dateLabel;
+    if (typeof datePicker.showPicker === 'function') {
+      datePicker.showPicker();
+    } else {
+      datePicker.click();
+    }
+  }
+  revealUi();
+});
+
+datePicker?.addEventListener('change', () => {
+  if (!datePicker.value) return;
   previewCount = 0;
-  rebuild(today, today);
+  rebuild(datePicker.value, datePicker.value);
 });
 
 shuffleButton?.addEventListener('click', () => {
-  previewCount += 1;
-  const date = params.date || todayKey();
-  rebuild(date, `${date}:preview:${previewCount}:${Math.random().toString(36).slice(2, 7)}`);
+  const date = randomDateKey();
+  previewCount = 0;
+  rebuild(date, date);
 });
 
 fullscreenButton?.addEventListener('click', async () => {
@@ -399,24 +454,19 @@ rotationSpeedInput?.addEventListener('input', () => {
 });
 
 rotationDirectionButton?.addEventListener('click', () => {
-  manualRotation = true;
-  rotationDirection = rotationDirection === 1 ? -1 : 1;
-  applyRotationSettings();
+  const preset = rotationPresets[Math.floor(Math.random() * rotationPresets.length)];
+  applyRoutePreset({
+    ...preset,
+    direction: Math.random() > 0.5 ? 1 : -1,
+    speed: THREEClamp(preset.speed * (0.78 + Math.random() * 0.58), minRotationSpeed, maxRotationSpeed)
+  });
   revealUi();
 });
 
 rotationPresetButton?.addEventListener('click', () => {
-  manualRotation = true;
   const preset = rotationPresets[presetIndex % rotationPresets.length];
   presetIndex += 1;
-  rotationSpeed = preset.speed;
-  rotationDirection = preset.direction;
-  cameraRouteMode = preset.mode;
-  pitchAmplitude = preset.pitchAmplitude;
-  yawAmplitude = preset.yawAmplitude;
-  distanceAmplitude = preset.distanceAmplitude;
-  targetYAmplitude = preset.targetYAmplitude;
-  applyRotationSettings(preset.pitch);
+  applyRoutePreset(preset);
   revealUi();
 });
 

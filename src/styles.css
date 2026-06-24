@@ -175,6 +175,14 @@ button {
   transform: scaleX(-1);
 }
 
+.date-picker {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .segmented,
 .rotation-control {
   display: flex;
