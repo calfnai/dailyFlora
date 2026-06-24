@@ -1,0 +1,25 @@
+{
+  "positive": [
+    {"titleZh":"夏日多巴胺 🫧🎨🍃","titleEn":"Summer Dopamine"},
+    {"titleZh":"明明一束挺大的花束，拍出来咋就看不出来呢","titleEn":"Volume Read"},
+    {"titleZh":"邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦","titleEn":"Berry Grove"},
+    {"titleZh":"卡布奇诺的配色好可爱","titleEn":"Cappuccino Cream"},
+    {"titleZh":"宁波花店｜秋日果汁🍹","titleEn":"Autumn Juice"},
+    {"titleZh":"花束是浪漫的具象化｜杭州花店","titleEn":"Romance Made Visible"},
+    {"titleZh":"浅粉花序","titleEn":"Petal Quiet"},
+    {"titleZh":"奶白线条束","titleEn":"Cream Line Bouquet"},
+    {"titleZh":"野趣市场束","titleEn":"Wild Market Bloom"},
+    {"titleZh":"夏日风车","titleEn":"Summer Pinwheel"},
+    {"titleZh":"是仙女的梦幻紫～🫧🪻🫧","titleEn":"Fairy Violet"},
+    {"titleZh":"是洋水仙的季节呀～🌿🍯","titleEn":"Narcissus Season"},
+    {"titleZh":"朋友搬新家，送这一瓶“会呼吸的风景”","titleEn":"Breathing Landscape"},
+    {"titleZh":"狐尾百合✨","titleEn":"Foxtail Lily"},
+    {"titleZh":"🌷🍊🌸🪻🌿🌼🫧","titleEn":"Color Burst Bouquet"}
+  ],
+  "negative": [
+    {"titleZh":"裸花束是最自然的表达🌿","titleEn":"Bare Bouquet"},
+    {"titleZh":"中间的大向日葵占据了太多空间","titleEn":"Oversized Sunflower Fault"},
+    {"titleZh":"失衡高瓶花","titleEn":"Overgrown Vase Fault"},
+    {"titleZh":"蓝莓🫐的秘密～","titleEn":"Blueberry Monotone"}
+  ]
+}
