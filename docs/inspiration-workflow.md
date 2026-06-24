@@ -6,21 +6,32 @@ separate workflow that reviews the creator list in `data/inspiration-library.jso
 ## Nightly Check
 
 - Time: 21:00 Asia/Shanghai.
-- Access: Lobster uses the owner's local Xiaohongshu login state when available.
-- Fallback: if the page is blocked or logged out, report the access issue and
-  wait for the owner to provide screenshots or fresh links.
+- Access: owner-provided links only. Do not let Lobster batch-open Xiaohongshu
+  pages or crawl creator homepages.
+- Fallback: if Xiaohongshu asks for login, captcha, SMS, QR scan, or account
+  verification, stop browsing and record the access issue.
 - Token budget: Codex should read compact Lobster output from `data/inbox`
   instead of browsing Xiaohongshu directly during normal checks.
 
-## Lobster Handoff
+## Reference Deck
 
-1. Run `npm run lobster:plan`.
-2. Open Lobster and give it `data/inbox/YYYY-MM-DD/lobster-task.json` or
-   `data/inbox/YYYY-MM-DD/lobster-prompt.md`.
-3. Ask Lobster, using its DeepSeek engine, to write
-   `data/inbox/YYYY-MM-DD/notes.json`.
+- `docs/reference-deck.md` is the repo-visible named summary of the current reference set.
+- Use it when you want to talk about the named examples without opening the richer local gallery.
+
+## Owner Link Handoff
+
+1. Put owner-selected Xiaohongshu links in
+   `data/inbox/YYYY-MM-DD/owner-links.json`.
+2. Run `npm run inspiration:links -- data/inbox/YYYY-MM-DD/owner-links.json`.
+3. If the script writes access issues, fix the read path together instead of
+   asking the owner for manual descriptions.
 4. Run `npm run inspiration:ingest -- data/inbox/YYYY-MM-DD/notes.json`.
 5. Review `pendingRecommendations` in `data/inspiration-library.json`.
+
+## Lobster Fallback
+
+Use Lobster only if explicitly requested for a single owner-provided link. It is
+not the default browser or analysis layer.
 
 ## What To Record
 
@@ -33,5 +44,8 @@ separate workflow that reviews the creator list in `data/inspiration-library.jso
 ## What Not To Do
 
 - Do not copy reference images into the deployed app.
+- Do not batch-open creator pages, crawl homepages, or trigger repeated
+  Xiaohongshu login prompts.
+- Do not require the owner to update or upload images; links are enough.
 - Do not let new references automatically change the generator.
 - Do not fabricate updates when Xiaohongshu access fails.
