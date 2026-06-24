@@ -225,7 +225,8 @@ button {
 }
 
 .date-picker {
-  position: absolute;
+  position: fixed;
+  z-index: 3;
   width: 42px;
   height: 42px;
   opacity: 0;

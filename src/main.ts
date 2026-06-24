@@ -144,7 +144,6 @@ let pitchAmplitude = 0;
 let yawAmplitude = 0;
 let distanceAmplitude = 0;
 let targetYAmplitude = 0;
-let presetIndex = 0;
 let manualRotation = false;
 let specialAudio: HTMLAudioElement | null = null;
 
@@ -209,8 +208,8 @@ function syncControls() {
 
   if (rotationDirectionButton) {
     rotationDirectionButton.classList.toggle('is-reverse', rotationDirection === -1);
-    rotationDirectionButton.setAttribute('aria-label', 'Random camera route');
-    rotationDirectionButton.title = 'Random camera route';
+    rotationDirectionButton.setAttribute('aria-label', 'Reverse current camera route');
+    rotationDirectionButton.title = 'Reverse current camera route';
   }
 }
 
@@ -222,6 +221,13 @@ function revealUi() {
     ui.hud.classList.add('is-hidden');
     ui.controls.classList.add('is-hidden');
   }, 3200);
+}
+
+function positionDatePicker() {
+  if (!datePicker || !todayButton) return;
+  const rect = todayButton.getBoundingClientRect();
+  datePicker.style.left = `${Math.round(rect.left)}px`;
+  datePicker.style.top = `${Math.round(rect.top)}px`;
 }
 
 function updateUrl(date: string, seed: string) {
@@ -403,6 +409,7 @@ pauseButton?.addEventListener('click', () => {
 
 todayButton?.addEventListener('click', () => {
   if (datePicker) {
+    positionDatePicker();
     datePicker.value = spec.dateLabel;
     if (typeof datePicker.showPicker === 'function') {
       datePicker.showPicker();
@@ -417,6 +424,7 @@ datePicker?.addEventListener('change', () => {
   if (!datePicker.value) return;
   previewCount = 0;
   rebuild(datePicker.value, datePicker.value);
+  datePicker.blur();
 });
 
 shuffleButton?.addEventListener('click', () => {
@@ -454,19 +462,19 @@ rotationSpeedInput?.addEventListener('input', () => {
 });
 
 rotationDirectionButton?.addEventListener('click', () => {
+  manualRotation = true;
+  rotationDirection = rotationDirection === 1 ? -1 : 1;
+  applyRotationSettings();
+  revealUi();
+});
+
+rotationPresetButton?.addEventListener('click', () => {
   const preset = rotationPresets[Math.floor(Math.random() * rotationPresets.length)];
   applyRoutePreset({
     ...preset,
     direction: Math.random() > 0.5 ? 1 : -1,
     speed: THREEClamp(preset.speed * (0.78 + Math.random() * 0.58), minRotationSpeed, maxRotationSpeed)
   });
-  revealUi();
-});
-
-rotationPresetButton?.addEventListener('click', () => {
-  const preset = rotationPresets[presetIndex % rotationPresets.length];
-  presetIndex += 1;
-  applyRoutePreset(preset);
   revealUi();
 });
 
@@ -480,6 +488,7 @@ window.addEventListener('resize', () => {
     applyRotationSettings();
     setLabels();
   }
+  positionDatePicker();
 });
 
 ['pointermove', 'pointerdown', 'touchstart', 'keydown'].forEach((eventName) => {

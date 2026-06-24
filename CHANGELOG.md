@@ -1,5 +1,19 @@
 # DailyFlora Changelog
 
+## 0.12.2 - 2026-06-25
+
+Interaction and render-level correction.
+
+- Repositioned the native date picker on top of the calendar button before opening, so it no longer appears outside the reachable browser area.
+- Date selection now blurs the hidden picker after applying the date, letting the picker close naturally after selection.
+- Corrected the camera controls:
+  - circular-arrow button reverses the current camera route only.
+  - star/preset button randomizes a new camera route preset.
+- Re-aligned render levels with the intended meaning:
+  - `省`: low-poly spherical flower masses.
+  - `清`: simple 5-petal low-poly flowers.
+  - `精`: multiple recognizable flower-form prototypes, including rose/camellia/peony-like layered blooms, chamomile-like daisies, orchid-like asymmetry, spike flowers, hydrangea/pompon clusters, and bell-fruit forms.
+
 ## 0.12.1 - 2026-06-25
 
 Corrective patch for the 0.12.0 visual regression.
