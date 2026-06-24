@@ -1,5 +1,30 @@
 # DailyFlora Changelog
 
+## 0.12.1 - 2026-06-25
+
+Corrective patch for the 0.12.0 visual regression.
+
+- Reverted the incorrect flower-head and green-plant batching that broke the bouquet's overall silhouette.
+- Restored the steadier bouquet body distribution from the previous low-poly flower version.
+- Added visible hover/focus tips on the auto-hiding control UI so each button explains its function in plain language.
+- Clarified the circular-arrow control as "随机镜头路线" instead of leaving it visually ambiguous as a reverse icon.
+
+## 0.12E - 2026-06-25
+
+Extended MVP definition layer.
+
+- Added `productVersion: 0.12E` while keeping npm `version` at valid SemVer
+  `0.12.0`.
+- Added the project abstract and development intention document.
+- Defined the rule that `E` versions are Extended versions with product/data
+  capabilities beyond the pure visual frontend.
+- Added a free MVP architecture for no-server development on GitHub Pages and
+  similar free static hosting.
+- Added TypeScript field contracts for users, entitlements, bouquet records,
+  favorites, share records, legal consent, and personal aesthetic inputs.
+- Kept the implementation lightweight: no rented server, no paid database, no
+  full app/APK/screen-saver build in this version.
+
 ## 0.12.0 - 2026-06-25
 
 Current dense revision.

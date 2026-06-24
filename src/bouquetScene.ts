@@ -243,60 +243,11 @@ function makeLowPolyFlowerGeometry(petalCount: number, radius: number) {
   return geometry;
 }
 
-function makeCupFlowerGeometry(petalCount: number, radius: number) {
-  const positions: number[] = [];
-  const addTriangle = (a: THREE.Vector3, b: THREE.Vector3, c: THREE.Vector3) => {
-    positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
-  };
-
-  for (let i = 0; i < petalCount; i += 1) {
-    const angle = (i / petalCount) * Math.PI * 2;
-    const next = ((i + 1) / petalCount) * Math.PI * 2;
-    const inner = new THREE.Vector3(Math.cos(angle) * radius * 0.22, Math.sin(angle) * radius * 0.22, radius * 0.06);
-    const left = new THREE.Vector3(Math.cos(angle) * radius * 0.52, Math.sin(angle) * radius * 0.52, radius * 0.18);
-    const right = new THREE.Vector3(Math.cos(next) * radius * 0.52, Math.sin(next) * radius * 0.52, radius * 0.18);
-    const tip = new THREE.Vector3(
-      Math.cos((angle + next) / 2) * radius * 0.9,
-      Math.sin((angle + next) / 2) * radius * 0.9,
-      radius * 0.36
-    );
-    addTriangle(inner, left, tip);
-    addTriangle(inner, tip, right);
-  }
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-function makeStarFlowerGeometry(petalCount: number, radius: number) {
-  const positions: number[] = [];
-  const addTriangle = (a: THREE.Vector3, b: THREE.Vector3, c: THREE.Vector3) => {
-    positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
-  };
-  const center = new THREE.Vector3(0, 0, radius * 0.08);
-
-  for (let i = 0; i < petalCount; i += 1) {
-    const angle = (i / petalCount) * Math.PI * 2;
-    const direction = new THREE.Vector3(Math.cos(angle), Math.sin(angle), 0);
-    const tangent = new THREE.Vector3(-Math.sin(angle), Math.cos(angle), 0);
-    const root = direction.clone().multiplyScalar(radius * 0.2);
-    const left = root.clone().addScaledVector(tangent, radius * 0.18).setZ(-0.006);
-    const right = root.clone().addScaledVector(tangent, -radius * 0.18).setZ(-0.006);
-    const tip = direction.clone().multiplyScalar(radius * (0.98 + (i % 3) * 0.08)).setZ(radius * 0.08);
-    addTriangle(center, left, tip);
-    addTriangle(center, tip, right);
-  }
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-function flowerMaterial(spec: DailyBouquetSpec) {
-  return new THREE.MeshStandardMaterial({
+function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
+  const rng = createRng(`${spec.seed}:flowers`);
+  const petalCount = quality.renderName === 'low' ? 5 : spec.special ? 8 : 7;
+  const geometry = makeLowPolyFlowerGeometry(petalCount, spec.special ? 0.072 : 0.064);
+  const material = new THREE.MeshStandardMaterial({
     roughness: 0.82,
     metalness: 0.0,
     flatShading: true,
@@ -304,126 +255,45 @@ function flowerMaterial(spec: DailyBouquetSpec) {
     emissive: new THREE.Color(spec.theme.glow),
     emissiveIntensity: 0.08
   });
-}
+  const count = Math.floor(quality.flowerCount * spec.flowerDensity);
+  const mesh = new THREE.InstancedMesh(geometry, material, count);
+  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
 
-function orientInstanceToBouquetPoint(p: THREE.Vector3, theta: number, rng: ReturnType<typeof createRng>, openness: number) {
-  const outward = p.clone().normalize();
-  const randomAxis = new THREE.Vector3(rng.range(-1, 1), rng.range(-0.6, 1), rng.range(-1, 1)).normalize();
-  const normal = outward.lerp(randomAxis, openness).normalize();
-  tempObject.quaternion.setFromUnitVectors(up, normal);
-  tempObject.rotateZ(rng.range(0, Math.PI * 2));
-  tempObject.rotateX(rng.range(-0.75, 0.75));
-  tempObject.rotateY(theta + rng.range(-0.9, 0.9));
-}
-
-function setFlowerInstances(
-  mesh: THREE.InstancedMesh,
-  spec: DailyBouquetSpec,
-  rng: ReturnType<typeof createRng>,
-  count: number,
-  scaleBias: number,
-  colorLift: number,
-  orientationOpenness: number
-) {
   for (let i = 0; i < count; i += 1) {
     const theta = rng.range(0, Math.PI * 2);
-    const phi = rng.range(0.34, 1.68);
-    const p = bouquetPoint(spec, rng.range(0.42, 1.84), rng.range(0.78, 1.5), theta, phi);
-    p.y += spec.haloLift + rng.range(-0.3, 0.38);
+    const phi = rng.range(0.36, 1.66);
+    const p = bouquetPoint(spec, rng.range(0.5, 1.78), rng.range(0.82, 1.46), theta, phi);
+    p.y += spec.haloLift + rng.range(-0.26, 0.36);
     const bloom = spec.special?.bloomScale;
     const large = bloom && rng.value() < bloom.largeBias;
-    const baseScale = bloom
+    const scale = bloom
       ? rng.range(bloom.small, large ? bloom.large : bloom.medium)
-      : rng.range(0.42, 0.98) * (rng.value() > 0.9 ? rng.range(1.08, 1.48) : 1);
-    const scale = baseScale * scaleBias;
+      : rng.range(0.46, 0.9) * (rng.value() > 0.96 ? 1.08 : 1);
     tempObject.position.copy(p);
-    orientInstanceToBouquetPoint(p, theta, rng, orientationOpenness);
-    tempObject.scale.set(
-      scale * rng.range(0.72, 1.34),
-      scale * rng.range(0.64, 1.26),
-      scale * rng.range(0.58, 1.18)
-    );
+    tempObject.quaternion.setFromUnitVectors(up, p.clone().normalize());
+    tempObject.rotateZ(rng.range(0, Math.PI * 2));
+    tempObject.rotateX(rng.range(-0.38, 0.38));
+    if (spec.special) {
+      tempObject.scale.set(scale * rng.range(0.9, 1.28), scale * rng.range(0.56, 0.82), scale * rng.range(0.9, 1.18));
+    } else {
+      tempObject.scale.set(scale * rng.range(0.82, 1.16), scale * rng.range(0.82, 1.12), scale * rng.range(0.72, 1.06));
+    }
     tempObject.updateMatrix();
     mesh.setMatrixAt(i, tempObject.matrix);
-    mesh.setColorAt(i, tempColor.set(pickColor(spec.theme.palette, rng.value())).lerp(new THREE.Color('#ffffff'), rng.range(0, colorLift)));
+    mesh.setColorAt(i, tempColor.set(pickColor(spec.theme.palette, rng.value())).lerp(new THREE.Color('#ffffff'), rng.range(0.0, 0.1)));
   }
   if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-}
-
-function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
-  const rng = createRng(`${spec.seed}:flowers`);
-  const count = Math.floor(quality.flowerCount * spec.flowerDensity);
-
-  if (quality.renderName === 'low') {
-    const geometry = new THREE.IcosahedronGeometry(spec.special ? 0.058 : 0.052, 0);
-    const mesh = new THREE.InstancedMesh(geometry, flowerMaterial(spec), count);
-    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    setFlowerInstances(mesh, spec, createRng(`${spec.seed}:flowers:low`), count, 0.9, 0.08, 0.75);
-    return mesh;
-  }
-
-  if (quality.renderName === 'medium') {
-    const geometry = makeLowPolyFlowerGeometry(spec.special ? 6 : 5, spec.special ? 0.072 : 0.062);
-    const mesh = new THREE.InstancedMesh(geometry, flowerMaterial(spec), count);
-    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    setFlowerInstances(mesh, spec, rng, count, 1, 0.1, 0.5);
-    return mesh;
-  }
-
-  const group = new THREE.Group();
-  const batches = [
-    { geometry: makeLowPolyFlowerGeometry(7, spec.special ? 0.08 : 0.068), share: 0.42, scale: 1.0, lift: 0.1, open: 0.54 },
-    { geometry: makeCupFlowerGeometry(8, spec.special ? 0.078 : 0.066), share: 0.22, scale: 1.18, lift: 0.08, open: 0.72 },
-    { geometry: makeStarFlowerGeometry(9, spec.special ? 0.075 : 0.064), share: 0.22, scale: 0.92, lift: 0.12, open: 0.82 },
-    { geometry: new THREE.DodecahedronGeometry(spec.special ? 0.06 : 0.052, 0), share: 0.14, scale: 0.78, lift: 0.06, open: 0.95 }
-  ];
-  let used = 0;
-  batches.forEach((batch, index) => {
-    const batchCount = index === batches.length - 1 ? count - used : Math.max(1, Math.floor(count * batch.share));
-    used += batchCount;
-    const mesh = new THREE.InstancedMesh(batch.geometry, flowerMaterial(spec), batchCount);
-    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    setFlowerInstances(mesh, spec, createRng(`${spec.seed}:flowers:${index}`), batchCount, batch.scale, batch.lift, batch.open);
-    group.add(mesh);
-  });
-  return group;
-}
-
-function makePlantGeometry(kind: 'leaf' | 'grass' | 'round' | 'split') {
-  const shape = new THREE.Shape();
-  if (kind === 'grass') {
-    shape.moveTo(-0.018, -0.22);
-    shape.bezierCurveTo(0.02, -0.08, 0.05, 0.12, 0.012, 0.3);
-    shape.bezierCurveTo(-0.035, 0.1, -0.04, -0.08, -0.018, -0.22);
-  } else if (kind === 'round') {
-    shape.moveTo(0, 0.14);
-    shape.bezierCurveTo(0.16, 0.14, 0.18, -0.08, 0, -0.14);
-    shape.bezierCurveTo(-0.18, -0.08, -0.16, 0.14, 0, 0.14);
-  } else if (kind === 'split') {
-    shape.moveTo(0, 0.18);
-    shape.lineTo(0.055, 0.04);
-    shape.lineTo(0.14, 0.02);
-    shape.lineTo(0.055, -0.03);
-    shape.lineTo(0.09, -0.18);
-    shape.lineTo(0, -0.08);
-    shape.lineTo(-0.09, -0.18);
-    shape.lineTo(-0.055, -0.03);
-    shape.lineTo(-0.14, 0.02);
-    shape.lineTo(-0.055, 0.04);
-    shape.lineTo(0, 0.18);
-  } else {
-    shape.moveTo(0, 0.13);
-    shape.bezierCurveTo(0.11, 0.08, 0.13, -0.08, 0, -0.15);
-    shape.bezierCurveTo(-0.13, -0.08, -0.11, 0.08, 0, 0.13);
-  }
-  const geometry = new THREE.ShapeGeometry(shape);
-  geometry.computeVertexNormals();
-  return geometry;
+  return mesh;
 }
 
 function buildLeaves(spec: DailyBouquetSpec, quality: QualityProfile) {
-  const group = new THREE.Group();
-  const createPlantMaterial = () => new THREE.MeshStandardMaterial({
+  const rng = createRng(`${spec.seed}:leaves`);
+  const shape = new THREE.Shape();
+  shape.moveTo(0, 0.13);
+  shape.bezierCurveTo(0.11, 0.08, 0.13, -0.08, 0, -0.15);
+  shape.bezierCurveTo(-0.13, -0.08, -0.11, 0.08, 0, 0.13);
+  const geometry = new THREE.ShapeGeometry(shape);
+  const material = new THREE.MeshStandardMaterial({
     roughness: 0.9,
     metalness: 0,
     side: THREE.DoubleSide,
@@ -433,48 +303,29 @@ function buildLeaves(spec: DailyBouquetSpec, quality: QualityProfile) {
     emissiveIntensity: 0.05
   });
   const count = Math.floor(quality.leafCount * spec.leafDensity * (spec.special ? 0.68 : 1));
-  const plantKinds: Array<{ kind: 'leaf' | 'grass' | 'round' | 'split'; share: number; width: number; height: number }> =
-    quality.renderName === 'low'
-      ? [
-          { kind: 'leaf', share: 0.72, width: 0.86, height: 1.1 },
-          { kind: 'grass', share: 0.28, width: 0.48, height: 1.45 }
-        ]
-      : [
-          { kind: 'leaf', share: 0.38, width: 0.82, height: 1.14 },
-          { kind: 'grass', share: 0.24, width: 0.36, height: 1.72 },
-          { kind: 'round', share: 0.22, width: 0.9, height: 0.92 },
-          { kind: 'split', share: 0.16, width: 0.74, height: 1.04 }
-        ];
-  let used = 0;
-  plantKinds.forEach((plant, index) => {
-    const batchCount = index === plantKinds.length - 1 ? count - used : Math.max(1, Math.floor(count * plant.share));
-    used += batchCount;
-    const rng = createRng(`${spec.seed}:plants:${plant.kind}`);
-    const mesh = new THREE.InstancedMesh(makePlantGeometry(plant.kind), createPlantMaterial(), batchCount);
-    for (let i = 0; i < batchCount; i += 1) {
-      const theta = rng.range(0, Math.PI * 2);
-      const phi = rng.range(0.36, 1.86);
-      const p = bouquetPoint(spec, rng.range(0.38, 1.92), rng.range(0.62, 1.42), theta, phi);
-      p.y += spec.haloLift + rng.range(-0.42, 0.28);
-      const size = spec.special ? rng.range(0.28, 0.78) : rng.range(0.42, 1.38);
-      tempObject.position.copy(p);
-      orientInstanceToBouquetPoint(p, theta, rng, plant.kind === 'grass' ? 0.9 : 0.62);
-      tempObject.scale.set(
-        size * plant.width * rng.range(0.45, 1.25),
-        size * plant.height * rng.range(0.58, 1.58),
-        size
-      );
-      tempObject.updateMatrix();
-      mesh.setMatrixAt(i, tempObject.matrix);
-      mesh.setColorAt(
-        i,
-        tempColor.set(pickColor(spec.theme.leafPalette, rng.value())).lerp(new THREE.Color(spec.theme.glow), rng.range(0, 0.08))
-      );
-    }
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    group.add(mesh);
-  });
-  return group;
+  const mesh = new THREE.InstancedMesh(geometry, material, count);
+
+  for (let i = 0; i < count; i += 1) {
+    const theta = rng.range(0, Math.PI * 2);
+    const phi = rng.range(0.38, 1.82);
+    const p = bouquetPoint(spec, rng.range(0.44, 1.78), rng.range(0.7, 1.38), theta, phi);
+    p.y += spec.haloLift + rng.range(-0.38, 0.24);
+    const size = spec.special ? rng.range(0.32, 0.82) : rng.range(0.55, 1.28);
+    tempObject.position.copy(p);
+    tempObject.quaternion.setFromUnitVectors(up, p.clone().normalize());
+    tempObject.rotateY(theta + rng.range(-0.8, 0.8));
+    tempObject.rotateX(rng.range(-0.8, 0.8));
+    tempObject.scale.set(
+      size * rng.range(0.42, spec.special ? 0.7 : 0.92),
+      size * rng.range(0.72, spec.special ? 1.12 : 1.45),
+      size
+    );
+    tempObject.updateMatrix();
+    mesh.setMatrixAt(i, tempObject.matrix);
+    mesh.setColorAt(i, tempColor.set(pickColor(spec.theme.leafPalette, rng.value())));
+  }
+  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  return mesh;
 }
 
 function buildStemBundle(spec: DailyBouquetSpec) {
