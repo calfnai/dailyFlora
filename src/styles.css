@@ -29,6 +29,10 @@ body {
   min-height: 100vh;
 }
 
+body.is-special {
+  background: #050408;
+}
+
 button {
   font: inherit;
 }
@@ -228,6 +232,157 @@ button {
   border-radius: 999px;
 }
 
+.is-special .app-shell {
+  background:
+    radial-gradient(circle at 50% 42%, rgb(255 228 168 / 12%), transparent 24%),
+    radial-gradient(circle at 58% 56%, rgb(170 130 210 / 9%), transparent 34%),
+    linear-gradient(180deg, #050408 0%, #080711 54%, #030305 100%);
+}
+
+.is-special .hud,
+.is-special .controls {
+  color: rgb(255 246 224 / 62%);
+}
+
+.is-special .daily-theme {
+  font-size: clamp(14px, 1.8vw, 20px);
+  text-transform: lowercase;
+}
+
+.is-special .quality-mark,
+.is-special .segmented,
+.is-special .rotation-control,
+.is-special .controls {
+  border-color: rgb(255 232 193 / 10%);
+  background: rgb(5 4 8 / 28%);
+}
+
+.special-start-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background:
+    radial-gradient(circle at 51% 43%, rgb(255 236 188 / 12%), transparent 24%),
+    linear-gradient(180deg, rgb(5 4 8 / 88%), rgb(5 4 8 / 68%));
+  opacity: 1;
+  transition: opacity 850ms ease;
+}
+
+.special-start-overlay.is-dismissed {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.special-start-copy {
+  display: grid;
+  justify-items: center;
+  gap: 22px;
+  max-width: 620px;
+  text-align: center;
+  color: #fff6dd;
+  text-shadow: 0 1px 28px rgb(0 0 0 / 76%);
+}
+
+.special-date {
+  margin: 0;
+  color: rgb(255 237 199 / 62%);
+  font-size: 13px;
+  letter-spacing: 0.16em;
+}
+
+.special-start-copy h1 {
+  margin: 0;
+  max-width: 14em;
+  font-size: clamp(30px, 7vw, 74px);
+  font-weight: 420;
+  line-height: 0.96;
+  letter-spacing: 0;
+}
+
+.special-start-button {
+  min-height: 44px;
+  padding: 0 22px;
+  border: 1px solid rgb(255 244 218 / 36%);
+  border-radius: 999px;
+  color: #fff8df;
+  background: rgb(255 245 218 / 10%);
+  box-shadow: 0 18px 60px rgb(0 0 0 / 24%);
+  backdrop-filter: blur(18px);
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    transform 180ms ease,
+    border-color 180ms ease;
+}
+
+.special-start-button:hover,
+.special-start-button:focus-visible {
+  border-color: rgb(255 244 218 / 58%);
+  background: rgb(255 245 218 / 16%);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.special-caption,
+.special-quote,
+.special-credit {
+  position: fixed;
+  z-index: 2;
+  color: rgb(255 246 224 / 58%);
+  text-shadow: 0 1px 18px rgb(0 0 0 / 68%);
+  pointer-events: none;
+}
+
+.special-caption {
+  left: max(18px, env(safe-area-inset-left));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.special-caption p,
+.special-quote p {
+  margin: 0;
+}
+
+.special-quote {
+  right: max(20px, env(safe-area-inset-right));
+  top: 50%;
+  max-width: min(330px, calc(100vw - 40px));
+  font-size: clamp(14px, 1.8vw, 19px);
+  line-height: 1.42;
+  opacity: 0;
+  animation: specialQuoteIn 2.2s ease 10s forwards;
+}
+
+.special-quote [lang='zh-CN'] {
+  margin-top: 14px;
+  color: rgb(255 225 232 / 44%);
+  font-size: 0.82em;
+}
+
+.special-credit {
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  color: rgb(255 246 224 / 34%);
+  font-size: 10px;
+}
+
+@keyframes specialQuoteIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 680px) {
   .hud {
     left: 14px;
@@ -264,5 +419,23 @@ button {
 
   .rotation-slider {
     width: clamp(82px, 24vw, 122px);
+  }
+
+  .special-caption {
+    left: 14px;
+    bottom: 82px;
+  }
+
+  .special-quote {
+    top: auto;
+    right: 14px;
+    bottom: 132px;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  .special-credit {
+    right: 14px;
+    bottom: 58px;
   }
 }

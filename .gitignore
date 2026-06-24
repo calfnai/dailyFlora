@@ -1,6 +1,14 @@
 node_modules/
 dist/
+.tools/
 .DS_Store
 *.local
 data/inbox/*/
 !data/inbox/README.md
+
+# TouchDesigner autosaves and local crash recovery files
+*.toe.autosave
+*.tox.autosave
+*.toe.backup
+*.tox.backup
+CrashAutoSave*.toe

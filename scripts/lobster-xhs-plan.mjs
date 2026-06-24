@@ -23,8 +23,16 @@ const task = {
   date: today,
   source: 'xiaohongshu',
   assistant: 'Lobster external AI app running DeepSeek or another model',
-  goal: 'Fetch recent flower arrangement updates for DailyFlora inspiration review.',
+  goal: 'Organize owner-provided Xiaohongshu links for DailyFlora inspiration review without stressing the account session.',
+  accessMode: 'owner-provided-links',
   creators,
+  ownerProvidedLinks: [
+    {
+      sourceUrl: 'paste Xiaohongshu note/profile link here',
+      creatorName: 'optional',
+      title: 'optional'
+    }
+  ],
   outputFile: `data/inbox/${today}/notes.json`,
   outputShape: {
     notes: [
@@ -34,8 +42,8 @@ const task = {
         sourceUrl: 'string',
         title: 'string',
         observedAt: today,
-        imagePaths: ['optional local screenshot paths'],
-        caption: 'optional caption or summary',
+        imagePaths: [],
+        caption: 'optional summary from accessible page text',
         colorNotes: ['short visual observation'],
         spatialNotes: ['3D bouquet structure observation'],
         materialNotes: ['flower/leaf/filler observation'],
@@ -51,17 +59,33 @@ const task = {
     ]
   },
   rules: [
-    'Use the local logged-in browser state if available.',
+    'Process only links explicitly provided by the owner in this run.',
+    'Do not crawl creator homepages to discover more posts.',
+    'Do not ask the owner to log in repeatedly.',
+    'Open at most one Xiaohongshu URL at a time.',
+    'If Xiaohongshu asks for login, captcha, SMS, QR scan, or account verification, stop browsing immediately.',
     'Do not copy original images into the web app.',
-    'Prefer screenshots or local evidence only inside data/inbox.',
-    'No need to fetch every historical post; recent updates and notable new patterns are enough.',
+    'Do not ask the owner for screenshots unless the owner volunteers them.',
+    'Use only visible/link-accessible information and keep observations compact.',
     'If access fails, write accessIssues instead of guessing.'
   ]
 };
 
 const prompt = `# Lobster Task: DailyFlora Xiaohongshu Inspiration
 
-Open the creators listed in \`lobster-task.json\`, using the local logged-in browser state if possible.
+This is an owner-provided-links task. Do not batch-open Xiaohongshu pages.
+
+Use only links explicitly provided by the owner for this run. The creators listed in \`lobster-task.json\` are reference names, not a browsing queue.
+
+Safety rules:
+
+- Do not crawl creator homepages to discover more posts.
+- Do not open multiple Xiaohongshu tabs.
+- Do not trigger repeated login prompts.
+- Do not request SMS, QR scan, captcha, or account verification.
+- If Xiaohongshu asks for login or verification, stop browsing and record an \`accessIssues\` item.
+- Do not ask the owner for screenshots unless the owner volunteers them.
+- If no owner-provided links are available, return only \`accessIssues\` and ask for links.
 
 Return \`notes.json\` in the same folder. Keep it compact. Focus only on what can improve a 360-degree low-power particle bouquet:
 

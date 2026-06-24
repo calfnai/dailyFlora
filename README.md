@@ -19,11 +19,64 @@ npm run build
 
 The build output is static and can be hosted on GitHub Pages.
 
+## Deploy To GitHub Pages
+
+First-time login on a machine:
+
+```bash
+npm run github:login
+```
+
+Deploy the source manifest to `main` and the built static site to `gh-pages`:
+
+```bash
+npm run deploy:github
+```
+
+Deploy only the built static site:
+
+```bash
+npm run deploy:pages
+```
+
+The deploy script uses GitHub CLI authentication and automatically downloads a
+local GitHub CLI copy into `.tools/gh` if `gh` is not installed. The default
+source sync is intentionally manifest-based via
+`scripts/deploy-source-files.json`, so unrelated local drafts are not pushed by
+accident. Use `node scripts/deploy-github-pages.mjs --main=tracked` only when
+you intentionally want to sync all tracked files except ignored build/inbox
+paths and workflow files.
+
+If a new Codex conversation says the project cannot sync to GitHub, read
+`docs/github-sync-runbook.md`. The usual cause is missing system-level `gh`
+installation or missing GitHub authentication, not a repository limitation.
+
+## Multi-device Workflow
+
+This repository is safe to use as the shared source for multiple development
+machines.
+
+```bash
+git clone https://github.com/calfnai/dailyFlora.git
+cd dailyFlora
+npm ci
+npm run dev
+```
+
+Before switching machines, commit and push the current branch. On the next
+machine, pull the branch before editing. Keep generated folders such as
+`node_modules/`, `dist/`, and dated `data/inbox/` folders out of Git.
+
+TouchDesigner `.toe`, `.tox`, and `.tdz` files are treated as binary project
+assets. If those files become large, move them to Git LFS before using GitHub as
+the long-term sync point.
+
 ## URL Options
 
 - `?date=YYYY-MM-DD` previews a specific day.
 - `?seed=...` shares a fixed bouquet.
-- `?quality=auto|low|medium|high` controls rendering load.
+- `?density=low|medium|high` controls bouquet density.
+- `?render=auto|low|medium|high` controls rendering precision.
 
 ## Inspiration Workflow
 
@@ -32,12 +85,14 @@ updates live in `data/inspiration-library.json` and must be confirmed before
 they influence the generator.
 
 ```bash
-npm run lobster:plan
+npm run inspiration:links -- data/inbox/YYYY-MM-DD/owner-links.json
 npm run inspiration:ingest -- data/inbox/YYYY-MM-DD/notes.json
 ```
 
-The first command creates a compact handoff packet for Lobster, the external AI
-app you can use with DeepSeek. DailyFlora only ingests Lobster's resulting JSON.
+The first command reads owner-provided Xiaohongshu links and writes compact
+`notes.json` observations. If a link cannot be read, it records `accessIssues`
+so the read path can be fixed without asking the owner for manual descriptions.
+Lobster is only a fallback for a single explicit link, not the default workflow.
 
 The default mobile profile is intentionally conservative. Auto quality treats
 phones as `low`, aiming for a screensaver that stays closer to an iPhone 13 Pro

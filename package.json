@@ -7,7 +7,11 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
     "preview": "vite preview --host 0.0.0.0",
+    "github:login": "node scripts/deploy-github-pages.mjs --login",
+    "deploy:github": "node scripts/deploy-github-pages.mjs",
+    "deploy:pages": "node scripts/deploy-github-pages.mjs --main=skip",
     "lobster:plan": "node scripts/lobster-xhs-plan.mjs",
+    "inspiration:links": "node scripts/ingest-owner-links.mjs",
     "inspiration:ingest": "node scripts/ingest-lobster-inbox.mjs"
   },
   "dependencies": {

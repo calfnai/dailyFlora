@@ -63,7 +63,368 @@
         "Keep a hand-tied floating base instead of a vase for v1."
       ],
       "status": "accepted"
+    },
+    {
+      "id": "lobster-2026-06-15-aHR0cHM6Ly93d3cu",
+      "creatorId": "5d87975300000000010188c5",
+      "creatorName": "Mm🔥",
+      "sourceUrl": "https://www.xiaohongshu.com/discovery/item/6a2f283900000000060221e3?source=webshare&xhsshare=pc_web&xsec_token=AB0G7c_Eh8stxDAJ7Y7Qtg0OJlA6lLKBtF77KjFsIh0AU=&xsec_source=pc_share",
+      "title": "不是惊喜，是“你懂我”的那种安心💐",
+      "observedAt": "2026-06-15",
+      "colorNotes": [
+        "composition reads as carefully matched rather than high-contrast novelty"
+      ],
+      "spatialNotes": [
+        "favor a balanced bouquet body with recognizable focal blooms and supporting texture"
+      ],
+      "materialNotes": [
+        "no explicit material detail available from public text; keep source link pending for visual review"
+      ],
+      "parameterSuggestions": [
+        "keep focal bloom count moderate, then use small particles to echo material matching"
+      ],
+      "status": "accepted",
+      "inboxEvidence": {
+        "file": "data/inbox/2026-06-15/notes.json",
+        "imagePaths": [],
+        "caption": "收到这束花真的太开心了所以决定分享一下学校附近挖到的这家宝藏花店！[派对R][派对R][派对R][派对R][派对R]\n拿图定制还原度也是高到离谱💯\n本来只是抱着试试看的心态，\n给老板看了张网图：我想要这种花🌷\n结果拿到手那一刻我惊了——\n🎨颜色、花型、搭配，几乎一毛一样！\n老板审美也太在线了吧👏\n而且价格对学生党超友好！\n美女老板人也超nice，别问去就对了💗\n#生活充满惊喜[话题]# #总有人用心总有人浪漫[话题]# #低预算高颜值[话题]# #罗江[话题]# #罗江花店[话题]# #宝藏花店[话题]# #分享[话题]#"
+      },
+      "implementedIn": {
+        "themeId": "dopamine-field",
+        "files": [
+          "src/themes.ts",
+          "src/spec.ts",
+          "src/bouquetScene.ts"
+        ],
+        "summary": "Added a warm bright field bouquet theme with stronger branch, leaf, and outer-line structure."
+      }
+    },
+    {
+      "id": "inspiration-2026-06-15-6a2e64490000000021015b88",
+      "creatorId": "634431450000000018028ba8",
+      "creatorName": "葡萄枝的花",
+      "sourceUrl": "https://www.xiaohongshu.com/discovery/item/6a2e64490000000021015b88?source=webshare&xhsshare=pc_web&xsec_token=ABfop9ihtfGbs1VnCXGbqEMPNYVP6eGo8rM8CM5rAuc_M=&xsec_source=pc_share",
+      "title": "蝉鸣铺满河床🍃🌠",
+      "observedAt": "2026-06-15",
+      "colorNotes": [
+        "warm bright palette signal; bias toward sunlit yellow, peach, and fresh green accents"
+      ],
+      "spatialNotes": [
+        "natural bouquet cue; keep the silhouette airy instead of a compact dome"
+      ],
+      "materialNotes": [
+        "increase branch, leaf, grass, and small filler rhythm around the outer shell"
+      ],
+      "parameterSuggestions": [
+        "add a warm daylight palette variant with higher yellow/peach weight and softer green support",
+        "raise outer branch/grass count and vary stem heights for a field-like structure"
+      ],
+      "status": "accepted",
+      "inboxEvidence": {
+        "file": "data/inbox/2026-06-15/notes.json",
+        "imagePaths": [],
+        "caption": "#成都花店[话题]# #见面花束[话题]# #生日花束[话题]# #自然系花礼[话题]# #田园风花艺[话题]# #温暖明亮色系[话题]# #鲜花[话题]# #阳光[话题]##治愈[话题]##等待麻雀降临的少年[话题]#"
+      },
+      "implementedIn": {
+        "themeId": "dopamine-field",
+        "files": [
+          "src/themes.ts",
+          "src/spec.ts",
+          "src/bouquetScene.ts"
+        ],
+        "summary": "Added a warm bright field bouquet theme with stronger branch, leaf, and outer-line structure."
+      }
+    },
+    {
+      "id": "inspiration-2026-06-15-6a281235000000001700b7f9",
+      "creatorId": "57385aee6a6a6976421d81af",
+      "creatorName": "时光花里",
+      "sourceUrl": "https://www.xiaohongshu.com/explore/6a281235000000001700b7f9?xsec_token=AB0dPiZm7BNwrVykZV4t_8j8_SMiTgSkO2ArQIP28gZAs=&xsec_source=pc_feed",
+      "title": "好有生命力的花花🌸🌼🍃🪻🫧",
+      "observedAt": "2026-06-15",
+      "colorNotes": [
+        "no explicit color detail available from public text; keep source link pending for visual review"
+      ],
+      "spatialNotes": [
+        "natural bouquet cue; keep the silhouette airy instead of a compact dome"
+      ],
+      "materialNotes": [
+        "increase branch, leaf, grass, and small filler rhythm around the outer shell"
+      ],
+      "parameterSuggestions": [
+        "raise outer branch/grass count and vary stem heights for a field-like structure"
+      ],
+      "status": "accepted",
+      "inboxEvidence": {
+        "file": "data/inbox/2026-06-15/notes.json",
+        "imagePaths": [],
+        "caption": "#义乌花店[话题]# #生日花束[话题]# #送闺蜜花束[话题]# #多巴胺花束[话题]# #鲜花抱抱桶[话题]# #五彩缤纷的花束[话题]# #多巴胺花束[话题]# #毕业季花束[话题]# #送女朋友的花束[话题]# #送老师花束[话题]#"
+      },
+      "implementedIn": {
+        "themeId": "dopamine-field",
+        "files": [
+          "src/themes.ts",
+          "src/spec.ts",
+          "src/bouquetScene.ts"
+        ],
+        "summary": "Added a warm bright field bouquet theme with stronger branch, leaf, and outer-line structure."
+      }
     }
   ],
-  "pendingRecommendations": []
+  "pendingRecommendations": [],
+  "lastIngest": {
+    "at": "2026-06-14T23:01:26.441Z",
+    "input": "data/inbox/2026-06-15/notes.json",
+    "added": 1,
+    "accessIssues": []
+  },
+  "lastImplementation": {
+    "at": "2026-06-14T23:10:08.918Z",
+    "acceptedIds": [
+      "lobster-2026-06-15-aHR0cHM6Ly93d3cu",
+      "inspiration-2026-06-15-6a2e64490000000021015b88",
+      "inspiration-2026-06-15-6a281235000000001700b7f9"
+    ],
+    "themeId": "dopamine-field",
+    "summary": "Implemented owner-provided Xiaohongshu links as the 生命力花田 theme and theme-level density biases."
+  },
+  "referenceDeck": [
+    {
+      "id": "summer-dopamine",
+      "section": "正向范例",
+      "titleZh": "夏日多巴胺 🫧🎨🍃",
+      "titleEn": "Summer Dopamine",
+      "group": "positive",
+      "imagePaths": [
+        "docs/释义/夏日多巴胺 🫧🎨🍃_1_Dreamseeker寻梦_来自小红书网页版.jpg",
+        "docs/释义/夏日多巴胺 🫧🎨🍃_2_Dreamseeker寻梦_来自小红书网页版.jpg"
+      ]
+    },
+    {
+      "id": "volume-read",
+      "section": "正向范例",
+      "titleZh": "明明一束挺大的花束，拍出来咋就看不出来呢",
+      "titleEn": "Volume Read",
+      "group": "positive",
+      "imagePaths": [
+        "docs/释义/明明一束挺大的花束，拍出来咋就看不出来呢.jpg",
+        "docs/释义/明明一束挺大的花束，拍出来咋就看不出来呢2.jpg"
+      ]
+    },
+    {
+      "id": "berry-grove",
+      "section": "正向范例",
+      "titleZh": "邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦",
+      "titleEn": "Berry Grove",
+      "group": "positive",
+      "imagePaths": [
+        "docs/释义/邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦_1_一茉Flower_来自小红书网页版.jpg",
+        "docs/释义/邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦_2_一茉Flower_来自小红书网页版.jpg",
+        "docs/释义/邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦_3_一茉Flower_来自小红书网页版.jpg",
+        "docs/释义/邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦_4_一茉Flower_来自小红书网页版.jpg"
+      ]
+    },
+    {
+      "id": "cappuccino-cream",
+      "section": "正向范例",
+      "titleZh": "卡布奇诺的配色好可爱",
+      "titleEn": "Cappuccino Cream",
+      "group": "positive",
+      "imagePaths": [
+        "docs/释义/卡布奇诺的配色好可爱.png"
+      ]
+    },
+    {
+      "id": "autumn-juice",
+      "section": "正向范例",
+      "titleZh": "宁波花店｜秋日果汁🍹",
+      "titleEn": "Autumn Juice",
+      "group": "positive",
+      "imagePaths": [
+        "docs/释义/宁波花店｜秋日果汁🍹_1_西西花艺工作室_来自小红书网页版.jpg",
+        "docs/释义/宁波花店｜秋日果汁🍹_2_西西花艺工作室_来自小红书网页版.jpg",
+        "docs/释义/宁波花店｜秋日果汁🍹_3_西西花艺工作室_来自小红书网页版.jpg",
+        "docs/释义/宁波花店｜秋日果汁🍹_4_西西花艺工作室_来自小红书网页版.jpg"
+      ]
+    },
+    {
+      "id": "romance-made-visible",
+      "section": "正向范例",
+      "titleZh": "花束是浪漫的具象化｜杭州花店",
+      "titleEn": "Romance Made Visible",
+      "group": "positive",
+      "imagePaths": [
+        "docs/释义/花束是浪漫的具象化｜杭州花店_1_椿信子 Chunsign_来自小红书网页版.jpg",
+        "docs/释义/花束是浪漫的具象化｜杭州花店_2_椿信子 Chunsign_来自小红书网页版.jpg",
+        "docs/释义/花束是浪漫的具象化｜杭州花店_3_椿信子 Chunsign_来自小红书网页版.jpg",
+        "docs/释义/花束是浪漫的具象化｜杭州花店_4_椿信子 Chunsign_来自小红书网页版.jpg"
+      ]
+    },
+    {
+      "id": "bare-bouquet-positive",
+      "section": "反向范例",
+      "titleZh": "裸花束是最自然的表达🌿",
+      "titleEn": "Bare Bouquet",
+      "group": "negative",
+      "imagePaths": [
+        "docs/释义/裸花束是最自然的表达🌿_1_Be yourself flower_来自小红书网页版.jpg"
+      ]
+    },
+    {
+      "id": "oversized-sunflower-fault",
+      "section": "反向范例",
+      "titleZh": "中间的大向日葵占据了太多空间",
+      "titleEn": "Oversized Sunflower Fault",
+      "group": "negative",
+      "imagePaths": [
+        "docs/释义/明明一束挺大的花束，拍出来咋就看不出来呢.jpg",
+        "docs/释义/明明一束挺大的花束，拍出来咋就看不出来呢2.jpg"
+      ]
+    },
+    {
+      "id": "petal-quiet",
+      "section": "其他正面参考",
+      "titleZh": "浅粉花序",
+      "titleEn": "Petal Quiet",
+      "group": "positive-detail",
+      "imagePaths": [
+        "docs/untitled folder/其他正面参考.jpg"
+      ]
+    },
+    {
+      "id": "cream-line-bouquet",
+      "section": "其他正面参考",
+      "titleZh": "奶白线条束",
+      "titleEn": "Cream Line Bouquet",
+      "group": "positive-detail",
+      "imagePaths": [
+        "docs/untitled folder/其他正面参考2.jpg"
+      ]
+    },
+    {
+      "id": "wild-market-bloom",
+      "section": "其他正面参考",
+      "titleZh": "野趣市场束",
+      "titleEn": "Wild Market Bloom",
+      "group": "positive-detail",
+      "imagePaths": [
+        "docs/untitled folder/其他正面参考3.jpg"
+      ]
+    },
+    {
+      "id": "overgrown-vase-fault",
+      "section": "其他反向参考",
+      "titleZh": "失衡高瓶花",
+      "titleEn": "Overgrown Vase Fault",
+      "group": "negative",
+      "imagePaths": [
+        "docs/untitled folder/其他反向参考3.jpg"
+      ]
+    },
+    {
+      "id": "summer-pinwheel",
+      "section": "有整体，有局部细节",
+      "titleZh": "夏日风车",
+      "titleEn": "Summer Pinwheel",
+      "group": "positive-detail",
+      "imagePaths": [
+        "docs/untitled folder/有整体，有局部细节/夏日风车_1_柏恩花室_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/夏日风车_2_柏恩花室_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/夏日风车_3_柏恩花室_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/夏日风车_4_柏恩花室_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/夏日风车_5_柏恩花室_来自小红书网页版.jpg"
+      ]
+    },
+    {
+      "id": "fairy-violet",
+      "section": "有整体，有局部细节",
+      "titleZh": "是仙女的梦幻紫～🫧🪻🫧",
+      "titleEn": "Fairy Violet",
+      "group": "positive-detail",
+      "imagePaths": [
+        "docs/untitled folder/有整体，有局部细节/是仙女的梦幻紫～🫧🪻🫧_1_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/是仙女的梦幻紫～🫧🪻🫧_2_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/是仙女的梦幻紫～🫧🪻🫧_3_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/是仙女的梦幻紫～🫧🪻🫧_4_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/是仙女的梦幻紫～🫧🪻🫧_5_Césped_来自小红书网页版.jpg"
+      ]
+    },
+    {
+      "id": "narcissus-season",
+      "section": "有整体，有局部细节",
+      "titleZh": "是洋水仙的季节呀～🌿🍯",
+      "titleEn": "Narcissus Season",
+      "group": "positive-detail",
+      "imagePaths": [
+        "docs/untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_1_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_2_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_3_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_4_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_5_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_6_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_7_Césped_来自小红书网页版.jpg"
+      ]
+    },
+    {
+      "id": "breathing-landscape",
+      "section": "有整体，有局部细节",
+      "titleZh": "朋友搬新家，送这一瓶“会呼吸的风景”",
+      "titleEn": "Breathing Landscape",
+      "group": "positive-detail",
+      "imagePaths": [
+        "docs/untitled folder/有整体，有局部细节/朋友搬新家，送这一瓶“会呼吸的风景”_1_大兜花园DorBeetleGarden_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/朋友搬新家，送这一瓶“会呼吸的风景”_2_大兜花园DorBeetleGarden_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/朋友搬新家，送这一瓶“会呼吸的风景”_3_大兜花园DorBeetleGarden_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/朋友搬新家，送这一瓶“会呼吸的风景”_4_大兜花园DorBeetleGarden_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/朋友搬新家，送这一瓶“会呼吸的风景”_5_大兜花园DorBeetleGarden_来自小红书网页版.jpg"
+      ]
+    },
+    {
+      "id": "foxtail-lily",
+      "section": "有整体，有局部细节",
+      "titleZh": "狐尾百合✨",
+      "titleEn": "Foxtail Lily",
+      "group": "positive-detail",
+      "imagePaths": [
+        "docs/untitled folder/有整体，有局部细节/狐尾百合✨_1_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/狐尾百合✨_2_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/狐尾百合✨_3_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/狐尾百合✨_4_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/狐尾百合✨_5_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/狐尾百合✨_6_Césped_来自小红书网页版.jpg"
+      ]
+    },
+    {
+      "id": "color-burst-bouquet",
+      "section": "有整体，有局部细节",
+      "titleZh": "🌷🍊🌸🪻🌿🌼🫧",
+      "titleEn": "Color Burst Bouquet",
+      "group": "positive-detail",
+      "imagePaths": [
+        "docs/untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_1_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_2_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_3_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_4_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_5_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_6_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_7_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_8_Césped_来自小红书网页版.jpg"
+      ]
+    },
+    {
+      "id": "blueberry-monotone",
+      "section": "颜色单调了点",
+      "titleZh": "蓝莓🫐的秘密～",
+      "titleEn": "Blueberry Monotone",
+      "group": "monotone",
+      "imagePaths": [
+        "docs/untitled folder/颜色单调了点/蓝莓🫐的秘密～_1_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/颜色单调了点/蓝莓🫐的秘密～_2_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/颜色单调了点/蓝莓🫐的秘密～_3_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/颜色单调了点/蓝莓🫐的秘密～_4_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/颜色单调了点/蓝莓🫐的秘密～_5_Césped_来自小红书网页版.jpg",
+        "docs/untitled folder/颜色单调了点/蓝莓🫐的秘密～_6_Césped_来自小红书网页版.jpg"
+      ]
+    }
+  ]
 }
