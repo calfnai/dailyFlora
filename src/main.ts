@@ -225,7 +225,7 @@ function updateUrl(date: string, seed: string) {
   } else {
     next.searchParams.set('render', selectedRender);
   }
-  if (selectedTheme === 'dopamine-field') {
+  if (selectedTheme === 'random') {
     next.searchParams.delete('theme');
   } else {
     next.searchParams.set('theme', selectedTheme);

@@ -2,7 +2,7 @@ import { createRng, todayKey } from './random';
 import { themes } from './themes';
 import type { DailyBouquetSpec } from './types';
 
-const defaultThemeId = 'dopamine-field';
+const defaultThemeId = 'random';
 
 export function readParams() {
   const params = new URLSearchParams(window.location.search);
