@@ -7,9 +7,20 @@ export const specialReferences: Record<string, SpecialBouquetReference> = {
 };
 
 export function readSpecialId(search = window.location.search) {
+  const pathname = window.location.pathname.replace(/\/+$/, '');
+  if (pathname.endsWith('/special0629')) return 'ngc2787';
+
   const params = new URLSearchParams(search);
   const id = params.get('special');
   return id && specialReferences[id] ? id : null;
+}
+
+export function special0629Pathname() {
+  const pathname = window.location.pathname;
+  const match = pathname.match(/^(.*?\/special0629)(?:\/.*)?$/);
+  if (match) return match[1];
+  const basePath = pathname.endsWith('/') ? pathname : pathname.replace(/\/[^/]*$/, '/');
+  return `${basePath}special0629`;
 }
 
 export function withBasePath(path: string) {
@@ -29,7 +40,7 @@ export function createSpecialSpec(reference: SpecialBouquetReference, dateOverri
     rotationSpeed: 0.025,
     asymmetry: reference.shape.asymmetry,
     haloLift: reference.shape.verticalLift,
-    flowerPlan: getFlowerPlanById('fairy-violet-air')!,
+    flowerPlan: getFlowerPlanById('her-january-sky-memory')!,
     special: reference
   };
 }

@@ -1,0 +1,714 @@
+{
+  "updatedAt": "2026-06-26",
+  "gate": {
+    "status": "pass",
+    "title": "花库验收达到及格线",
+    "summary": "用户已确认 Primitive Gate / 花库验收达到及格线。15 类花材/叶材形态允许作为下一阶段 composition、palette、camera 改造的基础，但后续主视觉修改仍必须同步更新本 dashboard。",
+    "rules": [
+      "先复盘参考图，不直接改主花束视觉。",
+      "Primitive Lab 已按 15 类主流花材/叶材形态达到用户验收及格线。",
+      "旧 7 类只作为兼容别名和历史粗分类，不再代表完整覆盖。",
+      "后续可以进入整束 composition 改造准备，但任何主视觉修改必须同步更新本 dashboard 的状态和下一步任务。"
+    ],
+    "links": [
+      {
+        "label": "参考图库",
+        "href": "./dailyflora-reference-gallery.html"
+      },
+      {
+        "label": "Primitive Lab",
+        "href": "./primitive-lab.html"
+      },
+      {
+        "label": "花材识别文档",
+        "href": "./reference-flower-identification.md"
+      },
+      {
+        "label": "美学评分看板",
+        "href": "./aesthetic-rating-board.md"
+      }
+    ]
+  },
+  "roles": [
+    {
+      "id": "creative-director",
+      "name": "创意总监",
+      "brief": "判断整体方向是否符合 DailyFlora，不允许跑偏到欧美婚礼、粗糙市场束、单一大主花。"
+    },
+    {
+      "id": "art-director",
+      "name": "美术指导",
+      "brief": "拆解色彩、轮廓、花材层级、空气感、前后关系。"
+    },
+    {
+      "id": "project-director",
+      "name": "项目主任",
+      "brief": "决定当前阶段是否允许进入下一层，比如 primitive 未过就不能进 composition。"
+    },
+    {
+      "id": "cto",
+      "name": "CTO",
+      "brief": "判断现有 Three.js 结构能否实现，不够就列出需要新增的可控参数或组件。"
+    }
+  ],
+  "reusableAestheticRules": [
+    {
+      "id": "foliage-space-support",
+      "title": "叶材与绿色部分",
+      "summary": "叶材和绿色部分是花束空间感上的支撑，不是物理接触式托举花盘，也不是随机装饰。",
+      "principles": [
+        "花束本来由花泥、扎口或结构固定，叶材不需要像支架一样真的撑住花盘。",
+        "叶材和绿色部分带来层次感，并营造春意盎然的感觉，避免画面全是花、全是高饱和花材而产生油画般的腻感。",
+        "有了叶材和绿色部分的衬托，花的选择可以更高饱和，但整体仍然保持清爽、有空气。",
+        "花束的呼吸来自花和叶的不同朝向，以及它们之间距离关系形成的微妙美感。",
+        "叶材应该从花束结构里合理地冒出来，托住花间的空气，也就是托住花与空气之间的空气。",
+        "叶材负责拉开空间、补充边缘节奏，但不能挡住主花，不能飞到不合理位置，不能比花更抢戏。"
+      ],
+      "rejectSignals": [
+        "叶子狠狠挡住花朵。",
+        "绿色部分随机乱飞，出现在叶子不该合理存在的位置。",
+        "叶材比花更抢戏。",
+        "全是花、没有绿色缓冲，画面变腻。"
+      ],
+      "ownerAcceptance": "由用户最终验收；Codex 只能整理证据和提出修正，不能替用户宣布叶材审美通过。"
+    }
+  ],
+  "targetShapeVocabulary": [
+    {
+      "id": "disk-face-flower",
+      "name": "盘状花",
+      "examples": "雏菊、洋甘菊、非洲菊、太阳花感、银莲花/波斯菊感",
+      "whyNeeded": "承担清楚的脸盘识别和明亮停顿。"
+    },
+    {
+      "id": "layered-dahlia-form",
+      "name": "层叠大丽花/团瓣型",
+      "examples": "大丽花、层层放射的浅粉团瓣、其他正面参考2里的大花头",
+      "whyNeeded": "承担层层展开、饱满但不玫瑰化的大型团瓣主花。"
+    },
+    {
+      "id": "ruffled-rose-form",
+      "name": "褶皱玫瑰型",
+      "examples": "更接近玫瑰、洋桔梗、皱边轻软花头",
+      "whyNeeded": "承担比层叠大丽花更内卷、更柔软、更玫瑰感的花头。"
+    },
+    {
+      "id": "star-pinwheel-form",
+      "name": "星形/风车型",
+      "examples": "长窄瓣放射花、夏日风车参考里的橙色星形花",
+      "whyNeeded": "对应夏日风车、多色花束里的放射局部记忆点。"
+    },
+    {
+      "id": "tulip-cup-form",
+      "name": "郁金香/杯型",
+      "examples": "郁金香、半闭合杯状花、柔软杯形花苞",
+      "whyNeeded": "表达半开、含蓄、杯状体积，避免所有开口花都摊平。"
+    },
+    {
+      "id": "trumpet-throat-form",
+      "name": "洋水仙管心型",
+      "examples": "洋水仙、带 trumpet center 的白黄季节花",
+      "whyNeeded": "洋水仙季节不能只靠白黄配色，必须有管心识别。"
+    },
+    {
+      "id": "datura-trumpet-form",
+      "name": "大喇叭型",
+      "examples": "Datura / devil's trumpet 这类大喇叭、深喉部、外翻口缘花",
+      "whyNeeded": "它和洋水仙小管心不是同一类，应该单独表达大喇叭体积和深喉部。"
+    },
+    {
+      "id": "orchid-butterfly-form",
+      "name": "兰花/蝴蝶型",
+      "examples": "蝴蝶兰、蝴蝶形不对称开口花",
+      "whyNeeded": "承担不对称、轻盈、飘逸的雕塑花局部。"
+    },
+    {
+      "id": "calla-curled-bract",
+      "name": "马蹄莲/卷曲苞片型",
+      "examples": "马蹄莲、单片包裹、卷曲苞片、曲线雕塑花",
+      "whyNeeded": "对应会呼吸的风景等参考里的曲线植物形态。"
+    },
+    {
+      "id": "spike-vertical-form",
+      "name": "穗状花",
+      "examples": "飞燕草、金鱼草、风信子、狐尾百合、蛇鞭菊",
+      "whyNeeded": "提供竖向节奏、高度和空间方向。"
+    },
+    {
+      "id": "umbel-mini-cluster",
+      "name": "伞状/小簇型",
+      "examples": "蕾丝花、伞形小花、白色填充小簇",
+      "whyNeeded": "补足小白花、米花、伞状填充，不应全归为空气点。"
+    },
+    {
+      "id": "hydrangea-cloud-cluster",
+      "name": "绣球/云团型",
+      "examples": "绣球、绿色云团、小花面团、密集云状簇",
+      "whyNeeded": "承担成片簇团和柔软体积，不等同于小簇填充。"
+    },
+    {
+      "id": "fruit-pod-form",
+      "name": "果材/荚果型",
+      "examples": "蓝莓感浆果、小圆果、荚果、枝端果粒",
+      "whyNeeded": "对应蓝莓、浆果森林和枝端果粒，不等于吊下来的风铃果。"
+    },
+    {
+      "id": "hanging-bell-fruit",
+      "name": "吊坠风铃果型",
+      "examples": "夏日风车第5张里的橙色吊坠果/风铃果",
+      "whyNeeded": "补足向下悬挂、灯笼状、风铃状果材，这是普通浆果/荚果无法概括的形态。"
+    },
+    {
+      "id": "foliage-grass-branch",
+      "name": "叶材/草线/枝条型",
+      "examples": "长叶、蕨叶、草线、藤线、黑枝、外逸线、绿色支撑材料",
+      "whyNeeded": "叶材与绿色部分是空间、层次、春意和饱和度缓冲的关键，不是背景噪声。"
+    }
+  ],
+  "primitiveGate": [
+    {
+      "primitive": "DiskFlower",
+      "humanName": "盘状花",
+      "status": "pass",
+      "acceptance": "隐藏标签后 3 秒内应读成洋甘菊、雏菊、非洲菊、太阳花一类的脸盘花。",
+      "nextTask": "已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "LayeredDahliaFlower",
+      "humanName": "层叠大丽花/团瓣型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成其他正面参考2那类层层放射、饱满浅粉的大型团瓣花。",
+      "ownerStatus": "2 与 3 更像了：需要拆分",
+      "ownerFeedback": "2 和 3 看起来简直一样，必须拉开形态差异。",
+      "nextTask": "已改为细长尖瓣、多层放射的大丽花/团瓣方向，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "RuffledRoseFlower",
+      "humanName": "褶皱玫瑰型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成更内卷、更柔软、更接近玫瑰/洋桔梗的花头。",
+      "ownerStatus": "3 与 2 更像了：需要拆分",
+      "ownerFeedback": "2 和 3 看起来简直一样，3 应继续承担更玫瑰、更内卷、更柔软的方向。",
+      "nextTask": "已改为宽瓣、内卷、柔软褶皱玫瑰方向，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "StarPinwheelFlower",
+      "humanName": "星形/风车型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成长窄瓣放射花或夏日风车参考里的橙色星形花。",
+      "ownerStatus": "4 比上一版差：回归/小修",
+      "ownerFeedback": "比上一版差，需要回归到更协调的结构，只做小修。",
+      "nextTask": "已缩小过肥中心点并收敛延伸花瓣，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "TulipCupFlower",
+      "humanName": "郁金香/杯型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成郁金香、半闭合杯状花或柔软杯形花苞。",
+      "ownerStatus": "5 重做",
+      "ownerFeedback": "废弃当前实现，重新建模；不能像球芯或抽象花瓣桶。",
+      "nextTask": "已换成杯状、半闭合、勺形花瓣方向，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "TrumpetThroatFlower",
+      "humanName": "洋水仙管心型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成洋水仙或带 trumpet center 的白黄季节花。",
+      "ownerStatus": "6 方向有点像，可保留继续修",
+      "ownerFeedback": "保留当前建模方向，小步优化，不能和大喇叭型混淆。",
+      "nextTask": "已小步强化外瓣与管心关系，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "DaturaTrumpetFlower",
+      "humanName": "大喇叭型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成 Datura / devil's trumpet 这类大喇叭、深喉部、外翻口缘花。",
+      "ownerStatus": "7 太像一个喇叭：重做",
+      "ownerFeedback": "这次喇叭形太离谱，像一个喇叭而已，不像花。",
+      "nextTask": "已从单个喇叭物件改成五瓣外翻围出喉部，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "OrchidButterflyFlower",
+      "humanName": "兰花/蝴蝶型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成蝴蝶兰或蝴蝶形不对称开口花。",
+      "ownerStatus": "8 比例对，角度错",
+      "ownerFeedback": "这次比例对了，但花瓣角度不对；上上次角度更正确。",
+      "nextTask": "已保留这次比例和花蕊，并把花瓣角度往上上版方向回调，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "CallaCurledBract",
+      "humanName": "马蹄莲/卷曲苞片型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成马蹄莲、卷曲苞片或单片包裹的曲线雕塑花。",
+      "ownerStatus": "9 越来越接近，但卷曲未闭合",
+      "ownerFeedback": "外圈卷曲部分继续沿现在的角度拉长并继续卷曲。",
+      "nextTask": "已拉长外圈卷曲并增强闭合趋势，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "SpikeFlower",
+      "humanName": "穗状花",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成飞燕草、金鱼草、风信子、狐尾百合或蛇鞭菊类竖向花材。",
+      "ownerStatus": "10 不如上上版",
+      "ownerFeedback": "当前 10 不如上上版，需要回修。",
+      "nextTask": "已从胶囊串改回小花沿穗排列，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "UmbelMiniCluster",
+      "humanName": "伞状/小簇型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成蕾丝花、伞形小花或白色填充小簇。",
+      "ownerStatus": "11 单面观察性仍在",
+      "ownerFeedback": "需要调整小花面向角度，让它 360 看起来都正常。",
+      "nextTask": "已增加小花花心并调整花瓣面向角度，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "FullHydrangeaCloud",
+      "humanName": "绣球/云团型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成绣球、绿色云团或密集云状小花簇。",
+      "nextTask": "已增加更多微花和雾点，让它更丰满，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "FruitPodCluster",
+      "humanName": "果材/荚果型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成蓝莓感浆果、小圆果、荚果或枝端果粒。",
+      "ownerStatus": "13 球太大，密度不够",
+      "ownerFeedback": "果粒尺寸需要变小，整体密度要上来。",
+      "nextTask": "已缩小果粒并增加枝端数量和密度，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "HangingBellFruit",
+      "humanName": "吊坠风铃果型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成夏日风车第5张那类向下悬挂、灯笼状、风铃状果材。",
+      "ownerStatus": "14 完全不对：重做",
+      "ownerFeedback": "当前 14 太滑稽，像没有认真建模。",
+      "nextTask": "已废弃胶囊体，改成悬垂灯笼/风铃果结构，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    },
+    {
+      "primitive": "FoliageGrassBranch",
+      "humanName": "叶材/草线/枝条型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成长叶、蕨叶、草线、藤线、枝条或绿色空间材料。",
+      "nextTask": "已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+    }
+  ],
+  "reviewGroups": [
+    {
+      "id": "summer-pinwheel",
+      "title": "夏日风车",
+      "englishTitle": "Summer Pinwheel",
+      "kind": "positive",
+      "status": "needs-work",
+      "referenceLinks": [
+        {
+          "label": "参考图库定位",
+          "href": "./dailyflora-reference-gallery.html#summer-pinwheel"
+        },
+        {
+          "label": "Primitive Lab",
+          "href": "./primitive-lab.html"
+        }
+      ],
+      "images": [
+        "./untitled folder/有整体，有局部细节/夏日风车_1_柏恩花室_来自小红书网页版.jpg",
+        "./untitled folder/有整体，有局部细节/夏日风车_3_柏恩花室_来自小红书网页版.jpg"
+      ],
+      "humanConclusion": "整体成立，局部也能看出花材节奏；不是只有一个大轮廓。",
+      "positiveSignals": [
+        "橙色星形/盘状花是局部记忆点。",
+        "蓝色小花、白色伞状填充、橙色果点共同串联多色。",
+        "外圈枝条和高低层次让花束不是平面贴图。"
+      ],
+      "negativeConstraints": [
+        "不要把多色做成乱堆。",
+        "不要让中心主花压住外圈小枝条。",
+        "不要丢失侧面和局部细节。"
+      ],
+      "primitives": [
+        "DiskFlower",
+        "SpikeFlower",
+        "OpenSculptureFlower",
+        "BerryCluster",
+        "AirFiller"
+      ],
+      "currentImplementation": "已有 flowerPlan，但主花束精细渲染仍主要使用旧 flower type geometry；primitive 尚未作为整束花语法回接。",
+      "failureReason": "花库单体已达到用户验收及格线；本组尚未通过的是整束 composition 还没有验证，仍要检查花材比例、层级、空气感、叶材位置和相机呈现。",
+      "nextTasks": [
+        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
+        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+      ],
+      "roleReview": {
+        "creativeDirector": "方向符合 DailyFlora，重点是明亮、多色、轻快，但不能滑向艳俗堆色。",
+        "artDirector": "需要橙、蓝、白、绿各自承担材料角色，而不是只做 palette。",
+        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "cto": "需要把 primitive factories 接入 high render，或先做 composition lab 验证混合摆放。"
+      }
+    },
+    {
+      "id": "fairy-violet",
+      "title": "梦幻紫",
+      "englishTitle": "Fairy Violet",
+      "kind": "positive",
+      "status": "needs-work",
+      "referenceLinks": [
+        {
+          "label": "参考图库定位",
+          "href": "./dailyflora-reference-gallery.html#fairy-violet"
+        },
+        {
+          "label": "Primitive Lab",
+          "href": "./primitive-lab.html"
+        }
+      ],
+      "images": [
+        "./untitled folder/有整体，有局部细节/是仙女的梦幻紫～🫧🪻🫧_1_Césped_来自小红书网页版.jpg",
+        "./untitled folder/有整体，有局部细节/是仙女的梦幻紫～🫧🪻🫧_4_Césped_来自小红书网页版.jpg"
+      ],
+      "humanConclusion": "统一的蓝紫气氛要轻，靠细枝、小白点和穗线打散。",
+      "positiveSignals": [
+        "蓝紫穗状花形成主线。",
+        "白色小点和细枝创造空气。",
+        "少量圆花和不对称花瓣提供局部停顿。"
+      ],
+      "negativeConstraints": [
+        "不要变成一团闷紫。",
+        "不要所有花型都一样。",
+        "不要靠调色替代花材层次。"
+      ],
+      "primitives": [
+        "SpikeFlower",
+        "LayeredRoundFlower",
+        "OpenSculptureFlower",
+        "AirFiller"
+      ],
+      "currentImplementation": "flowerPlan 中已有 fairy-violet-air，但 primitive 与参考图的映射还停留在计划层。",
+      "failureReason": "花库单体已达到用户验收及格线；本组尚未通过的是整束 composition 还没有验证，仍要检查花材比例、层级、空气感、叶材位置和相机呈现。",
+      "nextTasks": [
+        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
+        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+      ],
+      "roleReview": {
+        "creativeDirector": "方向可用，但紫色必须轻；闷块是主要风险。",
+        "artDirector": "蓝紫主体必须被白点、枝线和局部浅色打散。",
+        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "cto": "需要可控的空气点线密度、外逸高度和穗线摆放参数。"
+      }
+    },
+    {
+      "id": "narcissus-season",
+      "title": "洋水仙季节",
+      "englishTitle": "Narcissus Season",
+      "kind": "positive",
+      "status": "needs-work",
+      "referenceLinks": [
+        {
+          "label": "参考图库定位",
+          "href": "./dailyflora-reference-gallery.html#narcissus-season"
+        },
+        {
+          "label": "Primitive Lab",
+          "href": "./primitive-lab.html"
+        }
+      ],
+      "images": [
+        "./untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_1_Césped_来自小红书网页版.jpg",
+        "./untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_4_Césped_来自小红书网页版.jpg"
+      ],
+      "humanConclusion": "季节感来自白黄开口花、长叶和细小填充，不是给普通花换颜色。",
+      "positiveSignals": [
+        "白黄 trumpet/open-center 花是识别核心。",
+        "长窄叶和草线提供季节边缘。",
+        "小白点和紫色小点避免单调。"
+      ],
+      "negativeConstraints": [
+        "不要把洋水仙做成普通五瓣花。",
+        "不要只有白黄标签，没有花型结构。",
+        "不要丢掉长叶和细枝的季节感。"
+      ],
+      "primitives": [
+        "OpenSculptureFlower",
+        "AirFiller",
+        "SpikeFlower"
+      ],
+      "currentImplementation": "OpenSculptureFlower 有喉部和主瓣雏形，但还未作为洋水仙语法进入整束花。",
+      "failureReason": "花库单体已达到用户验收及格线；本组尚未通过的是整束 composition 还没有验证，仍要检查花材比例、层级、空气感、叶材位置和相机呈现。",
+      "nextTasks": [
+        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
+        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+      ],
+      "roleReview": {
+        "creativeDirector": "方向可用，关键是季节性而非泛白黄配色。",
+        "artDirector": "开口花、长叶、细枝必须同时出现，且主次清楚。",
+        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "cto": "现有 primitive 缺少专门的 trumpet 参数，可先用 OpenSculptureFlower 扩展。"
+      }
+    },
+    {
+      "id": "breathing-landscape",
+      "title": "会呼吸的风景",
+      "englishTitle": "Breathing Landscape",
+      "kind": "positive",
+      "status": "needs-work",
+      "referenceLinks": [
+        {
+          "label": "参考图库定位",
+          "href": "./dailyflora-reference-gallery.html#breathing-landscape"
+        },
+        {
+          "label": "Primitive Lab",
+          "href": "./primitive-lab.html"
+        }
+      ],
+      "images": [
+        "./untitled folder/有整体，有局部细节/朋友搬新家，送这一瓶“会呼吸的风景”_1_大兜花园DorBeetleGarden_来自小红书网页版.jpg",
+        "./untitled folder/有整体，有局部细节/朋友搬新家，送这一瓶“会呼吸的风景”_5_大兜花园DorBeetleGarden_来自小红书网页版.jpg"
+      ],
+      "humanConclusion": "像一瓶风景，开阔但不空，绿色植物也是主角。",
+      "positiveSignals": [
+        "前后层次和留白构成呼吸感。",
+        "黄色曲线花、蓝色小花、绿色簇团共同构成风景。",
+        "草线、蕨叶、枝条比普通叶片更重要。"
+      ],
+      "negativeConstraints": [
+        "不要只做空，空必须由远近层次支撑。",
+        "不要把绿色简化成重复叶片。",
+        "不要把风景感压成紧凑圆球。"
+      ],
+      "primitives": [
+        "OpenSculptureFlower",
+        "ClusterFlower",
+        "AirFiller",
+        "SpikeFlower"
+      ],
+      "currentImplementation": "当前主场景有 branches、outer lines 和 leaves，但植物材料还未具备可识别角色。",
+      "failureReason": "花库单体已达到用户验收及格线；本组尚未通过的是整束 composition 还没有验证，仍要检查花材比例、层级、空气感、叶材位置和相机呈现。",
+      "nextTasks": [
+        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
+        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+      ],
+      "roleReview": {
+        "creativeDirector": "方向符合项目气质，但不能只是留白模板。",
+        "artDirector": "绿色、黄花、蓝点、细枝必须形成前中后空间。",
+        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "cto": "可能需要新增 foliage primitive，现有 buildLeaves 太单一。"
+      }
+    },
+    {
+      "id": "foxtail-lily",
+      "title": "狐尾百合",
+      "englishTitle": "Foxtail Lily",
+      "kind": "positive",
+      "status": "needs-work",
+      "referenceLinks": [
+        {
+          "label": "参考图库定位",
+          "href": "./dailyflora-reference-gallery.html#foxtail-lily"
+        },
+        {
+          "label": "Primitive Lab",
+          "href": "./primitive-lab.html"
+        }
+      ],
+      "images": [
+        "./untitled folder/有整体，有局部细节/狐尾百合✨_1_Césped_来自小红书网页版.jpg",
+        "./untitled folder/有整体，有局部细节/狐尾百合✨_6_Césped_来自小红书网页版.jpg"
+      ],
+      "humanConclusion": "强竖向穗线是核心，但底部要有小花和叶材托住。",
+      "positiveSignals": [
+        "高耸穗线决定整体识别。",
+        "底部小花、簇团和叶材避免变成几根杆。",
+        "竖线需要轻微弯曲和疏密变化。"
+      ],
+      "negativeConstraints": [
+        "不要僵硬柱子。",
+        "不要所有花都挤在中心。",
+        "不要只有竖线没有底部支撑。"
+      ],
+      "primitives": [
+        "SpikeFlower",
+        "ClusterFlower",
+        "AirFiller",
+        "DiskFlower"
+      ],
+      "currentImplementation": "SpikeFlower 已有底密顶疏尝试，但整束高低构图还未建立门禁。",
+      "failureReason": "花库单体已达到用户验收及格线；本组尚未通过的是整束 composition 还没有验证，仍要检查花材比例、层级、空气感、叶材位置和相机呈现。",
+      "nextTasks": [
+        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
+        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+      ],
+      "roleReview": {
+        "creativeDirector": "方向可用，强识别但不能压迫。",
+        "artDirector": "竖线、底部、小花停顿三者都必须出现。",
+        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "cto": "需要高位 placement 和底部 support placement 的独立控制。"
+      }
+    },
+    {
+      "id": "berry-grove",
+      "title": "浆果森林",
+      "englishTitle": "Berry Grove",
+      "kind": "positive",
+      "status": "needs-work",
+      "referenceLinks": [
+        {
+          "label": "参考图库定位",
+          "href": "./dailyflora-reference-gallery.html#berry-grove"
+        },
+        {
+          "label": "Primitive Lab",
+          "href": "./primitive-lab.html"
+        }
+      ],
+      "images": [
+        "./释义/邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦_1_一茉Flower_来自小红书网页版.jpg",
+        "./释义/邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦_4_一茉Flower_来自小红书网页版.jpg"
+      ],
+      "humanConclusion": "小果、小花、细枝叶混在一起，像森林里冒出的童话感。",
+      "positiveSignals": [
+        "果粒和小圆点是核心节奏。",
+        "小雏菊、簇花和叶材形成低密度细节。",
+        "整体要可爱，不要成熟端庄。"
+      ],
+      "negativeConstraints": [
+        "不要礼盒感。",
+        "不要大主花过多。",
+        "不要把果材做成无枝条依附的散点。"
+      ],
+      "primitives": [
+        "BerryCluster",
+        "ClusterFlower",
+        "DiskFlower",
+        "AirFiller"
+      ],
+      "currentImplementation": "BerryCluster 已有枝端果粒结构，但主花束仍未使用该 primitive。",
+      "failureReason": "花库单体已达到用户验收及格线；本组尚未通过的是整束 composition 还没有验证，仍要检查花材比例、层级、空气感、叶材位置和相机呈现。",
+      "nextTasks": [
+        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
+        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+      ],
+      "roleReview": {
+        "creativeDirector": "方向高度符合可爱、轻、当代小红书语境。",
+        "artDirector": "果点必须有枝条归属，小花负责童话感，不能端庄化。",
+        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "cto": "需要将 BerryCluster 从 lab 组件接到 high render，并限制大主花概率。"
+      }
+    },
+    {
+      "id": "autumn-juice",
+      "title": "秋日果汁",
+      "englishTitle": "Autumn Juice",
+      "kind": "positive",
+      "status": "needs-work",
+      "referenceLinks": [
+        {
+          "label": "参考图库定位",
+          "href": "./dailyflora-reference-gallery.html#autumn-juice"
+        },
+        {
+          "label": "Primitive Lab",
+          "href": "./primitive-lab.html"
+        }
+      ],
+      "images": [
+        "./释义/宁波花店｜秋日果汁🍹_1_西西花艺工作室_来自小红书网页版.jpg",
+        "./释义/宁波花店｜秋日果汁🍹_4_西西花艺工作室_来自小红书网页版.jpg"
+      ],
+      "humanConclusion": "暖橙黄、饱满但不沉，有层叠主花和果感跳点。",
+      "positiveSignals": [
+        "橙黄层叠花形成果汁温度。",
+        "白色圆花和蓝色小花做冷暖平衡。",
+        "小果点和小盘花避免一坨橙色。"
+      ],
+      "negativeConstraints": [
+        "不要冷灰。",
+        "不要全变橙色块。",
+        "不要饱满到沉重。"
+      ],
+      "primitives": [
+        "LayeredRoundFlower",
+        "DiskFlower",
+        "BerryCluster",
+        "ClusterFlower"
+      ],
+      "currentImplementation": "autumn-juice flowerPlan 已存在，但 high render 的层叠花仍非新 primitive。",
+      "failureReason": "LayeredRoundFlower 若不通过，秋日果汁只能靠颜色，缺少饱满花材质感。",
+      "nextTasks": [
+        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
+        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+      ],
+      "roleReview": {
+        "creativeDirector": "方向可用，温暖甜感明确。",
+        "artDirector": "饱满必须由层叠形态支撑，不能只靠高密度。",
+        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "cto": "需要在 high render 中支持层叠 primitive 的实例化和尺度上限。"
+      }
+    },
+    {
+      "id": "negative-samples",
+      "title": "反向样本组",
+      "englishTitle": "Bare / Oversized / Overgrown Faults",
+      "kind": "negative",
+      "status": "pass",
+      "referenceLinks": [
+        {
+          "label": "参考图库反向范例",
+          "href": "./dailyflora-reference-gallery.html#negative-samples"
+        },
+        {
+          "label": "美学评分看板",
+          "href": "./aesthetic-rating-board.md"
+        }
+      ],
+      "images": [
+        "./释义/裸花束是最自然的表达🌿_1_Be yourself flower_来自小红书网页版.jpg",
+        "./untitled folder/其他反向参考3.jpg"
+      ],
+      "humanConclusion": "这些图用于设边界：不要太原生态、不要单一大主花、不要失衡高瓶化。",
+      "positiveSignals": [
+        "结构提醒可保留：真实枝条、体量、自然材料。",
+        "可作为错误检测，不作为审美目标。"
+      ],
+      "negativeConstraints": [
+        "不要粗糙裸束。",
+        "不要大向日葵或单一主花占据全局。",
+        "不要过高、过散、失衡、颜色单调。"
+      ],
+      "primitives": [
+        "DiskFlower",
+        "AirFiller",
+        "SpikeFlower"
+      ],
+      "currentImplementation": "已在 handoff 和识别文档中记录为 caution，但 dashboard 要继续把它们作为硬约束。",
+      "failureReason": "不属于失败；这是后续视觉修改的拒绝清单。",
+      "nextTasks": [
+        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
+        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+      ],
+      "roleReview": {
+        "creativeDirector": "这些不是 DailyFlora 目标审美，只能作为边界。",
+        "artDirector": "可借用真实体量和枝条，但不能继承粗糙、失衡和单调。",
+        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "cto": "需要在生成侧限制 focal bloom 尺寸、中心权重和过高外逸比例。"
+      }
+    }
+  ]
+}

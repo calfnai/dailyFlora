@@ -223,6 +223,7 @@ function filesUnder(root) {
 function copyReferenceGalleryToDist() {
   const distDocs = path.join(repoRoot, 'dist', 'docs');
   const entries = [
+    ['docs/aesthetic-review-dashboard.html', 'aesthetic-review-dashboard.html'],
     ['docs/dailyflora-reference-gallery.html', 'dailyflora-reference-gallery.html'],
     ['docs/dailyflora-flower-plan-samples.html', 'dailyflora-flower-plan-samples.html'],
     ['docs/释义', '释义'],
@@ -235,8 +236,23 @@ function copyReferenceGalleryToDist() {
     const destinationPath = path.join(distDocs, destination);
     if (!fs.existsSync(sourcePath)) fail(`Reference gallery asset is missing: ${source}`);
     fs.rmSync(destinationPath, { recursive: true, force: true });
-    fs.cpSync(sourcePath, destinationPath, { recursive: true });
+    fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
+    if (fs.statSync(sourcePath).isDirectory()) {
+      const copy = runStatus('ditto', [sourcePath, destinationPath]);
+      if (copy.status !== 0) {
+        fs.cpSync(sourcePath, destinationPath, { recursive: true, verbatimSymlinks: true });
+      }
+    } else {
+      fs.copyFileSync(sourcePath, destinationPath);
+    }
   }
+
+  const distData = path.join(repoRoot, 'dist', 'data');
+  fs.mkdirSync(distData, { recursive: true });
+  fs.copyFileSync(
+    path.join(repoRoot, 'data', 'aesthetic-review-dashboard.json'),
+    path.join(distData, 'aesthetic-review-dashboard.json')
+  );
 }
 
 function readManifestFiles() {

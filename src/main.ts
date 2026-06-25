@@ -4,7 +4,7 @@ import { todayKey } from './random';
 import { createDailySpec, readParams } from './spec';
 import { resolveQuality } from './quality';
 import { BouquetScene } from './bouquetScene';
-import { createSpecialSpec, readSpecialId, specialReferences, withBasePath } from './special';
+import { createSpecialSpec, readSpecialId, special0629Pathname, specialReferences, withBasePath } from './special';
 
 type RotationDirection = 1 | -1;
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
@@ -106,6 +106,8 @@ const todayButton = document.querySelector<HTMLButtonElement>('#today-button');
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker');
 const shuffleButton = document.querySelector<HTMLButtonElement>('#shuffle-button');
 const fullscreenButton = document.querySelector<HTMLButtonElement>('#fullscreen-button');
+const zoomInButton = document.querySelector<HTMLButtonElement>('#zoom-in-button');
+const zoomOutButton = document.querySelector<HTMLButtonElement>('#zoom-out-button');
 const densityButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-density-choice]'));
 const renderButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-render-choice]'));
 const rotationSpeedInput = document.querySelector<HTMLInputElement>('#rotation-speed');
@@ -130,7 +132,10 @@ let params = readParams();
 const specialId = readSpecialId();
 const specialReference = specialId ? specialReferences[specialId] : null;
 let selectedDensity = specialReference ? 'medium' : normalizeDensity(params.density);
-let selectedRender = normalizeRender(params.render);
+const searchParams = new URLSearchParams(window.location.search);
+let selectedRender = specialReference && !searchParams.has('render') && !searchParams.has('quality')
+  ? 'high'
+  : normalizeRender(params.render);
 let selectedTheme = specialReference ? specialReference.theme.id : params.theme;
 let quality = resolveQuality(selectedDensity, selectedRender);
 let spec = specialReference
@@ -147,6 +152,7 @@ let yawAmplitude = 0;
 let distanceAmplitude = 0;
 let targetYAmplitude = 0;
 let manualRotation = false;
+let manualZoom = 0;
 let specialAudio: HTMLAudioElement | null = null;
 
 function THREEClamp(value: number, min: number, max: number) {
@@ -267,8 +273,14 @@ function updateUrl(date: string, seed: string) {
     next.searchParams.set('theme', selectedTheme);
   }
   if (specialReference) {
-    next.searchParams.set('special', specialReference.id);
-    next.searchParams.set('date', date);
+    next.pathname = special0629Pathname();
+    next.searchParams.delete('special');
+    next.searchParams.delete('seed');
+    if (date === specialReference.date) {
+      next.searchParams.delete('date');
+    } else {
+      next.searchParams.set('date', date);
+    }
   }
   window.history.replaceState({}, '', next);
 }
@@ -285,6 +297,16 @@ function applyRotationSettings(pitch?: number) {
     targetYAmplitude
   });
   syncControls();
+}
+
+function applyZoom(nextZoom: number) {
+  manualZoom = scene.setZoomOffset(THREEClamp(nextZoom, -1.35, 2.05));
+  revealUi();
+}
+
+function zoomBy(delta: number) {
+  manualZoom = scene.zoomBy(delta);
+  revealUi();
 }
 
 function applyRoutePreset(preset: (typeof rotationPresets)[number]) {
@@ -388,6 +410,7 @@ function rebuildQuality(nextDensity = selectedDensity, nextRender = selectedRend
   if (changed) {
     scene.rebuild(spec, quality);
     applyRotationSettings();
+    scene.setZoomOffset(manualZoom);
   }
   setLabels();
   syncControls();
@@ -449,6 +472,24 @@ fullscreenButton?.addEventListener('click', async () => {
   }
   revealUi();
 });
+
+zoomInButton?.addEventListener('click', () => {
+  zoomBy(-0.28);
+});
+
+zoomOutButton?.addEventListener('click', () => {
+  zoomBy(0.28);
+});
+
+canvas.addEventListener(
+  'wheel',
+  (event) => {
+    event.preventDefault();
+    const normalized = THREEClamp(event.deltaY / 520, -0.42, 0.42);
+    applyZoom(manualZoom + normalized);
+  },
+  { passive: false }
+);
 
 densityButtons.forEach((button) => {
   button.addEventListener('click', () => {
@@ -516,5 +557,6 @@ if (specialReference) {
   createSpecialOverlay();
 }
 applyRotationSettings();
+scene.setZoomOffset(manualZoom);
 revealUi();
 scene.start();

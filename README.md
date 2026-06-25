@@ -1,8 +1,18 @@
 # DailyFlora
 
-DailyFlora is a pure frontend 3D particle bouquet screensaver. It generates a
-new spatial bouquet every day from a deterministic date seed, then slowly
-rotates it so the bouquet reads from every angle.
+DailyFlora is a daily digital bouquet project. The current public surface is a
+frontend 3D bouquet screensaver: it generates a new spatial bouquet every day
+from a deterministic date seed, then slowly rotates it so the bouquet reads from
+every angle.
+
+Current product version: `0.12E`.
+
+`E` means Extended. Extended versions keep the web-first visual work, while
+reserving product-layer capabilities such as lightweight user data, favorites,
+share history, personal aesthetic inputs, usage limits, credits, terms, and EULA
+records. Read `docs/project-abstract.md` together with `CHANGELOG.md`; the
+abstract records product intent and version meaning, while the changelog records
+completed changes.
 
 ## Run Locally
 
@@ -18,6 +28,12 @@ npm run build
 ```
 
 The build output is static and can be hosted on GitHub Pages.
+
+## Aesthetic Review Gate
+
+Before changing the main bouquet visuals, review
+`docs/aesthetic-review-dashboard.html`. It maps reference groups to visual
+signals, primitive requirements, role reviews, current status, and next tasks.
 
 ## Deploy To GitHub Pages
 

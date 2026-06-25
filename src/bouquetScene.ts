@@ -2,12 +2,16 @@ import * as THREE from 'three';
 import type { DailyBouquetSpec, FlowerPlanItem, FlowerTypeId, QualityProfile } from './types';
 import { createRng, hashString } from './random';
 import { withBasePath } from './special';
+import { floraPrimitiveFactories, type FloraPrimitiveName, type FloraPrimitiveRole } from './floraPrimitives';
 
 const tempObject = new THREE.Object3D();
 const tempColor = new THREE.Color();
 const up = new THREE.Vector3(0, 1, 0);
+const forward = new THREE.Vector3(0, 0, 1);
 const minCameraPitch = 0.03;
 const maxCameraPitch = 1.34;
+const minZoomOffset = -1.35;
+const maxZoomOffset = 2.05;
 
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
 
@@ -468,6 +472,179 @@ function geometryForFlowerType(typeId: FlowerTypeId, radius: number) {
   }
 }
 
+function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimitiveName {
+  if (planId === 'her-january-sky-memory') {
+    if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
+    if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
+    if (item.typeId === 'camelliaPeony') return 'RuffledRoseFlower';
+    if (item.typeId === 'hydrangea') return 'UmbelMiniCluster';
+    if (item.typeId === 'bellFruit') return 'AirFiller';
+    if (item.typeId === 'liatris') return 'FoliageGrassBranch';
+  }
+
+  if (item.typeId === 'bellFruit') {
+    return planId === 'berry-grove' ? 'FruitPodCluster' : 'HangingBellFruit';
+  }
+
+  if (item.typeId === 'orchid') {
+    if (planId === 'breathing-landscape') return 'TrumpetThroatFlower';
+    if (planId === 'summer-pinwheel-detail') return 'StarPinwheelFlower';
+    return 'OrchidButterflyFlower';
+  }
+
+  if (item.typeId === 'chamomile') {
+    return planId === 'summer-pinwheel-detail' && item.role === 'filler' ? 'StarPinwheelFlower' : 'DiskFlower';
+  }
+
+  const primitiveByType: Record<FlowerTypeId, FloraPrimitiveName> = {
+    lowPolyMass: 'FullHydrangeaCloud',
+    fivePetal: 'DiskFlower',
+    rose: 'RuffledRoseFlower',
+    camelliaPeony: 'LayeredDahliaFlower',
+    chamomile: 'DiskFlower',
+    orchid: 'OrchidButterflyFlower',
+    snapdragon: 'SpikeFlower',
+    hyacinth: 'SpikeFlower',
+    liatris: 'SpikeFlower',
+    hydrangea: 'FullHydrangeaCloud',
+    pompon: 'FullHydrangeaCloud',
+    bellFruit: 'HangingBellFruit'
+  };
+  return primitiveByType[item.typeId];
+}
+
+function primitiveRoleForPlanItem(item: FlowerPlanItem): FloraPrimitiveRole {
+  if (item.role === 'main') return 'hero';
+  if (item.role === 'line') return 'line';
+  if (item.role === 'cluster') return 'cluster';
+  if (item.role === 'fruit') return 'fruit';
+  if (item.role === 'filler') return 'filler';
+  return 'secondary';
+}
+
+function primitivePalette(spec: DailyBouquetSpec, primitive: FloraPrimitiveName, rng: ReturnType<typeof createRng>) {
+  const flower = spec.theme.palette;
+  const leaf = spec.theme.leafPalette;
+  const color = (index: number) => flower[index % flower.length];
+  const leafColor = (index: number) => leaf[index % leaf.length];
+  const warm = color(Math.floor(rng.value() * flower.length));
+
+  if (primitive === 'FoliageGrassBranch') return [leafColor(0), leafColor(1), leafColor(2), spec.theme.stem];
+  if (primitive === 'FruitPodCluster') return [color(4), color(3), leafColor(1), color(2)];
+  if (primitive === 'HangingBellFruit') return [color(0), color(1), leafColor(1), color(2)];
+  if (primitive === 'TrumpetThroatFlower') return [color(2), '#fffdf2', color(0), color(1)];
+  if (primitive === 'CallaCurledBract') return [color(2), color(1), color(0), leafColor(1)];
+  if (primitive === 'SpikeFlower') return [warm, color(1), color(2), leafColor(1)];
+  if (primitive === 'UmbelMiniCluster') return ['#fffdf4', color(2), color(3), leafColor(2)];
+  if (primitive === 'FullHydrangeaCloud') return [color(3), color(2), color(4), '#f4ffd8'];
+  return [warm, color(1), color(2), leafColor(2)];
+}
+
+function orientPrimitiveGroup(
+  group: THREE.Group,
+  primitive: FloraPrimitiveName,
+  point: THREE.Vector3,
+  theta: number,
+  rng: ReturnType<typeof createRng>
+) {
+  const outward = point.clone().setY(point.y * 0.55 + 0.48).normalize();
+  const facePrimitives: FloraPrimitiveName[] = [
+    'DiskFlower',
+    'LayeredDahliaFlower',
+    'RuffledRoseFlower',
+    'StarPinwheelFlower',
+    'TrumpetThroatFlower',
+    'DaturaTrumpetFlower',
+    'OrchidButterflyFlower'
+  ];
+
+  if (facePrimitives.includes(primitive)) {
+    group.quaternion.setFromUnitVectors(forward, outward.lengthSq() ? outward : forward);
+    group.rotateZ(rng.range(0, Math.PI * 2));
+    group.rotateX(rng.range(-0.18, 0.18));
+    return;
+  }
+
+  if (primitive === 'SpikeFlower' || primitive === 'FoliageGrassBranch') {
+    group.quaternion.setFromUnitVectors(up, new THREE.Vector3(Math.cos(theta) * 0.22, 1, Math.sin(theta) * 0.22).normalize());
+    group.rotateY(rng.range(-0.45, 0.45));
+    return;
+  }
+
+  if (primitive === 'HangingBellFruit') {
+    group.rotation.set(rng.range(-0.18, 0.18), theta + rng.range(-0.35, 0.35), rng.range(-0.12, 0.12));
+    return;
+  }
+
+  group.quaternion.setFromUnitVectors(up, outward.lengthSq() ? outward : up);
+  group.rotateY(rng.range(0, Math.PI * 2));
+}
+
+function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
+  const plannedCount = Math.floor(quality.flowerCount * spec.flowerDensity);
+  const count = Math.max(64, Math.floor(plannedCount * (spec.special ? 0.34 : 0.44)));
+  const group = new THREE.Group();
+  const batches = spec.flowerPlan.items;
+  let used = 0;
+
+  batches.forEach((batch, index) => {
+    const batchCount = index === batches.length - 1 ? count - used : Math.max(1, Math.floor(count * batch.share));
+    used += batchCount;
+    const primitive = primitiveForPlanItem(batch, spec.flowerPlan.id);
+    const factory = floraPrimitiveFactories[primitive];
+    const localRng = createRng(`${spec.seed}:primitive-flowers:${spec.flowerPlan.id}:${batch.typeId}:${primitive}`);
+
+    for (let i = 0; i < batchCount; i += 1) {
+      const { p, theta } = placementPoint(spec, localRng, batch.placement);
+      const roleScale =
+        batch.role === 'main' ? 0.26 :
+        batch.role === 'line' ? 0.25 :
+        batch.role === 'cluster' ? 0.23 :
+        batch.role === 'fruit' ? 0.2 :
+        batch.role === 'filler' ? 0.16 :
+        0.21;
+      const bloom = spec.special?.bloomScale;
+      const specialScale = bloom ? localRng.range(bloom.small, bloom.medium) * 0.52 : 1;
+      const primitiveGroup = factory({
+        seed: `${spec.seed}:bouquet-primitive:${primitive}:${batch.typeId}:${i}`,
+        position: p,
+        scale: roleScale * batch.scale * localRng.range(0.82, 1.22) * specialScale,
+        colorPalette: primitivePalette(spec, primitive, localRng),
+        openness: ['OrchidButterflyFlower', 'TrumpetThroatFlower', 'DaturaTrumpetFlower', 'CallaCurledBract'].includes(primitive) ? 0.94 : localRng.range(0.62, 0.86),
+        density: ['UmbelMiniCluster', 'FullHydrangeaCloud', 'FruitPodCluster'].includes(primitive) ? 1.08 : localRng.range(0.86, 1.02),
+        curvature: ['SpikeFlower', 'FoliageGrassBranch', 'CallaCurledBract'].includes(primitive) ? 0.86 : 0.42,
+        role: primitiveRoleForPlanItem(batch)
+      });
+      primitiveGroup.name = `${primitive}:${batch.cn}`;
+      orientPrimitiveGroup(primitiveGroup, primitive, p, theta, localRng);
+      group.add(primitiveGroup);
+    }
+  });
+
+  const foliageFactory = floraPrimitiveFactories.FoliageGrassBranch;
+  const foliageRng = createRng(`${spec.seed}:primitive-foliage-accents`);
+  const foliageCount = Math.max(6, Math.floor(count * 0.08 * spec.theme.wildness));
+  for (let i = 0; i < foliageCount; i += 1) {
+    const { p, theta } = placementPoint(spec, foliageRng, i % 4 === 0 ? 'spray' : i % 2 === 0 ? 'outer' : 'mixed');
+    p.y -= foliageRng.range(0.18, 0.42);
+    p.multiplyScalar(foliageRng.range(0.9, 1.02));
+    const foliage = foliageFactory({
+      seed: `${spec.seed}:bouquet-foliage:${i}`,
+      position: p,
+      scale: foliageRng.range(0.2, 0.32),
+      colorPalette: primitivePalette(spec, 'FoliageGrassBranch', foliageRng),
+      openness: 0.74,
+      density: 0.92,
+      curvature: 0.86,
+      role: 'line'
+    });
+    orientPrimitiveGroup(foliage, 'FoliageGrassBranch', p, theta, foliageRng);
+    group.add(foliage);
+  }
+
+  return group;
+}
+
 function placementPoint(
   spec: DailyBouquetSpec,
   rng: ReturnType<typeof createRng>,
@@ -579,20 +756,7 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
     return mesh;
   }
 
-  const group = new THREE.Group();
-  const batches = spec.flowerPlan.items;
-  let used = 0;
-  batches.forEach((batch, index) => {
-    const batchCount = index === batches.length - 1 ? count - used : Math.max(1, Math.floor(count * batch.share));
-    used += batchCount;
-    const geometry = geometryForFlowerType(batch.typeId, spec.special ? 0.084 : 0.074);
-    const mesh = new THREE.InstancedMesh(geometry, material.clone(), batchCount);
-    mesh.name = `${batch.typeId}:${batch.cn}`;
-    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    place(mesh, createRng(`${spec.seed}:flowers:${spec.flowerPlan.id}:${batch.typeId}`), batchCount, batch.scale, 0.12, batch.placement);
-    group.add(mesh);
-  });
-  return group;
+  return buildPrimitiveFlowers(spec, quality);
 }
 
 function buildLeaves(spec: DailyBouquetSpec, quality: QualityProfile) {
@@ -902,6 +1066,7 @@ export class BouquetScene {
   private yawAmplitude = 0;
   private distanceAmplitude = 0;
   private targetYAmplitude = 0;
+  private zoomOffset = 0;
   private cameraDistance = 5.36;
   private baseCameraDistance = 5.36;
   private targetCameraDistance = 5.36;
@@ -1045,9 +1210,9 @@ export class BouquetScene {
     const wide = ratio > 1.65;
     this.camera.aspect = width / height;
     this.camera.fov = phone ? 42 : wide ? 32 : 34;
-    this.baseCameraDistance = phone ? 5.82 : wide ? 5.08 : 5.36;
-    this.targetCameraDistance = this.baseCameraDistance;
-    this.cameraDistance = this.baseCameraDistance;
+    this.baseCameraDistance = phone ? 6.9 : wide ? 6.15 : 6.45;
+    this.targetCameraDistance = this.baseCameraDistance + this.zoomOffset;
+    this.cameraDistance = this.targetCameraDistance;
     this.baseCameraTargetY = phone ? 0.66 : wide ? 0.74 : 0.7;
     this.targetCameraTargetY = this.baseCameraTargetY;
     this.cameraTargetY = this.baseCameraTargetY;
@@ -1063,7 +1228,7 @@ export class BouquetScene {
       routeOffsets = this.routeOffsets();
       this.targetCameraYaw += this.routeSpeed * this.routeDirection * this.routePulse() * delta;
       this.targetCameraPitch = THREE.MathUtils.clamp(this.baseCameraPitch + routeOffsets.pitch, minCameraPitch, maxCameraPitch);
-      this.targetCameraDistance = this.baseCameraDistance + routeOffsets.distance;
+      this.targetCameraDistance = this.baseCameraDistance + this.zoomOffset + routeOffsets.distance;
       this.targetCameraTargetY = this.baseCameraTargetY + routeOffsets.targetY;
     }
     this.cameraYaw += (this.targetCameraYaw - this.cameraYaw) * 0.1;
@@ -1084,7 +1249,7 @@ export class BouquetScene {
   private updateCamera(routeOffsets: CameraRouteOffsets) {
     const yaw = this.cameraYaw + routeOffsets.yaw;
     const pitch = THREE.MathUtils.clamp(this.cameraPitch, minCameraPitch, maxCameraPitch);
-    const distance = Math.max(3.8, this.cameraDistance);
+    const distance = THREE.MathUtils.clamp(this.cameraDistance, 3.2, 8.7);
     const target = new THREE.Vector3(0, this.cameraTargetY, 0);
     const horizontal = Math.cos(pitch) * distance;
 
@@ -1215,6 +1380,20 @@ export class BouquetScene {
     };
     this.canvas.addEventListener('pointerup', release);
     this.canvas.addEventListener('pointercancel', release);
+  }
+
+  setZoomOffset(offset: number) {
+    this.zoomOffset = THREE.MathUtils.clamp(offset, minZoomOffset, maxZoomOffset);
+    this.targetCameraDistance = this.baseCameraDistance + this.zoomOffset;
+    return this.zoomOffset;
+  }
+
+  zoomBy(delta: number) {
+    return this.setZoomOffset(this.zoomOffset + delta);
+  }
+
+  getZoomOffset() {
+    return this.zoomOffset;
   }
 
   private disposeObject(object: THREE.Object3D) {
