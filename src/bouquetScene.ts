@@ -623,14 +623,15 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
 
   const foliageFactory = floraPrimitiveFactories.FoliageGrassBranch;
   const foliageRng = createRng(`${spec.seed}:primitive-foliage-accents`);
-  const foliageCount = Math.max(8, Math.floor(count * 0.12 * spec.theme.wildness));
+  const foliageCount = Math.max(6, Math.floor(count * 0.08 * spec.theme.wildness));
   for (let i = 0; i < foliageCount; i += 1) {
-    const { p, theta } = placementPoint(spec, foliageRng, i % 3 === 0 ? 'spray' : 'outer');
-    p.y -= foliageRng.range(0.08, 0.32);
+    const { p, theta } = placementPoint(spec, foliageRng, i % 4 === 0 ? 'spray' : i % 2 === 0 ? 'outer' : 'mixed');
+    p.y -= foliageRng.range(0.18, 0.42);
+    p.multiplyScalar(foliageRng.range(0.9, 1.02));
     const foliage = foliageFactory({
       seed: `${spec.seed}:bouquet-foliage:${i}`,
       position: p,
-      scale: foliageRng.range(0.18, 0.28),
+      scale: foliageRng.range(0.2, 0.32),
       colorPalette: primitivePalette(spec, 'FoliageGrassBranch', foliageRng),
       openness: 0.74,
       density: 0.92,

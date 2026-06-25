@@ -881,37 +881,57 @@ export function createAirFiller(options: FloraPrimitiveOptions) {
 export function createFoliageGrassBranch(options: FloraPrimitiveOptions) {
   const rng = createRng(`${options.seed}:foliage`);
   const group = new THREE.Group();
+  const stemColor = colorAt(options.colorPalette, 0);
   const linePositions: number[] = [];
   const lineColors: number[] = [];
-  const stemColor = colorAt(options.colorPalette, 0);
-  const leafCount = Math.max(10, Math.round(14 * options.density));
-  const leaves = new THREE.InstancedMesh(taperedPetalGeometry(0.32, 0.046, 0.035, 0.018), material(colorAt(options.colorPalette, 1), 0.92), leafCount);
+  const leafCount = Math.max(12, Math.round(16 * options.density));
+  const grassCount = Math.max(10, Math.round(14 * options.density));
+  const leaves = new THREE.InstancedMesh(taperedPetalGeometry(0.28, 0.04, 0.024, 0.012), material(colorAt(options.colorPalette, 1), 0.92), leafCount);
+  const spine = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-0.58, -0.16, rng.range(-0.04, 0.04)),
+    new THREE.Vector3(-0.24, rng.range(-0.04, 0.08), rng.range(-0.08, 0.08)),
+    new THREE.Vector3(0.16, rng.range(-0.02, 0.12), rng.range(-0.08, 0.08)),
+    new THREE.Vector3(0.62, 0.18, rng.range(-0.04, 0.04))
+  ]);
+
+  const spinePoints = spine.getPoints(12);
+  for (let i = 0; i < spinePoints.length - 1; i += 1) {
+    const a = spinePoints[i];
+    const b = spinePoints[i + 1];
+    linePositions.push(a.x, a.y, a.z, b.x, b.y, b.z);
+    lineColors.push(stemColor.r, stemColor.g, stemColor.b, stemColor.r, stemColor.g, stemColor.b);
+  }
 
   for (let i = 0; i < leafCount; i += 1) {
     const side = i % 2 === 0 ? 1 : -1;
-    const t = i / Math.max(1, leafCount - 1);
-    const base = new THREE.Vector3(Math.sin(t * Math.PI * 1.4) * 0.08, -0.52 + t * 1.08, Math.cos(t * Math.PI) * 0.06);
-    const tip = base.clone().add(new THREE.Vector3(side * rng.range(0.12, 0.34), rng.range(0.08, 0.26), rng.range(-0.18, 0.18)));
+    const t = (i + 0.55) / (leafCount + 1);
+    const base = spine.getPoint(t);
+    const tangent = spine.getTangent(t).normalize();
+    const sideVector = new THREE.Vector3(-tangent.y, tangent.x, rng.range(-0.25, 0.25)).normalize();
+    const length = rng.range(0.18, 0.34) * (0.78 + Math.sin(t * Math.PI) * 0.18);
+    const tip = base.clone().addScaledVector(sideVector, side * length).add(new THREE.Vector3(rng.range(-0.015, 0.015), rng.range(-0.02, 0.04), rng.range(-0.04, 0.04)));
     linePositions.push(base.x, base.y, base.z, tip.x, tip.y, tip.z);
     lineColors.push(stemColor.r, stemColor.g, stemColor.b, stemColor.r, stemColor.g, stemColor.b);
-    const normal = new THREE.Vector3(side * 0.58, 0.86, rng.range(-0.18, 0.18));
+    const normal = sideVector.multiplyScalar(side).add(new THREE.Vector3(0, 0.72, rng.range(-0.12, 0.12))).normalize();
     setInstance(
       leaves,
       i,
       tip,
-      new THREE.Vector3(rng.range(0.72, 1.16), rng.range(0.82, 1.42), 1),
+      new THREE.Vector3(rng.range(0.66, 1.04), rng.range(0.72, 1.12), 1),
       colorAt(options.colorPalette, i).clone().lerp(new THREE.Color('#ffffff'), rng.range(0.0, 0.14)),
-      side > 0 ? -0.5 : 0.5,
+      side > 0 ? -0.42 : 0.42,
       normal
     );
   }
 
   const grassPositions: number[] = [];
   const grassColors: number[] = [];
-  for (let i = 0; i < 26; i += 1) {
-    const angle = rng.range(-1.1, 1.1);
-    const start = new THREE.Vector3(rng.range(-0.08, 0.08), -0.56, rng.range(-0.08, 0.08));
-    const end = new THREE.Vector3(Math.sin(angle) * rng.range(0.36, 0.9), rng.range(0.36, 1.08), Math.cos(angle) * rng.range(0.16, 0.48));
+  for (let i = 0; i < grassCount; i += 1) {
+    const t = rng.range(0.08, 0.96);
+    const start = spine.getPoint(t);
+    const tangent = spine.getTangent(t).normalize();
+    const drift = new THREE.Vector3(-tangent.y, tangent.x, rng.range(-0.35, 0.35)).normalize().multiplyScalar(rng.range(-0.16, 0.16));
+    const end = start.clone().addScaledVector(tangent, rng.range(0.18, 0.46)).add(drift).add(new THREE.Vector3(0, rng.range(-0.02, 0.12), rng.range(-0.04, 0.04)));
     grassPositions.push(start.x, start.y, start.z, end.x, end.y, end.z);
     const c = colorAt(options.colorPalette, i + 2);
     grassColors.push(c.r, c.g, c.b, c.r, c.g, c.b);

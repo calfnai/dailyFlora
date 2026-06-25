@@ -325,6 +325,10 @@ button {
   text-transform: lowercase;
 }
 
+.is-special .flower-plan-mark {
+  display: none;
+}
+
 .is-special .quality-mark,
 .is-special .segmented,
 .is-special .rotation-control,
