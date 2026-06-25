@@ -10,6 +10,8 @@ const up = new THREE.Vector3(0, 1, 0);
 const forward = new THREE.Vector3(0, 0, 1);
 const minCameraPitch = 0.03;
 const maxCameraPitch = 1.34;
+const minZoomOffset = -1.35;
+const maxZoomOffset = 1.65;
 
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
 
@@ -1054,6 +1056,7 @@ export class BouquetScene {
   private yawAmplitude = 0;
   private distanceAmplitude = 0;
   private targetYAmplitude = 0;
+  private zoomOffset = 0;
   private cameraDistance = 5.36;
   private baseCameraDistance = 5.36;
   private targetCameraDistance = 5.36;
@@ -1198,8 +1201,8 @@ export class BouquetScene {
     this.camera.aspect = width / height;
     this.camera.fov = phone ? 42 : wide ? 32 : 34;
     this.baseCameraDistance = phone ? 5.82 : wide ? 5.08 : 5.36;
-    this.targetCameraDistance = this.baseCameraDistance;
-    this.cameraDistance = this.baseCameraDistance;
+    this.targetCameraDistance = this.baseCameraDistance + this.zoomOffset;
+    this.cameraDistance = this.targetCameraDistance;
     this.baseCameraTargetY = phone ? 0.66 : wide ? 0.74 : 0.7;
     this.targetCameraTargetY = this.baseCameraTargetY;
     this.cameraTargetY = this.baseCameraTargetY;
@@ -1215,7 +1218,7 @@ export class BouquetScene {
       routeOffsets = this.routeOffsets();
       this.targetCameraYaw += this.routeSpeed * this.routeDirection * this.routePulse() * delta;
       this.targetCameraPitch = THREE.MathUtils.clamp(this.baseCameraPitch + routeOffsets.pitch, minCameraPitch, maxCameraPitch);
-      this.targetCameraDistance = this.baseCameraDistance + routeOffsets.distance;
+      this.targetCameraDistance = this.baseCameraDistance + this.zoomOffset + routeOffsets.distance;
       this.targetCameraTargetY = this.baseCameraTargetY + routeOffsets.targetY;
     }
     this.cameraYaw += (this.targetCameraYaw - this.cameraYaw) * 0.1;
@@ -1236,7 +1239,7 @@ export class BouquetScene {
   private updateCamera(routeOffsets: CameraRouteOffsets) {
     const yaw = this.cameraYaw + routeOffsets.yaw;
     const pitch = THREE.MathUtils.clamp(this.cameraPitch, minCameraPitch, maxCameraPitch);
-    const distance = Math.max(3.8, this.cameraDistance);
+    const distance = THREE.MathUtils.clamp(this.cameraDistance, 3.2, 7.2);
     const target = new THREE.Vector3(0, this.cameraTargetY, 0);
     const horizontal = Math.cos(pitch) * distance;
 
@@ -1367,6 +1370,20 @@ export class BouquetScene {
     };
     this.canvas.addEventListener('pointerup', release);
     this.canvas.addEventListener('pointercancel', release);
+  }
+
+  setZoomOffset(offset: number) {
+    this.zoomOffset = THREE.MathUtils.clamp(offset, minZoomOffset, maxZoomOffset);
+    this.targetCameraDistance = this.baseCameraDistance + this.zoomOffset;
+    return this.zoomOffset;
+  }
+
+  zoomBy(delta: number) {
+    return this.setZoomOffset(this.zoomOffset + delta);
+  }
+
+  getZoomOffset() {
+    return this.zoomOffset;
   }
 
   private disposeObject(object: THREE.Object3D) {

@@ -102,8 +102,8 @@ const reviewNotes: Partial<Record<FloraPrimitiveName, { status: string; note: st
     note: '沿当前角度拉长外圈卷曲部分，让单片苞片更接近闭合。'
   },
   SpikeFlower: {
-    status: '10 不如上上版：回修',
-    note: '已从胶囊串改回小花沿穗排列；本轮花库验收已达到及格线。'
+    status: '10 回退为直立穗状',
+    note: '已取消统一弯曲度，改回直立中轴，只保留极小随机偏移和小花错落。'
   },
   UmbelMiniCluster: {
     status: '11 需要 360 可看',

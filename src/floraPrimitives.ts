@@ -525,9 +525,15 @@ export function createSpikeFlower(options: FloraPrimitiveOptions) {
   const rng = createRng(`${options.seed}:spike`);
   const group = new THREE.Group();
   const height = 1.76 + options.openness * 0.22;
-  const curve = makeStemCurve(height, options.curvature, rng.range(-0.04, 0.04));
+  const lean = new THREE.Vector3(rng.range(-0.025, 0.025), 0, rng.range(-0.025, 0.025));
+  const curve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, -height * 0.52, 0),
+    new THREE.Vector3(lean.x * 0.35, -height * 0.15, lean.z * 0.35),
+    new THREE.Vector3(lean.x * 0.72, height * 0.18, lean.z * 0.72),
+    new THREE.Vector3(lean.x, height * 0.52, lean.z)
+  ]);
   const stem = new THREE.Mesh(
-    new THREE.TubeGeometry(curve, 18, 0.018, 6),
+    new THREE.TubeGeometry(curve, 8, 0.018, 6),
     material(colorAt(options.colorPalette, 2), 0.9)
   );
   const floretCount = Math.max(30, Math.round(40 * options.density));
@@ -537,9 +543,9 @@ export function createSpikeFlower(options: FloraPrimitiveOptions) {
   for (let i = 0; i < floretCount; i += 1) {
     const t = i / Math.max(1, floretCount - 1);
     const base = curve.getPoint(t);
-    const taper = (1.18 - t * 0.72) * (0.72 + Math.sin(t * Math.PI) * 0.24);
-    const angle = (i % 6) * (Math.PI / 3) + t * Math.PI * 3.1 + rng.range(-0.08, 0.08);
-    const center = base.add(new THREE.Vector3(Math.cos(angle) * 0.11 * taper, rng.range(-0.018, 0.018), Math.sin(angle) * 0.11 * taper));
+    const taper = (1.16 - t * 0.66) * (0.78 + Math.sin(t * Math.PI) * 0.18);
+    const angle = (i % 7) * (Math.PI / 3.5) + i * 0.16 + rng.range(-0.14, 0.14);
+    const center = base.add(new THREE.Vector3(Math.cos(angle) * 0.105 * taper, rng.range(-0.012, 0.012), Math.sin(angle) * 0.105 * taper));
     for (let petal = 0; petal < 4; petal += 1) {
       const petalAngle = angle + (petal / 4) * Math.PI * 2;
       setInstance(
@@ -549,7 +555,7 @@ export function createSpikeFlower(options: FloraPrimitiveOptions) {
         new THREE.Vector3(taper * rng.range(0.72, 0.98), taper * rng.range(0.72, 1), 1),
         colorAt(options.colorPalette, i + petal).clone().lerp(new THREE.Color('#ffffff'), rng.range(0.03, 0.22)),
         petalAngle - Math.PI / 2,
-        new THREE.Vector3(Math.cos(angle) * 0.32, 0.88, Math.sin(angle) * 0.32)
+        new THREE.Vector3(Math.cos(angle) * 0.22, 0.96, Math.sin(angle) * 0.22)
       );
       cursor += 1;
     }

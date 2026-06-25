@@ -106,6 +106,8 @@ const todayButton = document.querySelector<HTMLButtonElement>('#today-button');
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker');
 const shuffleButton = document.querySelector<HTMLButtonElement>('#shuffle-button');
 const fullscreenButton = document.querySelector<HTMLButtonElement>('#fullscreen-button');
+const zoomInButton = document.querySelector<HTMLButtonElement>('#zoom-in-button');
+const zoomOutButton = document.querySelector<HTMLButtonElement>('#zoom-out-button');
 const densityButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-density-choice]'));
 const renderButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-render-choice]'));
 const rotationSpeedInput = document.querySelector<HTMLInputElement>('#rotation-speed');
@@ -147,6 +149,7 @@ let yawAmplitude = 0;
 let distanceAmplitude = 0;
 let targetYAmplitude = 0;
 let manualRotation = false;
+let manualZoom = 0;
 let specialAudio: HTMLAudioElement | null = null;
 
 function THREEClamp(value: number, min: number, max: number) {
@@ -287,6 +290,16 @@ function applyRotationSettings(pitch?: number) {
   syncControls();
 }
 
+function applyZoom(nextZoom: number) {
+  manualZoom = scene.setZoomOffset(THREEClamp(nextZoom, -1.35, 1.65));
+  revealUi();
+}
+
+function zoomBy(delta: number) {
+  manualZoom = scene.zoomBy(delta);
+  revealUi();
+}
+
 function applyRoutePreset(preset: (typeof rotationPresets)[number]) {
   manualRotation = true;
   rotationSpeed = preset.speed;
@@ -388,6 +401,7 @@ function rebuildQuality(nextDensity = selectedDensity, nextRender = selectedRend
   if (changed) {
     scene.rebuild(spec, quality);
     applyRotationSettings();
+    scene.setZoomOffset(manualZoom);
   }
   setLabels();
   syncControls();
@@ -449,6 +463,24 @@ fullscreenButton?.addEventListener('click', async () => {
   }
   revealUi();
 });
+
+zoomInButton?.addEventListener('click', () => {
+  zoomBy(-0.28);
+});
+
+zoomOutButton?.addEventListener('click', () => {
+  zoomBy(0.28);
+});
+
+canvas.addEventListener(
+  'wheel',
+  (event) => {
+    event.preventDefault();
+    const normalized = THREEClamp(event.deltaY / 520, -0.42, 0.42);
+    applyZoom(manualZoom + normalized);
+  },
+  { passive: false }
+);
 
 densityButtons.forEach((button) => {
   button.addEventListener('click', () => {
@@ -516,5 +548,6 @@ if (specialReference) {
   createSpecialOverlay();
 }
 applyRotationSettings();
+scene.setZoomOffset(manualZoom);
 revealUi();
 scene.start();

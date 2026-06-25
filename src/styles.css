@@ -241,7 +241,8 @@ button {
 }
 
 .segmented,
-.rotation-control {
+.rotation-control,
+.zoom-control {
   display: flex;
   align-items: center;
   min-height: 42px;
@@ -279,9 +280,14 @@ button {
   outline: none;
 }
 
-.rotation-control {
+.rotation-control,
+.zoom-control {
   gap: 7px;
   padding: 3px 7px 3px 3px;
+}
+
+.zoom-control {
+  padding-right: 3px;
 }
 
 .slider-shell {
@@ -322,6 +328,7 @@ button {
 .is-special .quality-mark,
 .is-special .segmented,
 .is-special .rotation-control,
+.is-special .zoom-control,
 .is-special .controls {
   border-color: rgb(255 232 193 / 10%);
   background: rgb(5 4 8 / 28%);
