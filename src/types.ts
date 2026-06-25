@@ -13,6 +13,43 @@ export interface QualityProfile {
   targetFps: number;
 }
 
+export type FlowerTypeId =
+  | 'lowPolyMass'
+  | 'fivePetal'
+  | 'rose'
+  | 'camelliaPeony'
+  | 'chamomile'
+  | 'orchid'
+  | 'snapdragon'
+  | 'hyacinth'
+  | 'liatris'
+  | 'hydrangea'
+  | 'pompon'
+  | 'bellFruit';
+
+export type FlowerPlanRole = 'main' | 'secondary' | 'line' | 'cluster' | 'fruit' | 'filler';
+
+export interface FlowerPlanItem {
+  typeId: FlowerTypeId;
+  cn: string;
+  en: string;
+  role: FlowerPlanRole;
+  share: number;
+  scale: number;
+  placement: 'center' | 'outer' | 'high' | 'low' | 'spray' | 'mixed';
+  note: string;
+}
+
+export interface FlowerPlan {
+  id: string;
+  cnName: string;
+  enName: string;
+  reference: string;
+  silhouette: string;
+  avoid: string;
+  items: FlowerPlanItem[];
+}
+
 export interface BouquetTheme {
   id: string;
   name: string;
@@ -88,6 +125,7 @@ export interface DailyBouquetSpec {
   rotationSpeed: number;
   asymmetry: number;
   haloLift: number;
+  flowerPlan: FlowerPlan;
   special?: SpecialBouquetReference;
 }
 
