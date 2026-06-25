@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DailyFlora 审美复盘 Dashboard</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #080a07;
+        --surface: #10150f;
+        --surface-2: #171e15;
+        --surface-3: #20281d;
+        --text: #f7f0e3;
+        --muted: rgb(247 240 227 / 70%);
+        --line: rgb(247 240 227 / 15%);
+        --good: #87d486;
+        --warn: #f2cb62;
+        --bad: #ef8b73;
+        --cool: #9fc6ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 14% 0%, rgb(242 203 98 / 13%), transparent 28%),
+          radial-gradient(circle at 88% 8%, rgb(135 212 134 / 10%), transparent 26%),
+          linear-gradient(180deg, #080a07, #0d110c 58%, #080a07);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        width: min(1440px, 100%);
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+        gap: 20px;
+        align-items: stretch;
+        min-height: 360px;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: linear-gradient(145deg, rgb(16 21 15 / 95%), rgb(25 32 23 / 84%));
+      }
+
+      .eyebrow,
+      .kicker {
+        margin: 0 0 10px;
+        color: var(--warn);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 13ch;
+        font-size: clamp(38px, 6vw, 88px);
+        line-height: 0.95;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        max-width: 76ch;
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.72;
+      }
+
+      .gate-card,
+      .panel,
+      .group-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgb(8 10 7 / 46%);
+      }
+
+      .gate-card {
+        display: grid;
+        gap: 18px;
+        padding: 20px;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        min-height: 28px;
+        padding: 0 10px;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .status.blocked {
+        color: var(--bad);
+      }
+
+      .status.needs-work {
+        color: var(--warn);
+      }
+
+      .status.pass {
+        color: var(--good);
+      }
+
+      .link-row,
+      .filters,
+      .primitive-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .pill,
+      .filter-button {
+        display: inline-flex;
+        align-items: center;
+        min-height: 32px;
+        padding: 0 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        background: rgb(255 255 255 / 4%);
+        font: inherit;
+        font-size: 13px;
+        text-decoration: none;
+      }
+
+      .filter-button {
+        cursor: pointer;
+      }
+
+      .filter-button[aria-pressed="true"] {
+        color: #10150f;
+        border-color: transparent;
+        background: var(--warn);
+        font-weight: 800;
+      }
+
+      .section {
+        margin-top: 22px;
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: end;
+        margin-bottom: 12px;
+      }
+
+      .section h2 {
+        font-size: clamp(24px, 3vw, 42px);
+        line-height: 1.05;
+      }
+
+      .section-copy {
+        max-width: 78ch;
+        margin-top: 8px;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .role-grid,
+      .primitive-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .primitive-grid {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+      }
+
+      .panel {
+        padding: 14px;
+      }
+
+      .panel h3 {
+        font-size: 16px;
+      }
+
+      .panel p,
+      .panel li,
+      .group-card p,
+      .group-card li {
+        color: var(--muted);
+        line-height: 1.58;
+        font-size: 14px;
+      }
+
+      ul {
+        margin: 8px 0 0;
+        padding-left: 19px;
+      }
+
+      .group-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .group-card {
+        overflow: hidden;
+      }
+
+      .group-card.is-hidden {
+        display: none;
+      }
+
+      .thumb-strip {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1px;
+        background: var(--line);
+      }
+
+      .thumb-strip img {
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+        display: block;
+        background: var(--surface-2);
+      }
+
+      .group-body {
+        display: grid;
+        gap: 14px;
+        padding: 16px;
+      }
+
+      .group-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .group-title h3 {
+        font-size: 24px;
+        line-height: 1.18;
+      }
+
+      .en {
+        margin-top: 4px;
+        color: var(--cool);
+        font-size: 13px;
+      }
+
+      .kind {
+        color: var(--muted);
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .subpanel {
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgb(255 255 255 / 3%);
+      }
+
+      .subpanel h4 {
+        margin: 0 0 8px;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .role-review {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .role-review .subpanel h4 {
+        color: var(--warn);
+      }
+
+      .empty {
+        padding: 30px;
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      @media (max-width: 1040px) {
+        .hero,
+        .group-grid,
+        .split,
+        .role-review {
+          grid-template-columns: 1fr;
+        }
+
+        .role-grid,
+        .primitive-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 640px) {
+        .shell {
+          padding: 14px;
+        }
+
+        .hero {
+          padding: 18px;
+        }
+
+        .section-head,
+        .group-top {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .role-grid,
+        .primitive-grid,
+        .thumb-strip {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">DailyFlora aesthetic review gate</p>
+          <h1>审美复盘 Dashboard</h1>
+          <p class="lead">
+            这页只做门禁和复盘：先确认参考图到底被读成了什么视觉规则，再决定哪些 Three.js primitive 可以承接。没有 dashboard 结论，不继续直接改主花束视觉。
+          </p>
+        </div>
+        <aside class="gate-card" id="gate-card"></aside>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Review roles</p>
+            <h2>四角色复盘</h2>
+            <p class="section-copy">角色不是隐藏人格表演，而是页面上可检查的判断栏。每个参考组都必须留下四类结论。</p>
+          </div>
+        </div>
+        <div class="role-grid" id="role-grid"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Primitive gate</p>
+            <h2>七个形态门禁</h2>
+            <p class="section-copy">隐藏标签后，单个形态应能在几秒内分出盘状、层叠、穗状、开口雕塑、簇花、果材和空气填充。</p>
+          </div>
+          <a class="pill" href="./primitive-lab.html">打开 Primitive Lab</a>
+        </div>
+        <div class="primitive-grid" id="primitive-grid"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Reference topology</p>
+            <h2>参考图到执行任务</h2>
+            <p class="section-copy">每组卡片固定呈现：人话结论、正向信号、负向约束、对应 primitive、当前实现、失败原因、下一步任务和四角色复盘。</p>
+          </div>
+          <div class="filters" id="filters" aria-label="筛选复盘卡"></div>
+        </div>
+        <div class="group-grid" id="group-grid"></div>
+        <div class="empty" id="empty" hidden>没有符合筛选条件的复盘卡。</div>
+      </section>
+    </main>
+
+    <script id="fallback-data" type="application/json">
+      {
+        "updatedAt": "2026-06-25",
+        "gate": {
+          "status": "blocked",
+          "title": "Primitive gate is not passed",
+          "summary": "七个 primitive 在隐藏标签状态下还没有通过 3 秒可识别验收前，不进入整束 composition 改造。",
+          "rules": ["先复盘参考图，不直接改主花束视觉。"],
+          "links": [{"label": "Primitive Lab", "href": "./primitive-lab.html"}]
+        },
+        "roles": [],
+        "primitiveGate": [],
+        "reviewGroups": []
+      }
+    </script>
+    <script>
+      const statusText = {
+        blocked: 'blocked',
+        'needs-work': 'needs-work',
+        pass: 'pass'
+      };
+
+      const roleLabels = {
+        creativeDirector: '创意总监',
+        artDirector: '美术指导',
+        projectDirector: '项目主任',
+        cto: 'CTO'
+      };
+
+      const primitiveNames = {
+        DiskFlower: '盘状花',
+        LayeredRoundFlower: '层叠圆花',
+        SpikeFlower: '穗状花',
+        OpenSculptureFlower: '开口雕塑花',
+        ClusterFlower: '簇花',
+        BerryCluster: '果材',
+        AirFiller: '空气填充'
+      };
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function list(items) {
+        return `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+      }
+
+      function statusBadge(status) {
+        return `<span class="status ${escapeHtml(status)}">${escapeHtml(statusText[status] || status)}</span>`;
+      }
+
+      async function loadData() {
+        try {
+          const response = await fetch('../data/aesthetic-review-dashboard.json', { cache: 'no-store' });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return response.json();
+        } catch {
+          const fallback = document.querySelector('#fallback-data');
+          return JSON.parse(fallback.textContent);
+        }
+      }
+
+      function renderGate(data) {
+        const gate = data.gate;
+        document.querySelector('#gate-card').innerHTML = `
+          <div>${statusBadge(gate.status)}</div>
+          <div>
+            <h2>${escapeHtml(gate.title)}</h2>
+            <p class="section-copy">${escapeHtml(gate.summary)}</p>
+          </div>
+          ${list(gate.rules)}
+          <div class="link-row">
+            ${gate.links.map((link) => `<a class="pill" href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`).join('')}
+          </div>
+        `;
+      }
+
+      function renderRoles(data) {
+        document.querySelector('#role-grid').innerHTML = data.roles
+          .map(
+            (role) => `
+              <article class="panel">
+                <h3>${escapeHtml(role.name)}</h3>
+                <p>${escapeHtml(role.brief)}</p>
+              </article>
+            `
+          )
+          .join('');
+      }
+
+      function renderPrimitiveGate(data) {
+        document.querySelector('#primitive-grid').innerHTML = data.primitiveGate
+          .map(
+            (item) => `
+              <article class="panel">
+                <div>${statusBadge(item.status)}</div>
+                <h3>${escapeHtml(item.humanName)}</h3>
+                <p class="en">${escapeHtml(item.primitive)}</p>
+                <p>${escapeHtml(item.acceptance)}</p>
+                <p><strong>下一步：</strong>${escapeHtml(item.nextTask)}</p>
+              </article>
+            `
+          )
+          .join('');
+      }
+
+      function renderGroup(group) {
+        return `
+          <article class="group-card" data-kind="${escapeHtml(group.kind)}" data-status="${escapeHtml(group.status)}">
+            <div class="thumb-strip">
+              ${group.images.map((src) => `<img src="${escapeHtml(src)}" alt="${escapeHtml(group.title)} reference" loading="lazy" />`).join('')}
+            </div>
+            <div class="group-body">
+              <div class="group-top">
+                <div class="group-title">
+                  <div class="kind">${escapeHtml(group.kind)}</div>
+                  <h3>${escapeHtml(group.title)}</h3>
+                  <div class="en">${escapeHtml(group.englishTitle)}</div>
+                </div>
+                ${statusBadge(group.status)}
+              </div>
+              <p>${escapeHtml(group.humanConclusion)}</p>
+              <div class="primitive-list">
+                ${group.primitives
+                  .map((primitive) => `<span class="pill">${escapeHtml(primitiveNames[primitive] || primitive)}</span>`)
+                  .join('')}
+              </div>
+              <div class="link-row">
+                ${group.referenceLinks.map((link) => `<a class="pill" href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`).join('')}
+              </div>
+              <div class="split">
+                <div class="subpanel">
+                  <h4>正向信号</h4>
+                  ${list(group.positiveSignals)}
+                </div>
+                <div class="subpanel">
+                  <h4>负向约束</h4>
+                  ${list(group.negativeConstraints)}
+                </div>
+              </div>
+              <div class="split">
+                <div class="subpanel">
+                  <h4>当前实现</h4>
+                  <p>${escapeHtml(group.currentImplementation)}</p>
+                </div>
+                <div class="subpanel">
+                  <h4>未通过原因</h4>
+                  <p>${escapeHtml(group.failureReason)}</p>
+                </div>
+              </div>
+              <div class="subpanel">
+                <h4>下一步任务</h4>
+                ${list(group.nextTasks)}
+              </div>
+              <div class="role-review">
+                ${Object.entries(group.roleReview)
+                  .map(
+                    ([role, text]) => `
+                      <div class="subpanel">
+                        <h4>${escapeHtml(roleLabels[role] || role)}</h4>
+                        <p>${escapeHtml(text)}</p>
+                      </div>
+                    `
+                  )
+                  .join('')}
+              </div>
+            </div>
+          </article>
+        `;
+      }
+
+      function renderGroups(data) {
+        const grid = document.querySelector('#group-grid');
+        grid.innerHTML = data.reviewGroups.map(renderGroup).join('');
+      }
+
+      function renderFilters() {
+        const filters = [
+          ['all', '全部'],
+          ['blocked', 'blocked'],
+          ['needs-work', 'needs-work'],
+          ['pass', 'pass'],
+          ['positive', '正向'],
+          ['negative', '反向']
+        ];
+        document.querySelector('#filters').innerHTML = filters
+          .map(
+            ([value, label], index) => `
+              <button class="filter-button" type="button" data-filter="${value}" aria-pressed="${index === 0 ? 'true' : 'false'}">
+                ${label}
+              </button>
+            `
+          )
+          .join('');
+      }
+
+      function wireFilters() {
+        const buttons = Array.from(document.querySelectorAll('.filter-button'));
+        const cards = Array.from(document.querySelectorAll('.group-card'));
+        const empty = document.querySelector('#empty');
+
+        buttons.forEach((button) => {
+          button.addEventListener('click', () => {
+            const filter = button.dataset.filter;
+            buttons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+            let visible = 0;
+            cards.forEach((card) => {
+              const show = filter === 'all' || card.dataset.status === filter || card.dataset.kind === filter;
+              card.classList.toggle('is-hidden', !show);
+              if (show) visible += 1;
+            });
+            empty.hidden = visible > 0;
+          });
+        });
+      }
+
+      loadData().then((data) => {
+        renderGate(data);
+        renderRoles(data);
+        renderPrimitiveGate(data);
+        renderGroups(data);
+        renderFilters();
+        wireFilters();
+      });
+    </script>
+  </body>
+</html>

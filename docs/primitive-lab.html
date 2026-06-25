@@ -61,7 +61,18 @@
         font-size: 14px;
       }
 
-      button {
+      .tools {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 8px;
+        max-width: 520px;
+      }
+
+      button,
+      select,
+      output {
         flex: 0 0 auto;
         min-height: 36px;
         padding: 0 13px;
@@ -69,7 +80,20 @@
         border-radius: 8px;
         color: var(--text);
         background: var(--panel);
+        font: inherit;
+        font-size: 13px;
+      }
+
+      button,
+      select {
         cursor: pointer;
+      }
+
+      output {
+        display: inline-flex;
+        align-items: center;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
       }
 
       .stage {
@@ -134,8 +158,8 @@
         }
       }
     </style>
-    <script type="module" crossorigin src="../assets/primitiveLab-DszsryXp.js"></script>
-    <link rel="modulepreload" crossorigin href="../assets/random-qq0gYkZR.js">
+    <script type="module" crossorigin src="../assets/primitiveLab-Br_pVSc7.js"></script>
+    <link rel="modulepreload" crossorigin href="../assets/random-C0jAC2Z_.js">
   </head>
   <body>
     <main class="shell">
@@ -144,7 +168,16 @@
           <h1>DailyFlora Primitive Lab</h1>
           <p>七种花材形态先单独验收：隐藏标签后，应能分出盘状、层叠、穗线、开口雕塑、簇花、浆果和空气填充。</p>
         </div>
-        <button id="toggle-labels" type="button" aria-pressed="true">隐藏标签</button>
+        <div class="tools" aria-label="Primitive lab controls">
+          <select id="isolate-primitive" aria-label="Isolate primitive"></select>
+          <button type="button" data-view="front">正面</button>
+          <button type="button" data-view="side">侧面</button>
+          <button type="button" data-view="top">顶视</button>
+          <button id="silhouette-button" type="button" aria-pressed="false">轮廓</button>
+          <button id="grid-button" type="button" aria-pressed="true">网格</button>
+          <button id="toggle-labels" type="button" aria-pressed="false">标签</button>
+          <output id="primitive-stats" aria-label="Performance stats">draw 0 · tri 0 · pts 0</output>
+        </div>
       </header>
       <section class="stage" aria-label="Floral primitive test scene">
         <canvas id="primitive-canvas"></canvas>
