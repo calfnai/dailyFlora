@@ -1,5 +1,13 @@
 # DailyFlora Changelog
 
+## 0.12.5 - 2026-06-25
+
+Public reference gallery publishing.
+
+- GitHub Pages deployment now publishes `docs/dailyflora-reference-gallery.html`.
+- The gallery image folders `docs/释义/` and `docs/untitled folder/` are copied into the public Pages build so the gallery works online.
+- This intentionally makes the local reference gallery publicly accessible after deployment.
+
 ## 0.12.4 - 2026-06-25
 
 Reference flower identification and clear-mode correction.
