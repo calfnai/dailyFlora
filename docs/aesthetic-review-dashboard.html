@@ -713,7 +713,8 @@
             curvature: ['SpikeFlower', 'FoliageGrassBranch', 'CallaCurledBract'].includes(primitive) ? 0.86 : 0.42,
             role: ['SpikeFlower', 'FoliageGrassBranch'].includes(primitive) ? 'line' : 'secondary'
           });
-          model.rotation.x = ['DiskFlower', 'LayeredDahliaFlower', 'RuffledRoseFlower', 'StarPinwheelFlower', 'TrumpetThroatFlower'].includes(primitive) ? -0.7 : -0.1;
+          model.rotation.x = ['DiskFlower', 'LayeredDahliaFlower', 'RuffledRoseFlower', 'StarPinwheelFlower', 'TrumpetThroatFlower'].includes(primitive) ? -0.7 : primitive === 'FoliageGrassBranch' ? -0.34 : -0.1;
+          if (primitive === 'FoliageGrassBranch') model.rotation.z = -0.38;
           scene.add(model);
           previewScenes.push({ renderer, scene, camera, model, canvas, primitive });
         });
