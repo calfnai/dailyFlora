@@ -4,7 +4,7 @@ import { todayKey } from './random';
 import { createDailySpec, readParams } from './spec';
 import { resolveQuality } from './quality';
 import { BouquetScene } from './bouquetScene';
-import { createSpecialSpec, readSpecialId, specialReferences, withBasePath } from './special';
+import { createSpecialSpec, readSpecialId, special0629Pathname, specialReferences, withBasePath } from './special';
 
 type RotationDirection = 1 | -1;
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
@@ -132,7 +132,10 @@ let params = readParams();
 const specialId = readSpecialId();
 const specialReference = specialId ? specialReferences[specialId] : null;
 let selectedDensity = specialReference ? 'medium' : normalizeDensity(params.density);
-let selectedRender = normalizeRender(params.render);
+const searchParams = new URLSearchParams(window.location.search);
+let selectedRender = specialReference && !searchParams.has('render') && !searchParams.has('quality')
+  ? 'high'
+  : normalizeRender(params.render);
 let selectedTheme = specialReference ? specialReference.theme.id : params.theme;
 let quality = resolveQuality(selectedDensity, selectedRender);
 let spec = specialReference
@@ -270,8 +273,14 @@ function updateUrl(date: string, seed: string) {
     next.searchParams.set('theme', selectedTheme);
   }
   if (specialReference) {
-    next.searchParams.set('special', specialReference.id);
-    next.searchParams.set('date', date);
+    next.pathname = special0629Pathname();
+    next.searchParams.delete('special');
+    next.searchParams.delete('seed');
+    if (date === specialReference.date) {
+      next.searchParams.delete('date');
+    } else {
+      next.searchParams.set('date', date);
+    }
   }
   window.history.replaceState({}, '', next);
 }
@@ -291,7 +300,7 @@ function applyRotationSettings(pitch?: number) {
 }
 
 function applyZoom(nextZoom: number) {
-  manualZoom = scene.setZoomOffset(THREEClamp(nextZoom, -1.35, 1.65));
+  manualZoom = scene.setZoomOffset(THREEClamp(nextZoom, -1.35, 2.05));
   revealUi();
 }
 

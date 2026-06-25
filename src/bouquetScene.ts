@@ -11,7 +11,7 @@ const forward = new THREE.Vector3(0, 0, 1);
 const minCameraPitch = 0.03;
 const maxCameraPitch = 1.34;
 const minZoomOffset = -1.35;
-const maxZoomOffset = 1.65;
+const maxZoomOffset = 2.05;
 
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
 
@@ -473,6 +473,15 @@ function geometryForFlowerType(typeId: FlowerTypeId, radius: number) {
 }
 
 function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimitiveName {
+  if (planId === 'her-january-sky-memory') {
+    if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
+    if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
+    if (item.typeId === 'camelliaPeony') return 'RuffledRoseFlower';
+    if (item.typeId === 'hydrangea') return 'UmbelMiniCluster';
+    if (item.typeId === 'bellFruit') return 'AirFiller';
+    if (item.typeId === 'liatris') return 'FoliageGrassBranch';
+  }
+
   if (item.typeId === 'bellFruit') {
     return planId === 'berry-grove' ? 'FruitPodCluster' : 'HangingBellFruit';
   }
@@ -1200,7 +1209,7 @@ export class BouquetScene {
     const wide = ratio > 1.65;
     this.camera.aspect = width / height;
     this.camera.fov = phone ? 42 : wide ? 32 : 34;
-    this.baseCameraDistance = phone ? 5.82 : wide ? 5.08 : 5.36;
+    this.baseCameraDistance = phone ? 6.9 : wide ? 6.15 : 6.45;
     this.targetCameraDistance = this.baseCameraDistance + this.zoomOffset;
     this.cameraDistance = this.targetCameraDistance;
     this.baseCameraTargetY = phone ? 0.66 : wide ? 0.74 : 0.7;
@@ -1239,7 +1248,7 @@ export class BouquetScene {
   private updateCamera(routeOffsets: CameraRouteOffsets) {
     const yaw = this.cameraYaw + routeOffsets.yaw;
     const pitch = THREE.MathUtils.clamp(this.cameraPitch, minCameraPitch, maxCameraPitch);
-    const distance = THREE.MathUtils.clamp(this.cameraDistance, 3.2, 7.2);
+    const distance = THREE.MathUtils.clamp(this.cameraDistance, 3.2, 8.7);
     const target = new THREE.Vector3(0, this.cameraTargetY, 0);
     const horizontal = Math.cos(pitch) * distance;
 

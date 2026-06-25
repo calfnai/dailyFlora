@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 
@@ -12,6 +12,12 @@ export default defineConfig({
         copyFileSync(
           resolve(__dirname, 'data/aesthetic-review-dashboard.json'),
           resolve(__dirname, 'dist/data/aesthetic-review-dashboard.json')
+        );
+        mkdirSync(resolve(__dirname, 'dist/special0629'), { recursive: true });
+        const indexHtml = readFileSync(resolve(__dirname, 'dist/index.html'), 'utf8');
+        writeFileSync(
+          resolve(__dirname, 'dist/special0629/index.html'),
+          indexHtml.replace('<head>', '<head>\n    <base href="../" />')
         );
       }
     }

@@ -235,8 +235,16 @@ function copyReferenceGalleryToDist() {
     const sourcePath = path.join(repoRoot, source);
     const destinationPath = path.join(distDocs, destination);
     if (!fs.existsSync(sourcePath)) fail(`Reference gallery asset is missing: ${source}`);
-      fs.rmSync(destinationPath, { recursive: true, force: true });
-    fs.cpSync(sourcePath, destinationPath, { recursive: true });
+    fs.rmSync(destinationPath, { recursive: true, force: true });
+    fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
+    if (fs.statSync(sourcePath).isDirectory()) {
+      const copy = runStatus('ditto', [sourcePath, destinationPath]);
+      if (copy.status !== 0) {
+        fs.cpSync(sourcePath, destinationPath, { recursive: true, verbatimSymlinks: true });
+      }
+    } else {
+      fs.copyFileSync(sourcePath, destinationPath);
+    }
   }
 
   const distData = path.join(repoRoot, 'dist', 'data');

@@ -102,6 +102,23 @@ const plans: FlowerPlan[] = [
       { typeId: 'bellFruit', cn: '风铃果形', en: 'bell fruit form', role: 'fruit', share: 0.14, scale: 0.82, placement: 'spray', note: '局部停顿。' },
       { typeId: 'hydrangea', cn: '小绣球簇', en: 'small hydrangea cluster', role: 'cluster', share: 0.14, scale: 0.82, placement: 'low', note: '低层小体积。' }
     ])
+  },
+  {
+    id: 'her-january-sky-memory',
+    cnName: '一月星空记忆束',
+    enName: 'Her January Sky Memory',
+    reference: 'private-special: 2026-06-29 bouquet photos + Hubble NGC 2787',
+    silhouette: '下半部饱满柔软，右侧粉白主花密一点；上方和左侧有细长枝条、白色小点和火焰状花瓣伸出。',
+    avoid: '避免平均球形，避免只剩星空点阵，避免叶子压过花，避免变成情人节红粉配色。',
+    items: normalizeShares([
+      { typeId: 'chamomile', cn: '白色宇宙菊/小雏菊形', en: 'white cosmos daisy form', role: 'main', share: 0.22, scale: 1.04, placement: 'mixed', note: '照片里最清楚的白色开面花，带黄心。' },
+      { typeId: 'camelliaPeony', cn: '浅粉层叠圆花', en: 'blush layered round bloom', role: 'secondary', share: 0.18, scale: 1.02, placement: 'low', note: '复现粉色柔软体积。' },
+      { typeId: 'orchid', cn: '白色杯形郁金香/马蹄莲感', en: 'ivory cup-shaped bloom', role: 'main', share: 0.16, scale: 1.0, placement: 'outer', note: '用杯形花保留照片里的白色杯状轮廓。' },
+      { typeId: 'orchid', cn: '橙红火焰百合形', en: 'coral flame-lily form', role: 'line', share: 0.14, scale: 1.12, placement: 'spray', note: '负责左侧外伸、卷曲、火焰感的记忆点。' },
+      { typeId: 'hydrangea', cn: '淡蓝淡紫小花簇', en: 'pale blue lilac mini clusters', role: 'cluster', share: 0.14, scale: 0.82, placement: 'mixed', note: '蓝紫小花只做局部冷色闪光。' },
+      { typeId: 'liatris', cn: '绿色细线枝条', en: 'fine green line stems', role: 'line', share: 0.1, scale: 1.08, placement: 'high', note: '拉出真实花束的高低和不对称。' },
+      { typeId: 'bellFruit', cn: '满天星白色小珠', en: 'baby-breath pearl dots', role: 'filler', share: 0.06, scale: 0.72, placement: 'spray', note: '补充空气感白点，不做照片展示。' }
+    ])
   }
 ];
 
