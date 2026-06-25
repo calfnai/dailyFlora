@@ -1,5 +1,12 @@
 # DailyFlora Changelog
 
+## 0.12.6 - 2026-06-25
+
+Public flower-plan sample page publishing.
+
+- GitHub Pages deployment now publishes `docs/dailyflora-flower-plan-samples.html`.
+- The public sample page can be used outside the local dev server to review fixed high-detail bouquet examples.
+
 ## 0.12.5 - 2026-06-25
 
 Public reference gallery publishing.

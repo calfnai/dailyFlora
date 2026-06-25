@@ -224,6 +224,7 @@ function copyReferenceGalleryToDist() {
   const distDocs = path.join(repoRoot, 'dist', 'docs');
   const entries = [
     ['docs/dailyflora-reference-gallery.html', 'dailyflora-reference-gallery.html'],
+    ['docs/dailyflora-flower-plan-samples.html', 'dailyflora-flower-plan-samples.html'],
     ['docs/释义', '释义'],
     ['docs/untitled folder', 'untitled folder']
   ];
