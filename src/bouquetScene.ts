@@ -567,10 +567,15 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   }
 
   if (quality.renderName === 'medium') {
-    const geometry = makeLowPolyFlowerGeometry(5, spec.special ? 0.072 : 0.064);
-    const mesh = new THREE.InstancedMesh(geometry, material, count);
+    const geometry = new THREE.SphereGeometry(spec.special ? 0.064 : 0.056, 16, 10);
+    const mediumMaterial = material.clone();
+    mediumMaterial.flatShading = false;
+    mediumMaterial.transparent = true;
+    mediumMaterial.opacity = 0.8;
+    mediumMaterial.depthWrite = false;
+    const mesh = new THREE.InstancedMesh(geometry, mediumMaterial, count);
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    place(mesh, rng, count, 1, 0.1);
+    place(mesh, rng, count, 0.96, 0.1);
     return mesh;
   }
 

@@ -1,5 +1,15 @@
 # DailyFlora Changelog
 
+## 0.12.4 - 2026-06-25
+
+Reference flower identification and clear-mode correction.
+
+- Added `docs/reference-flower-identification.md`, a visual identification pass over the local reference gallery.
+- Reframed the reference bouquets as named material roles: disk flowers, layered round flowers, spike flowers, sculptural open flowers, cluster flowers, berries, and airy filler.
+- Changed `清` rendering from five-petal low-poly flowers to smooth spherical flower masses with 80% opacity.
+- Kept `省` as low-poly spherical flower masses.
+- Updated the `清` control tooltip to describe the new translucent sphere behavior.
+
 ## 0.12.3 - 2026-06-25
 
 Flower-plan layer for readable high-detail generation.
