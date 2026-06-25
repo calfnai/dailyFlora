@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DailyFlora Primitive Lab</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #070907;
+        --text: #f8f0df;
+        --muted: rgb(248 240 223 / 68%);
+        --line: rgb(248 240 223 / 16%);
+        --panel: rgb(12 17 12 / 86%);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow: hidden;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 12% 0%, rgb(255 210 94 / 12%), transparent 28%),
+          radial-gradient(circle at 88% 12%, rgb(105 184 143 / 10%), transparent 30%),
+          var(--bg);
+      }
+
+      .shell {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 22px 12px;
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(180deg, rgb(7 9 7 / 92%), rgb(7 9 7 / 64%));
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(20px, 2.5vw, 34px);
+        letter-spacing: 0;
+      }
+
+      p {
+        max-width: 76ch;
+        margin: 6px 0 0;
+        color: var(--muted);
+        line-height: 1.5;
+        font-size: 14px;
+      }
+
+      button {
+        flex: 0 0 auto;
+        min-height: 36px;
+        padding: 0 13px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--text);
+        background: var(--panel);
+        cursor: pointer;
+      }
+
+      .stage {
+        position: relative;
+        min-height: 0;
+      }
+
+      #primitive-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+      }
+
+      #primitive-canvas:active {
+        cursor: grabbing;
+      }
+
+      #primitive-labels {
+        position: absolute;
+        inset: auto 24px 24px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        pointer-events: none;
+      }
+
+      .primitive-label {
+        min-width: 0;
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: rgb(248 240 223 / 86%);
+        background: rgb(8 11 8 / 72%);
+        text-align: center;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+      }
+
+      #primitive-labels.is-hidden {
+        display: none;
+      }
+
+      @media (max-width: 720px) {
+        body {
+          overflow: auto;
+        }
+
+        .shell {
+          min-height: 100vh;
+          height: 760px;
+        }
+
+        header {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        #primitive-labels {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          inset: auto 12px 12px;
+        }
+      }
+    </style>
+    <script type="module" crossorigin src="../assets/primitiveLab-DszsryXp.js"></script>
+    <link rel="modulepreload" crossorigin href="../assets/random-qq0gYkZR.js">
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <div>
+          <h1>DailyFlora Primitive Lab</h1>
+          <p>七种花材形态先单独验收：隐藏标签后，应能分出盘状、层叠、穗线、开口雕塑、簇花、浆果和空气填充。</p>
+        </div>
+        <button id="toggle-labels" type="button" aria-pressed="true">隐藏标签</button>
+      </header>
+      <section class="stage" aria-label="Floral primitive test scene">
+        <canvas id="primitive-canvas"></canvas>
+        <div id="primitive-labels"></div>
+      </section>
+    </main>
+  </body>
+</html>
