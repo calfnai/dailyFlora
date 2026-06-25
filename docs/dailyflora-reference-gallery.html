@@ -1,0 +1,940 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DailyFlora 参考图卡</title>
+    <style>
+      :root {
+        --bg: #090d08;
+        --panel: rgba(18, 24, 17, 0.92);
+        --panel2: rgba(30, 38, 28, 0.92);
+        --text: #f5efe4;
+        --muted: rgba(245, 239, 228, 0.72);
+        --faint: rgba(245, 239, 228, 0.14);
+        --accent: #f6d75a;
+        --accent2: #8ee39a;
+        --bad: #ff8f8f;
+        --shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top, rgba(246, 215, 90, 0.12), transparent 26%),
+          radial-gradient(circle at 80% 8%, rgba(142, 227, 154, 0.08), transparent 18%),
+          linear-gradient(180deg, #081006 0%, #090d08 100%);
+      }
+
+      .shell {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 28px 18px 56px;
+      }
+
+      .hero {
+        padding: 26px 26px 22px;
+        border: 1px solid var(--faint);
+        border-radius: 28px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+        box-shadow: var(--shadow);
+      }
+
+      .eyebrow {
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-size: 12px;
+        color: var(--accent);
+      }
+
+      h1 {
+        margin: 10px 0 0;
+        font-size: clamp(30px, 4vw, 52px);
+        line-height: 1.05;
+      }
+
+      .lead {
+        margin: 12px 0 0;
+        max-width: 70ch;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .chips {
+        margin-top: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .chip {
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--faint);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .section {
+        margin-top: 24px;
+        border: 1px solid var(--faint);
+        border-radius: 26px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .section header {
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--faint);
+        background: linear-gradient(90deg, rgba(246, 215, 90, 0.1), rgba(142, 227, 154, 0.05));
+      }
+
+      .section h2 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .section p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        padding: 18px;
+      }
+
+      .card {
+        border-radius: 22px;
+        overflow: hidden;
+        border: 1px solid var(--faint);
+        background: linear-gradient(180deg, var(--panel), var(--panel2));
+        box-shadow: var(--shadow);
+        display: grid;
+      }
+
+      .card.bad {
+        outline: 1px solid rgba(255, 143, 143, 0.26);
+      }
+
+      .visual {
+        background:
+          radial-gradient(circle at top, rgba(255, 255, 255, 0.06), transparent 30%),
+          rgba(255, 255, 255, 0.02);
+        padding: 14px;
+        border-bottom: 1px solid var(--faint);
+      }
+
+      .thumbs {
+        display: grid;
+        gap: 10px;
+      }
+
+      .thumbs.cols-1 {
+        grid-template-columns: 1fr;
+      }
+
+      .thumbs.cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .thumbs.cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .thumbs.cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      figure {
+        margin: 0;
+      }
+
+      .thumb {
+        width: 100%;
+        display: block;
+        border-radius: 16px;
+        object-fit: cover;
+        aspect-ratio: 4 / 5;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .thumb.wide {
+        aspect-ratio: 4 / 3;
+      }
+
+      .body {
+        padding: 16px 18px 18px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .title {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.35;
+      }
+
+      .sub {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .linkrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: 999px;
+        text-decoration: none;
+        color: #121212;
+        background: var(--accent);
+        font-weight: 700;
+        font-size: 13px;
+      }
+
+      .btn.secondary {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--faint);
+        font-weight: 600;
+      }
+
+      .blocks {
+        display: grid;
+        gap: 10px;
+      }
+
+      .label {
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent2);
+      }
+
+      .copy {
+        margin: 6px 0 0;
+        line-height: 1.7;
+      }
+
+      ul {
+        margin: 6px 0 0;
+        padding-left: 18px;
+        line-height: 1.7;
+      }
+
+      .card.good .body {
+        border-left: 3px solid var(--accent2);
+      }
+
+      .card.bad .body {
+        border-left: 3px solid var(--bad);
+      }
+
+      .note {
+        margin-top: 18px;
+        padding: 16px 18px;
+        border-radius: 18px;
+        border: 1px solid var(--faint);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .mini {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .namepair {
+        display: grid;
+        gap: 4px;
+      }
+
+      .namepair .zh {
+        margin: 0;
+      }
+
+      .namepair .en {
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      @media (max-width: 920px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .shell {
+          padding-inline: 14px;
+        }
+
+        .thumbs.cols-2,
+        .thumbs.cols-3,
+        .thumbs.cols-4 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .thumbs.cols-2,
+        .thumbs.cols-3,
+        .thumbs.cols-4 {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div class="eyebrow">DailyFlora reference deck</div>
+        <h1>带图参考卡</h1>
+        <p class="lead">
+          这页直接读本地图片，不再只看链接。每张卡都保留“你要的感觉 / 要避免什么 / 参数怎么动”，方便我们边看图边对话。
+        </p>
+        <div class="chips">
+          <span class="chip">本地图片：`docs/释义/`</span>
+          <span class="chip">支持多图卡片</span>
+          <span class="chip">原始链接保留</span>
+          <span class="chip">适合直接开浏览器看</span>
+        </div>
+      </section>
+
+      <section class="section">
+        <header>
+          <h2>正向范例</h2>
+          <p>这些图是“想要继续长成这样”的方向。每张卡都已经按图整理过，不只是标题。</p>
+        </header>
+        <div class="grid">
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-2">
+                <figure><img class="thumb" src="./释义/夏日多巴胺 🫧🎨🍃_1_Dreamseeker寻梦_来自小红书网页版.jpg" alt="夏日多巴胺 1" /></figure>
+                <figure><img class="thumb" src="./释义/夏日多巴胺 🫧🎨🍃_2_Dreamseeker寻梦_来自小红书网页版.jpg" alt="夏日多巴胺 2" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">夏日多巴胺 🫧🎨🍃</h3>
+                <div class="en">Summer Dopamine</div>
+              </div>
+              <div class="linkrow">
+                <a class="btn" href="http://xhslink.com/o/1StOtyGow8u" target="_blank" rel="noreferrer">打开原链接</a>
+                <a class="btn secondary" href="./释义/夏日多巴胺 🫧🎨🍃_1_Dreamseeker寻梦_来自小红书网页版.jpg" target="_blank" rel="noreferrer">看大图</a>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="label">你要的感觉</div>
+                  <p class="copy">明亮、活泼、像夏天突然一下子打开了色彩。</p>
+                </div>
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">别做成艳俗堆色，也别太重太闷。</p>
+                </div>
+                <div>
+                  <div class="label">参数怎么动</div>
+                  <ul>
+                    <li>暖黄、桃粉、浅绿为主，少量蓝紫点缀。</li>
+                    <li>亮点多一点，但整体保持轻盈。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./释义/明明一束挺大的花束，拍出来咋就看不出来呢.jpg" alt="花束体积 1" /></figure>
+                <figure><img class="thumb wide" src="./释义/明明一束挺大的花束，拍出来咋就看不出来呢2.jpg" alt="花束体积 2" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">明明一束挺大的花束，拍出来咋就看不出来呢</h3>
+                <div class="en">Volume Read</div>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="label">你要的感觉</div>
+                  <p class="copy">真实的大体量花束，但镜头里要显得有层次，不是一坨。</p>
+                </div>
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">别让画面塌成一团，也别只剩局部好看。</p>
+                </div>
+                <div>
+                  <div class="label">参数怎么动</div>
+                  <ul>
+                    <li>增加枝条和外轮廓。</li>
+                    <li>强化侧面和背面的可读性。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-4">
+                <figure><img class="thumb" src="./释义/邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦_1_一茉Flower_来自小红书网页版.jpg" alt="浆果森林 1" /></figure>
+                <figure><img class="thumb" src="./释义/邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦_2_一茉Flower_来自小红书网页版.jpg" alt="浆果森林 2" /></figure>
+                <figure><img class="thumb" src="./释义/邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦_3_一茉Flower_来自小红书网页版.jpg" alt="浆果森林 3" /></figure>
+                <figure><img class="thumb" src="./释义/邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦_4_一茉Flower_来自小红书网页版.jpg" alt="浆果森林 4" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦</h3>
+                <div class="en">Berry Grove</div>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="label">你要的感觉</div>
+                  <p class="copy">像森林里冒出来的果子和小花，有童话感。</p>
+                </div>
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">别做成太规整的礼盒花，也别太成熟端庄。</p>
+                </div>
+                <div>
+                  <div class="label">参数怎么动</div>
+                  <ul>
+                    <li>提高小颗粒、莓果感、枝叶感。</li>
+                    <li>减少单一大花比例。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./释义/卡布奇诺的配色好可爱.png" alt="卡布奇诺配色" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">卡布奇诺的配色好可爱</h3>
+                <div class="en">Cappuccino Cream</div>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="label">你要的感觉</div>
+                  <p class="copy">温柔、奶感、带一点甜味的配色。</p>
+                </div>
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">别太荧光，别太硬。</p>
+                </div>
+                <div>
+                  <div class="label">参数怎么动</div>
+                  <ul>
+                    <li>奶咖、米白、浅橙、柔粉做底。</li>
+                    <li>整体对比收一点。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./释义/宁波花店｜秋日果汁🍹_1_西西花艺工作室_来自小红书网页版.jpg" alt="秋日果汁 1" /></figure>
+                <figure><img class="thumb wide" src="./释义/宁波花店｜秋日果汁🍹_2_西西花艺工作室_来自小红书网页版.jpg" alt="秋日果汁 2" /></figure>
+                <figure><img class="thumb wide" src="./释义/宁波花店｜秋日果汁🍹_3_西西花艺工作室_来自小红书网页版.jpg" alt="秋日果汁 3" /></figure>
+                <figure><img class="thumb wide" src="./释义/宁波花店｜秋日果汁🍹_4_西西花艺工作室_来自小红书网页版.jpg" alt="秋日果汁 4" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">宁波花店｜秋日果汁🍹</h3>
+                <div class="en">Autumn Juice</div>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="label">你要的感觉</div>
+                  <p class="copy">像秋天的果汁，偏暖、偏甜、偏多汁。</p>
+                </div>
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">别冷、别灰、别太素。</p>
+                </div>
+                <div>
+                  <div class="label">参数怎么动</div>
+                  <ul>
+                    <li>提高橙、黄、暖红权重。</li>
+                    <li>增加一点饱满的果感和温度。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./释义/花束是浪漫的具象化｜杭州花店_1_椿信子 Chunsign_来自小红书网页版.jpg" alt="浪漫具象化 1" /></figure>
+                <figure><img class="thumb wide" src="./释义/花束是浪漫的具象化｜杭州花店_2_椿信子 Chunsign_来自小红书网页版.jpg" alt="浪漫具象化 2" /></figure>
+                <figure><img class="thumb wide" src="./释义/花束是浪漫的具象化｜杭州花店_3_椿信子 Chunsign_来自小红书网页版.jpg" alt="浪漫具象化 3" /></figure>
+                <figure><img class="thumb wide" src="./释义/花束是浪漫的具象化｜杭州花店_4_椿信子 Chunsign_来自小红书网页版.jpg" alt="浪漫具象化 4" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">花束是浪漫的具象化｜杭州花店</h3>
+                <div class="en">Romance Made Visible</div>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="label">你要的感觉</div>
+                  <p class="copy">花束本身就像“浪漫”的实体化表达。</p>
+                </div>
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">别太功能型，别像随手扎的。</p>
+                </div>
+                <div>
+                  <div class="label">参数怎么动</div>
+                  <ul>
+                    <li>保留结构感和完成度。</li>
+                    <li>但别把花束做得太大太重。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <header>
+          <h2>反向范例</h2>
+          <p>这些是“别长成这样”的提醒。它们对生成器很有用，因为能直接变成约束。</p>
+        </header>
+        <div class="grid">
+          <article class="card bad">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./释义/裸花束是最自然的表达🌿_1_Be yourself flower_来自小红书网页版.jpg" alt="裸花束" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">裸花束是最自然的表达🌿</h3>
+                <div class="en">Bare Bouquet</div>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">太赤裸、太原生态、像没整理完。</p>
+                </div>
+                <div>
+                  <div class="label">参数提醒</div>
+                  <ul>
+                    <li>自然感要有，但不能牺牲可读性和精致度。</li>
+                    <li>不要过度省略包装、支撑、结构层次。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card bad">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./释义/明明一束挺大的花束，拍出来咋就看不出来呢.jpg" alt="大花束反例 1" /></figure>
+                <figure><img class="thumb wide" src="./释义/明明一束挺大的花束，拍出来咋就看不出来呢2.jpg" alt="大花束反例 2" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">中间的大向日葵占据了太多空间</h3>
+                <div class="en">Oversized Sunflower Fault</div>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">单个大主花压住全局。</p>
+                </div>
+                <div>
+                  <div class="label">参数提醒</div>
+                  <ul>
+                    <li>不要让单朵花尺寸、权重、位置过于霸道。</li>
+                    <li>主花要有，但必须让位给整体结构和周边层次。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <header>
+          <h2>其他正反参考</h2>
+          <p>这组负责补“整体强、局部强、颜色单调、反面”四种判断。</p>
+        </header>
+        <div class="grid">
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./untitled folder/其他正面参考.jpg" alt="其他正面参考 1" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">浅粉花序</h3>
+                <div class="en">Petal Quiet</div>
+              </div>
+              <div class="mini">整体与局部都成立</div>
+            </div>
+          </article>
+
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./untitled folder/其他正面参考2.jpg" alt="其他正面参考 2" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">奶白线条束</h3>
+                <div class="en">Cream Line Bouquet</div>
+              </div>
+              <div class="mini">整体与局部都成立</div>
+            </div>
+          </article>
+
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./untitled folder/其他正面参考3.jpg" alt="其他正面参考 3" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">野趣市场束</h3>
+                <div class="en">Wild Market Bloom</div>
+              </div>
+              <div class="mini">整体与局部都成立</div>
+            </div>
+          </article>
+
+          <article class="card bad">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./untitled folder/其他反向参考3.jpg" alt="其他反向参考 3" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">失衡高瓶花</h3>
+                <div class="en">Overgrown Vase Fault</div>
+              </div>
+              <div class="mini">形状有点过头，颜色也偏单</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <header>
+          <h2>你这次新给的参考</h2>
+          <p>按你现成的分组先挂上：有整体、有局部细节，颜色单调但形状好，和反面教材。后面我们可以继续逐张细分。</p>
+        </header>
+        <div class="grid">
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/夏日风车_1_柏恩花室_来自小红书网页版.jpg" alt="夏日风车 1" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/夏日风车_2_柏恩花室_来自小红书网页版.jpg" alt="夏日风车 2" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/夏日风车_3_柏恩花室_来自小红书网页版.jpg" alt="夏日风车 3" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/夏日风车_4_柏恩花室_来自小红书网页版.jpg" alt="夏日风车 4" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/夏日风车_5_柏恩花室_来自小红书网页版.jpg" alt="夏日风车 5" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">夏日风车</h3>
+                <div class="en">Summer Pinwheel</div>
+              </div>
+              <div class="mini">有整体，也有局部细节</div>
+              <div class="blocks">
+                <div>
+                  <div class="label">你要的感觉</div>
+                  <p class="copy">整体很成立，而且每个局部都能看出花材节奏，不是只有一个大轮廓。</p>
+                </div>
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">别把这种层次感做丢，尤其是侧面和外圈的小枝条。</p>
+                </div>
+                <div>
+                  <div class="label">参数怎么动</div>
+                  <ul>
+                    <li>保留高层次的外逸线。</li>
+                    <li>让大中小花都有位置，不要全挤到中心。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/是仙女的梦幻紫～🫧🪻🫧_1_Césped_来自小红书网页版.jpg" alt="梦幻紫 1" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/是仙女的梦幻紫～🫧🪻🫧_2_Césped_来自小红书网页版.jpg" alt="梦幻紫 2" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/是仙女的梦幻紫～🫧🪻🫧_3_Césped_来自小红书网页版.jpg" alt="梦幻紫 3" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/是仙女的梦幻紫～🫧🪻🫧_4_Césped_来自小红书网页版.jpg" alt="梦幻紫 4" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/是仙女的梦幻紫～🫧🪻🫧_5_Césped_来自小红书网页版.jpg" alt="梦幻紫 5" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">是仙女的梦幻紫～🫧🪻🫧</h3>
+                <div class="en">Fairy Violet</div>
+              </div>
+              <div class="mini">有整体，也有局部细节</div>
+              <div class="blocks">
+                <div>
+                  <div class="label">你要的感觉</div>
+                  <p class="copy">整体统一，但不是一团紫，里面有轻飘飘的细节和空气感。</p>
+                </div>
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">别把这种气氛压重，紫色一重就容易闷。</p>
+                </div>
+                <div>
+                  <div class="label">参数怎么动</div>
+                  <ul>
+                    <li>用轻薄的蓝紫系和小花层次做空气。</li>
+                    <li>保留细长枝条，让画面往外呼吸。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_1_Césped_来自小红书网页版.jpg" alt="洋水仙 1" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_2_Césped_来自小红书网页版.jpg" alt="洋水仙 2" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_3_Césped_来自小红书网页版.jpg" alt="洋水仙 3" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_4_Césped_来自小红书网页版.jpg" alt="洋水仙 4" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_5_Césped_来自小红书网页版.jpg" alt="洋水仙 5" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_6_Césped_来自小红书网页版.jpg" alt="洋水仙 6" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/是洋水仙的季节呀～🌿🍯_7_Césped_来自小红书网页版.jpg" alt="洋水仙 7" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">是洋水仙的季节呀～🌿🍯</h3>
+                <div class="en">Narcissus Season</div>
+              </div>
+              <div class="mini">有整体，也有局部细节</div>
+              <div class="blocks">
+                <div>
+                  <div class="label">你要的感觉</div>
+                  <p class="copy">有季节性，整体气质清楚，细节里也有柔和的材料变化。</p>
+                </div>
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">别把季节感做成单调的标签，要保留花材的层次。</p>
+                </div>
+                <div>
+                  <div class="label">参数怎么动</div>
+                  <ul>
+                    <li>把黄绿色和浅白拉开一点层次。</li>
+                    <li>用枝条和小花点出季节边缘。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/朋友搬新家，送这一瓶“会呼吸的风景”_1_大兜花园DorBeetleGarden_来自小红书网页版.jpg" alt="会呼吸的风景 1" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/朋友搬新家，送这一瓶“会呼吸的风景”_2_大兜花园DorBeetleGarden_来自小红书网页版.jpg" alt="会呼吸的风景 2" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/朋友搬新家，送这一瓶“会呼吸的风景”_3_大兜花园DorBeetleGarden_来自小红书网页版.jpg" alt="会呼吸的风景 3" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/朋友搬新家，送这一瓶“会呼吸的风景”_4_大兜花园DorBeetleGarden_来自小红书网页版.jpg" alt="会呼吸的风景 4" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/朋友搬新家，送这一瓶“会呼吸的风景”_5_大兜花园DorBeetleGarden_来自小红书网页版.jpg" alt="会呼吸的风景 5" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">朋友搬新家，送这一瓶“会呼吸的风景”</h3>
+                <div class="en">Breathing Landscape</div>
+              </div>
+              <div class="mini">有整体，也有局部细节</div>
+              <div class="blocks">
+                <div>
+                  <div class="label">你要的感觉</div>
+                  <p class="copy">像一瓶真的风景，整体开阔，局部又有细节能停下来看。</p>
+                </div>
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">别只做成一片空，风景感要靠前后层次支撑。</p>
+                </div>
+                <div>
+                  <div class="label">参数怎么动</div>
+                  <ul>
+                    <li>增加外圈枝条和远近关系。</li>
+                    <li>让主体和散点之间有呼吸间隔。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/狐尾百合✨_1_Césped_来自小红书网页版.jpg" alt="狐尾百合 1" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/狐尾百合✨_2_Césped_来自小红书网页版.jpg" alt="狐尾百合 2" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/狐尾百合✨_3_Césped_来自小红书网页版.jpg" alt="狐尾百合 3" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/狐尾百合✨_4_Césped_来自小红书网页版.jpg" alt="狐尾百合 4" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/狐尾百合✨_5_Césped_来自小红书网页版.jpg" alt="狐尾百合 5" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/狐尾百合✨_6_Césped_来自小红书网页版.jpg" alt="狐尾百合 6" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">狐尾百合✨</h3>
+                <div class="en">Foxtail Lily</div>
+              </div>
+              <div class="mini">有整体，也有局部细节</div>
+              <div class="blocks">
+                <div>
+                  <div class="label">你要的感觉</div>
+                  <p class="copy">竖向线条很强，花材层次清楚，局部细节也很能打。</p>
+                </div>
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">别把纵向拉太死，还是要留一点松动。</p>
+                </div>
+                <div>
+                  <div class="label">参数怎么动</div>
+                  <ul>
+                    <li>加强向上的枝条和纵向节奏。</li>
+                    <li>把局部小花散点做出来。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_1_Césped_来自小红书网页版.jpg" alt="多色花束 1" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_2_Césped_来自小红书网页版.jpg" alt="多色花束 2" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_3_Césped_来自小红书网页版.jpg" alt="多色花束 3" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_4_Césped_来自小红书网页版.jpg" alt="多色花束 4" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_5_Césped_来自小红书网页版.jpg" alt="多色花束 5" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_6_Césped_来自小红书网页版.jpg" alt="多色花束 6" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_7_Césped_来自小红书网页版.jpg" alt="多色花束 7" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/有整体，有局部细节/🌷🍊🌸🪻🌿🌼🫧_8_Césped_来自小红书网页版.jpg" alt="多色花束 8" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">🌷🍊🌸🪻🌿🌼🫧</h3>
+                <div class="en">Color Burst Bouquet</div>
+              </div>
+              <div class="mini">有整体，也有局部细节</div>
+              <div class="blocks">
+                <div>
+                  <div class="label">你要的感觉</div>
+                  <p class="copy">颜色跳得多，但整体还是有统一感，局部细节很丰富。</p>
+                </div>
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">别让多色变成乱堆，要保住节奏。</p>
+                </div>
+                <div>
+                  <div class="label">参数怎么动</div>
+                  <ul>
+                    <li>允许更多颜色层，但每层都要有位置。</li>
+                    <li>让小花和枝条帮忙把颜色串起来。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card good">
+            <div class="visual">
+              <div class="thumbs cols-1">
+                <figure><img class="thumb wide" src="./untitled folder/颜色单调了点/蓝莓🫐的秘密～_1_Césped_来自小红书网页版.jpg" alt="蓝莓秘密 1" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/颜色单调了点/蓝莓🫐的秘密～_2_Césped_来自小红书网页版.jpg" alt="蓝莓秘密 2" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/颜色单调了点/蓝莓🫐的秘密～_3_Césped_来自小红书网页版.jpg" alt="蓝莓秘密 3" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/颜色单调了点/蓝莓🫐的秘密～_4_Césped_来自小红书网页版.jpg" alt="蓝莓秘密 4" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/颜色单调了点/蓝莓🫐的秘密～_5_Césped_来自小红书网页版.jpg" alt="蓝莓秘密 5" /></figure>
+                <figure><img class="thumb wide" src="./untitled folder/颜色单调了点/蓝莓🫐的秘密～_6_Césped_来自小红书网页版.jpg" alt="蓝莓秘密 6" /></figure>
+              </div>
+            </div>
+            <div class="body">
+              <div class="namepair">
+                <h3 class="title zh">蓝莓🫐的秘密～</h3>
+                <div class="en">Blueberry Monotone</div>
+              </div>
+              <div class="mini">颜色单调了点，但形状是好的</div>
+              <div class="blocks">
+                <div>
+                  <div class="label">你要的感觉</div>
+                  <p class="copy">整体形状不错，层次也在，只是颜色变化不够丰富。</p>
+                </div>
+                <div>
+                  <div class="label">要避免什么</div>
+                  <p class="copy">别把这种形状做坏了，但也别继续只用一条色带。</p>
+                </div>
+                <div>
+                  <div class="label">参数怎么动</div>
+                  <ul>
+                    <li>保留结构，增加一点辅助色。</li>
+                    <li>让蓝紫之外有少量亮色跳出来。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <div class="note">
+        如果你要，我下一步可以继续把这页改成：
+        1. 更适合你手机查看的单列版本。
+        2. 每张图下方再加一句更短的“人话总结”。
+        3. 直接做成 Markdown 版，方便你复制到聊天里继续讨论。
+      </div>
+    </main>
+  </body>
+</html>
