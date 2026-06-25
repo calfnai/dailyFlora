@@ -8,9 +8,9 @@
       content="DailyFlora creates a low-power 3D particle bouquet that changes every day."
     />
     <title>DailyFlora</title>
-    <script type="module" crossorigin src="./assets/main-CXEd_Cdr.js"></script>
-    <link rel="modulepreload" crossorigin href="./assets/floraPrimitives-CUd6ra15.js">
-    <link rel="stylesheet" crossorigin href="./assets/main-BMuWgEzL.css">
+    <script type="module" crossorigin src="./assets/main-CSJw7_g_.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/floraPrimitives-DY4GMp7n.js">
+    <link rel="stylesheet" crossorigin href="./assets/main-C5MYnI8e.css">
   </head>
   <body>
     <main class="app-shell" aria-label="DailyFlora 3D bouquet screensaver">
@@ -39,6 +39,14 @@
         <button class="icon-button" id="fullscreen-button" type="button" title="Fullscreen" aria-label="Fullscreen" data-tooltip="全屏观看">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v2H6v4H4zM14 4h6v6h-2V6h-4zM4 14h2v4h4v2H4zM18 18v-4h2v6h-6v-2z" /></svg>
         </button>
+        <div class="zoom-control" aria-label="Zoom controls">
+          <button class="icon-button compact-button" id="zoom-out-button" type="button" title="Zoom out" aria-label="Zoom out" data-tooltip="拉远">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11h14v2H5z" /></svg>
+          </button>
+          <button class="icon-button compact-button" id="zoom-in-button" type="button" title="Zoom in" aria-label="Zoom in" data-tooltip="拉近">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z" /></svg>
+          </button>
+        </div>
         <div class="segmented density-control" aria-label="Bouquet density">
           <button class="segment-button" type="button" data-density-choice="low" aria-pressed="false" title="Sparse bouquet" data-tooltip="花材少一点">疏</button>
           <button class="segment-button" type="button" data-density-choice="medium" aria-pressed="true" title="Medium bouquet" data-tooltip="花材中等">中</button>
