@@ -1,8 +1,13 @@
 {
   "name": "daily-flora",
   "private": true,
-  "version": "0.12.8",
+  "version": "0.12.17",
+  "productVersion": "0.12E",
   "type": "module",
+  "engines": {
+    "node": "18.x",
+    "npm": "10.x"
+  },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",

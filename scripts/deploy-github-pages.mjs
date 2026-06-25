@@ -220,6 +220,33 @@ function filesUnder(root) {
   return files.sort();
 }
 
+function copyReferenceGalleryToDist() {
+  const distDocs = path.join(repoRoot, 'dist', 'docs');
+  const entries = [
+    ['docs/aesthetic-review-dashboard.html', 'aesthetic-review-dashboard.html'],
+    ['docs/dailyflora-reference-gallery.html', 'dailyflora-reference-gallery.html'],
+    ['docs/dailyflora-flower-plan-samples.html', 'dailyflora-flower-plan-samples.html'],
+    ['docs/释义', '释义'],
+    ['docs/untitled folder', 'untitled folder']
+  ];
+
+  fs.mkdirSync(distDocs, { recursive: true });
+  for (const [source, destination] of entries) {
+    const sourcePath = path.join(repoRoot, source);
+    const destinationPath = path.join(distDocs, destination);
+    if (!fs.existsSync(sourcePath)) fail(`Reference gallery asset is missing: ${source}`);
+      fs.rmSync(destinationPath, { recursive: true, force: true });
+    fs.cpSync(sourcePath, destinationPath, { recursive: true });
+  }
+
+  const distData = path.join(repoRoot, 'dist', 'data');
+  fs.mkdirSync(distData, { recursive: true });
+  fs.copyFileSync(
+    path.join(repoRoot, 'data', 'aesthetic-review-dashboard.json'),
+    path.join(distData, 'aesthetic-review-dashboard.json')
+  );
+}
+
 function readManifestFiles() {
   const manifest = JSON.parse(fs.readFileSync(sourceManifestPath, 'utf8'));
   if (!Array.isArray(manifest)) fail('scripts/deploy-source-files.json must be a JSON array.');
@@ -363,6 +390,8 @@ function main() {
 
   const distIndex = path.join(repoRoot, 'dist', 'index.html');
   if (!fs.existsSync(distIndex)) fail('dist/index.html does not exist. Run npm run build first.');
+
+  copyReferenceGalleryToDist();
 
   const pagesEntries = treeEntries(gh, repo, filesUnder(path.join(repoRoot, 'dist')).map((file) => path.relative(repoRoot, file)), 'dist');
   pagesEntries.push({ path: '.nojekyll', mode: '100644', type: 'blob', content: '' });

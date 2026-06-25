@@ -9,8 +9,9 @@ const viewButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[da
 const silhouetteButton = document.querySelector<HTMLButtonElement>('#silhouette-button');
 const gridButton = document.querySelector<HTMLButtonElement>('#grid-button');
 const statsPanel = document.querySelector<HTMLElement>('#primitive-stats');
+const reviewPanel = document.querySelector<HTMLElement>('#primitive-review');
 
-if (!canvas || !labelLayer || !toggleLabels || !isolateSelect || !silhouetteButton || !gridButton || !statsPanel) {
+if (!canvas || !labelLayer || !toggleLabels || !isolateSelect || !silhouetteButton || !gridButton || !statsPanel || !reviewPanel) {
   throw new Error('Primitive lab could not find the required page elements.');
 }
 
@@ -21,25 +22,101 @@ const primitiveIsolateSelect = isolateSelect;
 const primitiveSilhouetteButton = silhouetteButton;
 const primitiveGridButton = gridButton;
 const primitiveStatsPanel = statsPanel;
+const primitiveReviewPanel = reviewPanel;
 
 const primitiveNames: FloraPrimitiveName[] = [
   'DiskFlower',
-  'LayeredRoundFlower',
+  'LayeredDahliaFlower',
+  'RuffledRoseFlower',
+  'StarPinwheelFlower',
+  'TulipCupFlower',
+  'TrumpetThroatFlower',
+  'DaturaTrumpetFlower',
+  'OrchidButterflyFlower',
+  'CallaCurledBract',
   'SpikeFlower',
-  'OpenSculptureFlower',
-  'ClusterFlower',
-  'BerryCluster',
-  'AirFiller'
+  'UmbelMiniCluster',
+  'FullHydrangeaCloud',
+  'FruitPodCluster',
+  'HangingBellFruit',
+  'FoliageGrassBranch'
 ];
 
 const palettes: Record<FloraPrimitiveName, string[]> = {
   DiskFlower: ['#fff8e7', '#f7edd2', '#f0c83a', '#7f8e3e'],
+  LayeredDahliaFlower: ['#f8c9d8', '#fff1f5', '#e7a7bb', '#86a762'],
+  RuffledRoseFlower: ['#f8b9cf', '#fff3f6', '#e77da0', '#9bb36b'],
+  LayeredRoseFlower: ['#ff9fbd', '#f6c1d2', '#f06b86', '#ffe2a9'],
+  RuffledRoundFlower: ['#f7c6df', '#fff0f6', '#d66b9f', '#ffe4b8'],
+  StarPinwheelFlower: ['#ff8b32', '#ffd15a', '#e9565d', '#7aa65a'],
+  TulipCupFlower: ['#ffbf5a', '#fff0c2', '#f58aa2', '#5d8a55'],
+  TrumpetThroatFlower: ['#fff9e8', '#ffffff', '#ffc847', '#f08b36'],
+  DaturaTrumpetFlower: ['#ffffff', '#f2e3ff', '#8a5ab8', '#58783f'],
+  OrchidButterflyFlower: ['#f8c8eb', '#fff6fb', '#e078b8', '#cc8b4f'],
+  CallaCurledBract: ['#fff7df', '#f6e8b5', '#f2b84c', '#6c8b57'],
   LayeredRoundFlower: ['#ff9fbd', '#f6c1d2', '#f06b86', '#ffe2a9'],
   SpikeFlower: ['#8bb8ff', '#b699ff', '#d9d1ff', '#59775c'],
   OpenSculptureFlower: ['#fdf3d6', '#fff9ee', '#ffcf5a', '#d98254'],
+  UmbelMiniCluster: ['#ffffff', '#fff6d8', '#e8f5ff', '#89a86a'],
+  FullHydrangeaCloud: ['#c9eea8', '#e9ffd4', '#a9d981', '#f3ffe6'],
+  HydrangeaCloudCluster: ['#b8d8ff', '#f2f4ff', '#9fc1ef', '#b8f0d2'],
+  FruitPodCluster: ['#4566d9', '#273f91', '#bbd1ff', '#5f7a51'],
+  HangingBellFruit: ['#ff9f26', '#ffd45d', '#78a55a', '#f7be45'],
+  FoliageGrassBranch: ['#5f8f62', '#86b86f', '#c6d88a', '#2f573b'],
   ClusterFlower: ['#b8d8ff', '#f2f4ff', '#9fc1ef', '#b8f0d2'],
   BerryCluster: ['#4566d9', '#273f91', '#bbd1ff', '#5f7a51'],
   AirFiller: ['#ffffff', '#f8f0c8', '#d5e8ff', '#a4c998']
+};
+
+const reviewNotes: Partial<Record<FloraPrimitiveName, { status: string; note: string }>> = {
+  LayeredDahliaFlower: {
+    status: '2 与 3 太像：已拆分',
+    note: '已改成细长尖瓣、多层放射的大丽花/团瓣方向，避免和褶皱玫瑰混成一个形。'
+  },
+  RuffledRoseFlower: {
+    status: '3 与 2 太像：已拆分',
+    note: '已改成宽瓣、内卷、柔软褶皱玫瑰方向，和 2 的放射尖瓣拉开。'
+  },
+  StarPinwheelFlower: {
+    status: '4 比上一版差：回归/小修',
+    note: '已回归更协调的结构，只缩小中心并收敛花瓣延伸；本轮花库验收已达到及格线。'
+  },
+  TulipCupFlower: {
+    status: '5 重做',
+    note: '已废弃球芯/花瓣桶方向，改为杯状、半闭合、勺形花瓣。'
+  },
+  TrumpetThroatFlower: {
+    status: '6 方向可保留',
+    note: '保留洋水仙管心方向，只小步强化外瓣和管心关系。'
+  },
+  DaturaTrumpetFlower: {
+    status: '7 太像一个喇叭：重做',
+    note: '已从单个喇叭物件改成五瓣外翻围出喉部；本轮花库验收已达到及格线。'
+  },
+  OrchidButterflyFlower: {
+    status: '8 比例对，角度回调',
+    note: '保留这次比例和花蕊，把花瓣角度往上上版更正确的方向回调。'
+  },
+  CallaCurledBract: {
+    status: '9 接近，继续闭合卷曲',
+    note: '沿当前角度拉长外圈卷曲部分，让单片苞片更接近闭合。'
+  },
+  SpikeFlower: {
+    status: '10 不如上上版：回修',
+    note: '已从胶囊串改回小花沿穗排列；本轮花库验收已达到及格线。'
+  },
+  UmbelMiniCluster: {
+    status: '11 需要 360 可看',
+    note: '已调整小花面向角度，并增加花心，减少单面观察性。'
+  },
+  FruitPodCluster: {
+    status: '13 球太大、密度不够',
+    note: '已缩小果粒并增加枝端数量和密度。'
+  },
+  HangingBellFruit: {
+    status: '14 重做',
+    note: '已废弃胶囊体，改成悬垂灯笼/风铃果结构。'
+  }
 };
 
 const scene = new THREE.Scene();
@@ -61,18 +138,18 @@ scene.add(keyLight);
 const root = new THREE.Group();
 scene.add(root);
 const grid = new THREE.GridHelper(9, 18, '#354236', '#1d2a20');
-grid.position.y = -2.08;
+grid.position.y = -2.35;
 scene.add(grid);
 
 const silhouetteMaterial = new THREE.MeshBasicMaterial({ color: '#f8f0df', side: THREE.DoubleSide });
 
 const slots = primitiveNames.map((name, index) => {
-  const col = index % 4;
-  const row = Math.floor(index / 4);
+  const col = index % 5;
+  const row = Math.floor(index / 5);
   return {
     name,
-    position: new THREE.Vector3((col - 1.5) * 2.25, row === 0 ? 1.08 : -1.38, 0),
-    scale: row === 0 ? 0.82 : 0.9
+    position: new THREE.Vector3((col - 2) * 1.78, 1.68 - row * 1.88, 0),
+    scale: 0.58
   };
 });
 
@@ -86,12 +163,12 @@ for (const slot of slots) {
     position: slot.position,
     scale: slot.scale,
     colorPalette: palettes[slot.name],
-    openness: slot.name === 'OpenSculptureFlower' ? 0.95 : 0.68,
-    density: slot.name === 'AirFiller' || slot.name === 'ClusterFlower' ? 1.08 : 0.92,
-    curvature: slot.name === 'SpikeFlower' || slot.name === 'AirFiller' ? 0.85 : 0.42,
-    role: slot.name === 'DiskFlower' || slot.name === 'LayeredRoundFlower' ? 'hero' : 'secondary'
+    openness: ['OrchidButterflyFlower', 'TrumpetThroatFlower', 'DaturaTrumpetFlower', 'CallaCurledBract'].includes(slot.name) ? 0.95 : 0.68,
+    density: ['UmbelMiniCluster', 'FullHydrangeaCloud', 'FoliageGrassBranch'].includes(slot.name) ? 1.08 : 0.92,
+    curvature: ['SpikeFlower', 'FoliageGrassBranch', 'CallaCurledBract'].includes(slot.name) ? 0.85 : 0.42,
+    role: ['DiskFlower', 'LayeredDahliaFlower', 'RuffledRoseFlower'].includes(slot.name) ? 'hero' : 'secondary'
   });
-  group.rotation.x = slot.name === 'DiskFlower' || slot.name === 'LayeredRoundFlower' ? -0.72 : 0;
+  group.rotation.x = ['DiskFlower', 'LayeredDahliaFlower', 'RuffledRoseFlower', 'StarPinwheelFlower', 'TrumpetThroatFlower'].includes(slot.name) ? -0.72 : 0;
   root.add(group);
   rotatingGroups.push(group);
   groupByName.set(slot.name, group);
@@ -105,6 +182,18 @@ primitiveIsolateSelect.innerHTML = [
   '<option value="all">全部</option>',
   ...primitiveNames.map((name) => `<option value="${name}">${name}</option>`)
 ].join('');
+
+function updateReviewPanel() {
+  const selected = primitiveIsolateSelect.value as FloraPrimitiveName | 'all';
+  if (selected === 'all') {
+    primitiveReviewPanel.innerHTML = '<strong>花库验收已达及格线</strong><span>用户已确认 Primitive Gate 可以进入下一阶段；后续主视觉修改仍要同步 dashboard。</span>';
+    return;
+  }
+  const note = reviewNotes[selected];
+  primitiveReviewPanel.innerHTML = note
+    ? `<strong>${note.status}</strong><span>${note.note}</span>`
+    : '<strong>待用户验收</strong><span>当前类尚未收到本轮明确通过反馈。</span>';
+}
 
 let labelsVisible = false;
 primitiveLabelLayer.classList.add('is-hidden');
@@ -123,6 +212,7 @@ primitiveIsolateSelect.addEventListener('change', () => {
   groupByName.forEach((group, name) => {
     group.visible = selected === 'all' || selected === name;
   });
+  updateReviewPanel();
 });
 
 primitiveSilhouetteButton.addEventListener('click', () => {
@@ -222,4 +312,5 @@ function animate(time: number) {
 }
 
 resize();
+updateReviewPanel();
 requestAnimationFrame(animate);

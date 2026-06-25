@@ -96,6 +96,33 @@
         font-variant-numeric: tabular-nums;
       }
 
+      #primitive-review {
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        z-index: 2;
+        max-width: min(380px, calc(100% - 36px));
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgb(8 11 8 / 78%);
+        color: var(--text);
+        pointer-events: none;
+      }
+
+      #primitive-review strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 13px;
+      }
+
+      #primitive-review span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
       .stage {
         position: relative;
         min-height: 0;
@@ -164,7 +191,7 @@
       <header>
         <div>
           <h1>DailyFlora Primitive Lab</h1>
-          <p>七种花材形态先单独验收：隐藏标签后，应能分出盘状、层叠、穗线、开口雕塑、簇花、浆果和空气填充。</p>
+          <p>15 类花材/叶材 primitive 已达到本轮花库验收及格线。下一阶段可以把它们用于整束 composition 验证；后续主视觉修改仍要同步 dashboard。</p>
         </div>
         <div class="tools" aria-label="Primitive lab controls">
           <select id="isolate-primitive" aria-label="Isolate primitive"></select>
@@ -179,6 +206,7 @@
       </header>
       <section class="stage" aria-label="Floral primitive test scene">
         <canvas id="primitive-canvas"></canvas>
+        <div id="primitive-review" aria-live="polite"></div>
         <div id="primitive-labels"></div>
       </section>
     </main>
