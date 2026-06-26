@@ -188,11 +188,16 @@
 
       .role-grid,
       .rules-grid,
+      .library-grid,
       .shape-grid,
       .primitive-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 12px;
+      }
+
+      .library-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
       .rules-grid {
@@ -209,6 +214,30 @@
 
       .panel {
         padding: 14px;
+      }
+
+      .library-card {
+        display: grid;
+        gap: 10px;
+        min-height: 156px;
+        padding: 16px;
+        text-decoration: none;
+      }
+
+      .library-card strong {
+        font-size: 20px;
+      }
+
+      .library-card span {
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .library-card em {
+        color: var(--warn);
+        font-style: normal;
+        font-size: 13px;
+        font-weight: 800;
       }
 
       .panel h3 {
@@ -349,6 +378,7 @@
         .group-grid,
         .split,
         .rules-grid,
+        .library-grid,
         .shape-grid,
         .role-review {
           grid-template-columns: 1fr;
@@ -377,6 +407,7 @@
 
         .role-grid,
         .primitive-grid,
+        .library-grid,
         .thumb-strip {
           grid-template-columns: 1fr;
         }
