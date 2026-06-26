@@ -296,13 +296,13 @@ export const herRealBouquetReferenceV4: SpecialBouquetReference = {
     background: '#050408',
     floor: '#171218',
     glow: '#fff0ad',
-    densityBias: 1.22,
-    verticalBias: 1.16,
-    wildness: 1.1,
-    branchBias: 1.18,
-    leafBias: 0.82,
-    flowerBias: 1.28,
-    outerLineBias: 1.2
+    densityBias: 1.28,
+    verticalBias: 1.06,
+    wildness: 0.94,
+    branchBias: 0.82,
+    leafBias: 0.78,
+    flowerBias: 1.36,
+    outerLineBias: 0.86
   },
   visualAnalysis: {
     mainColors: [
@@ -337,12 +337,12 @@ export const herRealBouquetReferenceV4: SpecialBouquetReference = {
       'Keep the full garden-bouquet abundance, use fewer but wider white cosmos faces, emphasize red-yellow gloriosa lines, blue/lilac small flowers, pink lower fullness, baby-breath pearls, transparent wrap, and visible stems.'
   },
   shape: {
-    radius: 1.08,
-    height: 1.36,
-    verticalLift: 0.24,
+    radius: 0.96,
+    height: 1.24,
+    verticalLift: 0.2,
     asymmetry: 0.36,
-    airySprayBias: 1.2,
-    centralFullness: 1.24,
+    airySprayBias: 0.96,
+    centralFullness: 1.46,
     stemVisibility: 1.26
   },
   bloomScale: {

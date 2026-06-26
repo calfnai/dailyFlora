@@ -100,8 +100,12 @@ const rotationPresets: Array<{
 const canvas = document.querySelector<HTMLCanvasElement>('#flora-canvas');
 const hud = document.querySelector<HTMLElement>('#hud');
 const controls = document.querySelector<HTMLElement>('#controls');
+const controlsToggleButton = document.querySelector<HTMLButtonElement>('#controls-toggle');
+const controlsPanel = document.querySelector<HTMLElement>('#controls-panel');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
 const themeLabel = document.querySelector<HTMLElement>('#daily-theme');
+const themeCnLabel = document.querySelector<HTMLElement>('#daily-theme-cn');
+const themeEnLabel = document.querySelector<HTMLElement>('#daily-theme-en');
 const flowerPlanLabel = document.querySelector<HTMLElement>('#flower-plan-mark');
 const qualityLabel = document.querySelector<HTMLElement>('#quality-mark');
 const pauseButton = document.querySelector<HTMLButtonElement>('#pause-button');
@@ -117,7 +121,19 @@ const rotationSpeedInput = document.querySelector<HTMLInputElement>('#rotation-s
 const rotationDirectionButton = document.querySelector<HTMLButtonElement>('#rotation-direction-button');
 const rotationPresetButton = document.querySelector<HTMLButtonElement>('#rotation-preset-button');
 
-if (!canvas || !hud || !controls || !dateLabel || !themeLabel || !flowerPlanLabel || !qualityLabel) {
+if (
+  !canvas ||
+  !hud ||
+  !controls ||
+  !controlsToggleButton ||
+  !controlsPanel ||
+  !dateLabel ||
+  !themeLabel ||
+  !themeCnLabel ||
+  !themeEnLabel ||
+  !flowerPlanLabel ||
+  !qualityLabel
+) {
   throw new Error('DailyFlora could not find the required page elements.');
 }
 
@@ -125,8 +141,12 @@ const ui = {
   canvas,
   hud,
   controls,
+  controlsToggleButton,
+  controlsPanel,
   dateLabel,
   themeLabel,
+  themeCnLabel,
+  themeEnLabel,
   flowerPlanLabel,
   qualityLabel
 };
@@ -184,13 +204,19 @@ function bouquetHoverTitle() {
   return `${spec.theme.name} / ${english}`;
 }
 
+function themeEnglishName() {
+  return themeEnglishNames[spec.theme.id] || spec.theme.id;
+}
+
 function flowerPlanText() {
   return spec.flowerPlan.items.map((item) => item.cn).join(' / ');
 }
 
 function setLabels() {
+  const english = themeEnglishName();
   ui.dateLabel.textContent = spec.dateLabel;
-  ui.themeLabel.textContent = spec.theme.name;
+  ui.themeCnLabel.textContent = spec.theme.name;
+  ui.themeEnLabel.textContent = english;
   ui.flowerPlanLabel.textContent = `${spec.flowerPlan.cnName} · ${flowerPlanText()}`;
   ui.flowerPlanLabel.title = `${spec.flowerPlan.reference}\n${spec.flowerPlan.silhouette}\n避免：${spec.flowerPlan.avoid}`;
   if (datePicker) datePicker.value = spec.dateLabel;
@@ -202,7 +228,7 @@ function setLabels() {
   const renderLabel =
     selectedRender === 'auto' ? `自/${renderLabels[quality.renderName]}` : renderLabels[quality.renderName];
   ui.qualityLabel.textContent = `${densityLabels[quality.densityName]} · ${renderLabel}`;
-  document.title = `DailyFlora - ${spec.theme.name}`;
+  document.title = `DailyFlora - ${spec.theme.name} / ${english}`;
 }
 
 function syncControls() {
@@ -237,14 +263,17 @@ function revealUi() {
   hideTimer = window.setTimeout(() => {
     ui.hud.classList.add('is-hidden');
     ui.controls.classList.add('is-hidden');
-  }, 3200);
+  }, ui.controls.classList.contains('is-expanded') ? 7000 : 3200);
 }
 
-function positionDatePicker() {
-  if (!datePicker || !todayButton) return;
-  const rect = todayButton.getBoundingClientRect();
-  datePicker.style.left = `${Math.round(rect.left)}px`;
-  datePicker.style.top = `${Math.round(rect.top)}px`;
+function setControlsExpanded(expanded: boolean) {
+  ui.controls.classList.toggle('is-expanded', expanded);
+  ui.controls.classList.toggle('is-collapsed', !expanded);
+  ui.controlsPanel.hidden = !expanded;
+  ui.controlsToggleButton.setAttribute('aria-expanded', String(expanded));
+  ui.controlsToggleButton.setAttribute('aria-label', expanded ? 'Hide viewing controls' : 'Show viewing controls');
+  ui.controlsToggleButton.title = expanded ? 'Hide viewing controls' : 'Show viewing controls';
+  revealUi();
 }
 
 function updateUrl(date: string, seed: string) {
@@ -445,6 +474,10 @@ function setRender(nextRender: RenderQualityName) {
   rebuildQuality();
 }
 
+controlsToggleButton?.addEventListener('click', () => {
+  setControlsExpanded(!controls.classList.contains('is-expanded'));
+});
+
 pauseButton?.addEventListener('click', () => {
   const paused = scene.togglePause();
   pauseButton.setAttribute('aria-label', paused ? 'Resume rotation' : 'Pause rotation');
@@ -457,7 +490,6 @@ pauseButton?.addEventListener('click', () => {
 
 todayButton?.addEventListener('click', () => {
   if (datePicker) {
-    positionDatePicker();
     datePicker.value = spec.dateLabel;
     if (typeof datePicker.showPicker === 'function') {
       datePicker.showPicker();
@@ -554,7 +586,6 @@ window.addEventListener('resize', () => {
     applyRotationSettings();
     setLabels();
   }
-  positionDatePicker();
 });
 
 ['pointermove', 'pointerdown', 'touchstart', 'keydown'].forEach((eventName) => {
