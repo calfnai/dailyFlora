@@ -570,6 +570,36 @@ function compositionScaleForPrimitive(primitive: FloraPrimitiveName) {
   return 1;
 }
 
+function settleSpikeAnchor(
+  point: THREE.Vector3,
+  placement: FlowerPlanItem['placement'],
+  rng: ReturnType<typeof createRng>
+) {
+  const maxYByPlacement: Record<FlowerPlanItem['placement'], number> = {
+    center: 1.0,
+    outer: 1.08,
+    high: 1.24,
+    low: 0.86,
+    spray: 1.12,
+    mixed: 1.02
+  };
+  const maxY = maxYByPlacement[placement] + (rng.value() < 0.16 ? rng.range(0.12, 0.24) : 0);
+
+  if (point.y > maxY) {
+    point.y = maxY - rng.range(0.02, 0.18);
+  }
+
+  if (placement !== 'high' && point.y > 0.88 && rng.value() < 0.68) {
+    point.y -= rng.range(0.12, 0.32);
+  }
+
+  if (placement === 'high' && point.y < 0.78) {
+    point.y += rng.range(0.08, 0.2);
+  }
+
+  return point;
+}
+
 function spikeLeanRange(placement: FlowerPlanItem['placement']): [number, number] {
   if (placement === 'high') return [0.14, 0.42];
   if (placement === 'spray') return [0.22, 0.58];
@@ -701,6 +731,7 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
 
     for (let i = 0; i < batchCount; i += 1) {
       const { p, theta } = placementPoint(spec, localRng, batch.placement);
+      if (primitive === 'SpikeFlower') settleSpikeAnchor(p, batch.placement, localRng);
       const roleScale =
         batch.role === 'main' ? 0.26 :
         batch.role === 'line' ? 0.25 :
