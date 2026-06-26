@@ -1,16 +1,18 @@
-import { herJanuarySkyReference, herJanuarySkyReferenceV2 } from './specialBouquetReference';
+import { herJanuarySkyReference, herJanuarySkyReferenceV2, herJanuarySkyReferenceV3 } from './specialBouquetReference';
 import { getFlowerPlanById } from './flowerPlans';
 import type { DailyBouquetSpec, SpecialBouquetReference } from './types';
 
 export const specialReferences: Record<string, SpecialBouquetReference> = {
   ngc2787: herJanuarySkyReference,
-  ngc2787v2: herJanuarySkyReferenceV2
+  ngc2787v2: herJanuarySkyReferenceV2,
+  ngc2787v3: herJanuarySkyReferenceV3
 };
 
 export function readSpecialId(search = window.location.search) {
   const pathname = window.location.pathname.replace(/\/+$/, '');
-  if (pathname.endsWith('/special0629-v2')) return 'ngc2787v2';
-  if (pathname.endsWith('/special0629')) return 'ngc2787';
+  for (const [id, reference] of Object.entries(specialReferences)) {
+    if (reference.routePath && pathname.endsWith(`/${reference.routePath}`)) return id;
+  }
 
   const params = new URLSearchParams(search);
   const id = params.get('special');
@@ -20,8 +22,8 @@ export function readSpecialId(search = window.location.search) {
 export function specialPathname(reference: SpecialBouquetReference) {
   const routePath = reference.routePath || 'special0629';
   const pathname = window.location.pathname;
-  const match = pathname.match(/^(.*?\/special0629(?:-v2)?)(?:\/.*)?$/);
-  if (match) return match[1];
+  const match = pathname.match(/^(.*?\/)special0629(?:-v\d+)?(?:\/.*)?$/);
+  if (match) return `${match[1]}${routePath}`;
   const basePath = pathname.endsWith('/') ? pathname : pathname.replace(/\/[^/]*$/, '/');
   return `${basePath}${routePath}`;
 }

@@ -114,6 +114,14 @@ export interface SpecialBouquetReference {
     dustColors: string[];
     galaxyTint: string;
     warmCore: string;
+    galaxyOpacity?: number;
+    galaxyScale?: number;
+    galaxyPosition?: [number, number, number];
+    galaxyRotation?: number;
+    galaxyAlphaMap?: boolean;
+    galaxyDepthTest?: boolean;
+    coreOpacity?: number;
+    coreRadius?: number;
   };
 }
 

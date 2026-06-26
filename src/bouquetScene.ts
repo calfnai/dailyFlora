@@ -473,6 +473,16 @@ function geometryForFlowerType(typeId: FlowerTypeId, radius: number) {
 }
 
 function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimitiveName {
+  if (planId === 'her-january-sky-memory-v3') {
+    if (item.typeId === 'camelliaPeony' || item.typeId === 'rose') return 'RuffledRoseFlower';
+    if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
+    if (item.typeId === 'orchid' && item.role === 'secondary') return 'OrchidButterflyFlower';
+    if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
+    if (item.typeId === 'hydrangea') return 'UmbelMiniCluster';
+    if (item.typeId === 'bellFruit') return 'AirFiller';
+    if (item.typeId === 'liatris') return 'FoliageGrassBranch';
+  }
+
   if (planId === 'her-january-sky-memory-v2') {
     if (item.typeId === 'camelliaPeony') return 'RuffledRoseFlower';
     if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
@@ -1015,32 +1025,69 @@ function buildSpecialCosmicLayer(spec: DailyBouquetSpec, quality: QualityProfile
 
   const galaxyTexture = new THREE.TextureLoader().load(withBasePath(spec.special.hubbleImagePath));
   galaxyTexture.colorSpace = THREE.SRGBColorSpace;
+  const galaxyScale = spec.special.cosmic.galaxyScale ?? 1;
+  const galaxyPosition = spec.special.cosmic.galaxyPosition ?? [0.42, 0.62, -9.1];
+  const galaxyMaterial = spec.special.cosmic.galaxyAlphaMap
+    ? new THREE.ShaderMaterial({
+        uniforms: {
+          map: { value: galaxyTexture },
+          tint: { value: new THREE.Color(spec.special.cosmic.galaxyTint) },
+          opacity: { value: spec.special.cosmic.galaxyOpacity ?? 0.34 }
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform sampler2D map;
+          uniform vec3 tint;
+          uniform float opacity;
+          varying vec2 vUv;
+
+          void main() {
+            vec4 tex = texture2D(map, vUv);
+            float luminance = dot(tex.rgb, vec3(0.299, 0.587, 0.114));
+            float alpha = smoothstep(0.045, 0.42, luminance) * opacity;
+            vec3 lifted = pow(tex.rgb, vec3(0.52)) * tint * 1.7;
+            gl_FragColor = vec4(lifted, alpha);
+          }
+        `,
+        transparent: true,
+        depthWrite: false,
+        depthTest: spec.special.cosmic.galaxyDepthTest ?? true
+      })
+    : new THREE.MeshBasicMaterial({
+        map: galaxyTexture,
+        color: spec.special.cosmic.galaxyTint,
+        transparent: true,
+        opacity: spec.special.cosmic.galaxyOpacity ?? 0.34,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        depthTest: spec.special.cosmic.galaxyDepthTest ?? true
+      });
   const galaxy = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.5, 4.4),
-    new THREE.MeshBasicMaterial({
-      map: galaxyTexture,
-      color: spec.special.cosmic.galaxyTint,
-      transparent: true,
-      opacity: 0.34,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    })
+    new THREE.PlaneGeometry(4.5 * galaxyScale, 4.4 * galaxyScale),
+    galaxyMaterial
   );
-  galaxy.position.set(0.42, 0.62, -9.1);
-  galaxy.rotation.z = -0.2;
+  galaxy.position.set(galaxyPosition[0], galaxyPosition[1], galaxyPosition[2]);
+  galaxy.rotation.z = spec.special.cosmic.galaxyRotation ?? -0.2;
   group.add(galaxy);
 
   const core = new THREE.Mesh(
-    new THREE.CircleGeometry(0.72, 48),
+    new THREE.CircleGeometry(spec.special.cosmic.coreRadius ?? 0.72, 48),
     new THREE.MeshBasicMaterial({
       color: spec.special.cosmic.warmCore,
       transparent: true,
-      opacity: 0.16,
+      opacity: spec.special.cosmic.coreOpacity ?? 0.16,
       blending: THREE.AdditiveBlending,
-      depthWrite: false
+      depthWrite: false,
+      depthTest: spec.special.cosmic.galaxyDepthTest ?? true
     })
   );
-  core.position.set(0.24, 0.58, -9.05);
+  core.position.set(galaxyPosition[0] - 0.18, galaxyPosition[1] - 0.04, galaxyPosition[2] + 0.05);
   group.add(core);
   return group;
 }

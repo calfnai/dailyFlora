@@ -136,6 +136,24 @@ const plans: FlowerPlan[] = [
       { typeId: 'bellFruit', cn: '满天星白色小珠', en: 'baby-breath pearl air', role: 'filler', share: 0.06, scale: 0.68, placement: 'spray', note: '只做细碎空气点，不变成主花。' },
       { typeId: 'orchid', cn: '橙红火焰花线', en: 'coral flame-lily strokes', role: 'line', share: 0.04, scale: 1.1, placement: 'spray', note: '保留照片里的橙红记忆点，数量很少。' }
     ])
+  },
+  {
+    id: 'her-january-sky-memory-v3',
+    cnName: '一月星空春意束 v3',
+    enName: 'Her January Sky Spring Memory v3',
+    reference: 'private-special: 2026-06-29 bouquet photos, spring color restored, NGC 2787 visible',
+    silhouette: '下半部粉白金色更饱满，中层有蓝紫和珊瑚色跳点，上方保留细枝空气，但不让枝线压过花。',
+    avoid: '避免大量菊花盘面；避免为了少菊花而变灰、变稀、变不春天；避免 NGC 2787 只剩不可见暗影。',
+    items: normalizeShares([
+      { typeId: 'camelliaPeony', cn: '粉白褶皱主花', en: 'blush ivory ruffled bloom', role: 'main', share: 0.22, scale: 1.04, placement: 'low', note: '保留柔软饱满核心，替代菊花式圆盘。' },
+      { typeId: 'rose', cn: '淡金层叠花', en: 'pale gold layered bloom', role: 'secondary', share: 0.14, scale: 0.96, placement: 'center', note: '增加春天的暖黄色明度，不做雏菊脸。' },
+      { typeId: 'orchid', cn: '象牙杯形花', en: 'ivory cup bloom', role: 'main', share: 0.16, scale: 1.0, placement: 'outer', note: '回应照片中的白色杯形轮廓。' },
+      { typeId: 'orchid', cn: '蓝紫蝴蝶花瓣', en: 'blue lilac butterfly petals', role: 'secondary', share: 0.12, scale: 0.88, placement: 'mixed', note: '恢复缤纷冷色层，避免画面只剩粉白绿。' },
+      { typeId: 'hydrangea', cn: '春雾小花簇', en: 'spring mist mini clusters', role: 'cluster', share: 0.14, scale: 0.78, placement: 'mixed', note: '小簇像空气里的碎花，不是主花盘。' },
+      { typeId: 'orchid', cn: '珊瑚火焰花线', en: 'coral flame-lily strokes', role: 'line', share: 0.08, scale: 1.08, placement: 'spray', note: '少量橙红外伸，让花束鲜活。' },
+      { typeId: 'liatris', cn: '嫩绿空气枝', en: 'fresh green airy stems', role: 'line', share: 0.08, scale: 1.0, placement: 'high', note: '控制枝线比例，只支撑空间感。' },
+      { typeId: 'bellFruit', cn: '满天星光点', en: 'baby-breath light pearls', role: 'filler', share: 0.06, scale: 0.66, placement: 'spray', note: '细碎白点，和星尘呼应。' }
+    ])
   }
 ];
 

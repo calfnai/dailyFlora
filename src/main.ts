@@ -31,7 +31,8 @@ const themeEnglishNames: Record<string, string> = {
   'dopamine-field': 'Dopamine Field',
   'starry-night': 'Starry Night',
   'her-january-sky': 'Her January Sky',
-  'her-january-sky-v2': 'Her January Sky v2'
+  'her-january-sky-v2': 'Her January Sky v2',
+  'her-january-sky-v3': 'Her January Sky v3'
 };
 const rotationPresets: Array<{
   speed: number;

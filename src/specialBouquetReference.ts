@@ -164,3 +164,92 @@ export const herJanuarySkyReferenceV2: SpecialBouquetReference = {
     opacity: 0.12
   }
 };
+
+export const herJanuarySkyReferenceV3: SpecialBouquetReference = {
+  ...herJanuarySkyReference,
+  id: 'ngc2787v3',
+  title: 'her-january-sky-v3',
+  versionLabel: 'v3',
+  routePath: 'special0629-v3',
+  flowerPlanId: 'her-january-sky-memory-v3',
+  seed: 'daily-flora:special:ngc2787:v3:spring-memory:2026-06-29',
+  theme: {
+    ...herJanuarySkyReference.theme,
+    id: 'her-january-sky-v3',
+    name: 'her january sky v3',
+    palette: [
+      '#fff8dd',
+      '#ffe06a',
+      '#f6b7cb',
+      '#eecfe8',
+      '#b9d8f5',
+      '#f67c4c',
+      '#c94d63',
+      '#f9eee8',
+      '#d9f0b8'
+    ],
+    leafPalette: ['#6f8f38', '#8fb458', '#bed27f', '#e0ebb9'],
+    stem: '#7f9949',
+    background: '#050408',
+    floor: '#161119',
+    glow: '#fff0b0',
+    densityBias: 1.16,
+    verticalBias: 1.22,
+    wildness: 1.16,
+    branchBias: 1.22,
+    leafBias: 0.88,
+    flowerBias: 1.2,
+    outerLineBias: 1.34
+  },
+  visualAnalysis: {
+    ...herJanuarySkyReference.visualAnalysis,
+    flowerShapes: [
+      'bright spring cup blooms with ivory and pale yellow light',
+      'soft blush ruffled flowers for the full remembered core',
+      'lilac-blue butterfly petals and airy mini clusters',
+      'small coral flame-lily strokes for asymmetry',
+      'only a few tiny yellow sparks, not repeated daisy discs'
+    ],
+    silhouette:
+      'A cheerful spring hand bouquet: full lower core, colorful middle layer, airy upper sprays, and a visible galaxy glow behind it.',
+    emotionalTone:
+      'Fresh, colorful, tender, and quietly cosmic, closer to a spring memory than a dark memorial object.',
+    particleTranslation:
+      'Keep spring color variety from the photos, reduce chrysanthemum-like disks, and make NGC 2787 a visible translucent celestial plate behind the flowers.'
+  },
+  shape: {
+    radius: 1.07,
+    height: 1.42,
+    verticalLift: 0.26,
+    asymmetry: 0.32,
+    airySprayBias: 1.22,
+    centralFullness: 1.18,
+    stemVisibility: 1.18
+  },
+  bloomScale: {
+    small: 0.52,
+    medium: 0.9,
+    large: 1.38,
+    largeBias: 0.15
+  },
+  wrapping: {
+    color: '#dfe5dc',
+    edgeColor: '#fff6fa',
+    ribbonColor: '#efb8cc',
+    opacity: 0.13
+  },
+  cosmic: {
+    starColors: ['#fff8dc', '#dbe8ff', '#ffd7b8', '#c9d1ff'],
+    dustColors: ['#fff0a8', '#f3c6d8', '#d5c2ff', '#b7d5ff'],
+    galaxyTint: '#ffffff',
+    warmCore: '#ffe58a',
+    galaxyOpacity: 0.9,
+    galaxyScale: 1.28,
+    galaxyPosition: [-1.42, 1.16, -8.95],
+    galaxyRotation: -0.08,
+    galaxyAlphaMap: true,
+    galaxyDepthTest: false,
+    coreOpacity: 0.48,
+    coreRadius: 0.9
+  }
+};
