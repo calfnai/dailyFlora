@@ -125,6 +125,8 @@
 
 2026-06-26 二十次确认：用户要求把 Codex 对审美的理解、流程、skills 和记忆写进项目，作为一个大版本。`0.13.0` 已将项目审美系统固化为 `docs/dailyflora-aesthetic-system-0.13.md`，将项目 Codex skill 固化为 `docs/dailyflora-codex-skill.md` 和 `.codex/skills/dailyflora/SKILL.md`，并把这些文件接入 README、project abstract、dashboard 和发布清单。后续新线程不得只依赖聊天上下文，必须先读这些项目内记忆。
 
+2026-06-26 二十一次确认：用户指出 0.13 没有继续追问和修正 CTO 口径，也没有兑现角色是否合并/新增的讨论；同时指出山岗小花和热带丛林中有一种好看的小面花未进入 TARGET SHAPE VOCABULARY。`0.13.1` 将 CTO 改为“生成架构审查”，新增“花材库管理员”视角，正式把 `CosmosOpenFlower / 波斯菊/小面花型` 登记为第 16 类目标形态。另按用户反馈：马蹄莲单体保留但整束比例下调；伞状/小簇型绿色假茎缩短并降低透明度；果材/荚果型暂记为同类风险较轻，继续观察。
+
 ## 当前决定性文件
 
 - `docs/dailyflora-aesthetic-system-0.13.md`：0.13 审美系统总纲，记录目标花束、反向约束、叶材规则、花库门禁、composition 经验和流程。
@@ -133,7 +135,7 @@
 - `src/bouquetScene.ts`：最终 Three.js 花束形态和材质，决定视觉结果。
 - `src/floraPrimitives.ts`：可复用花材 primitive，后续应逐步替换 `精` 渲染里的匿名几何。
 - `src/flowerPlans.ts`：生成前花型计划，决定 `精` 模式尝试哪些花材角色。
-- `data/aesthetic-review-dashboard.json`：参考图到 primitive、验收状态和四角色复盘的数据源。
+- `data/aesthetic-review-dashboard.json`：参考图到 primitive、验收状态和审查角色复盘的数据源。
 - `docs/aesthetic-review-dashboard.html`：继续改主视觉前必须阅读的人类可读门禁页。
 - `src/spec.ts`：每天的 seed、主题和 flowerPlan 生成入口。
 - `src/main.ts`：UI、日期、random、镜头路线、HUD 文案。
@@ -170,6 +172,7 @@
 - `0.12.25` 将审美审核入口收进 `?debug` 模式，增加 FPS/资源 debug 面板，修正上下拖拽方向，并把播放按钮放到 reverse 左侧。
 - `0.12.26` 修复发布脚本覆盖编译页的问题，恢复 dashboard、Primitive Lab、参考图库和花束库在线可用。
 - `0.13.0` 将 DailyFlora 审美理解、流程、项目 skill 和记忆写入仓库，形成后续 Codex 必须读取的 0.13 审美操作系统。
+- `0.13.1` 修正审查角色机制，新增花材库管理员，并将 CosmosOpenFlower 补登记为第 16 类目标形态；同时修 Calla 整束比例和 Umbel 假茎倒三角问题。
 
 下一台机器继续开发时，不要重复 `0.12.0` 的错误：不要为了“更多花型”破坏花束整体轮廓。
 
