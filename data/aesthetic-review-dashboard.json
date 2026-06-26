@@ -3,7 +3,7 @@
   "gate": {
     "status": "pass",
     "title": "花库验收达到及格线",
-    "summary": "用户已确认 Primitive Gate / 花库验收达到及格线。15 类花材/叶材形态允许作为下一阶段 composition、palette、camera 改造的基础，但后续主视觉修改仍必须同步更新本 dashboard。",
+    "summary": "用户已确认 Primitive Gate / 花库验收达到及格线。0.13 已将审美理解、流程、skill 和记忆写进项目；15 类花材/叶材形态允许作为下一阶段 composition、palette、camera 改造的基础，但后续主视觉修改仍必须同步更新本 dashboard。",
     "rules": [
       "先复盘参考图，不直接改主花束视觉。",
       "Primitive Lab 已按 15 类主流花材/叶材形态达到用户验收及格线。",
@@ -22,6 +22,14 @@
       {
         "label": "花束库",
         "href": "./dailyflora-flower-plan-samples.html"
+      },
+      {
+        "label": "0.13 审美系统",
+        "href": "./dailyflora-aesthetic-system-0.13.md"
+      },
+      {
+        "label": "Codex Skill",
+        "href": "./dailyflora-codex-skill.md"
       },
       {
         "label": "花材识别文档",
