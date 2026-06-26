@@ -554,11 +554,11 @@ function primitiveRoleForPlanItem(item: FlowerPlanItem): FloraPrimitiveRole {
 }
 
 function spikeLeanRange(placement: FlowerPlanItem['placement']): [number, number] {
-  if (placement === 'high') return [0.08, 0.34];
-  if (placement === 'spray') return [0.16, 0.48];
-  if (placement === 'outer') return [0.12, 0.42];
-  if (placement === 'mixed') return [0.1, 0.38];
-  return [0.06, 0.28];
+  if (placement === 'high') return [0.14, 0.42];
+  if (placement === 'spray') return [0.22, 0.58];
+  if (placement === 'outer') return [0.18, 0.5];
+  if (placement === 'mixed') return [0.14, 0.46];
+  return [0.1, 0.32];
 }
 
 function primitivePalette(
@@ -625,11 +625,16 @@ function orientPrimitiveGroup(
   if (primitive === 'SpikeFlower') {
     const [minLean, maxLean] = spikeLeanRange(placement);
     const lean = rng.range(minLean, maxLean);
-    const direction = theta + rng.range(-1.55, 1.55) + (rng.value() < 0.28 ? Math.PI : 0);
+    const radial = new THREE.Vector3(point.x, 0, point.z);
+    if (radial.lengthSq() < 0.0001) radial.set(Math.cos(theta), 0, Math.sin(theta));
+    radial.normalize();
+    const side = new THREE.Vector3(-radial.z, 0, radial.x).multiplyScalar(rng.range(-0.42, 0.42));
+    const openBias = rng.value() < 0.86 ? rng.range(0.82, 1.2) : rng.range(0.28, 0.62);
+    const horizontal = radial.multiplyScalar(openBias).add(side).normalize().multiplyScalar(lean);
     const target = new THREE.Vector3(
-      Math.cos(direction) * lean,
+      horizontal.x,
       rng.range(0.92, 1.14),
-      Math.sin(direction) * lean
+      horizontal.z
     ).normalize();
     group.quaternion.setFromUnitVectors(up, target);
     group.rotateY(rng.range(-Math.PI, Math.PI));
