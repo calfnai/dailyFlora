@@ -313,6 +313,62 @@
   ],
   "reviewGroups": [
     {
+      "id": "dewberry-morning",
+      "title": "晨露莓园",
+      "englishTitle": "Dewberry Morning",
+      "kind": "generated-candidate",
+      "status": "needs-owner-review",
+      "referenceLinks": [
+        {
+          "label": "打开生成花束",
+          "href": "../?date=2026-06-26&seed=dewberry-morning-air&theme=dewberry-morning&render=high&density=medium"
+        },
+        {
+          "label": "Primitive Lab",
+          "href": "./primitive-lab.html"
+        }
+      ],
+      "images": [],
+      "humanConclusion": "这是不依赖外部参考图的原创候选：学习山岗小花的空间语法，但换成清晨莓园的湿润、明亮、轻盈方向。",
+      "positiveSignals": [
+        "小花矩阵承接高饱和色，不让画面变成单一大主花。",
+        "低位粉莓褶皱花和蓝紫小簇托住体积，避免只有散点。",
+        "莓红果点和珊瑚星形线花提供局部记忆点。",
+        "嫩绿穗线穿插在花丛中并向外打开，形成空气和开洋感。",
+        "叶材与绿色部分用于缓冲莓红、柠檬黄和浅蓝紫的饱和度。"
+      ],
+      "negativeConstraints": [
+        "不要变成山岗小花的换色版。",
+        "不要让穗状花重新堆成顶部一大片。",
+        "不要全是花、没有绿色支撑空气。",
+        "不要把莓果做成无枝条归属的随机点。",
+        "不要出现单一大主花压住整束。"
+      ],
+      "primitives": [
+        "CosmosOpenFlower",
+        "UmbelMiniCluster",
+        "FruitPodCluster",
+        "TulipCupFlower",
+        "RuffledRoseFlower",
+        "SpikeFlower",
+        "StarPinwheelFlower",
+        "FoliageGrassBranch"
+      ],
+      "currentImplementation": "0.12.24 新增 `dewberry-morning` theme 和 `dewberry-morning-air` flowerPlan，并为该 plan 指定 primitive 映射与专属配色。",
+      "failureReason": "这是 Codex 按当前审美理解生成的候选，还没有经过用户视觉验收；不能自动标记为通过。",
+      "nextTasks": [
+        "请用户查看生成花束，判断是否真的继承了山岗小花的空间语法，而不是只换了颜色。",
+        "如果通过，再考虑把其中的 composition 经验迁移到繁星夜色、海盐柠檬、月光手捧等主题。",
+        "如果不通过，按 palette、composition、primitive、camera/UI 四类拆开记录失败原因。"
+      ],
+      "roleReview": {
+        "creativeDirector": "方向符合 DailyFlora：当代、鲜活、有春意，不走欧美婚礼或粗糙市场束。但它必须被用户验收，不能由 Codex 自宣通过。",
+        "artDirector": "采用白黄小花矩阵、低位冷色小簇、莓红果点、少量杯形停顿和外开绿线，目标是湿润、轻盈、可呼吸。",
+        "projectDirector": "允许作为原创候选加入项目；状态应保持 needs-owner-review，用户未确认前不把它当成新标准。",
+        "cto": "现有 Three.js primitive 足够实现第一版，不新增花库类型；主要通过 flowerPlan、theme palette 和 primitivePalette 专属映射完成。"
+      }
+    },
+    {
       "id": "summer-pinwheel",
       "title": "夏日风车",
       "englishTitle": "Summer Pinwheel",

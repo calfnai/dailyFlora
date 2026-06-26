@@ -30,6 +30,7 @@ const themeEnglishNames: Record<string, string> = {
   'summer-pinwheel': 'Summer Pinwheel',
   'dopamine-field': 'Dopamine Field',
   'starry-night': 'Starry Night',
+  'dewberry-morning': 'Dewberry Morning',
   'her-january-sky': 'Her January Sky',
   'her-january-sky-v2': 'Her January Sky v2',
   'her-january-sky-v3': 'Her January Sky v3',

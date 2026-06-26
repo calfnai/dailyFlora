@@ -72,6 +72,24 @@ const plans: FlowerPlan[] = [
     ])
   },
   {
+    id: 'dewberry-morning-air',
+    cnName: '晨露莓园空气束',
+    enName: 'Dewberry Morning Air',
+    reference: 'original-dailyflora: 根据用户已确认的山岗小花 composition 语法凭空生成',
+    silhouette: '中低层是白黄小花和蓝紫小簇，莓红果点穿插，少量杯形花停顿，嫩绿穗线从花丛中向外打开。',
+    avoid: '避免变成山岗小花换皮，避免穗状花在顶部成片，避免全是高饱和花而没有绿色和空气缓冲。',
+    items: normalizeShares([
+      { typeId: 'chamomile', cn: '奶白小面花', en: 'ivory small open faces', role: 'filler', share: 0.18, scale: 0.86, placement: 'mixed', note: '形成清晨感小花矩阵，不做大菊花脸。' },
+      { typeId: 'chamomile', cn: '柠檬黄小雏菊', en: 'lemon daisy sparks', role: 'filler', share: 0.12, scale: 0.72, placement: 'mixed', note: '少量明亮黄色跳点，不能铺成黄墙。' },
+      { typeId: 'hydrangea', cn: '蓝紫雾状小簇', en: 'blue lilac mist clusters', role: 'cluster', share: 0.16, scale: 0.78, placement: 'mixed', note: '像湿润空气里的冷色小簇，支撑前后层次。' },
+      { typeId: 'bellFruit', cn: '莓红露珠果材', en: 'dewberry fruit dots', role: 'fruit', share: 0.16, scale: 0.82, placement: 'mixed', note: '果点必须有枝条归属，做晨露和莓园记忆点。' },
+      { typeId: 'orchid', cn: '象牙杯形花', en: 'ivory cup blooms', role: 'main', share: 0.12, scale: 0.94, placement: 'outer', note: '少量杯形停顿，让画面有可看的局部而不是全碎花。' },
+      { typeId: 'camelliaPeony', cn: '粉莓褶皱小团花', en: 'raspberry ruffled small blooms', role: 'secondary', share: 0.12, scale: 0.9, placement: 'low', note: '低位柔软体积，只托住花束，不抢成大主花。' },
+      { typeId: 'liatris', cn: '嫩绿外开穗线', en: 'fresh green open spike lines', role: 'line', share: 0.1, scale: 1.02, placement: 'mixed', note: '穿插在花丛中并向外打开，不能顶部成片。' },
+      { typeId: 'orchid', cn: '珊瑚星形线花', en: 'coral star line petals', role: 'line', share: 0.04, scale: 0.98, placement: 'spray', note: '极少量珊瑚色外伸，让原创主题有自己的记忆点。' }
+    ])
+  },
+  {
     id: 'autumn-juice',
     cnName: '秋日果汁束',
     enName: 'Autumn Juice Bouquet',
@@ -163,15 +181,15 @@ const plans: FlowerPlan[] = [
     silhouette: '透明包装托住右下方手捧核心，粉白主体很满；左侧有红黄嘉兰长线外伸，上方满天星和绿枝轻散，整体是右下到左上的非对称扇形。',
     avoid: '避免把白色波斯菊做成密瓣菊花团；避免削弱黄色、蓝色、粉色和红黄嘉兰；避免花束变稀或变成抽象星点。',
     items: normalizeShares([
-      { typeId: 'chamomile', cn: '白色波斯菊开面花', en: 'white cosmos open faces', role: 'main', share: 0.18, scale: 1.0, placement: 'mixed', note: '照片里最醒目的白色薄瓣黄心花，要少瓣、开面、分散。' },
-      { typeId: 'chamomile', cn: '黄色春日小雏菊', en: 'yellow spring daisy accents', role: 'filler', share: 0.1, scale: 0.78, placement: 'mixed', note: '黄色跳点很多，但尺寸要小，不能主导成菊花墙。' },
-      { typeId: 'orchid', cn: '红黄嘉兰火焰线', en: 'red yellow gloriosa flame lines', role: 'line', share: 0.16, scale: 1.18, placement: 'spray', note: '真实花束最有辨识度的外伸卷曲形态。' },
-      { typeId: 'camelliaPeony', cn: '浅粉柔软团块', en: 'soft blush rounded clusters', role: 'secondary', share: 0.16, scale: 0.98, placement: 'low', note: '复现粉色玫瑰/绣球/康乃馨感的饱满底层。' },
+      { typeId: 'chamomile', cn: '白色波斯菊开面花', en: 'white cosmos open faces', role: 'main', share: 0.24, scale: 1.08, placement: 'mixed', note: '照片里最醒目的白色薄瓣黄心花，要少瓣、开面、分散。' },
+      { typeId: 'chamomile', cn: '黄色春日小雏菊', en: 'yellow spring daisy accents', role: 'filler', share: 0.1, scale: 0.9, placement: 'mixed', note: '黄色跳点很多，但尺寸要小，不能主导成菊花墙。' },
+      { typeId: 'orchid', cn: '红黄嘉兰火焰线', en: 'red yellow gloriosa flame lines', role: 'line', share: 0.1, scale: 1.08, placement: 'spray', note: '真实花束最有辨识度的外伸卷曲形态。' },
+      { typeId: 'camelliaPeony', cn: '浅粉柔软团块', en: 'soft blush rounded clusters', role: 'secondary', share: 0.2, scale: 1.04, placement: 'low', note: '复现粉色玫瑰/绣球/康乃馨感的饱满底层。' },
       { typeId: 'orchid', cn: '白色杯形花', en: 'ivory cup blooms', role: 'main', share: 0.12, scale: 0.96, placement: 'outer', note: '右侧和上层可见的白色杯形轮廓。' },
       { typeId: 'orchid', cn: '淡紫星形花瓣', en: 'pale lilac star petals', role: 'secondary', share: 0.1, scale: 0.86, placement: 'mixed', note: '补照片里的淡紫星形花，增加层次。' },
-      { typeId: 'hydrangea', cn: '蓝色小穗花簇', en: 'blue airy mini clusters', role: 'cluster', share: 0.12, scale: 0.78, placement: 'mixed', note: '蓝色小花是照片的重要冷色点。' },
+      { typeId: 'hydrangea', cn: '蓝色小穗花簇', en: 'blue airy mini clusters', role: 'cluster', share: 0.12, scale: 0.84, placement: 'mixed', note: '蓝色小花是照片的重要冷色点。' },
       { typeId: 'bellFruit', cn: '满天星白珠', en: 'baby-breath white pearls', role: 'filler', share: 0.1, scale: 0.68, placement: 'spray', note: '白色小珠沿外圈和上方散开。' },
-      { typeId: 'liatris', cn: '嫩绿枝叶和花苞', en: 'fresh green stems and buds', role: 'line', share: 0.06, scale: 1.0, placement: 'high', note: '真实枝叶可见，但不压过花面。' }
+      { typeId: 'liatris', cn: '嫩绿枝叶和花苞', en: 'fresh green stems and buds', role: 'line', share: 0.02, scale: 0.92, placement: 'high', note: '真实枝叶可见，但不压过花面。' }
     ])
   }
 ];
@@ -184,7 +202,8 @@ const themePlanIds: Record<string, string[]> = {
   'hillside-wild': ['foxtail-lily-vertical', 'berry-grove'],
   'tropical-forest': ['berry-grove', 'foxtail-lily-vertical'],
   'moon-white': ['breathing-landscape', 'fairy-violet-air'],
-  'starry-night': ['fairy-violet-air', 'berry-grove']
+  'starry-night': ['fairy-violet-air', 'berry-grove'],
+  'dewberry-morning': ['dewberry-morning-air']
 };
 
 export function createFlowerPlan(seed: string, theme: BouquetTheme) {

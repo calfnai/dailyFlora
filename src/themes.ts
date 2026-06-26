@@ -108,5 +108,22 @@ export const themes: BouquetTheme[] = [
     densityBias: 1.05,
     verticalBias: 1.0,
     wildness: 1.3
+  },
+  {
+    id: 'dewberry-morning',
+    name: '晨露莓园',
+    palette: ['#fffaf0', '#ff78a8', '#ffd95a', '#8fd8ff', '#d9bcff', '#ff8f5a', '#8eea92'],
+    leafPalette: ['#124a34', '#2f8056', '#69b96a', '#bddf82'],
+    stem: '#5d7f4f',
+    background: '#05090a',
+    floor: '#18251f',
+    glow: '#fff0a8',
+    densityBias: 1.12,
+    verticalBias: 1.02,
+    wildness: 1.26,
+    branchBias: 1.12,
+    leafBias: 1.08,
+    flowerBias: 1.04,
+    outerLineBias: 1.18
   }
 ];

@@ -165,7 +165,7 @@ button {
 }
 
 .controls.is-collapsed {
-  gap: 0;
+  gap: 8px;
   padding: 0;
   border-color: transparent;
   background: transparent;
@@ -186,6 +186,13 @@ button {
 }
 
 .controls-toggle {
+  flex: 0 0 auto;
+  background: rgb(8 9 12 / 34%);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 26%);
+  backdrop-filter: blur(16px);
+}
+
+.review-dashboard-button {
   flex: 0 0 auto;
   background: rgb(8 9 12 / 34%);
   box-shadow: 0 12px 40px rgb(0 0 0 / 26%);
@@ -243,6 +250,7 @@ button {
   border-radius: 50%;
   color: rgb(255 249 232 / 84%);
   background: rgb(255 255 255 / 8%);
+  text-decoration: none;
   transition:
     background 180ms ease,
     transform 180ms ease,

@@ -473,6 +473,16 @@ function geometryForFlowerType(typeId: FlowerTypeId, radius: number) {
 }
 
 function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimitiveName {
+  if (planId === 'dewberry-morning-air') {
+    if (item.typeId === 'chamomile') return 'CosmosOpenFlower';
+    if (item.typeId === 'hydrangea') return 'UmbelMiniCluster';
+    if (item.typeId === 'bellFruit') return 'FruitPodCluster';
+    if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
+    if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
+    if (item.typeId === 'camelliaPeony') return 'RuffledRoseFlower';
+    if (item.typeId === 'liatris') return 'SpikeFlower';
+  }
+
   if (planId === 'her-real-bouquet-memory-v4') {
     if (item.typeId === 'chamomile') return 'CosmosOpenFlower';
     if (item.typeId === 'camelliaPeony') return 'RuffledRoseFlower';
@@ -573,6 +583,17 @@ function primitivePalette(
   const leafColor = (index: number) => leaf[index % leaf.length];
   const warm = color(Math.floor(rng.value() * flower.length));
 
+  if (spec.flowerPlan.id === 'dewberry-morning-air' && item) {
+    if (item.cn.includes('奶白')) return ['#fffaf0', '#f5ead6', '#f3ca43', leafColor(2)];
+    if (item.cn.includes('柠檬黄')) return ['#ffdf50', '#fff5a6', '#f6f2dc', leafColor(1)];
+    if (item.cn.includes('蓝紫')) return ['#8fd8ff', '#d9bcff', '#fffaf0', leafColor(2)];
+    if (item.cn.includes('莓红')) return ['#ff78a8', '#c84b80', '#ffd8e6', leafColor(1)];
+    if (item.cn.includes('象牙')) return ['#fffaf0', '#f7e6bf', '#ffd95a', leafColor(1)];
+    if (item.cn.includes('粉莓')) return ['#f5adc6', '#fff1ec', '#ff78a8', leafColor(2)];
+    if (item.cn.includes('嫩绿')) return ['#8eea92', '#bddf82', '#fffaf0', leafColor(1)];
+    if (item.cn.includes('珊瑚')) return ['#ff8f5a', '#ffd95a', '#ff78a8', leafColor(2)];
+  }
+
   if (spec.flowerPlan.id === 'her-real-bouquet-memory-v4' && item) {
     if (item.cn.includes('白色波斯菊')) return ['#fffdf2', '#f6efdc', '#f4cf2e', leafColor(2)];
     if (item.cn.includes('黄色春日')) return ['#ffe132', '#fff58c', '#7c691f', leafColor(1)];
@@ -658,7 +679,8 @@ function orientPrimitiveGroup(
 
 function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   const plannedCount = Math.floor(quality.flowerCount * spec.flowerDensity);
-  const count = Math.max(64, Math.floor(plannedCount * (spec.special ? 0.34 : 0.44)));
+  const specialPrimitiveRatio = spec.flowerPlan.id === 'her-real-bouquet-memory-v4' ? 0.5 : 0.34;
+  const count = Math.max(64, Math.floor(plannedCount * (spec.special ? specialPrimitiveRatio : 0.44)));
   const group = new THREE.Group();
   const batches = spec.flowerPlan.items;
   let used = 0;
