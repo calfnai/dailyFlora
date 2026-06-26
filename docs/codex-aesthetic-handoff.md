@@ -1,14 +1,14 @@
 # DailyFlora Codex 接入与美感来源维护
 
-最后更新：2026-06-25
+最后更新：2026-06-26
 
 这份文档用于在另一台电脑上接入 DailyFlora，并让新的 Codex 线程继续维护美感来源、版本进度和生成规则。
 
 ## 当前项目状态快照
 
-- 当前 npm 版本：`0.12.26`
-- 当前产品层标记：`0.12E`
-- 当前主要开发分支：`codex/low-poly-petal-flowers`
+- 当前 npm 版本：`0.13.0`
+- 当前产品层标记：`0.13`
+- 当前主要同步分支：`main`
 - 线上入口：<https://calfnai.github.io/dailyFlora/>
 - 线上参考图库：<https://calfnai.github.io/dailyFlora/docs/dailyflora-reference-gallery.html>
 - 本地参考图库：`docs/dailyflora-reference-gallery.html`
@@ -16,20 +16,26 @@
 - 花材识别文档：`docs/reference-flower-identification.md`
 - 花型计划样例页：`docs/dailyflora-flower-plan-samples.html`
 - 花材形态实验页：`docs/primitive-lab.html`
+- 0.13 审美系统总纲：`docs/dailyflora-aesthetic-system-0.13.md`
+- 项目 Codex skill：`docs/dailyflora-codex-skill.md`
+- 项目本地 skill 入口：`.codex/skills/dailyflora/SKILL.md`
 - 版本提要：`CHANGELOG.md`
 
 另一台机器的 Codex 必须先读：
 
-1. `docs/codex-aesthetic-handoff.md`
-2. `CHANGELOG.md`
-3. `docs/aesthetic-review-dashboard.html`
-4. `data/aesthetic-review-dashboard.json`
-5. `docs/dailyflora-reference-gallery.html`
-6. `docs/reference-flower-identification.md`
-7. `src/flowerPlans.ts`
-8. `src/bouquetScene.ts`
-9. `src/floraPrimitives.ts`
-10. `docs/primitive-lab.html`
+1. `docs/dailyflora-aesthetic-system-0.13.md`
+2. `docs/dailyflora-codex-skill.md`
+3. `.codex/skills/dailyflora/SKILL.md`
+4. `docs/codex-aesthetic-handoff.md`
+5. `CHANGELOG.md`
+6. `docs/aesthetic-review-dashboard.html`
+7. `data/aesthetic-review-dashboard.json`
+8. `docs/dailyflora-reference-gallery.html`
+9. `docs/reference-flower-identification.md`
+10. `src/flowerPlans.ts`
+11. `src/bouquetScene.ts`
+12. `src/floraPrimitives.ts`
+13. `docs/primitive-lab.html`
 
 不要只看代码。这个项目的生成判断依赖用户连续纠正过的审美规则。
 
@@ -62,6 +68,7 @@
 - debug 版由 URL 参数 `?debug` 或 `?debug=1` 开启；debug 版必须显示当前 FPS 和资源占用信息。
 - 普通观赏模式不显示审美审核入口，审美复盘页本身也必须检查 `debug` 参数。
 - GitHub Pages 发布时不能用原始 HTML 覆盖 Vite 已编译的 `docs/aesthetic-review-dashboard.html`；否则 dashboard 和 Primitive Lab 的脚本不会执行，页面会退化成只剩静态文字。
+- 新增关键审美记忆或 skill 文档时，必须同时加入 `scripts/deploy-source-files.json`；如果 dashboard 要在线上链接这些文档，还要在部署脚本中复制到 `dist/docs`。
 - 自动隐藏 UI 上的按钮必须有清楚的人话提示。
 
 ## 当前审美判断
@@ -116,8 +123,13 @@
 
 2026-06-26 十九次确认：用户认可晨露莓园空气束方向不错，并要求新增 debug 版开关：只有 URL 带 `debug` 才能打开 debug 版；只有 debug 版能进入审美复盘；debug 版显示当前渲染 FPS 和资源占用。同时指出上下拖拽方向反直觉，左右拖拽保留；UI 上播放按钮要放在 reverse 按钮左边。`0.12.25` 已实现这些交互和门禁。
 
+2026-06-26 二十次确认：用户要求把 Codex 对审美的理解、流程、skills 和记忆写进项目，作为一个大版本。`0.13.0` 已将项目审美系统固化为 `docs/dailyflora-aesthetic-system-0.13.md`，将项目 Codex skill 固化为 `docs/dailyflora-codex-skill.md` 和 `.codex/skills/dailyflora/SKILL.md`，并把这些文件接入 README、project abstract、dashboard 和发布清单。后续新线程不得只依赖聊天上下文，必须先读这些项目内记忆。
+
 ## 当前决定性文件
 
+- `docs/dailyflora-aesthetic-system-0.13.md`：0.13 审美系统总纲，记录目标花束、反向约束、叶材规则、花库门禁、composition 经验和流程。
+- `docs/dailyflora-codex-skill.md`：项目内 Codex skill，记录接手项目时必须执行的工作方法。
+- `.codex/skills/dailyflora/SKILL.md`：项目本地 skill 入口，指向完整 skill 文档。
 - `src/bouquetScene.ts`：最终 Three.js 花束形态和材质，决定视觉结果。
 - `src/floraPrimitives.ts`：可复用花材 primitive，后续应逐步替换 `精` 渲染里的匿名几何。
 - `src/flowerPlans.ts`：生成前花型计划，决定 `精` 模式尝试哪些花材角色。
@@ -156,6 +168,8 @@
 - `0.12.23` 恢复 HUD 中英双语标题，修正日历选择器按钮锚点，并把山岗小花确定为当前 composition 正向样本。
 - `0.12.24` 恢复主界面审美审核入口，并新增原创候选花束 `晨露莓园 / Dewberry Morning`。
 - `0.12.25` 将审美审核入口收进 `?debug` 模式，增加 FPS/资源 debug 面板，修正上下拖拽方向，并把播放按钮放到 reverse 左侧。
+- `0.12.26` 修复发布脚本覆盖编译页的问题，恢复 dashboard、Primitive Lab、参考图库和花束库在线可用。
+- `0.13.0` 将 DailyFlora 审美理解、流程、项目 skill 和记忆写入仓库，形成后续 Codex 必须读取的 0.13 审美操作系统。
 
 下一台机器继续开发时，不要重复 `0.12.0` 的错误：不要为了“更多花型”破坏花束整体轮廓。
 
@@ -254,10 +268,10 @@ https://calfnai.github.io/dailyFlora/
 在另一台电脑上，用 Codex 打开 `dailyFlora` 文件夹，然后给 Codex 这段提示：
 
 ```text
-这是 DailyFlora 项目。请先阅读 docs/aesthetic-rating-board.md 和 docs/codex-aesthetic-handoff.md。
-维护美感来源时，只更新评分板和灵感库，不要直接改变生成规则。
-所有新审美来源先进入评分，不自动采纳。
-国外花艺网站不能作为默认审美来源；中国当代花艺和小红书语境优先。
+这是 DailyFlora 0.13 项目。请先阅读 docs/dailyflora-aesthetic-system-0.13.md、docs/dailyflora-codex-skill.md、docs/codex-aesthetic-handoff.md 和 CHANGELOG.md。
+不要只凭“理解了”继续改视觉。先判断问题属于 primitive、composition、palette、camera/UI 还是 deploy。
+用户是当前审美验收人；未经用户确认，不要把 Codex 的判断写成 pass。
+国外花艺网站和 Lobster 不能作为默认审美来源；用户给过的参考图和文字优先。
 ```
 
 如果只是整理美感来源，不需要运行构建，也不需要改 `src/`。

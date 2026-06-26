@@ -5,14 +5,14 @@ frontend 3D bouquet screensaver: it generates a new spatial bouquet every day
 from a deterministic date seed, then slowly rotates it so the bouquet reads from
 every angle.
 
-Current product version: `0.12E`.
+Current product version: `0.13`.
 
-`E` means Extended. Extended versions keep the web-first visual work, while
-reserving product-layer capabilities such as lightweight user data, favorites,
-share history, personal aesthetic inputs, usage limits, credits, terms, and EULA
-records. Read `docs/project-abstract.md` together with `CHANGELOG.md`; the
-abstract records product intent and version meaning, while the changelog records
-completed changes.
+`0.13` is the aesthetic operating-system release. It keeps the web-first visual
+work from `0.12E`, but makes the project memory explicit: target bouquet taste,
+negative constraints, Primitive Lab gate, composition lessons, Codex workflow,
+debug review access, and publication checks now live in the repository. Read
+`docs/project-abstract.md`, `docs/dailyflora-aesthetic-system-0.13.md`,
+`docs/dailyflora-codex-skill.md`, and `CHANGELOG.md` together.
 
 ## Run Locally
 
@@ -34,6 +34,12 @@ The build output is static and can be hosted on GitHub Pages.
 Before changing the main bouquet visuals, review
 `docs/aesthetic-review-dashboard.html`. It maps reference groups to visual
 signals, primitive requirements, role reviews, current status, and next tasks.
+
+For the 0.13 aesthetic memory and Codex workflow, read:
+
+- `docs/dailyflora-aesthetic-system-0.13.md`
+- `docs/dailyflora-codex-skill.md`
+- `.codex/skills/dailyflora/SKILL.md`
 
 ## Deploy To GitHub Pages
 

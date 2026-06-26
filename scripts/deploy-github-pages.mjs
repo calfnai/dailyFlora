@@ -223,9 +223,14 @@ function filesUnder(root) {
 function copyReferenceGalleryToDist() {
   const distDocs = path.join(repoRoot, 'dist', 'docs');
   const entries = [
+    ['docs/aesthetic-rating-board.md', 'aesthetic-rating-board.md'],
+    ['docs/codex-aesthetic-handoff.md', 'codex-aesthetic-handoff.md'],
     ['docs/dailyflora-reference-gallery.html', 'dailyflora-reference-gallery.html'],
     ['docs/dailyflora-reference-cards.html', 'dailyflora-reference-cards.html'],
+    ['docs/dailyflora-aesthetic-system-0.13.md', 'dailyflora-aesthetic-system-0.13.md'],
+    ['docs/dailyflora-codex-skill.md', 'dailyflora-codex-skill.md'],
     ['docs/dailyflora-flower-plan-samples.html', 'dailyflora-flower-plan-samples.html'],
+    ['docs/reference-flower-identification.md', 'reference-flower-identification.md'],
     ['docs/释义', '释义'],
     ['docs/untitled folder', 'untitled folder']
   ];

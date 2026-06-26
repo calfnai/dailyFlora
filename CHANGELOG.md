@@ -1,5 +1,16 @@
 # DailyFlora Changelog
 
+## 0.13.0 - 2026-06-26
+
+Aesthetic operating-system release.
+
+- Added `docs/dailyflora-aesthetic-system-0.13.md` as the project-level aesthetic memory: target bouquet taste, negative constraints, foliage rules, primitive gate, composition lessons, color rules, review workflow, and debug review entry.
+- Added `docs/dailyflora-codex-skill.md` as the project Codex skill for future DailyFlora work.
+- Added `.codex/skills/dailyflora/SKILL.md` as a project-local skill entrypoint.
+- Updated README, project abstract, and handoff docs so new Codex threads start from the 0.13 memory instead of relying on chat context.
+- Added the 0.13 aesthetic memory link to the review dashboard and copied key markdown review docs into the GitHub Pages deploy output.
+- Bumped `package.json` to `0.13.0` and `productVersion` to `0.13`.
+
 ## 0.12.26 - 2026-06-26
 
 Review library page restoration.

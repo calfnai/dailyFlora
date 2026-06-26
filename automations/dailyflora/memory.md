@@ -1,0 +1,2 @@
+2026-06-23 run: Synced the reference names into data/inspiration-library.json via a new referenceDeck section and kept docs/dailyflora-reference-gallery.html as the visual reference page. JSON validated successfully. Runtime recorded at 2026-06-23T20:55:07Z.
+2026-06-26 0.13 memory: The project-level aesthetic memory now lives in docs/dailyflora-aesthetic-system-0.13.md. The project Codex skill lives in docs/dailyflora-codex-skill.md and .codex/skills/dailyflora/SKILL.md. Future visual work must read these before changing bouquet generation.
