@@ -44,15 +44,15 @@ const plans: FlowerPlan[] = [
     cnName: '狐尾百合竖线束',
     enName: 'Foxtail Lily Vertical',
     reference: 'dailyflora-reference-gallery: 狐尾百合',
-    silhouette: '强竖向穗线，底部有小花和叶材支撑，不能变成僵硬柱子。',
-    avoid: '避免所有花都在中心，避免竖线太死。',
+    silhouette: '穗线从花丛中穿插上来，少量高线条拉开高度，底部有小花和叶材支撑。',
+    avoid: '避免穗状花在顶部成片，避免所有穗线同向直立成僵硬柱子。',
     items: normalizeShares([
-      { typeId: 'liatris', cn: '蛇鞭菊线形', en: 'liatris wand', role: 'line', share: 0.26, scale: 1.24, placement: 'high', note: '最高的竖向线条。' },
-      { typeId: 'hyacinth', cn: '风信子穗形', en: 'hyacinth spike', role: 'line', share: 0.2, scale: 1.08, placement: 'high', note: '密一点的花穗。' },
-      { typeId: 'snapdragon', cn: '金鱼草穗形', en: 'snapdragon spike', role: 'secondary', share: 0.16, scale: 1.02, placement: 'outer', note: '侧向穗线。' },
-      { typeId: 'chamomile', cn: '洋甘菊形', en: 'chamomile form', role: 'filler', share: 0.16, scale: 0.78, placement: 'mixed', note: '局部小花散点。' },
-      { typeId: 'bellFruit', cn: '风铃果形', en: 'bell fruit form', role: 'fruit', share: 0.1, scale: 0.82, placement: 'spray', note: '增加细节停顿。' },
-      { typeId: 'hydrangea', cn: '绣球簇形', en: 'hydrangea cluster', role: 'cluster', share: 0.12, scale: 0.86, placement: 'low', note: '底部托住体积。' }
+      { typeId: 'liatris', cn: '蛇鞭菊线形', en: 'liatris wand', role: 'line', share: 0.18, scale: 1.16, placement: 'mixed', note: '从花丛中穿插上来，不集中堆在顶部。' },
+      { typeId: 'hyacinth', cn: '风信子穗形', en: 'hyacinth spike', role: 'line', share: 0.12, scale: 0.98, placement: 'outer', note: '少量密一点的花穗，嵌在外圈层次里。' },
+      { typeId: 'snapdragon', cn: '金鱼草穗形', en: 'snapdragon spike', role: 'secondary', share: 0.12, scale: 0.94, placement: 'mixed', note: '侧向和中层穗线，不能形成顶部穗花墙。' },
+      { typeId: 'chamomile', cn: '洋甘菊形', en: 'chamomile form', role: 'filler', share: 0.22, scale: 0.78, placement: 'mixed', note: '局部小花散点，打散穗线。' },
+      { typeId: 'bellFruit', cn: '风铃果形', en: 'bell fruit form', role: 'fruit', share: 0.12, scale: 0.82, placement: 'spray', note: '增加细节停顿。' },
+      { typeId: 'hydrangea', cn: '绣球簇形', en: 'hydrangea cluster', role: 'cluster', share: 0.24, scale: 0.86, placement: 'low', note: '底部托住体积，防止山岗小花顶上成片。' }
     ])
   },
   {
@@ -153,6 +153,25 @@ const plans: FlowerPlan[] = [
       { typeId: 'orchid', cn: '珊瑚火焰花线', en: 'coral flame-lily strokes', role: 'line', share: 0.08, scale: 1.08, placement: 'spray', note: '少量橙红外伸，让花束鲜活。' },
       { typeId: 'liatris', cn: '嫩绿空气枝', en: 'fresh green airy stems', role: 'line', share: 0.08, scale: 1.0, placement: 'high', note: '控制枝线比例，只支撑空间感。' },
       { typeId: 'bellFruit', cn: '满天星光点', en: 'baby-breath light pearls', role: 'filler', share: 0.06, scale: 0.66, placement: 'spray', note: '细碎白点，和星尘呼应。' }
+    ])
+  },
+  {
+    id: 'her-real-bouquet-memory-v4',
+    cnName: '真实春日花束 v4',
+    enName: 'Real Spring Bouquet Memory v4',
+    reference: 'private-special: ref-01/ref-02/ref-03 real bouquet photos, especially ref-02 front view',
+    silhouette: '透明包装托住右下方手捧核心，粉白主体很满；左侧有红黄嘉兰长线外伸，上方满天星和绿枝轻散，整体是右下到左上的非对称扇形。',
+    avoid: '避免把白色波斯菊做成密瓣菊花团；避免削弱黄色、蓝色、粉色和红黄嘉兰；避免花束变稀或变成抽象星点。',
+    items: normalizeShares([
+      { typeId: 'chamomile', cn: '白色波斯菊开面花', en: 'white cosmos open faces', role: 'main', share: 0.18, scale: 1.0, placement: 'mixed', note: '照片里最醒目的白色薄瓣黄心花，要少瓣、开面、分散。' },
+      { typeId: 'chamomile', cn: '黄色春日小雏菊', en: 'yellow spring daisy accents', role: 'filler', share: 0.1, scale: 0.78, placement: 'mixed', note: '黄色跳点很多，但尺寸要小，不能主导成菊花墙。' },
+      { typeId: 'orchid', cn: '红黄嘉兰火焰线', en: 'red yellow gloriosa flame lines', role: 'line', share: 0.16, scale: 1.18, placement: 'spray', note: '真实花束最有辨识度的外伸卷曲形态。' },
+      { typeId: 'camelliaPeony', cn: '浅粉柔软团块', en: 'soft blush rounded clusters', role: 'secondary', share: 0.16, scale: 0.98, placement: 'low', note: '复现粉色玫瑰/绣球/康乃馨感的饱满底层。' },
+      { typeId: 'orchid', cn: '白色杯形花', en: 'ivory cup blooms', role: 'main', share: 0.12, scale: 0.96, placement: 'outer', note: '右侧和上层可见的白色杯形轮廓。' },
+      { typeId: 'orchid', cn: '淡紫星形花瓣', en: 'pale lilac star petals', role: 'secondary', share: 0.1, scale: 0.86, placement: 'mixed', note: '补照片里的淡紫星形花，增加层次。' },
+      { typeId: 'hydrangea', cn: '蓝色小穗花簇', en: 'blue airy mini clusters', role: 'cluster', share: 0.12, scale: 0.78, placement: 'mixed', note: '蓝色小花是照片的重要冷色点。' },
+      { typeId: 'bellFruit', cn: '满天星白珠', en: 'baby-breath white pearls', role: 'filler', share: 0.1, scale: 0.68, placement: 'spray', note: '白色小珠沿外圈和上方散开。' },
+      { typeId: 'liatris', cn: '嫩绿枝叶和花苞', en: 'fresh green stems and buds', role: 'line', share: 0.06, scale: 1.0, placement: 'high', note: '真实枝叶可见，但不压过花面。' }
     ])
   }
 ];

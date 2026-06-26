@@ -270,6 +270,39 @@ export function createDiskFlower(options: FloraPrimitiveOptions) {
   return applyRoot(group, options);
 }
 
+export function createCosmosOpenFlower(options: FloraPrimitiveOptions) {
+  const rng = createRng(`${options.seed}:cosmos-open`);
+  const group = new THREE.Group();
+  const petalCount = Math.max(7, Math.round(8 * options.density));
+  const petals = new THREE.InstancedMesh(
+    taperedPetalGeometry(0.92, 0.18, 0.08 + options.openness * 0.035, 0.08),
+    material(colorAt(options.colorPalette, 0)),
+    petalCount
+  );
+  const petalBase = colorAt(options.colorPalette, 0);
+
+  for (let i = 0; i < petalCount; i += 1) {
+    const angle = (i / petalCount) * Math.PI * 2 + rng.range(-0.08, 0.08);
+    const length = rng.range(0.86, 1.16);
+    const width = rng.range(0.86, 1.12);
+    const p = new THREE.Vector3(Math.cos(angle) * 0.18, Math.sin(angle) * 0.18, rng.range(-0.015, 0.02));
+    setInstance(
+      petals,
+      i,
+      p,
+      new THREE.Vector3(width, length, 1),
+      petalBase.clone().lerp(colorAt(options.colorPalette, 1), rng.range(0.04, 0.22)),
+      angle - Math.PI / 2 + rng.range(-0.06, 0.06)
+    );
+  }
+
+  const center = new THREE.Mesh(new THREE.SphereGeometry(0.19, 18, 10), material(colorAt(options.colorPalette, 2), 0.92));
+  center.scale.set(1, 1, 0.42);
+  center.position.z = 0.04;
+  group.add(petals, center);
+  return applyRoot(group, options);
+}
+
 export function createLayeredRoundFlower(options: FloraPrimitiveOptions) {
   const rng = createRng(`${options.seed}:layered`);
   const group = new THREE.Group();
@@ -953,6 +986,7 @@ export function createFoliageGrassBranch(options: FloraPrimitiveOptions) {
 
 export const floraPrimitiveFactories = {
   DiskFlower: createDiskFlower,
+  CosmosOpenFlower: createCosmosOpenFlower,
   LayeredDahliaFlower: createLayeredDahliaFlower,
   RuffledRoseFlower: createRuffledRoseFlower,
   StarPinwheelFlower: createStarPinwheelFlower,

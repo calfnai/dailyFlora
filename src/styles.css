@@ -447,14 +447,32 @@ button {
 
 .special-quote.is-custom {
   right: max(34px, env(safe-area-inset-right));
-  max-width: min(440px, calc(100vw - 40px));
+  max-width: min(460px, calc(100vw - 40px));
   color: rgb(255 246 224 / 78%);
   font-size: clamp(14px, 1.55vw, 17px);
   font-weight: 500;
-  line-height: 1.58;
+  line-height: 1.54;
   text-shadow:
     0 1px 18px rgb(0 0 0 / 92%),
     0 0 3px rgb(0 0 0 / 82%);
+}
+
+.special-quote.is-custom p {
+  opacity: 0;
+  transform: translateY(7px);
+  animation: specialQuoteLineIn 1.7s ease forwards;
+}
+
+.special-quote.is-custom p:nth-child(1) {
+  animation-delay: 10.3s;
+}
+
+.special-quote.is-custom p:nth-child(2) {
+  animation-delay: 11.4s;
+}
+
+.special-quote.is-custom p:nth-child(3) {
+  animation-delay: 12.5s;
 }
 
 .special-quote.is-custom [lang='zh-CN'] {
@@ -463,8 +481,28 @@ button {
   font-size: 1em;
 }
 
-.special-quote.is-custom [lang='zh-CN']:first-child {
+.special-quote.is-custom .special-quote-language p:first-child {
   margin-top: 0;
+}
+
+.special-quote-en {
+  margin-top: 18px;
+  color: rgb(255 232 218 / 48%);
+  font-size: 0.72em;
+  font-weight: 400;
+  line-height: 1.42;
+}
+
+.special-quote-en p:nth-child(1) {
+  animation-delay: 13.8s;
+}
+
+.special-quote-en p:nth-child(2) {
+  animation-delay: 14.9s;
+}
+
+.special-quote-en p:nth-child(3) {
+  animation-delay: 16s;
 }
 
 .special-credit {
@@ -480,6 +518,13 @@ button {
     transform: translateY(8px);
   }
 
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes specialQuoteLineIn {
   to {
     opacity: 1;
     transform: translateY(0);
@@ -540,9 +585,14 @@ button {
   .special-quote.is-custom {
     right: 14px;
     max-width: calc(100vw - 28px);
-    bottom: 148px;
-    font-size: 12.5px;
-    line-height: 1.52;
+    bottom: 142px;
+    font-size: 12px;
+    line-height: 1.46;
+  }
+
+  .special-quote-en {
+    margin-top: 12px;
+    font-size: 0.68em;
   }
 
   .special-credit {

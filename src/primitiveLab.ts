@@ -26,6 +26,7 @@ const primitiveReviewPanel = reviewPanel;
 
 const primitiveNames: FloraPrimitiveName[] = [
   'DiskFlower',
+  'CosmosOpenFlower',
   'LayeredDahliaFlower',
   'RuffledRoseFlower',
   'StarPinwheelFlower',
@@ -44,6 +45,7 @@ const primitiveNames: FloraPrimitiveName[] = [
 
 const palettes: Record<FloraPrimitiveName, string[]> = {
   DiskFlower: ['#fff8e7', '#f7edd2', '#f0c83a', '#7f8e3e'],
+  CosmosOpenFlower: ['#fffdf2', '#f6efdc', '#f4cf2e', '#7f8e3e'],
   LayeredDahliaFlower: ['#f8c9d8', '#fff1f5', '#e7a7bb', '#86a762'],
   RuffledRoseFlower: ['#f8b9cf', '#fff3f6', '#e77da0', '#9bb36b'],
   LayeredRoseFlower: ['#ff9fbd', '#f6c1d2', '#f06b86', '#ffe2a9'],

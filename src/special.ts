@@ -1,11 +1,17 @@
-import { herJanuarySkyReference, herJanuarySkyReferenceV2, herJanuarySkyReferenceV3 } from './specialBouquetReference';
+import {
+  herJanuarySkyReference,
+  herJanuarySkyReferenceV2,
+  herJanuarySkyReferenceV3,
+  herRealBouquetReferenceV4
+} from './specialBouquetReference';
 import { getFlowerPlanById } from './flowerPlans';
 import type { DailyBouquetSpec, SpecialBouquetReference } from './types';
 
 export const specialReferences: Record<string, SpecialBouquetReference> = {
   ngc2787: herJanuarySkyReference,
   ngc2787v2: herJanuarySkyReferenceV2,
-  ngc2787v3: herJanuarySkyReferenceV3
+  ngc2787v3: herJanuarySkyReferenceV3,
+  ngc2787v4: herRealBouquetReferenceV4
 };
 
 export function readSpecialId(search = window.location.search) {

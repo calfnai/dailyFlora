@@ -14,7 +14,7 @@ export default defineConfig({
           resolve(__dirname, 'dist/data/aesthetic-review-dashboard.json')
         );
         const indexHtml = readFileSync(resolve(__dirname, 'dist/index.html'), 'utf8');
-        for (const route of ['special0629', 'special0629-v2', 'special0629-v3']) {
+        for (const route of ['special0629', 'special0629-v2', 'special0629-v3', 'special0629-v4']) {
           mkdirSync(resolve(__dirname, `dist/${route}`), { recursive: true });
           writeFileSync(
             resolve(__dirname, `dist/${route}/index.html`),

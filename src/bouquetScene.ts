@@ -473,6 +473,17 @@ function geometryForFlowerType(typeId: FlowerTypeId, radius: number) {
 }
 
 function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimitiveName {
+  if (planId === 'her-real-bouquet-memory-v4') {
+    if (item.typeId === 'chamomile') return 'CosmosOpenFlower';
+    if (item.typeId === 'camelliaPeony') return 'RuffledRoseFlower';
+    if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
+    if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
+    if (item.typeId === 'orchid' && item.role === 'secondary') return 'OrchidButterflyFlower';
+    if (item.typeId === 'hydrangea') return 'UmbelMiniCluster';
+    if (item.typeId === 'bellFruit') return 'AirFiller';
+    if (item.typeId === 'liatris') return 'FoliageGrassBranch';
+  }
+
   if (planId === 'her-january-sky-memory-v3') {
     if (item.typeId === 'camelliaPeony' || item.typeId === 'rose') return 'RuffledRoseFlower';
     if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
@@ -542,12 +553,36 @@ function primitiveRoleForPlanItem(item: FlowerPlanItem): FloraPrimitiveRole {
   return 'secondary';
 }
 
-function primitivePalette(spec: DailyBouquetSpec, primitive: FloraPrimitiveName, rng: ReturnType<typeof createRng>) {
+function spikeLeanRange(placement: FlowerPlanItem['placement']): [number, number] {
+  if (placement === 'high') return [0.08, 0.34];
+  if (placement === 'spray') return [0.16, 0.48];
+  if (placement === 'outer') return [0.12, 0.42];
+  if (placement === 'mixed') return [0.1, 0.38];
+  return [0.06, 0.28];
+}
+
+function primitivePalette(
+  spec: DailyBouquetSpec,
+  primitive: FloraPrimitiveName,
+  rng: ReturnType<typeof createRng>,
+  item?: FlowerPlanItem
+) {
   const flower = spec.theme.palette;
   const leaf = spec.theme.leafPalette;
   const color = (index: number) => flower[index % flower.length];
   const leafColor = (index: number) => leaf[index % leaf.length];
   const warm = color(Math.floor(rng.value() * flower.length));
+
+  if (spec.flowerPlan.id === 'her-real-bouquet-memory-v4' && item) {
+    if (item.cn.includes('白色波斯菊')) return ['#fffdf2', '#f6efdc', '#f4cf2e', leafColor(2)];
+    if (item.cn.includes('黄色春日')) return ['#ffe132', '#fff58c', '#7c691f', leafColor(1)];
+    if (item.cn.includes('红黄嘉兰')) return ['#f36b45', '#ffe05c', '#c83f56', '#79a33d'];
+    if (item.cn.includes('浅粉')) return ['#f5c0cf', '#f1d8e8', '#fff2e3', leafColor(2)];
+    if (item.cn.includes('白色杯形')) return ['#fff8e6', '#f7ecd4', '#f3d36d', leafColor(1)];
+    if (item.cn.includes('淡紫')) return ['#d8c4f0', '#f0e8fb', '#b7d6ff', leafColor(2)];
+    if (item.cn.includes('蓝色')) return ['#84bdf4', '#b9d8f6', '#f0f6ff', leafColor(2)];
+    if (item.cn.includes('满天星')) return ['#fffdf4', '#eff7ff', '#dfe9c9', leafColor(1)];
+  }
 
   if (primitive === 'FoliageGrassBranch') return [leafColor(0), leafColor(1), leafColor(2), spec.theme.stem];
   if (primitive === 'FruitPodCluster') return [color(4), color(3), leafColor(1), color(2)];
@@ -565,10 +600,12 @@ function orientPrimitiveGroup(
   primitive: FloraPrimitiveName,
   point: THREE.Vector3,
   theta: number,
-  rng: ReturnType<typeof createRng>
+  rng: ReturnType<typeof createRng>,
+  placement: FlowerPlanItem['placement'] = 'mixed'
 ) {
   const outward = point.clone().setY(point.y * 0.55 + 0.48).normalize();
   const facePrimitives: FloraPrimitiveName[] = [
+    'CosmosOpenFlower',
     'DiskFlower',
     'LayeredDahliaFlower',
     'RuffledRoseFlower',
@@ -585,7 +622,21 @@ function orientPrimitiveGroup(
     return;
   }
 
-  if (primitive === 'SpikeFlower' || primitive === 'FoliageGrassBranch') {
+  if (primitive === 'SpikeFlower') {
+    const [minLean, maxLean] = spikeLeanRange(placement);
+    const lean = rng.range(minLean, maxLean);
+    const direction = theta + rng.range(-1.55, 1.55) + (rng.value() < 0.28 ? Math.PI : 0);
+    const target = new THREE.Vector3(
+      Math.cos(direction) * lean,
+      rng.range(0.92, 1.14),
+      Math.sin(direction) * lean
+    ).normalize();
+    group.quaternion.setFromUnitVectors(up, target);
+    group.rotateY(rng.range(-Math.PI, Math.PI));
+    return;
+  }
+
+  if (primitive === 'FoliageGrassBranch') {
     group.quaternion.setFromUnitVectors(up, new THREE.Vector3(Math.cos(theta) * 0.22, 1, Math.sin(theta) * 0.22).normalize());
     group.rotateY(rng.range(-0.45, 0.45));
     return;
@@ -629,14 +680,14 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
         seed: `${spec.seed}:bouquet-primitive:${primitive}:${batch.typeId}:${i}`,
         position: p,
         scale: roleScale * batch.scale * localRng.range(0.82, 1.22) * specialScale,
-        colorPalette: primitivePalette(spec, primitive, localRng),
+        colorPalette: primitivePalette(spec, primitive, localRng, batch),
         openness: ['OrchidButterflyFlower', 'TrumpetThroatFlower', 'DaturaTrumpetFlower', 'CallaCurledBract'].includes(primitive) ? 0.94 : localRng.range(0.62, 0.86),
         density: ['UmbelMiniCluster', 'FullHydrangeaCloud', 'FruitPodCluster'].includes(primitive) ? 1.08 : localRng.range(0.86, 1.02),
         curvature: ['SpikeFlower', 'FoliageGrassBranch', 'CallaCurledBract'].includes(primitive) ? 0.86 : 0.42,
         role: primitiveRoleForPlanItem(batch)
       });
       primitiveGroup.name = `${primitive}:${batch.cn}`;
-      orientPrimitiveGroup(primitiveGroup, primitive, p, theta, localRng);
+      orientPrimitiveGroup(primitiveGroup, primitive, p, theta, localRng, batch.placement);
       group.add(primitiveGroup);
     }
   });

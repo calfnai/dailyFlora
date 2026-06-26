@@ -32,7 +32,8 @@ const themeEnglishNames: Record<string, string> = {
   'starry-night': 'Starry Night',
   'her-january-sky': 'Her January Sky',
   'her-january-sky-v2': 'Her January Sky v2',
-  'her-january-sky-v3': 'Her January Sky v3'
+  'her-january-sky-v3': 'Her January Sky v3',
+  'her-real-bouquet-v4': 'Her Real Bouquet v4'
 };
 const rotationPresets: Array<{
   speed: number;
@@ -376,9 +377,16 @@ function createSpecialOverlay() {
   const quote = document.createElement('aside');
   quote.className = specialReference.quoteStanzas ? 'special-quote is-custom' : 'special-quote';
   if (specialReference.quoteStanzas) {
-    quote.innerHTML = specialReference.quoteStanzas
+    const zh = specialReference.quoteStanzas
       .map((stanza) => `<p lang="zh-CN">${stanza.replace(/\n/g, '<br />')}</p>`)
       .join('');
+    const en = (specialReference.quoteTranslationStanzas || [])
+      .map((stanza) => `<p lang="en">${stanza.replace(/\n/g, '<br />')}</p>`)
+      .join('');
+    quote.innerHTML = `
+      <div class="special-quote-language special-quote-zh">${zh}</div>
+      ${en ? `<div class="special-quote-language special-quote-en">${en}</div>` : ''}
+    `;
   } else {
     quote.innerHTML = `
       <p>Some flowers last for days.<br />Some light travels long enough to arrive as a memory.</p>

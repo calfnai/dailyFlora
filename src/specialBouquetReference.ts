@@ -1,11 +1,25 @@
 import type { SpecialBouquetReference } from './types';
 
+const specialQuoteStanzas = [
+  'NGC 2787 的光，哈勃望远镜找了很久。\n来自你降生那天的光，走了一亿年。',
+  '那束花，只走了几个街区，\n遇见一个还没被回答的午后。',
+  '然后它们都在今天，\n这束光里了。'
+];
+
+const specialQuoteTranslationStanzas = [
+  'The light of NGC 2787 took Hubble a long time to find.\nLight from the day you were born has traveled a hundred million years.',
+  'That bouquet traveled only a few blocks,\nand met an afternoon still waiting for an answer.',
+  'And today, they are both here,\ninside this light.'
+];
+
 export const herJanuarySkyReference: SpecialBouquetReference = {
   id: 'ngc2787',
   title: 'her-january-sky',
   versionLabel: 'v1',
   routePath: 'special0629',
   flowerPlanId: 'her-january-sky-memory',
+  quoteStanzas: specialQuoteStanzas,
+  quoteTranslationStanzas: specialQuoteTranslationStanzas,
   date: '2026-06-29',
   seed: 'daily-flora:special:ngc2787:2026-06-29',
   hubbleImagePath: 'special/ngc-2787.jpg',
@@ -172,11 +186,6 @@ export const herJanuarySkyReferenceV3: SpecialBouquetReference = {
   versionLabel: 'v3',
   routePath: 'special0629-v3',
   flowerPlanId: 'her-january-sky-memory-v3',
-  quoteStanzas: [
-    'NGC 2787 的光，哈勃望远镜找了很久。\n来自你降生那天的光，走了一亿年。',
-    '那束花，只走了几个街区，\n遇见一个还没被回答的午后。',
-    '然后它们都在今天，\n这束光里了。'
-  ],
   seed: 'daily-flora:special:ngc2787:v3:spring-memory:2026-06-29',
   theme: {
     ...herJanuarySkyReference.theme,
@@ -256,5 +265,102 @@ export const herJanuarySkyReferenceV3: SpecialBouquetReference = {
     galaxyDepthTest: false,
     coreOpacity: 0.48,
     coreRadius: 0.9
+  }
+};
+
+export const herRealBouquetReferenceV4: SpecialBouquetReference = {
+  ...herJanuarySkyReference,
+  id: 'ngc2787v4',
+  title: 'her-real-bouquet-v4',
+  versionLabel: 'v4',
+  routePath: 'special0629-v4',
+  flowerPlanId: 'her-real-bouquet-memory-v4',
+  seed: 'daily-flora:special:ngc2787:v4:real-bouquet-ref02:2026-06-29',
+  theme: {
+    ...herJanuarySkyReference.theme,
+    id: 'her-real-bouquet-v4',
+    name: 'her real bouquet v4',
+    palette: [
+      '#fffdf2',
+      '#ffe136',
+      '#f5bfd0',
+      '#d9c8ef',
+      '#86bff4',
+      '#f36b45',
+      '#c93f58',
+      '#fff1d6',
+      '#a8c85c'
+    ],
+    leafPalette: ['#668a35', '#86a94b', '#bfd27f', '#e2eab5'],
+    stem: '#789744',
+    background: '#050408',
+    floor: '#171218',
+    glow: '#fff0ad',
+    densityBias: 1.22,
+    verticalBias: 1.16,
+    wildness: 1.1,
+    branchBias: 1.18,
+    leafBias: 0.82,
+    flowerBias: 1.28,
+    outerLineBias: 1.2
+  },
+  visualAnalysis: {
+    mainColors: [
+      'white cosmos faces with yellow centers',
+      'yellow daisy accents',
+      'soft blush pink rounded clusters',
+      'blue and lilac small flowers',
+      'red-yellow gloriosa flame petals'
+    ],
+    accentColors: [
+      'fresh green stems and buds',
+      'white baby-breath pearls',
+      'ivory cup blooms',
+      'pale grey-white translucent wrap',
+      'pale pink ribbon'
+    ],
+    flowerShapes: [
+      'wide eight-petal cosmos-like open faces',
+      'small yellow daisy accents',
+      'curled red-yellow gloriosa petals extending left',
+      'blue airy mini clusters',
+      'pink soft round cluster blooms',
+      'ivory cup-shaped flowers'
+    ],
+    silhouette:
+      'Full spring garden hand bouquet held from the lower right, with a dense pink-white core and gloriosa lines reaching to the left.',
+    wrapping:
+      'Clear cellophane and translucent grey-white inner paper folded into visible triangular panels, tied with a pale pink ribbon.',
+    emotionalTone:
+      'Bright, full, fresh, personal, and spring-like; the bouquet should feel bought, carried, and loved, not abstracted away.',
+    particleTranslation:
+      'Keep the full garden-bouquet abundance, use fewer but wider white cosmos faces, emphasize red-yellow gloriosa lines, blue/lilac small flowers, pink lower fullness, baby-breath pearls, transparent wrap, and visible stems.'
+  },
+  shape: {
+    radius: 1.08,
+    height: 1.36,
+    verticalLift: 0.24,
+    asymmetry: 0.36,
+    airySprayBias: 1.2,
+    centralFullness: 1.24,
+    stemVisibility: 1.26
+  },
+  bloomScale: {
+    small: 0.5,
+    medium: 0.92,
+    large: 1.34,
+    largeBias: 0.16
+  },
+  wrapping: {
+    color: '#dfe4de',
+    edgeColor: '#fff8fb',
+    ribbonColor: '#efb5c9',
+    opacity: 0.14
+  },
+  cosmic: {
+    ...herJanuarySkyReferenceV3.cosmic,
+    galaxyOpacity: 0.74,
+    galaxyScale: 1.18,
+    coreOpacity: 0.36
   }
 };

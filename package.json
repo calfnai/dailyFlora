@@ -1,7 +1,7 @@
 {
   "name": "daily-flora",
   "private": true,
-  "version": "0.12.20",
+  "version": "0.12.21",
   "productVersion": "0.12E",
   "type": "module",
   "engines": {
