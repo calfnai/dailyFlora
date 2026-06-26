@@ -71,6 +71,9 @@ export interface BouquetTheme {
 export interface SpecialBouquetReference {
   id: string;
   title: string;
+  versionLabel?: string;
+  routePath?: string;
+  flowerPlanId?: string;
   date: string;
   seed: string;
   theme: BouquetTheme;

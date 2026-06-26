@@ -13,12 +13,14 @@ export default defineConfig({
           resolve(__dirname, 'data/aesthetic-review-dashboard.json'),
           resolve(__dirname, 'dist/data/aesthetic-review-dashboard.json')
         );
-        mkdirSync(resolve(__dirname, 'dist/special0629'), { recursive: true });
         const indexHtml = readFileSync(resolve(__dirname, 'dist/index.html'), 'utf8');
-        writeFileSync(
-          resolve(__dirname, 'dist/special0629/index.html'),
-          indexHtml.replace('<head>', '<head>\n    <base href="../" />')
-        );
+        for (const route of ['special0629', 'special0629-v2']) {
+          mkdirSync(resolve(__dirname, `dist/${route}`), { recursive: true });
+          writeFileSync(
+            resolve(__dirname, `dist/${route}/index.html`),
+            indexHtml.replace('<head>', '<head>\n    <base href="../" />')
+          );
+        }
       }
     }
   ],

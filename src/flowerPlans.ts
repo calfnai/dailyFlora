@@ -119,6 +119,23 @@ const plans: FlowerPlan[] = [
       { typeId: 'liatris', cn: '绿色细线枝条', en: 'fine green line stems', role: 'line', share: 0.1, scale: 1.08, placement: 'high', note: '拉出真实花束的高低和不对称。' },
       { typeId: 'bellFruit', cn: '满天星白色小珠', en: 'baby-breath pearl dots', role: 'filler', share: 0.06, scale: 0.72, placement: 'spray', note: '补充空气感白点，不做照片展示。' }
     ])
+  },
+  {
+    id: 'her-january-sky-memory-v2',
+    cnName: '一月星空记忆束 v2',
+    enName: 'Her January Sky Memory v2',
+    reference: 'private-special: 2026-06-29 bouquet photos translated with fewer daisy/chrysanthemum forms',
+    silhouette: '中下部是柔软粉白核心，外圈留出空气和透明枝线；右侧更满，左上有细线和少量橙红卷曲花瓣伸出。',
+    avoid: '避免菊花和雏菊占主导，避免圆盘花重复，避免平均球形，避免把星空做成廉价背景。',
+    items: normalizeShares([
+      { typeId: 'camelliaPeony', cn: '柔粉褶皱圆花', en: 'blush ruffled round bloom', role: 'main', share: 0.24, scale: 1.04, placement: 'low', note: '承担照片里的柔软粉色体积，但不用菊花盘面。' },
+      { typeId: 'orchid', cn: '象牙杯形花', en: 'ivory cup bloom', role: 'main', share: 0.2, scale: 1.02, placement: 'outer', note: '复现白色杯形和包裹感。' },
+      { typeId: 'orchid', cn: '卷曲马蹄莲感', en: 'curled calla bract', role: 'secondary', share: 0.16, scale: 0.98, placement: 'mixed', note: '增加优雅卷曲轮廓，减少平面花瓣。' },
+      { typeId: 'hydrangea', cn: '淡蓝淡紫小簇', en: 'pale blue-lilac airy clusters', role: 'cluster', share: 0.16, scale: 0.76, placement: 'mixed', note: '做冷色空气层和小花雾感。' },
+      { typeId: 'liatris', cn: '绿色空气枝线', en: 'green airy stem lines', role: 'line', share: 0.14, scale: 1.12, placement: 'high', note: '让叶材和枝条从花束中合理长出来。' },
+      { typeId: 'bellFruit', cn: '满天星白色小珠', en: 'baby-breath pearl air', role: 'filler', share: 0.06, scale: 0.68, placement: 'spray', note: '只做细碎空气点，不变成主花。' },
+      { typeId: 'orchid', cn: '橙红火焰花线', en: 'coral flame-lily strokes', role: 'line', share: 0.04, scale: 1.1, placement: 'spray', note: '保留照片里的橙红记忆点，数量很少。' }
+    ])
   }
 ];
 

@@ -473,6 +473,16 @@ function geometryForFlowerType(typeId: FlowerTypeId, radius: number) {
 }
 
 function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimitiveName {
+  if (planId === 'her-january-sky-memory-v2') {
+    if (item.typeId === 'camelliaPeony') return 'RuffledRoseFlower';
+    if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
+    if (item.typeId === 'orchid' && item.role === 'secondary') return 'CallaCurledBract';
+    if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
+    if (item.typeId === 'hydrangea') return 'UmbelMiniCluster';
+    if (item.typeId === 'bellFruit') return 'AirFiller';
+    if (item.typeId === 'liatris') return 'FoliageGrassBranch';
+  }
+
   if (planId === 'her-january-sky-memory') {
     if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
     if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';

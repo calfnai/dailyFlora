@@ -4,7 +4,7 @@ import { todayKey } from './random';
 import { createDailySpec, readParams } from './spec';
 import { resolveQuality } from './quality';
 import { BouquetScene } from './bouquetScene';
-import { createSpecialSpec, readSpecialId, special0629Pathname, specialReferences, withBasePath } from './special';
+import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
 
 type RotationDirection = 1 | -1;
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
@@ -30,7 +30,8 @@ const themeEnglishNames: Record<string, string> = {
   'summer-pinwheel': 'Summer Pinwheel',
   'dopamine-field': 'Dopamine Field',
   'starry-night': 'Starry Night',
-  'her-january-sky': 'Her January Sky'
+  'her-january-sky': 'Her January Sky',
+  'her-january-sky-v2': 'Her January Sky v2'
 };
 const rotationPresets: Array<{
   speed: number;
@@ -273,7 +274,7 @@ function updateUrl(date: string, seed: string) {
     next.searchParams.set('theme', selectedTheme);
   }
   if (specialReference) {
-    next.pathname = special0629Pathname();
+    next.pathname = specialPathname(specialReference);
     next.searchParams.delete('special');
     next.searchParams.delete('seed');
     if (date === specialReference.date) {
@@ -365,9 +366,10 @@ function createSpecialOverlay() {
 
   const caption = document.createElement('aside');
   caption.className = 'special-caption';
+  const versionText = specialReference.versionLabel ? ` · ${specialReference.versionLabel}` : '';
   caption.innerHTML = `
     <p>NGC 2787 · seen by Hubble</p>
-    <p>A bouquet remembered for 2026.06.29</p>
+    <p>A bouquet remembered for 2026.06.29${versionText}</p>
   `;
 
   const quote = document.createElement('aside');
