@@ -95,6 +95,7 @@ the long-term sync point.
 - `?theme=dopamine-field|summer-pinwheel|fairy-violet|moon-white|tropical-forest|sea-salt-lemon|hillside-wild|starry-night|dewberry-morning` previews a specific bouquet family.
 - `?density=low|medium|high` controls bouquet density.
 - `?render=auto|low|medium|high` controls rendering precision.
+- `?debug` or `?debug=1` shows debug-only controls, the aesthetic review entry, and rendering/resource stats.
 
 ## Inspiration Workflow
 

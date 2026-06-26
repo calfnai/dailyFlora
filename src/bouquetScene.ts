@@ -1210,6 +1210,9 @@ export class BouquetScene {
   private targetCameraTargetY = 0.7;
   private floorMaterial?: THREE.MeshBasicMaterial;
   private animationId = 0;
+  private debugFrameCount = 0;
+  private debugFps = 0;
+  private debugSampleAt = performance.now();
 
   constructor(canvas: HTMLCanvasElement, spec: DailyBouquetSpec, quality: QualityProfile) {
     this.canvas = canvas;
@@ -1379,6 +1382,47 @@ export class BouquetScene {
     }
     this.updateCamera(routeOffsets);
     this.renderer.render(this.scene, this.camera);
+    this.updateDebugFps();
+  }
+
+  private updateDebugFps() {
+    this.debugFrameCount += 1;
+    const now = performance.now();
+    const elapsed = now - this.debugSampleAt;
+    if (elapsed < 500) return;
+    this.debugFps = Math.round((this.debugFrameCount * 1000) / elapsed);
+    this.debugFrameCount = 0;
+    this.debugSampleAt = now;
+  }
+
+  getDebugStats() {
+    const size = this.renderer.getSize(new THREE.Vector2());
+    const heap = (performance as Performance & {
+      memory?: {
+        usedJSHeapSize: number;
+        totalJSHeapSize: number;
+        jsHeapSizeLimit: number;
+      };
+    }).memory;
+
+    return {
+      fps: this.debugFps,
+      targetFps: this.quality.targetFps,
+      density: this.quality.densityName,
+      render: this.quality.renderName,
+      pixelRatio: this.renderer.getPixelRatio(),
+      canvasWidth: Math.round(size.x),
+      canvasHeight: Math.round(size.y),
+      geometries: this.renderer.info.memory.geometries,
+      textures: this.renderer.info.memory.textures,
+      calls: this.renderer.info.render.calls,
+      triangles: this.renderer.info.render.triangles,
+      points: this.renderer.info.render.points,
+      lines: this.renderer.info.render.lines,
+      jsHeapUsedMb: heap ? Math.round(heap.usedJSHeapSize / 1024 / 1024) : null,
+      jsHeapTotalMb: heap ? Math.round(heap.totalJSHeapSize / 1024 / 1024) : null,
+      jsHeapLimitMb: heap ? Math.round(heap.jsHeapSizeLimit / 1024 / 1024) : null
+    };
   }
 
   private updateCamera(routeOffsets: CameraRouteOffsets) {
@@ -1500,7 +1544,7 @@ export class BouquetScene {
       this.dragY = event.clientY;
       this.targetCameraYaw -= dx * 0.008;
       this.targetCameraPitch = THREE.MathUtils.clamp(
-        this.targetCameraPitch - dy * 0.0058,
+        this.targetCameraPitch + dy * 0.0058,
         minCameraPitch,
         maxCameraPitch
       );

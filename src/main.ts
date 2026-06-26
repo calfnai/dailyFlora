@@ -109,6 +109,8 @@ const themeCnLabel = document.querySelector<HTMLElement>('#daily-theme-cn');
 const themeEnLabel = document.querySelector<HTMLElement>('#daily-theme-en');
 const flowerPlanLabel = document.querySelector<HTMLElement>('#flower-plan-mark');
 const qualityLabel = document.querySelector<HTMLElement>('#quality-mark');
+const reviewDashboardLink = document.querySelector<HTMLAnchorElement>('#review-dashboard-link');
+const debugPanel = document.querySelector<HTMLElement>('#debug-panel');
 const pauseButton = document.querySelector<HTMLButtonElement>('#pause-button');
 const todayButton = document.querySelector<HTMLButtonElement>('#today-button');
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker');
@@ -157,6 +159,8 @@ const specialId = readSpecialId();
 const specialReference = specialId ? specialReferences[specialId] : null;
 let selectedDensity = specialReference ? 'medium' : normalizeDensity(params.density);
 const searchParams = new URLSearchParams(window.location.search);
+const debugValue = searchParams.get('debug');
+const debugMode = searchParams.has('debug') && debugValue !== '0' && debugValue !== 'false';
 let selectedRender = specialReference && !searchParams.has('render') && !searchParams.has('quality')
   ? 'high'
   : normalizeRender(params.render);
@@ -178,6 +182,7 @@ let targetYAmplitude = 0;
 let manualRotation = false;
 let manualZoom = 0;
 let specialAudio: HTMLAudioElement | null = null;
+let debugTimer = 0;
 
 function THREEClamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -230,6 +235,41 @@ function setLabels() {
     selectedRender === 'auto' ? `自/${renderLabels[quality.renderName]}` : renderLabels[quality.renderName];
   ui.qualityLabel.textContent = `${densityLabels[quality.densityName]} · ${renderLabel}`;
   document.title = `DailyFlora - ${spec.theme.name} / ${english}`;
+}
+
+function formatCount(value: number) {
+  return value >= 1000 ? value.toLocaleString('en-US') : String(value);
+}
+
+function updateDebugPanel() {
+  if (!debugMode || !debugPanel) return;
+  const stats = scene.getDebugStats();
+  const heapText = stats.jsHeapUsedMb === null
+    ? 'n/a'
+    : `${stats.jsHeapUsedMb}/${stats.jsHeapTotalMb} MB`;
+  debugPanel.innerHTML = `
+    <div class="debug-row"><span>FPS</span><strong>${stats.fps || '--'} / ${stats.targetFps}</strong></div>
+    <div class="debug-row"><span>Render</span><strong>${stats.render} · ${stats.density}</strong></div>
+    <div class="debug-row"><span>Canvas</span><strong>${stats.canvasWidth}×${stats.canvasHeight} @ ${stats.pixelRatio.toFixed(2)}</strong></div>
+    <div class="debug-row"><span>Draw</span><strong>${stats.calls} calls · ${formatCount(stats.triangles)} tris</strong></div>
+    <div class="debug-row"><span>Points/Lines</span><strong>${formatCount(stats.points)} / ${formatCount(stats.lines)}</strong></div>
+    <div class="debug-row"><span>GPU res</span><strong>${stats.geometries} geo · ${stats.textures} tex</strong></div>
+    <div class="debug-row"><span>JS heap</span><strong>${heapText}</strong></div>
+  `;
+}
+
+function setupDebugMode() {
+  document.body.classList.toggle('is-debug', debugMode);
+  if (reviewDashboardLink) {
+    reviewDashboardLink.hidden = !debugMode;
+    reviewDashboardLink.href = withBasePath('docs/aesthetic-review-dashboard.html?debug=1');
+  }
+  if (debugPanel) {
+    debugPanel.hidden = !debugMode;
+  }
+  if (!debugMode) return;
+  updateDebugPanel();
+  debugTimer = window.setInterval(updateDebugPanel, 650);
 }
 
 function syncControls() {
@@ -594,8 +634,10 @@ window.addEventListener('resize', () => {
 });
 
 window.addEventListener('beforeunload', () => scene.stop());
+window.addEventListener('beforeunload', () => window.clearInterval(debugTimer));
 
 setLabels();
+setupDebugMode();
 if (specialReference) {
   rotationSpeed = 0.024;
   cameraRouteMode = 'figure-eight';

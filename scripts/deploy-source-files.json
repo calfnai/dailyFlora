@@ -1,11 +1,13 @@
 [
   ".gitignore",
+  "CHANGELOG.md",
   "README.md",
   "data/inspiration-library.json",
   "data/aesthetic-review-dashboard.json",
   "data/xiaohongshu-creators.json",
   "docs/aesthetic-review-dashboard.html",
   "docs/aesthetic-rating-board.md",
+  "docs/codex-aesthetic-handoff.md",
   "docs/dailyflora-flower-plan-samples.html",
   "docs/primitive-lab.html",
   "docs/extended-mvp-architecture.md",
