@@ -626,6 +626,57 @@ button {
   font-size: 10px;
 }
 
+.special-mute-button {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 3;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(255 244 218 / 20%);
+  border-radius: 999px;
+  color: rgb(255 246 224 / 72%);
+  background: rgb(5 4 8 / 36%);
+  box-shadow: 0 14px 42px rgb(0 0 0 / 28%);
+  backdrop-filter: blur(18px);
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    color 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.special-mute-button:hover,
+.special-mute-button:focus-visible {
+  color: rgb(255 248 224 / 92%);
+  border-color: rgb(255 244 218 / 42%);
+  background: rgb(255 245 218 / 12%);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.special-mute-button[hidden] {
+  display: none;
+}
+
+.special-mute-button svg {
+  width: 19px;
+  height: 19px;
+  fill: currentColor;
+}
+
+.special-mute-button svg path:last-child {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 @keyframes specialQuoteIn {
   from {
     opacity: 0;
@@ -726,5 +777,10 @@ button {
   .special-credit {
     right: 14px;
     bottom: 58px;
+  }
+
+  .special-mute-button {
+    top: 14px;
+    right: 14px;
   }
 }

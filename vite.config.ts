@@ -21,6 +21,11 @@ export default defineConfig({
             indexHtml.replace('<head>', '<head>\n    <base href="../" />')
           );
         }
+        mkdirSync(resolve(__dirname, 'dist/what-did-hubble-see-on-your-birthday'), { recursive: true });
+        copyFileSync(
+          resolve(__dirname, 'docs/what-did-hubble-see-on-your-birthday/index.html'),
+          resolve(__dirname, 'dist/what-did-hubble-see-on-your-birthday/index.html')
+        );
       }
     }
   ],

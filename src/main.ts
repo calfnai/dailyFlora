@@ -182,6 +182,7 @@ let targetYAmplitude = 0;
 let manualRotation = false;
 let manualZoom = 0;
 let specialAudio: HTMLAudioElement | null = null;
+let specialAudioMuted = false;
 let debugTimer = 0;
 
 function THREEClamp(value: number, min: number, max: number) {
@@ -468,13 +469,34 @@ function createSpecialOverlay() {
   credit.className = 'special-credit';
   credit.textContent = 'Image source: NASA / ESA / Hubble';
 
-  document.body.append(overlay, caption, quote, credit);
+  const muteButton = document.createElement('button');
+  muteButton.className = 'special-mute-button';
+  muteButton.type = 'button';
+  muteButton.hidden = true;
+  const syncMuteButton = () => {
+    muteButton.classList.toggle('is-muted', specialAudioMuted);
+    muteButton.setAttribute('aria-pressed', String(specialAudioMuted));
+    muteButton.setAttribute('aria-label', specialAudioMuted ? 'Unmute audio' : 'Mute audio');
+    muteButton.title = specialAudioMuted ? 'Unmute audio' : 'Mute audio';
+    muteButton.innerHTML = specialAudioMuted
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" /><path d="M17 9l4 4m0-4l-4 4" /></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" /><path d="M17 9.5a4 4 0 0 1 0 5M19.5 7a7.5 7.5 0 0 1 0 10" /></svg>';
+  };
+  syncMuteButton();
+  muteButton.addEventListener('click', () => {
+    specialAudioMuted = !specialAudioMuted;
+    if (specialAudio) specialAudio.muted = specialAudioMuted;
+    syncMuteButton();
+  });
+
+  document.body.append(overlay, caption, quote, credit, muteButton);
 
   try {
     specialAudio = new Audio(withBasePath(specialReference.audioPath));
     specialAudio.loop = true;
     specialAudio.preload = 'auto';
     specialAudio.volume = 0.42;
+    specialAudio.muted = false;
   } catch {
     specialAudio = null;
   }
@@ -483,8 +505,10 @@ function createSpecialOverlay() {
     overlay.classList.add('is-dismissed');
     try {
       await specialAudio?.play();
+      muteButton.hidden = !specialAudio;
     } catch {
       specialAudio = null;
+      muteButton.hidden = true;
     }
     window.setTimeout(() => overlay.remove(), 900);
   });

@@ -179,7 +179,7 @@ const plans: FlowerPlan[] = [
     enName: 'Real Spring Bouquet Memory v4',
     reference: 'private-special: ref-01/ref-02/ref-03 real bouquet photos, especially ref-02 front view',
     silhouette: '透明包装托住右下方手捧核心，粉白主体很满；左侧有红黄嘉兰长线外伸，上方满天星和绿枝轻散，整体是右下到左上的非对称扇形。',
-    avoid: '避免把白色波斯菊做成密瓣菊花团；避免削弱黄色、蓝色、粉色和红黄嘉兰；避免花束变稀或变成抽象星点。',
+    avoid: '避免白色/黄色开面花在同一区域堆成一片；单朵可以有细密花瓣，但整体要让不同花型和颜色互相穿插。',
     items: normalizeShares([
       { typeId: 'chamomile', cn: '白色波斯菊开面花', en: 'white cosmos open faces', role: 'main', share: 0.24, scale: 1.08, placement: 'mixed', note: '照片里最醒目的白色薄瓣黄心花，要少瓣、开面、分散。' },
       { typeId: 'chamomile', cn: '黄色春日小雏菊', en: 'yellow spring daisy accents', role: 'filler', share: 0.1, scale: 0.9, placement: 'mixed', note: '黄色跳点很多，但尺寸要小，不能主导成菊花墙。' },

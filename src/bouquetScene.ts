@@ -484,6 +484,7 @@ function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimit
   }
 
   if (planId === 'her-real-bouquet-memory-v4') {
+    if (item.typeId === 'chamomile' && item.cn.includes('黄色')) return 'DiskFlower';
     if (item.typeId === 'chamomile') return 'CosmosOpenFlower';
     if (item.typeId === 'camelliaPeony') return 'RuffledRoseFlower';
     if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
