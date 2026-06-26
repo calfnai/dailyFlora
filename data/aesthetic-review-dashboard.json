@@ -3,10 +3,10 @@
   "gate": {
     "status": "pass",
     "title": "花库验收达到及格线",
-    "summary": "用户已确认 Primitive Gate / 花库验收达到及格线。0.13 已将审美理解、流程、skill 和记忆写进项目；15 类花材/叶材形态允许作为下一阶段 composition、palette、camera 改造的基础，但后续主视觉修改仍必须同步更新本 dashboard。",
+    "summary": "用户已确认 Primitive Gate / 花库验收达到及格线。0.13 已将审美理解、流程、skill 和记忆写进项目；本轮根据山岗小花/热带丛林经验把 CosmosOpenFlower 补登记为第 16 类目标形态。16 类花材/叶材形态允许作为下一阶段 composition、palette、camera 改造的基础，但后续主视觉修改仍必须同步更新本 dashboard。",
     "rules": [
       "先复盘参考图，不直接改主花束视觉。",
-      "Primitive Lab 已按 15 类主流花材/叶材形态达到用户验收及格线。",
+      "Primitive Lab 已按 16 类主流花材/叶材形态达到用户验收及格线。",
       "旧 7 类只作为兼容别名和历史粗分类，不再代表完整覆盖。",
       "后续可以进入整束 composition 改造准备，但任何主视觉修改必须同步更新本 dashboard 的状态和下一步任务。"
     ],
@@ -50,7 +50,7 @@
     {
       "id": "art-director",
       "name": "美术指导",
-      "brief": "拆解色彩、轮廓、花材层级、空气感、前后关系。"
+      "brief": "拆解色彩、轮廓、花材层级、花叶朝向、空气感、前后关系和叶材合理性。"
     },
     {
       "id": "project-director",
@@ -59,8 +59,13 @@
     },
     {
       "id": "cto",
-      "name": "CTO",
-      "brief": "判断现有 Three.js 结构能否实现，不够就列出需要新增的可控参数或组件。"
+      "name": "生成架构审查",
+      "brief": "判断 Three.js 生成结构、参数暴露、比例控制、实例化性能和调试数据是否足够支撑审美目标；不替代美术判断。"
+    },
+    {
+      "id": "shape-curator",
+      "name": "花材库管理员",
+      "brief": "检查 flowerPlan、renderer、Primitive Lab 和 TARGET SHAPE VOCABULARY 是否一致；代码里用到的花型必须登记，参考图里反复出现的形态不能遗漏。"
     }
   ],
   "reusableAestheticRules": [
@@ -91,6 +96,12 @@
       "name": "盘状花",
       "examples": "雏菊、洋甘菊、非洲菊、太阳花感、银莲花/波斯菊感",
       "whyNeeded": "承担清楚的脸盘识别和明亮停顿。"
+    },
+    {
+      "id": "cosmos-open-face",
+      "name": "波斯菊/小面花型",
+      "examples": "波斯菊、山岗小花里的薄瓣小面花、热带丛林里的轻薄小花、真实春日花束里的白色开面花",
+      "whyNeeded": "它比盘状花更轻薄、更少瓣、更像小花矩阵的呼吸点；山岗小花和热带丛林好看的部分不能继续藏在 chamomile/disk 下面。"
     },
     {
       "id": "layered-dahlia-form",
@@ -187,6 +198,16 @@
       "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
     },
     {
+      "primitive": "CosmosOpenFlower",
+      "humanName": "波斯菊/小面花型",
+      "status": "pass",
+      "acceptance": "隐藏标签后应读成轻薄、少瓣、黄心的小面花，而不是厚重盘状花或大雏菊。",
+      "ownerStatus": "新增登记",
+      "ownerFeedback": "用户指出热带丛林和山岗小花里有一种未进入 TARGET SHAPE VOCABULARY 的花型，必须登记以便下次继续使用。",
+      "nextTask": "已正式补入 16 类目标形态词表；下一步在 tropical-forest / hillside-wild / dewberry 这类小花矩阵中继续使用。",
+      "ownerAcceptance": "用户确认应登记；单体沿用当前 CosmosOpenFlower，比例和 composition 后续由用户继续验收。"
+    },
+    {
       "primitive": "LayeredDahliaFlower",
       "humanName": "层叠大丽花/团瓣型",
       "status": "pass",
@@ -261,9 +282,9 @@
       "humanName": "马蹄莲/卷曲苞片型",
       "status": "pass",
       "acceptance": "隐藏标签后应读成马蹄莲、卷曲苞片或单片包裹的曲线雕塑花。",
-      "ownerStatus": "9 越来越接近，但卷曲未闭合",
-      "ownerFeedback": "外圈卷曲部分继续沿现在的角度拉长并继续卷曲。",
-      "nextTask": "已拉长外圈卷曲并增强闭合趋势，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerStatus": "单看可用，整束比例偏大",
+      "ownerFeedback": "马蹄莲/卷曲苞片型单看没问题，但放在一起会稍微比其他花大一点。",
+      "nextTask": "已只在整束 composition 渲染里下调尺度，保留 Primitive Lab 单体形态；下一轮看整束比例是否自然。",
       "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
     },
     {
@@ -281,9 +302,9 @@
       "humanName": "伞状/小簇型",
       "status": "pass",
       "acceptance": "隐藏标签后应读成蕾丝花、伞形小花或白色填充小簇。",
-      "ownerStatus": "11 单面观察性仍在",
-      "ownerFeedback": "需要调整小花面向角度，让它 360 看起来都正常。",
-      "nextTask": "已增加小花花心并调整花瓣面向角度，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerStatus": "下半部分绿色假茎过重",
+      "ownerFeedback": "伞状/小簇型在远处或高处出现时，下半部分绿色假茎形成上宽下窄倒三角，应去掉、缩短或低透明度处理。",
+      "nextTask": "已把绿色假茎改成花头附近短梗，并降低透明度；下一轮看远处和高处是否自然。",
       "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
     },
     {
@@ -299,9 +320,9 @@
       "humanName": "果材/荚果型",
       "status": "pass",
       "acceptance": "隐藏标签后应读成蓝莓感浆果、小圆果、荚果或枝端果粒。",
-      "ownerStatus": "13 球太大，密度不够",
-      "ownerFeedback": "果粒尺寸需要变小，整体密度要上来。",
-      "nextTask": "已缩小果粒并增加枝端数量和密度，已达到花库及格线；下一步用于 composition 改造验证。",
+      "ownerStatus": "同类结构风险较轻",
+      "ownerFeedback": "果材/荚果型也有支撑结构问题的风险，但目前不如伞状/小簇型严重，可能与配色和数量有关。",
+      "nextTask": "暂不重做；继续观察主花束中果材数量、颜色和枝条归属是否自然。",
       "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
     },
     {
@@ -377,7 +398,8 @@
         "creativeDirector": "方向符合 DailyFlora：当代、鲜活、有春意，不走欧美婚礼或粗糙市场束。但它必须被用户验收，不能由 Codex 自宣通过。",
         "artDirector": "采用白黄小花矩阵、低位冷色小簇、莓红果点、少量杯形停顿和外开绿线，目标是湿润、轻盈、可呼吸。",
         "projectDirector": "允许作为原创候选加入项目；状态应保持 needs-owner-review，用户未确认前不把它当成新标准。",
-        "cto": "现有 Three.js primitive 足够实现第一版，不新增花库类型；主要通过 flowerPlan、theme palette 和 primitivePalette 专属映射完成。"
+        "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
+        "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
     },
     {
@@ -428,7 +450,8 @@
         "creativeDirector": "方向符合 DailyFlora，重点是明亮、多色、轻快，但不能滑向艳俗堆色。",
         "artDirector": "需要橙、蓝、白、绿各自承担材料角色，而不是只做 palette。",
         "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
-        "cto": "需要把 primitive factories 接入 high render，或先做 composition lab 验证混合摆放。"
+        "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
+        "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
     },
     {
@@ -478,7 +501,8 @@
         "creativeDirector": "方向可用，但紫色必须轻；闷块是主要风险。",
         "artDirector": "蓝紫主体必须被白点、枝线和局部浅色打散。",
         "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
-        "cto": "需要可控的空气点线密度、外逸高度和穗线摆放参数。"
+        "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
+        "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
     },
     {
@@ -527,7 +551,8 @@
         "creativeDirector": "方向可用，关键是季节性而非泛白黄配色。",
         "artDirector": "开口花、长叶、细枝必须同时出现，且主次清楚。",
         "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
-        "cto": "现有 primitive 缺少专门的 trumpet 参数，可先用 OpenSculptureFlower 扩展。"
+        "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
+        "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
     },
     {
@@ -577,7 +602,8 @@
         "creativeDirector": "方向符合项目气质，但不能只是留白模板。",
         "artDirector": "绿色、黄花、蓝点、细枝必须形成前中后空间。",
         "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
-        "cto": "可能需要新增 foliage primitive，现有 buildLeaves 太单一。"
+        "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
+        "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
     },
     {
@@ -615,7 +641,8 @@
         "SpikeFlower",
         "ClusterFlower",
         "AirFiller",
-        "DiskFlower"
+        "DiskFlower",
+        "CosmosOpenFlower"
       ],
       "currentImplementation": "SpikeFlower 已有底密顶疏尝试，但整束高低构图还未建立门禁。",
       "failureReason": "花库单体已达到用户验收及格线；本组尚未通过的是整束 composition 还没有验证，仍要检查花材比例、层级、空气感、叶材位置和相机呈现。",
@@ -627,7 +654,8 @@
         "creativeDirector": "方向可用，强识别但不能压迫。",
         "artDirector": "竖线、底部、小花停顿三者都必须出现。",
         "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
-        "cto": "需要高位 placement 和底部 support placement 的独立控制。"
+        "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
+        "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
     },
     {
@@ -665,6 +693,7 @@
         "BerryCluster",
         "ClusterFlower",
         "DiskFlower",
+        "CosmosOpenFlower",
         "AirFiller"
       ],
       "currentImplementation": "BerryCluster 已有枝端果粒结构，但主花束仍未使用该 primitive。",
@@ -677,7 +706,8 @@
         "creativeDirector": "方向高度符合可爱、轻、当代小红书语境。",
         "artDirector": "果点必须有枝条归属，小花负责童话感，不能端庄化。",
         "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
-        "cto": "需要将 BerryCluster 从 lab 组件接到 high render，并限制大主花概率。"
+        "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
+        "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
     },
     {
@@ -727,7 +757,8 @@
         "creativeDirector": "方向可用，温暖甜感明确。",
         "artDirector": "饱满必须由层叠形态支撑，不能只靠高密度。",
         "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
-        "cto": "需要在 high render 中支持层叠 primitive 的实例化和尺度上限。"
+        "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
+        "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
     },
     {
@@ -775,7 +806,8 @@
         "creativeDirector": "这些不是 DailyFlora 目标审美，只能作为边界。",
         "artDirector": "可借用真实体量和枝条，但不能继承粗糙、失衡和单调。",
         "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
-        "cto": "需要在生成侧限制 focal bloom 尺寸、中心权重和过高外逸比例。"
+        "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
+        "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
     }
   ]

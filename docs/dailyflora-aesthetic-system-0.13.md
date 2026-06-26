@@ -61,23 +61,26 @@ DailyFlora 的目标不是通用“好看的花”，而是有中国当代花艺
 
 ## 花库记忆
 
-Primitive Lab 的旧 7 类只是历史粗分类，不足以覆盖主流花束形态。0.13 继承 15 类花库，用户已确认达到及格线：
+Primitive Lab 的旧 7 类只是历史粗分类，不足以覆盖主流花束形态。0.13 继承 16 类花库，用户已确认达到及格线：
 
 1. 盘状花 / `disk-face-flower`
-2. 层叠大丽花/团瓣型 / `layered-dahlia-form`
-3. 褶皱玫瑰型 / `ruffled-rose-form`
-4. 星形/风车型 / `star-pinwheel-form`
-5. 郁金香/杯型 / `tulip-cup-form`
-6. 洋水仙管心型 / `trumpet-throat-form`
-7. 大喇叭型 / `datura-trumpet-form`
-8. 兰花/蝴蝶型 / `orchid-butterfly-form`
-9. 马蹄莲/卷曲苞片型 / `calla-curled-bract`
-10. 穗状花 / `spike-vertical-form`
-11. 伞状/小簇型 / `umbel-mini-cluster`
-12. 绣球/云团型 / `hydrangea-cloud-cluster`
-13. 果材/荚果型 / `fruit-pod-form`
-14. 吊坠风铃果型 / `hanging-bell-fruit`
-15. 叶材/草线/枝条型 / `foliage-grass-branch`
+2. 波斯菊/小面花型 / `cosmos-open-face`
+3. 层叠大丽花/团瓣型 / `layered-dahlia-form`
+4. 褶皱玫瑰型 / `ruffled-rose-form`
+5. 星形/风车型 / `star-pinwheel-form`
+6. 郁金香/杯型 / `tulip-cup-form`
+7. 洋水仙管心型 / `trumpet-throat-form`
+8. 大喇叭型 / `datura-trumpet-form`
+9. 兰花/蝴蝶型 / `orchid-butterfly-form`
+10. 马蹄莲/卷曲苞片型 / `calla-curled-bract`
+11. 穗状花 / `spike-vertical-form`
+12. 伞状/小簇型 / `umbel-mini-cluster`
+13. 绣球/云团型 / `hydrangea-cloud-cluster`
+14. 果材/荚果型 / `fruit-pod-form`
+15. 吊坠风铃果型 / `hanging-bell-fruit`
+16. 叶材/草线/枝条型 / `foliage-grass-branch`
+
+新增 `cosmos-open-face` 是因为用户指出山岗小花和热带丛林里有一种好看的小面花并未进入 TARGET SHAPE VOCABULARY。它比盘状花更轻薄、更少瓣、更适合承担小花矩阵和呼吸点，不能继续藏在 `chamomile` 或 `DiskFlower` 下面。
 
 “达到及格线”不是最终完美，只表示可以进入整束 composition 验证。后续如果某一类在主花束里暴露新问题，要回到 Primitive Lab 或 dashboard 记录，而不是在整束里偷偷糊过去。
 
@@ -129,12 +132,13 @@ DailyFlora 可以使用高饱和色，但不能让画面变成厚重油画。
 
 ## 角色分工
 
-四个页面角色继续保留，但它们不是人格表演：
+审查角色不是人格表演，也不是固定不能变的组织架构。它们是为了把问题拆清楚：
 
 - 创意总监：判断整体方向是否跑偏，守住 DailyFlora 的语境。
 - 美术指导：拆色彩、轮廓、花材层级、空气感、前后关系、叶材合理性。
 - 项目主任：判断当前阶段是否允许进入下一层，避免绕过门禁。
-- CTO：判断 Three.js 结构是否能实现，需要新增什么参数或组件。
+- 生成架构审查：判断 Three.js 生成结构、参数暴露、比例控制、实例化性能和调试数据是否足够支撑审美目标；它不替代美术判断。
+- 花材库管理员：检查 flowerPlan、renderer、Primitive Lab 和 TARGET SHAPE VOCABULARY 是否一致；代码里用到的花型必须登记，参考图里反复出现的形态不能遗漏。
 
 另有一个显式门禁：用户是当前审美验收人。任务不重时，验收就是用户本人。
 

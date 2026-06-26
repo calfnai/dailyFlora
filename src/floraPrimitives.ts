@@ -696,7 +696,9 @@ export function createUmbelMiniCluster(options: FloraPrimitiveOptions) {
     const phi = rng.range(0.18, 1.22);
     const radius = rng.range(0.34, 0.62);
     const tip = new THREE.Vector3(Math.cos(theta) * Math.sin(phi) * radius, Math.cos(phi) * 0.42 + 0.24, Math.sin(theta) * Math.sin(phi) * radius);
-    linePositions.push(0, -0.34, 0, tip.x, tip.y, tip.z);
+    const stemBase = tip.clone().multiplyScalar(rng.range(0.24, 0.42));
+    stemBase.y = Math.max(-0.02, tip.y - rng.range(0.1, 0.18));
+    linePositions.push(stemBase.x, stemBase.y, stemBase.z, tip.x, tip.y, tip.z);
     lineColors.push(stemColor.r, stemColor.g, stemColor.b, stemColor.r, stemColor.g, stemColor.b);
     setInstance(
       cores,
@@ -725,7 +727,7 @@ export function createUmbelMiniCluster(options: FloraPrimitiveOptions) {
   const lineGeometry = new THREE.BufferGeometry();
   lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
   lineGeometry.setAttribute('color', new THREE.Float32BufferAttribute(lineColors, 3));
-  group.add(new THREE.LineSegments(lineGeometry, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.62 })), flowers, cores);
+  group.add(new THREE.LineSegments(lineGeometry, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.24 })), flowers, cores);
   return applyRoot(group, options);
 }
 

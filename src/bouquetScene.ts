@@ -535,6 +535,7 @@ function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimit
   }
 
   if (item.typeId === 'chamomile') {
+    if (['berry-grove', 'foxtail-lily-vertical', 'fairy-violet-air'].includes(planId)) return 'CosmosOpenFlower';
     return planId === 'summer-pinwheel-detail' && item.role === 'filler' ? 'StarPinwheelFlower' : 'DiskFlower';
   }
 
@@ -562,6 +563,11 @@ function primitiveRoleForPlanItem(item: FlowerPlanItem): FloraPrimitiveRole {
   if (item.role === 'fruit') return 'fruit';
   if (item.role === 'filler') return 'filler';
   return 'secondary';
+}
+
+function compositionScaleForPrimitive(primitive: FloraPrimitiveName) {
+  if (primitive === 'CallaCurledBract') return 0.82;
+  return 1;
 }
 
 function spikeLeanRange(placement: FlowerPlanItem['placement']): [number, number] {
@@ -707,7 +713,7 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
       const primitiveGroup = factory({
         seed: `${spec.seed}:bouquet-primitive:${primitive}:${batch.typeId}:${i}`,
         position: p,
-        scale: roleScale * batch.scale * localRng.range(0.82, 1.22) * specialScale,
+        scale: roleScale * batch.scale * compositionScaleForPrimitive(primitive) * localRng.range(0.82, 1.22) * specialScale,
         colorPalette: primitivePalette(spec, primitive, localRng, batch),
         openness: ['OrchidButterflyFlower', 'TrumpetThroatFlower', 'DaturaTrumpetFlower', 'CallaCurledBract'].includes(primitive) ? 0.94 : localRng.range(0.62, 0.86),
         density: ['UmbelMiniCluster', 'FullHydrangeaCloud', 'FruitPodCluster'].includes(primitive) ? 1.08 : localRng.range(0.86, 1.02),

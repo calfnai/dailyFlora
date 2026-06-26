@@ -1,5 +1,16 @@
 # DailyFlora Changelog
 
+## 0.13.1 - 2026-06-26
+
+Review role and primitive vocabulary correction.
+
+- Replaced the loose `CTO` review role with `生成架构审查`, focused on controllable Three.js structure, scale, placement, orientation, performance, and debug data.
+- Added `花材库管理员` as a dashboard review role so reusable shapes used in flower plans or renderers must be registered in the Target Shape Vocabulary.
+- Registered `CosmosOpenFlower / 波斯菊/小面花型` as the 16th target shape after the user identified the untracked small open-face flower in `山岗小花` and `热带丛林`.
+- Reduced `CallaCurledBract` scale inside full bouquet composition while keeping the accepted single primitive intact.
+- Shortened and faded the lower green fake stems on `UmbelMiniCluster` so distant/high placements no longer read as an unnatural inverted triangle.
+- Recorded the related `FruitPodCluster` structural risk as lighter and currently observation-only.
+
 ## 0.13.0 - 2026-06-26
 
 Aesthetic operating-system release.
