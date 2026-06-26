@@ -381,6 +381,32 @@
           grid-template-columns: 1fr;
         }
       }
+
+      .debug-lock {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .debug-lock-card {
+        max-width: 520px;
+        padding: 24px;
+        border: 1px solid rgb(255 255 255 / 12%);
+        border-radius: 12px;
+        background: rgb(255 255 255 / 6%);
+      }
+
+      .debug-lock-card h1 {
+        margin: 0 0 10px;
+        font-size: 24px;
+      }
+
+      .debug-lock-card p {
+        margin: 0 0 16px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
     </style>
   </head>
   <body>
@@ -475,6 +501,22 @@
     <script type="module">
       import * as THREE from 'three';
       import { floraPrimitiveFactories } from '../src/floraPrimitives.ts';
+
+      const dashboardDebugValue = new URLSearchParams(window.location.search).get('debug');
+      const dashboardDebugMode = new URLSearchParams(window.location.search).has('debug') && dashboardDebugValue !== '0' && dashboardDebugValue !== 'false';
+      if (!dashboardDebugMode) {
+        document.body.innerHTML = `
+          <main class="debug-lock">
+            <section class="debug-lock-card">
+              <p class="eyebrow">DailyFlora debug gate</p>
+              <h1>审美复盘只在 debug 版开放</h1>
+              <p>在主页面 URL 加上 <code>?debug=1</code> 后，从右下角的“审美审核”按钮进入。普通观赏模式不显示这页入口。</p>
+              <a class="pill" href="../?debug=1">打开 debug 版</a>
+            </section>
+          </main>
+        `;
+        throw new Error('Aesthetic review dashboard requires debug mode.');
+      }
 
       const statusText = {
         blocked: 'blocked',
