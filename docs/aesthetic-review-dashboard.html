@@ -188,11 +188,16 @@
 
       .role-grid,
       .rules-grid,
+      .library-grid,
       .shape-grid,
       .primitive-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 12px;
+      }
+
+      .library-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
       .rules-grid {
@@ -209,6 +214,30 @@
 
       .panel {
         padding: 14px;
+      }
+
+      .library-card {
+        display: grid;
+        gap: 10px;
+        min-height: 156px;
+        padding: 16px;
+        text-decoration: none;
+      }
+
+      .library-card strong {
+        font-size: 20px;
+      }
+
+      .library-card span {
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .library-card em {
+        color: var(--warn);
+        font-style: normal;
+        font-size: 13px;
+        font-weight: 800;
       }
 
       .panel h3 {
@@ -349,6 +378,7 @@
         .group-grid,
         .split,
         .rules-grid,
+        .library-grid,
         .shape-grid,
         .role-review {
           grid-template-columns: 1fr;
@@ -377,6 +407,7 @@
 
         .role-grid,
         .primitive-grid,
+        .library-grid,
         .thumb-strip {
           grid-template-columns: 1fr;
         }
@@ -408,6 +439,8 @@
         line-height: 1.7;
       }
     </style>
+    <script type="module" crossorigin src="../assets/aestheticReviewDashboard-CMpHhBVm.js"></script>
+    <link rel="modulepreload" crossorigin href="../assets/floraPrimitives-xXqEQ7N8.js">
   </head>
   <body>
     <main class="shell">
@@ -420,6 +453,33 @@
           </p>
         </div>
         <aside class="gate-card" id="gate-card"></aside>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Review library</p>
+            <h2>审美资料入口</h2>
+            <p class="section-copy">这里固定保留三类可检查材料：你给过的参考图片、已经及格的花库模型、以及可直接打开的花束样例。</p>
+          </div>
+        </div>
+        <div class="library-grid">
+          <a class="panel library-card" href="./dailyflora-reference-gallery.html">
+            <em>参考图片页</em>
+            <strong>审美图片库</strong>
+            <span>查看夏日风车、梦幻紫、洋水仙、会呼吸的风景、狐尾百合、浆果森林、秋日果汁和反向样本。</span>
+          </a>
+          <a class="panel library-card" href="./primitive-lab.html">
+            <em>花库罗列</em>
+            <strong>Primitive Lab</strong>
+            <span>逐个查看已达到及格线的花材/叶材 primitive，包含隐藏标签、隔离观察和模型状态。</span>
+          </a>
+          <a class="panel library-card" href="./dailyflora-flower-plan-samples.html">
+            <em>花束库</em>
+            <strong>固定花束样例</strong>
+            <span>打开已固定的高精度花束样例，包括晨露莓园空气束，用来判断 composition 是否继续沿正确方向走。</span>
+          </a>
+        </div>
       </section>
 
       <section class="section">
@@ -449,7 +509,7 @@
           <div>
             <p class="kicker">Target shape vocabulary</p>
             <h2>15 类目标形态词表</h2>
-            <p class="section-copy">这 15 类已经进入 Primitive Lab，当前等待用户逐类验收。旧 7 类只保留为历史粗分类和兼容别名。</p>
+            <p class="section-copy">这 15 类已经进入 Primitive Lab，并已达到用户确认的花库及格线。旧 7 类只保留为历史粗分类和兼容别名。</p>
           </div>
         </div>
         <div class="shape-grid" id="shape-grid"></div>
@@ -460,7 +520,7 @@
           <div>
             <p class="kicker">Primitive gate</p>
             <h2>花库验收</h2>
-            <p class="section-copy">隐藏标签后，单个形态应能被用户判断为对应的花材/叶材类型。当前不是通过状态，而是等待用户验收。</p>
+            <p class="section-copy">隐藏标签后，单个形态应能被用户判断为对应的花材/叶材类型。当前结论是花库验收达到及格线，可以作为下一阶段整束 composition 的基础。</p>
           </div>
           <a class="pill" href="./primitive-lab.html">打开 Primitive Lab</a>
         </div>
@@ -485,11 +545,15 @@
       {
         "updatedAt": "2026-06-25",
         "gate": {
-          "status": "blocked",
-          "title": "15 primitive shapes are implemented for owner review",
-          "summary": "Primitive Lab 已扩展到 15 类，等待用户逐类验收。",
-          "rules": ["先复盘参考图，不直接改主花束视觉。"],
-          "links": [{"label": "Primitive Lab", "href": "./primitive-lab.html"}]
+          "status": "pass",
+          "title": "花库验收达到及格线",
+          "summary": "Primitive Lab 已扩展到 15 类，并已达到用户确认的花库及格线。",
+          "rules": ["先复盘参考图，不直接改主花束视觉。", "后续主视觉修改必须同步更新 dashboard。"],
+          "links": [
+            {"label": "参考图库", "href": "./dailyflora-reference-gallery.html"},
+            {"label": "Primitive Lab", "href": "./primitive-lab.html"},
+            {"label": "花束库", "href": "./dailyflora-flower-plan-samples.html"}
+          ]
         },
         "roles": [],
         "primitiveGate": [],
@@ -497,410 +561,6 @@
         "targetShapeVocabulary": [],
         "reviewGroups": []
       }
-    </script>
-    <script type="module">
-      import * as THREE from 'three';
-      import { floraPrimitiveFactories } from '../src/floraPrimitives.ts';
-
-      const dashboardDebugValue = new URLSearchParams(window.location.search).get('debug');
-      const dashboardDebugMode = new URLSearchParams(window.location.search).has('debug') && dashboardDebugValue !== '0' && dashboardDebugValue !== 'false';
-      if (!dashboardDebugMode) {
-        document.body.innerHTML = `
-          <main class="debug-lock">
-            <section class="debug-lock-card">
-              <p class="eyebrow">DailyFlora debug gate</p>
-              <h1>审美复盘只在 debug 版开放</h1>
-              <p>在主页面 URL 加上 <code>?debug=1</code> 后，从右下角的“审美审核”按钮进入。普通观赏模式不显示这页入口。</p>
-              <a class="pill" href="../?debug=1">打开 debug 版</a>
-            </section>
-          </main>
-        `;
-        throw new Error('Aesthetic review dashboard requires debug mode.');
-      }
-
-      const statusText = {
-        blocked: 'blocked',
-        'needs-work': 'needs-work',
-        pass: 'pass'
-      };
-
-      const roleLabels = {
-        creativeDirector: '创意总监',
-        artDirector: '美术指导',
-        projectDirector: '项目主任',
-        cto: 'CTO'
-      };
-
-      const primitiveNames = {
-        DiskFlower: '盘状花',
-        LayeredDahliaFlower: '层叠大丽花/团瓣型',
-        RuffledRoseFlower: '褶皱玫瑰型',
-        StarPinwheelFlower: '星形/风车型',
-        TulipCupFlower: '郁金香/杯型',
-        TrumpetThroatFlower: '洋水仙管心型',
-        DaturaTrumpetFlower: '大喇叭型',
-        OrchidButterflyFlower: '兰花/蝴蝶型',
-        CallaCurledBract: '马蹄莲/卷曲苞片型',
-        UmbelMiniCluster: '伞状/小簇型',
-        FullHydrangeaCloud: '绣球/云团型',
-        FruitPodCluster: '果材/荚果型',
-        HangingBellFruit: '吊坠风铃果型',
-        FoliageGrassBranch: '叶材/草线/枝条型',
-        LayeredRoundFlower: '层叠圆花',
-        SpikeFlower: '穗状花',
-        OpenSculptureFlower: '开口雕塑花',
-        ClusterFlower: '簇花',
-        BerryCluster: '果材',
-        AirFiller: '空气填充'
-      };
-
-      const targetPrimitiveByShapeId = {
-        'disk-face-flower': 'DiskFlower',
-        'layered-dahlia-form': 'LayeredDahliaFlower',
-        'ruffled-rose-form': 'RuffledRoseFlower',
-        'star-pinwheel-form': 'StarPinwheelFlower',
-        'tulip-cup-form': 'TulipCupFlower',
-        'trumpet-throat-form': 'TrumpetThroatFlower',
-        'datura-trumpet-form': 'DaturaTrumpetFlower',
-        'orchid-butterfly-form': 'OrchidButterflyFlower',
-        'calla-curled-bract': 'CallaCurledBract',
-        'spike-vertical-form': 'SpikeFlower',
-        'umbel-mini-cluster': 'UmbelMiniCluster',
-        'hydrangea-cloud-cluster': 'FullHydrangeaCloud',
-        'fruit-pod-form': 'FruitPodCluster',
-        'hanging-bell-fruit': 'HangingBellFruit',
-        'foliage-grass-branch': 'FoliageGrassBranch'
-      };
-
-      const previewPalettes = {
-        DiskFlower: ['#fff8e7', '#f7edd2', '#f0c83a', '#7f8e3e'],
-        LayeredDahliaFlower: ['#f8c9d8', '#fff1f5', '#e7a7bb', '#86a762'],
-        RuffledRoseFlower: ['#f8b9cf', '#fff3f6', '#e77da0', '#9bb36b'],
-        StarPinwheelFlower: ['#ff8b32', '#ffd15a', '#e9565d', '#7aa65a'],
-        TulipCupFlower: ['#ffbf5a', '#fff0c2', '#f58aa2', '#5d8a55'],
-        TrumpetThroatFlower: ['#fff9e8', '#ffffff', '#ffc847', '#f08b36'],
-        DaturaTrumpetFlower: ['#ffffff', '#f2e3ff', '#8a5ab8', '#58783f'],
-        OrchidButterflyFlower: ['#f8c8eb', '#fff6fb', '#e078b8', '#cc8b4f'],
-        CallaCurledBract: ['#fff7df', '#f6e8b5', '#f2b84c', '#6c8b57'],
-        SpikeFlower: ['#8bb8ff', '#b699ff', '#d9d1ff', '#59775c'],
-        UmbelMiniCluster: ['#ffffff', '#fff6d8', '#e8f5ff', '#89a86a'],
-        FullHydrangeaCloud: ['#c9eea8', '#e9ffd4', '#a9d981', '#f3ffe6'],
-        FruitPodCluster: ['#4566d9', '#273f91', '#bbd1ff', '#5f7a51'],
-        HangingBellFruit: ['#ff9f26', '#ffd45d', '#78a55a', '#f7be45'],
-        FoliageGrassBranch: ['#5f8f62', '#86b86f', '#c6d88a', '#2f573b']
-      };
-
-      const previewScenes = [];
-
-      function escapeHtml(value) {
-        return String(value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      }
-
-      function list(items) {
-        return `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
-      }
-
-      function statusBadge(status) {
-        return `<span class="status ${escapeHtml(status)}">${escapeHtml(statusText[status] || status)}</span>`;
-      }
-
-      async function loadData() {
-        try {
-          const response = await fetch('../data/aesthetic-review-dashboard.json', { cache: 'no-store' });
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          return response.json();
-        } catch {
-          const fallback = document.querySelector('#fallback-data');
-          return JSON.parse(fallback.textContent);
-        }
-      }
-
-      function renderGate(data) {
-        const gate = data.gate;
-        document.querySelector('#gate-card').innerHTML = `
-          <div>${statusBadge(gate.status)}</div>
-          <div>
-            <h2>${escapeHtml(gate.title)}</h2>
-            <p class="section-copy">${escapeHtml(gate.summary)}</p>
-          </div>
-          ${list(gate.rules)}
-          <div class="link-row">
-            ${gate.links.map((link) => `<a class="pill" href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`).join('')}
-          </div>
-        `;
-      }
-
-      function renderRoles(data) {
-        document.querySelector('#role-grid').innerHTML = data.roles
-          .map(
-            (role) => `
-              <article class="panel">
-                <h3>${escapeHtml(role.name)}</h3>
-                <p>${escapeHtml(role.brief)}</p>
-              </article>
-            `
-          )
-          .join('');
-      }
-
-      function renderPrimitiveGate(data) {
-        document.querySelector('#primitive-grid').innerHTML = data.primitiveGate
-          .map(
-            (item) => {
-              const ownerStatus = item.ownerStatus
-                ? `<p><strong>用户判定：</strong>${escapeHtml(item.ownerStatus)}</p>`
-                : '';
-              const ownerFeedback = item.ownerFeedback
-                ? `<p><strong>反馈口径：</strong>${escapeHtml(item.ownerFeedback)}</p>`
-                : '';
-              const ownerAcceptance = item.ownerAcceptance
-                ? `<p><strong>验收结论：</strong>${escapeHtml(item.ownerAcceptance)}</p>`
-                : '';
-              return `
-                <article class="panel">
-                  <div>${statusBadge(item.status)}</div>
-                  <h3>${escapeHtml(item.humanName)}</h3>
-                  <p class="en">${escapeHtml(item.primitive)}</p>
-                  <p>${escapeHtml(item.acceptance)}</p>
-                  ${ownerStatus}
-                  ${ownerFeedback}
-                  ${ownerAcceptance}
-                  <p><strong>下一步：</strong>${escapeHtml(item.nextTask)}</p>
-                </article>
-              `;
-            }
-          )
-          .join('');
-      }
-
-      function renderReusableRules(data) {
-        const rules = data.reusableAestheticRules || [];
-        document.querySelector('#rules-grid').innerHTML = rules
-          .map(
-            (rule) => `
-              <article class="panel">
-                <h3>${escapeHtml(rule.title)}</h3>
-                <p>${escapeHtml(rule.summary)}</p>
-                <div class="subpanel">
-                  <h4>原则</h4>
-                  ${list(rule.principles || [])}
-                </div>
-                <div class="subpanel">
-                  <h4>拒绝信号</h4>
-                  ${list(rule.rejectSignals || [])}
-                </div>
-                <p><strong>验收：</strong>${escapeHtml(rule.ownerAcceptance || '')}</p>
-              </article>
-            `
-          )
-          .join('');
-      }
-
-      function renderTargetShapes(data) {
-        const shapes = data.targetShapeVocabulary || [];
-        document.querySelector('#shape-grid').innerHTML = shapes
-          .map(
-            (shape) => {
-              const primitive = targetPrimitiveByShapeId[shape.id] || '';
-              return `
-              <article class="panel">
-                <div class="shape-preview">
-                  <canvas data-shape-preview="${escapeHtml(primitive)}" aria-label="${escapeHtml(shape.name)} model preview"></canvas>
-                </div>
-                <h3>${escapeHtml(shape.name)}</h3>
-                <p class="en">${escapeHtml(shape.id)}</p>
-                <p><strong>对应模型：</strong>${escapeHtml(primitiveNames[primitive] || primitive || '未映射')}</p>
-                <p><strong>例子：</strong>${escapeHtml(shape.examples)}</p>
-                <p><strong>为什么需要：</strong>${escapeHtml(shape.whyNeeded)}</p>
-              </article>
-            `;
-            }
-          )
-          .join('');
-      }
-
-      function initTargetShapePreviews() {
-        previewScenes.splice(0, previewScenes.length);
-        const canvases = Array.from(document.querySelectorAll('[data-shape-preview]'));
-        canvases.forEach((canvas) => {
-          const primitive = canvas.dataset.shapePreview;
-          const factory = floraPrimitiveFactories[primitive];
-          if (!factory) return;
-
-          const scene = new THREE.Scene();
-          scene.add(new THREE.HemisphereLight('#fff4dc', '#182014', 1.9));
-          const key = new THREE.DirectionalLight('#ffffff', 2.25);
-          key.position.set(2.2, 3.2, 4.6);
-          scene.add(key);
-
-          const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 20);
-          camera.position.set(0, 0.35, 4.1);
-          camera.lookAt(0, 0.02, 0);
-
-          const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-          renderer.outputColorSpace = THREE.SRGBColorSpace;
-          renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.4));
-
-          const model = factory({
-            seed: `dashboard-target-shape:${primitive}`,
-            position: new THREE.Vector3(0, 0, 0),
-            scale: primitive === 'FoliageGrassBranch' ? 0.92 : primitive === 'SpikeFlower' ? 0.84 : 1.02,
-            colorPalette: previewPalettes[primitive] || ['#ffffff', '#f7d78a', '#80ad65', '#cc8b4f'],
-            openness: ['OrchidButterflyFlower', 'TrumpetThroatFlower', 'DaturaTrumpetFlower', 'CallaCurledBract'].includes(primitive) ? 0.95 : 0.7,
-            density: ['UmbelMiniCluster', 'FullHydrangeaCloud', 'FruitPodCluster', 'FoliageGrassBranch'].includes(primitive) ? 1.08 : 0.92,
-            curvature: ['SpikeFlower', 'FoliageGrassBranch', 'CallaCurledBract'].includes(primitive) ? 0.86 : 0.42,
-            role: ['SpikeFlower', 'FoliageGrassBranch'].includes(primitive) ? 'line' : 'secondary'
-          });
-          model.rotation.x = ['DiskFlower', 'LayeredDahliaFlower', 'RuffledRoseFlower', 'StarPinwheelFlower', 'TrumpetThroatFlower'].includes(primitive) ? -0.7 : primitive === 'FoliageGrassBranch' ? -0.34 : -0.1;
-          if (primitive === 'FoliageGrassBranch') model.rotation.z = -0.38;
-          scene.add(model);
-          previewScenes.push({ renderer, scene, camera, model, canvas, primitive });
-        });
-      }
-
-      function animateTargetShapePreviews() {
-        const time = performance.now() * 0.001;
-        previewScenes.forEach(({ renderer, scene, camera, model, canvas, primitive }, index) => {
-          const width = Math.max(1, canvas.clientWidth);
-          const height = Math.max(1, canvas.clientHeight);
-          if (canvas.width !== Math.floor(width * renderer.getPixelRatio()) || canvas.height !== Math.floor(height * renderer.getPixelRatio())) {
-            renderer.setSize(width, height, false);
-            camera.aspect = width / height;
-            camera.updateProjectionMatrix();
-          }
-          model.rotation.y = time * 0.22 + index * 0.18;
-          if (primitive === 'HangingBellFruit' || primitive === 'FoliageGrassBranch') model.rotation.y = time * 0.16 + index * 0.12;
-          renderer.render(scene, camera);
-        });
-        window.requestAnimationFrame(animateTargetShapePreviews);
-      }
-
-      function renderGroup(group) {
-        return `
-          <article class="group-card" data-kind="${escapeHtml(group.kind)}" data-status="${escapeHtml(group.status)}">
-            <div class="thumb-strip">
-              ${group.images.map((src) => `<img src="${escapeHtml(src)}" alt="${escapeHtml(group.title)} reference" loading="lazy" />`).join('')}
-            </div>
-            <div class="group-body">
-              <div class="group-top">
-                <div class="group-title">
-                  <div class="kind">${escapeHtml(group.kind)}</div>
-                  <h3>${escapeHtml(group.title)}</h3>
-                  <div class="en">${escapeHtml(group.englishTitle)}</div>
-                </div>
-                ${statusBadge(group.status)}
-              </div>
-              <p>${escapeHtml(group.humanConclusion)}</p>
-              <div class="primitive-list">
-                ${group.primitives
-                  .map((primitive) => `<span class="pill">${escapeHtml(primitiveNames[primitive] || primitive)}</span>`)
-                  .join('')}
-              </div>
-              <div class="link-row">
-                ${group.referenceLinks.map((link) => `<a class="pill" href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`).join('')}
-              </div>
-              <div class="split">
-                <div class="subpanel">
-                  <h4>正向信号</h4>
-                  ${list(group.positiveSignals)}
-                </div>
-                <div class="subpanel">
-                  <h4>负向约束</h4>
-                  ${list(group.negativeConstraints)}
-                </div>
-              </div>
-              <div class="split">
-                <div class="subpanel">
-                  <h4>当前实现</h4>
-                  <p>${escapeHtml(group.currentImplementation)}</p>
-                </div>
-                <div class="subpanel">
-                  <h4>未通过原因</h4>
-                  <p>${escapeHtml(group.failureReason)}</p>
-                </div>
-              </div>
-              <div class="subpanel">
-                <h4>下一步任务</h4>
-                ${list(group.nextTasks)}
-              </div>
-              <div class="role-review">
-                ${Object.entries(group.roleReview)
-                  .map(
-                    ([role, text]) => `
-                      <div class="subpanel">
-                        <h4>${escapeHtml(roleLabels[role] || role)}</h4>
-                        <p>${escapeHtml(text)}</p>
-                      </div>
-                    `
-                  )
-                  .join('')}
-              </div>
-            </div>
-          </article>
-        `;
-      }
-
-      function renderGroups(data) {
-        const grid = document.querySelector('#group-grid');
-        grid.innerHTML = data.reviewGroups.map(renderGroup).join('');
-      }
-
-      function renderFilters() {
-        const filters = [
-          ['all', '全部'],
-          ['blocked', 'blocked'],
-          ['needs-work', 'needs-work'],
-          ['pass', 'pass'],
-          ['positive', '正向'],
-          ['negative', '反向']
-        ];
-        document.querySelector('#filters').innerHTML = filters
-          .map(
-            ([value, label], index) => `
-              <button class="filter-button" type="button" data-filter="${value}" aria-pressed="${index === 0 ? 'true' : 'false'}">
-                ${label}
-              </button>
-            `
-          )
-          .join('');
-      }
-
-      function wireFilters() {
-        const buttons = Array.from(document.querySelectorAll('.filter-button'));
-        const cards = Array.from(document.querySelectorAll('.group-card'));
-        const empty = document.querySelector('#empty');
-
-        buttons.forEach((button) => {
-          button.addEventListener('click', () => {
-            const filter = button.dataset.filter;
-            buttons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
-            let visible = 0;
-            cards.forEach((card) => {
-              const show = filter === 'all' || card.dataset.status === filter || card.dataset.kind === filter;
-              card.classList.toggle('is-hidden', !show);
-              if (show) visible += 1;
-            });
-            empty.hidden = visible > 0;
-          });
-        });
-      }
-
-      loadData().then((data) => {
-        renderGate(data);
-        renderRoles(data);
-        renderReusableRules(data);
-        renderTargetShapes(data);
-        initTargetShapePreviews();
-        animateTargetShapePreviews();
-        renderPrimitiveGate(data);
-        renderGroups(data);
-        renderFilters();
-        wireFilters();
-      });
     </script>
   </body>
 </html>
