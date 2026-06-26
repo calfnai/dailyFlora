@@ -445,6 +445,28 @@ button {
   font-size: 0.82em;
 }
 
+.special-quote.is-custom {
+  right: max(34px, env(safe-area-inset-right));
+  max-width: min(440px, calc(100vw - 40px));
+  color: rgb(255 246 224 / 78%);
+  font-size: clamp(14px, 1.55vw, 17px);
+  font-weight: 500;
+  line-height: 1.58;
+  text-shadow:
+    0 1px 18px rgb(0 0 0 / 92%),
+    0 0 3px rgb(0 0 0 / 82%);
+}
+
+.special-quote.is-custom [lang='zh-CN'] {
+  margin-top: 16px;
+  color: inherit;
+  font-size: 1em;
+}
+
+.special-quote.is-custom [lang='zh-CN']:first-child {
+  margin-top: 0;
+}
+
 .special-credit {
   right: max(16px, env(safe-area-inset-right));
   bottom: max(14px, env(safe-area-inset-bottom));
@@ -513,6 +535,14 @@ button {
     bottom: 132px;
     font-size: 13px;
     text-align: right;
+  }
+
+  .special-quote.is-custom {
+    right: 14px;
+    max-width: calc(100vw - 28px);
+    bottom: 148px;
+    font-size: 12.5px;
+    line-height: 1.52;
   }
 
   .special-credit {

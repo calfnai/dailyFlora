@@ -374,11 +374,17 @@ function createSpecialOverlay() {
   `;
 
   const quote = document.createElement('aside');
-  quote.className = 'special-quote';
-  quote.innerHTML = `
-    <p>Some flowers last for days.<br />Some light travels long enough to arrive as a memory.</p>
-    <p lang="zh-CN">有些花会谢。<br />有些光，会走很久才抵达。</p>
-  `;
+  quote.className = specialReference.quoteStanzas ? 'special-quote is-custom' : 'special-quote';
+  if (specialReference.quoteStanzas) {
+    quote.innerHTML = specialReference.quoteStanzas
+      .map((stanza) => `<p lang="zh-CN">${stanza.replace(/\n/g, '<br />')}</p>`)
+      .join('');
+  } else {
+    quote.innerHTML = `
+      <p>Some flowers last for days.<br />Some light travels long enough to arrive as a memory.</p>
+      <p lang="zh-CN">有些花会谢。<br />有些光，会走很久才抵达。</p>
+    `;
+  }
 
   const credit = document.createElement('aside');
   credit.className = 'special-credit';

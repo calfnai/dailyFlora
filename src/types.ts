@@ -74,6 +74,7 @@ export interface SpecialBouquetReference {
   versionLabel?: string;
   routePath?: string;
   flowerPlanId?: string;
+  quoteStanzas?: string[];
   date: string;
   seed: string;
   theme: BouquetTheme;

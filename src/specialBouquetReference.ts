@@ -172,6 +172,11 @@ export const herJanuarySkyReferenceV3: SpecialBouquetReference = {
   versionLabel: 'v3',
   routePath: 'special0629-v3',
   flowerPlanId: 'her-january-sky-memory-v3',
+  quoteStanzas: [
+    'NGC 2787 的光，哈勃望远镜找了很久。\n来自你降生那天的光，走了一亿年。',
+    '那束花，只走了几个街区，\n遇见一个还没被回答的午后。',
+    '然后它们都在今天，\n这束光里了。'
+  ],
   seed: 'daily-flora:special:ngc2787:v3:spring-memory:2026-06-29',
   theme: {
     ...herJanuarySkyReference.theme,
@@ -245,7 +250,7 @@ export const herJanuarySkyReferenceV3: SpecialBouquetReference = {
     warmCore: '#ffe58a',
     galaxyOpacity: 0.9,
     galaxyScale: 1.28,
-    galaxyPosition: [-1.42, 1.16, -8.95],
+    galaxyPosition: [-1.36, -0.58, -8.95],
     galaxyRotation: -0.08,
     galaxyAlphaMap: true,
     galaxyDepthTest: false,
