@@ -456,6 +456,33 @@
       <section class="section">
         <div class="section-head">
           <div>
+            <p class="kicker">Review library</p>
+            <h2>审美资料入口</h2>
+            <p class="section-copy">这里固定保留三类可检查材料：你给过的参考图片、已经及格的花库模型、以及可直接打开的花束样例。</p>
+          </div>
+        </div>
+        <div class="library-grid">
+          <a class="panel library-card" href="./dailyflora-reference-gallery.html">
+            <em>参考图片页</em>
+            <strong>审美图片库</strong>
+            <span>查看夏日风车、梦幻紫、洋水仙、会呼吸的风景、狐尾百合、浆果森林、秋日果汁和反向样本。</span>
+          </a>
+          <a class="panel library-card" href="./primitive-lab.html">
+            <em>花库罗列</em>
+            <strong>Primitive Lab</strong>
+            <span>逐个查看已达到及格线的花材/叶材 primitive，包含隐藏标签、隔离观察和模型状态。</span>
+          </a>
+          <a class="panel library-card" href="./dailyflora-flower-plan-samples.html">
+            <em>花束库</em>
+            <strong>固定花束样例</strong>
+            <span>打开已固定的高精度花束样例，包括晨露莓园空气束，用来判断 composition 是否继续沿正确方向走。</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
             <p class="kicker">Review roles</p>
             <h2>四角色复盘</h2>
             <p class="section-copy">角色不是隐藏人格表演，而是页面上可检查的判断栏。每个参考组都必须留下四类结论。</p>
@@ -480,7 +507,7 @@
           <div>
             <p class="kicker">Target shape vocabulary</p>
             <h2>15 类目标形态词表</h2>
-            <p class="section-copy">这 15 类已经进入 Primitive Lab，当前等待用户逐类验收。旧 7 类只保留为历史粗分类和兼容别名。</p>
+            <p class="section-copy">这 15 类已经进入 Primitive Lab，并已达到用户确认的花库及格线。旧 7 类只保留为历史粗分类和兼容别名。</p>
           </div>
         </div>
         <div class="shape-grid" id="shape-grid"></div>
@@ -491,7 +518,7 @@
           <div>
             <p class="kicker">Primitive gate</p>
             <h2>花库验收</h2>
-            <p class="section-copy">隐藏标签后，单个形态应能被用户判断为对应的花材/叶材类型。当前不是通过状态，而是等待用户验收。</p>
+            <p class="section-copy">隐藏标签后，单个形态应能被用户判断为对应的花材/叶材类型。当前结论是花库验收达到及格线，可以作为下一阶段整束 composition 的基础。</p>
           </div>
           <a class="pill" href="./primitive-lab.html">打开 Primitive Lab</a>
         </div>
@@ -516,11 +543,15 @@
       {
         "updatedAt": "2026-06-25",
         "gate": {
-          "status": "blocked",
-          "title": "15 primitive shapes are implemented for owner review",
-          "summary": "Primitive Lab 已扩展到 15 类，等待用户逐类验收。",
-          "rules": ["先复盘参考图，不直接改主花束视觉。"],
-          "links": [{"label": "Primitive Lab", "href": "./primitive-lab.html"}]
+          "status": "pass",
+          "title": "花库验收达到及格线",
+          "summary": "Primitive Lab 已扩展到 15 类，并已达到用户确认的花库及格线。",
+          "rules": ["先复盘参考图，不直接改主花束视觉。", "后续主视觉修改必须同步更新 dashboard。"],
+          "links": [
+            {"label": "参考图库", "href": "./dailyflora-reference-gallery.html"},
+            {"label": "Primitive Lab", "href": "./primitive-lab.html"},
+            {"label": "花束库", "href": "./dailyflora-flower-plan-samples.html"}
+          ]
         },
         "roles": [],
         "primitiveGate": [],

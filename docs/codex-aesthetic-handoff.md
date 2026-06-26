@@ -6,7 +6,7 @@
 
 ## 当前项目状态快照
 
-- 当前 npm 版本：`0.12.25`
+- 当前 npm 版本：`0.12.26`
 - 当前产品层标记：`0.12E`
 - 当前主要开发分支：`codex/low-poly-petal-flowers`
 - 线上入口：<https://calfnai.github.io/dailyFlora/>
@@ -61,6 +61,7 @@
 - 审美审核入口只在 debug 版主界面可见，不能只靠用户记住 `docs/aesthetic-review-dashboard.html`。
 - debug 版由 URL 参数 `?debug` 或 `?debug=1` 开启；debug 版必须显示当前 FPS 和资源占用信息。
 - 普通观赏模式不显示审美审核入口，审美复盘页本身也必须检查 `debug` 参数。
+- GitHub Pages 发布时不能用原始 HTML 覆盖 Vite 已编译的 `docs/aesthetic-review-dashboard.html`；否则 dashboard 和 Primitive Lab 的脚本不会执行，页面会退化成只剩静态文字。
 - 自动隐藏 UI 上的按钮必须有清楚的人话提示。
 
 ## 当前审美判断

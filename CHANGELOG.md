@@ -1,5 +1,15 @@
 # DailyFlora Changelog
 
+## 0.12.26 - 2026-06-26
+
+Review library page restoration.
+
+- Fixed the GitHub Pages deploy step so it no longer overwrites Vite-built dashboard pages with raw source HTML.
+- Restored working compiled scripts for the aesthetic dashboard and Primitive Lab on the published site.
+- Added fixed dashboard entry cards for the reference image library, primitive flower library, and fixed bouquet sample library.
+- Added the reference gallery and legacy reference card page to the source deploy manifest.
+- Updated dashboard copy so the 15 primitive library is shown as user-confirmed passing the minimum gate, not still waiting for review.
+
 ## 0.12.25 - 2026-06-26
 
 Debug mode and interaction corrections.
