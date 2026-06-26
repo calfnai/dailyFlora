@@ -7,9 +7,9 @@ const specialQuoteStanzas = [
 ];
 
 const specialQuoteTranslationStanzas = [
-  'The light of NGC 2787 took Hubble a long time to find.\nLight from the day you were born has traveled a hundred million years.',
-  'That bouquet traveled only a few blocks,\nand met an afternoon still waiting for an answer.',
-  'And today, they are both here,\ninside this light.'
+  'Hubble searched a long time for this light.\nThe day MiMi was born sent light a hundred million years.',
+  'The bouquet walked a few blocks to an afternoon—',
+  'and here they are both inside this light.'
 ];
 
 export const herJanuarySkyReference: SpecialBouquetReference = {

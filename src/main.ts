@@ -479,8 +479,8 @@ function createSpecialOverlay() {
     muteButton.setAttribute('aria-label', specialAudioMuted ? 'Unmute audio' : 'Mute audio');
     muteButton.title = specialAudioMuted ? 'Unmute audio' : 'Mute audio';
     muteButton.innerHTML = specialAudioMuted
-      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" /><path d="M17 9l4 4m0-4l-4 4" /></svg>'
-      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" /><path d="M17 9.5a4 4 0 0 1 0 5M19.5 7a7.5 7.5 0 0 1 0 10" /></svg>';
+      ? '<svg class="special-audio-glyph" viewBox="0 0 32 32" aria-hidden="true"><path d="M9.2 18.5H6.9a1.25 1.25 0 0 1-1.25-1.25v-2.5A1.25 1.25 0 0 1 6.9 13.5h2.3l5.15-4.05v13.1L9.2 18.5Z" /><path d="M19.2 11.4l5.2 9.2" /></svg>'
+      : '<svg class="special-audio-glyph" viewBox="0 0 32 32" aria-hidden="true"><path d="M9.2 18.5H6.9a1.25 1.25 0 0 1-1.25-1.25v-2.5A1.25 1.25 0 0 1 6.9 13.5h2.3l5.15-4.05v13.1L9.2 18.5Z" /><path d="M18.55 12.6c.95.9 1.45 2.05 1.45 3.4s-.5 2.5-1.45 3.4" /><path d="M21.45 10.05c1.6 1.6 2.45 3.65 2.45 5.95s-.85 4.35-2.45 5.95" /></svg>';
   };
   syncMuteButton();
   muteButton.addEventListener('click', () => {
