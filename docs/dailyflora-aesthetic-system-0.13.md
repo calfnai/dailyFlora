@@ -1,6 +1,6 @@
 # DailyFlora 0.13 Aesthetic System
 
-最后更新：2026-06-26
+最后更新：2026-07-02
 
 这份文档是 DailyFlora 0.13 的审美记忆。它把本项目到目前为止由用户纠正出来的判断写进仓库，供后续 Codex、人工开发和审美复盘共同使用。
 
@@ -117,6 +117,8 @@ DailyFlora 可以使用高饱和色，但不能让画面变成厚重油画。
 - 月光手捧：柔和白黄方向成立。
 - 晨露莓园空气束：湿润、莓果、晨光和空气感方向成立。
 
+2026-07-02 新增并通过的参考：用户提供 `Lychee Garden｜捏一个彩虹🌈` 作为今日审美参考。公开可读信号包括自然风花束、绚丽色彩、彩虹花束、多巴胺配色和“生活是彩色的”。它应作为多色方向的增量证据：允许彩虹式多色，但必须按花材角色分配颜色，并用绿色、浅色花和空气间隔缓冲；果点或荔枝感只能作为有枝条归属的小圆点，不可变成随机散点。此项已进入 `data/aesthetic-review-dashboard.json` 的 `荔枝花园彩虹 / Lychee Garden Rainbow` 复盘卡。`0.13.4` 补上独立 `lychee-garden-rainbow` 地址，`0.13.5` 记录用户确认“做得很好”，状态改为 pass；新花不能借用其他花束地址，若后续被否定，应弃用该地址本身。
+
 ## 审美复盘流程
 
 任何主视觉改动前，默认走这个流程：
@@ -166,6 +168,11 @@ debug 版还应显示 FPS 和资源占用，方便判断视觉改动是否把项
 - `CHANGELOG.md`
 - `docs/codex-aesthetic-handoff.md`
 - `docs/dailyflora-aesthetic-system-0.13.md`
-- 如涉及 dashboard 状态，也更新 `data/aesthetic-review-dashboard.json`
+- `data/aesthetic-review-dashboard.json`。新增审美参考必须进入 dashboard，即使还没有图片或还未确认，也要建 `needs-owner-review` 卡片；不能只写入 inspiration library。
+- 新增生成花束必须有独立 theme/flowerPlan/URL。不要借用别的花束地址展示新花；如果用户不要这束花，就弃用这个地址本身。
 
 不要把重要判断只留在聊天里。
+
+如果某天用户不给新的审美输入，DailyFlora 仍按本 0.13 审美系统、已确认的花库门禁、既有主题和日期 seed 每日生成；新的外部参考只作为增量校准，不是每天生成的必要条件。
+
+2026-07-02 起，项目有每日自动生成发布任务：每天本机闲时以接近满上下文的独立 Codex cron 执行构建与 GitHub 发布。自动化不能绕过审美审核、owner-provided 参考门禁或新花独立地址规则。
