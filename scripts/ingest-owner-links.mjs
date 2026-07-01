@@ -24,6 +24,12 @@ function getNoteId(url) {
   return url.match(/\/(?:discovery\/)?(?:item|explore)\/([^?/#]+)/)?.[1] || null;
 }
 
+async function resolveOwnerUrl(url) {
+  if (getNoteId(url)) return url;
+  const response = await fetch(url, { redirect: 'follow', headers });
+  return response.url || url;
+}
+
 function extractInitialState(html) {
   const match = html.match(/window\.__INITIAL_STATE__=(.*)<\/script>/s);
   if (!match) return null;
@@ -47,6 +53,17 @@ function inferNotes({ title, desc, tags }) {
     colorNotes.push('warm bright palette signal; bias toward sunlit yellow, peach, and fresh green accents');
     parameterSuggestions.push('add a warm daylight palette variant with higher yellow/peach weight and softer green support');
   }
+  if (/彩虹|五彩|缤纷|多色|彩色/.test(text)) {
+    colorNotes.push('rainbow palette signal; use multiple clear hues but keep green, pale flowers, and air gaps as buffers');
+    spatialNotes.push('multi-color bouquet cue; distribute color by material role instead of making one noisy color cloud');
+    materialNotes.push('use small blooms, fruit points, and line flowers to carry saturated colors at different scales');
+    parameterSuggestions.push('increase controlled multi-hue variation while preserving readable flower roles and outer air');
+  }
+  if (/荔枝|Lychee|lychee/.test(text)) {
+    colorNotes.push('lychee garden cue; keep pink-red sweetness balanced with fresh green and pale highlights');
+    materialNotes.push('fruit-garden cue; consider small rounded fruit or pearl accents only when attached to stems');
+    parameterSuggestions.push('treat fruit dots as branch-owned accents, not loose random particles');
+  }
   if (/自然|田园|河床|蝉鸣|草|枝|叶|花束/.test(text)) {
     spatialNotes.push('natural bouquet cue; keep the silhouette airy instead of a compact dome');
     materialNotes.push('increase branch, leaf, grass, and small filler rhythm around the outer shell');
@@ -69,7 +86,14 @@ const notes = [];
 const accessIssues = [];
 
 for (const link of ownerLinks.links || []) {
-  const noteId = getNoteId(link.sourceUrl);
+  let resolvedSourceUrl = link.sourceUrl;
+  try {
+    resolvedSourceUrl = await resolveOwnerUrl(link.sourceUrl);
+  } catch {
+    resolvedSourceUrl = link.sourceUrl;
+  }
+
+  const noteId = getNoteId(resolvedSourceUrl);
   if (!noteId) {
     accessIssues.push({
       sourceUrl: link.sourceUrl,
@@ -80,12 +104,33 @@ for (const link of ownerLinks.links || []) {
   }
 
   try {
-    const response = await fetch(link.sourceUrl, { redirect: 'follow', headers });
+    const response = await fetch(resolvedSourceUrl, { redirect: 'follow', headers });
     const html = await response.text();
     const state = extractInitialState(html);
     const note = state ? noteFromState(state, noteId) : null;
 
     if (!response.ok || !note) {
+      const title = link.title || 'Untitled Xiaohongshu inspiration';
+      if (link.title) {
+        const inferred = inferNotes({ title, desc: '', tags: [] });
+        notes.push({
+          creatorId: 'unknown',
+          creatorName: link.creatorName || 'Unknown creator',
+          sourceUrl: resolvedSourceUrl,
+          originalSourceUrl: link.sourceUrl,
+          title,
+          observedAt,
+          imagePaths: [],
+          caption: 'Owner-provided title only; public page data was not readable.',
+          evidence: {
+            noteId,
+            imageCount: 0,
+            tags: [],
+            originalSourceUrl: link.sourceUrl
+          },
+          ...inferred
+        });
+      }
       accessIssues.push({
         sourceUrl: link.sourceUrl,
         creatorName: link.creatorName || 'Unknown creator',
@@ -103,7 +148,8 @@ for (const link of ownerLinks.links || []) {
     notes.push({
       creatorId: note.user?.userId || 'unknown',
       creatorName: note.user?.nickname || link.creatorName || 'Unknown creator',
-      sourceUrl: link.sourceUrl,
+      sourceUrl: resolvedSourceUrl,
+      originalSourceUrl: link.sourceUrl,
       title,
       observedAt,
       imagePaths: [],
@@ -111,7 +157,8 @@ for (const link of ownerLinks.links || []) {
       evidence: {
         noteId,
         imageCount: note.imageList?.length || 0,
-        tags: tags.map((tag) => tag.name).filter(Boolean)
+        tags: tags.map((tag) => tag.name).filter(Boolean),
+        originalSourceUrl: link.sourceUrl
       },
       ...inferred
     });

@@ -473,6 +473,16 @@ function geometryForFlowerType(typeId: FlowerTypeId, radius: number) {
 }
 
 function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimitiveName {
+  if (planId === 'lychee-garden-rainbow') {
+    if (item.typeId === 'chamomile') return 'CosmosOpenFlower';
+    if (item.typeId === 'bellFruit') return 'FruitPodCluster';
+    if (item.typeId === 'hydrangea') return 'UmbelMiniCluster';
+    if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
+    if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
+    if (item.typeId === 'liatris') return 'FoliageGrassBranch';
+    if (item.typeId === 'camelliaPeony' || item.typeId === 'rose') return 'RuffledRoseFlower';
+  }
+
   if (planId === 'dewberry-morning-air') {
     if (item.typeId === 'chamomile') return 'CosmosOpenFlower';
     if (item.typeId === 'hydrangea') return 'UmbelMiniCluster';
@@ -619,6 +629,17 @@ function primitivePalette(
   const color = (index: number) => flower[index % flower.length];
   const leafColor = (index: number) => leaf[index % leaf.length];
   const warm = color(Math.floor(rng.value() * flower.length));
+
+  if (spec.flowerPlan.id === 'lychee-garden-rainbow' && item) {
+    if (item.cn.includes('奶白')) return ['#fff7df', '#fff0c9', '#fff46a', leafColor(2)];
+    if (item.cn.includes('彩虹小面')) return [color(Math.floor(rng.value() * 6)), color(Math.floor(rng.value() * 6) + 1), '#fff7df', leafColor(2)];
+    if (item.cn.includes('荔枝')) return ['#ff5f8f', '#fff7df', '#ffb33f', leafColor(1)];
+    if (item.cn.includes('浅色空气')) return ['#fff7df', '#63d8ff', '#9a8cff', leafColor(2)];
+    if (item.cn.includes('彩虹星形')) return ['#ff5f8f', '#fff46a', '#63d8ff', leafColor(2)];
+    if (item.cn.includes('嫩绿')) return ['#7fe36d', '#c8e37a', '#fff7df', leafColor(1)];
+    if (item.cn.includes('粉橙')) return ['#ff8aac', '#ffb33f', '#fff0d7', leafColor(2)];
+    if (item.cn.includes('象牙')) return ['#fff7df', '#fff0c9', '#ffb33f', leafColor(1)];
+  }
 
   if (spec.flowerPlan.id === 'dewberry-morning-air' && item) {
     if (item.cn.includes('奶白')) return ['#fffaf0', '#f5ead6', '#f3ca43', leafColor(2)];

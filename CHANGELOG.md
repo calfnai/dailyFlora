@@ -1,5 +1,41 @@
 # DailyFlora Changelog
 
+## 0.13.5 - 2026-07-02
+
+Lychee Garden accepted and daily automation scheduled.
+
+- Recorded the owner's acceptance that `荔枝花园彩虹 / Lychee Garden Rainbow` is good.
+- Moved the Lychee Garden dashboard card from `needs-owner-review` to `pass`.
+- Preserved the dedicated `lychee-garden-rainbow` address as the accepted route for this bouquet.
+- Created a daily idle-time Codex automation to build the daily bouquet and deploy DailyFlora to GitHub.
+
+## 0.13.4 - 2026-07-02
+
+Dedicated Lychee Garden bouquet address.
+
+- Added a standalone `lychee-garden-rainbow` theme instead of previewing the new bouquet through `dopamine-field`.
+- Added the matching `lychee-garden-rainbow` flowerPlan with owner-provided reference notes, role-specific rainbow color distribution, branch-owned lychee fruit dots, airy pale clusters, and green outward branch lines.
+- Added dedicated primitive and palette mappings for the new plan in the high-quality bouquet renderer.
+- Added the dedicated URL to the flower-plan sample page and aesthetic review dashboard.
+- Recorded the rule that a new flower needs its own address; if the flower is rejected later, discard that address instead of reusing another bouquet address.
+
+## 0.13.3 - 2026-07-02
+
+Owner-provided daily inspiration intake.
+
+- Added the owner-provided Xiaohongshu reference `Lychee Garden｜捏一个彩虹🌈` as a pending inspiration item, preserving the original short link and resolved public note URL.
+- Extended the owner-link ingest script so `xhslink.com` short links resolve before note-id extraction.
+- Added compact inference for rainbow / multi-color and lychee-garden cues: controlled multi-hue color, green and pale-air buffers, branch-owned fruit points, small blooms, and airy natural silhouette.
+- Added the same reference to the aesthetic review dashboard as `荔枝花园彩虹 / Lychee Garden Rainbow`, with role review, positive signals, negative constraints, primitive mapping, and next tasks.
+- Kept the reference pending-confirmation; it does not automatically change generation rules or mark a new aesthetic direction as passed.
+
+## 0.13.2 - 2026-07-01
+
+Daily rollover behavior.
+
+- Added an automatic local-midnight rollover for the default daily bouquet mode, so a page left open overnight rebuilds into the new day's date seed.
+- Kept manually selected dates, random date previews, fixed shared seeds, and special bouquet routes pinned instead of forcing them back to today.
+
 ## 0.13.1 - 2026-06-26
 
 Review role and primitive vocabulary correction.

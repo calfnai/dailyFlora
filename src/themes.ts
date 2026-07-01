@@ -125,5 +125,22 @@ export const themes: BouquetTheme[] = [
     leafBias: 1.08,
     flowerBias: 1.04,
     outerLineBias: 1.18
+  },
+  {
+    id: 'lychee-garden-rainbow',
+    name: '荔枝花园彩虹',
+    palette: ['#ff5f8f', '#ffb33f', '#fff46a', '#7fe36d', '#63d8ff', '#9a8cff', '#fff7df'],
+    leafPalette: ['#12583a', '#2f8a56', '#75c46b', '#c8e37a'],
+    stem: '#5d8750',
+    background: '#050907',
+    floor: '#18251c',
+    glow: '#fff28a',
+    densityBias: 1.1,
+    verticalBias: 1.04,
+    wildness: 1.28,
+    branchBias: 1.14,
+    leafBias: 1.12,
+    flowerBias: 1.03,
+    outerLineBias: 1.2
   }
 ];

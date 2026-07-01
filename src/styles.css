@@ -348,6 +348,112 @@ button {
   pointer-events: none;
 }
 
+.date-calendar {
+  position: fixed;
+  z-index: 6;
+  width: min(292px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid rgb(255 246 220 / 16%);
+  border-radius: 8px;
+  color: rgb(255 250 235 / 92%);
+  background: rgb(7 8 10 / 88%);
+  box-shadow: 0 22px 70px rgb(0 0 0 / 46%);
+  backdrop-filter: blur(18px);
+}
+
+.date-calendar[hidden] {
+  display: none;
+}
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: 34px 1fr 34px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.calendar-header strong {
+  font-size: 13px;
+  font-weight: 560;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.calendar-nav-button,
+.calendar-day {
+  display: grid;
+  place-items: center;
+  border: 0;
+  color: inherit;
+  background: transparent;
+}
+
+.calendar-nav-button {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: rgb(255 249 232 / 72%);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.calendar-nav-button:hover,
+.calendar-nav-button:focus-visible,
+.calendar-day:hover,
+.calendar-day:focus-visible {
+  color: #fff8d8;
+  background: rgb(255 255 255 / 13%);
+  outline: none;
+}
+
+.calendar-weekdays,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.calendar-weekdays {
+  margin-bottom: 5px;
+  color: rgb(255 249 232 / 48%);
+  font-size: 11px;
+  line-height: 1;
+  text-align: center;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  min-width: 0;
+  border-radius: 50%;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.calendar-day.is-empty {
+  pointer-events: none;
+}
+
+.calendar-day.is-today {
+  color: #fff8d8;
+  box-shadow: inset 0 0 0 1px rgb(255 248 216 / 34%);
+}
+
+.calendar-day.is-selected {
+  color: #17120a;
+  background: #f4e681;
+  box-shadow: 0 8px 20px rgb(244 230 129 / 22%);
+}
+
+.calendar-day.is-selected:hover,
+.calendar-day.is-selected:focus-visible {
+  color: #17120a;
+  background: #fff0a6;
+}
+
 .segmented,
 .rotation-control,
 .zoom-control {

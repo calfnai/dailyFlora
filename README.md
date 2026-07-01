@@ -98,7 +98,7 @@ the long-term sync point.
 - `?date=YYYY-MM-DD` previews a specific day.
 - `?seed=...` shares a fixed bouquet.
 - `?theme=random` lets the date or seed choose the bouquet family.
-- `?theme=dopamine-field|summer-pinwheel|fairy-violet|moon-white|tropical-forest|sea-salt-lemon|hillside-wild|starry-night|dewberry-morning` previews a specific bouquet family.
+- `?theme=dopamine-field|summer-pinwheel|fairy-violet|moon-white|tropical-forest|sea-salt-lemon|hillside-wild|starry-night|dewberry-morning|lychee-garden-rainbow` previews a specific bouquet family.
 - `?density=low|medium|high` controls bouquet density.
 - `?render=auto|low|medium|high` controls rendering precision.
 - `?debug` or `?debug=1` shows debug-only controls, the aesthetic review entry, and rendering/resource stats.

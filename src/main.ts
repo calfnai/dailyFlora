@@ -31,6 +31,7 @@ const themeEnglishNames: Record<string, string> = {
   'dopamine-field': 'Dopamine Field',
   'starry-night': 'Starry Night',
   'dewberry-morning': 'Dewberry Morning',
+  'lychee-garden-rainbow': 'Lychee Garden Rainbow',
   'her-january-sky': 'Her January Sky',
   'her-january-sky-v2': 'Her January Sky v2',
   'her-january-sky-v3': 'Her January Sky v3',
@@ -114,6 +115,7 @@ const debugPanel = document.querySelector<HTMLElement>('#debug-panel');
 const pauseButton = document.querySelector<HTMLButtonElement>('#pause-button');
 const todayButton = document.querySelector<HTMLButtonElement>('#today-button');
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker');
+const calendarPanel = document.createElement('div');
 const shuffleButton = document.querySelector<HTMLButtonElement>('#shuffle-button');
 const fullscreenButton = document.querySelector<HTMLButtonElement>('#fullscreen-button');
 const zoomInButton = document.querySelector<HTMLButtonElement>('#zoom-in-button');
@@ -169,6 +171,7 @@ let quality = resolveQuality(selectedDensity, selectedRender);
 let spec = specialReference
   ? createSpecialSpec(specialReference, new URLSearchParams(window.location.search).get('date') || undefined)
   : createDailySpec(params.date, params.seed, selectedTheme);
+let followsToday = !specialReference && !searchParams.has('date') && !searchParams.has('seed');
 let scene = new BouquetScene(ui.canvas, spec, quality);
 let hideTimer = 0;
 let previewCount = 0;
@@ -184,6 +187,18 @@ let manualZoom = 0;
 let specialAudio: HTMLAudioElement | null = null;
 let specialAudioMuted = false;
 let debugTimer = 0;
+let dateRolloverTimer = 0;
+let calendarView = parseDateKey(spec.dateLabel);
+
+calendarPanel.className = 'date-calendar';
+calendarPanel.id = 'date-calendar';
+calendarPanel.hidden = true;
+calendarPanel.setAttribute('role', 'dialog');
+calendarPanel.setAttribute('aria-label', 'Pick bouquet date');
+document.body.append(calendarPanel);
+todayButton?.setAttribute('aria-haspopup', 'dialog');
+todayButton?.setAttribute('aria-controls', 'date-calendar');
+todayButton?.setAttribute('aria-expanded', 'false');
 
 function THREEClamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -236,6 +251,10 @@ function setLabels() {
     selectedRender === 'auto' ? `自/${renderLabels[quality.renderName]}` : renderLabels[quality.renderName];
   ui.qualityLabel.textContent = `${densityLabels[quality.densityName]} · ${renderLabel}`;
   document.title = `DailyFlora - ${spec.theme.name} / ${english}`;
+  if (!calendarPanel.hidden) {
+    renderCalendar();
+    positionCalendarPanel();
+  }
 }
 
 function formatCount(value: number) {
@@ -359,6 +378,124 @@ function updateUrl(date: string, seed: string) {
   window.history.replaceState({}, '', next);
 }
 
+function syncTodayMode(date: string, seed: string) {
+  followsToday = !specialReference && date === todayKey() && seed === date;
+}
+
+function parseDateKey(dateKey: string) {
+  const [year, month, day] = dateKey.split('-').map((part) => Number(part));
+  const fallback = new Date();
+  return {
+    year: Number.isFinite(year) ? year : fallback.getFullYear(),
+    month: Number.isFinite(month) ? THREEClamp(month - 1, 0, 11) : fallback.getMonth(),
+    day: Number.isFinite(day) ? THREEClamp(day, 1, 31) : fallback.getDate()
+  };
+}
+
+function dateKeyFromParts(year: number, month: number, day: number) {
+  const paddedMonth = String(month + 1).padStart(2, '0');
+  const paddedDay = String(day).padStart(2, '0');
+  return `${year}-${paddedMonth}-${paddedDay}`;
+}
+
+function daysInMonth(year: number, month: number) {
+  return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+}
+
+function firstWeekday(year: number, month: number) {
+  return new Date(Date.UTC(year, month, 1)).getUTCDay();
+}
+
+function selectCalendarDate(dateKey: string) {
+  previewCount = 0;
+  rebuild(dateKey, dateKey);
+  syncTodayMode(dateKey, dateKey);
+  closeCalendar();
+}
+
+function closeCalendar() {
+  if (calendarPanel.hidden) return;
+  calendarPanel.hidden = true;
+  todayButton?.setAttribute('aria-expanded', 'false');
+}
+
+function positionCalendarPanel() {
+  if (!todayButton) return;
+  const margin = 12;
+  const buttonRect = todayButton.getBoundingClientRect();
+  const panelRect = calendarPanel.getBoundingClientRect();
+  const panelWidth = panelRect.width || 292;
+  const panelHeight = panelRect.height || 332;
+  const viewportWidth = document.documentElement.clientWidth;
+  const viewportHeight = document.documentElement.clientHeight;
+  const preferredLeft = buttonRect.right - panelWidth;
+  const left = THREEClamp(preferredLeft, margin, Math.max(margin, viewportWidth - panelWidth - margin));
+  const aboveTop = buttonRect.top - panelHeight - 10;
+  const belowTop = buttonRect.bottom + 10;
+  const hasRoomAbove = aboveTop >= margin;
+  const preferredTop = hasRoomAbove ? aboveTop : belowTop;
+  const top = THREEClamp(preferredTop, margin, Math.max(margin, viewportHeight - panelHeight - margin));
+
+  calendarPanel.style.left = `${left}px`;
+  calendarPanel.style.top = `${top}px`;
+}
+
+function renderCalendar() {
+  const selected = parseDateKey(spec.dateLabel);
+  const today = parseDateKey(todayKey());
+  const totalDays = daysInMonth(calendarView.year, calendarView.month);
+  const leadingDays = firstWeekday(calendarView.year, calendarView.month);
+  const monthLabel = `${calendarView.year}.${String(calendarView.month + 1).padStart(2, '0')}`;
+  const dayButtons: string[] = [];
+
+  for (let index = 0; index < leadingDays; index += 1) {
+    dayButtons.push('<span class="calendar-day is-empty" aria-hidden="true"></span>');
+  }
+
+  for (let day = 1; day <= totalDays; day += 1) {
+    const dateKey = dateKeyFromParts(calendarView.year, calendarView.month, day);
+    const isSelected =
+      selected.year === calendarView.year && selected.month === calendarView.month && selected.day === day;
+    const isToday = today.year === calendarView.year && today.month === calendarView.month && today.day === day;
+    dayButtons.push(`
+      <button
+        class="calendar-day${isSelected ? ' is-selected' : ''}${isToday ? ' is-today' : ''}"
+        type="button"
+        data-calendar-date="${dateKey}"
+        aria-pressed="${isSelected}"
+      >${day}</button>
+    `);
+  }
+
+  calendarPanel.innerHTML = `
+    <div class="calendar-header">
+      <button class="calendar-nav-button" type="button" data-calendar-nav="-1" aria-label="Previous month">‹</button>
+      <strong>${monthLabel}</strong>
+      <button class="calendar-nav-button" type="button" data-calendar-nav="1" aria-label="Next month">›</button>
+    </div>
+    <div class="calendar-weekdays" aria-hidden="true">
+      <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+    </div>
+    <div class="calendar-grid">${dayButtons.join('')}</div>
+  `;
+}
+
+function openCalendar() {
+  calendarView = parseDateKey(spec.dateLabel);
+  renderCalendar();
+  calendarPanel.hidden = false;
+  todayButton?.setAttribute('aria-expanded', 'true');
+  positionCalendarPanel();
+}
+
+function toggleCalendar() {
+  if (calendarPanel.hidden) {
+    openCalendar();
+  } else {
+    closeCalendar();
+  }
+}
+
 function applyRotationSettings(pitch?: number) {
   scene.setRotationSettings({
     speed: rotationSpeed,
@@ -420,6 +557,25 @@ function rebuild(date: string, seed: string) {
   updateUrl(date, seed);
   params = { date, seed, density: selectedDensity, render: selectedRender, theme: selectedTheme };
   revealUi();
+}
+
+function scheduleDailyRollover() {
+  if (specialReference) return;
+
+  window.clearTimeout(dateRolloverTimer);
+  const now = new Date();
+  const nextDay = new Date(now);
+  nextDay.setHours(24, 0, 3, 0);
+  const delay = Math.max(1000, nextDay.getTime() - now.getTime());
+
+  dateRolloverTimer = window.setTimeout(() => {
+    const date = todayKey();
+    if (followsToday && spec.dateLabel !== date) {
+      rebuild(date, date);
+      syncTodayMode(date, date);
+    }
+    scheduleDailyRollover();
+  }, delay);
 }
 
 function createSpecialOverlay() {
@@ -554,14 +710,7 @@ pauseButton?.addEventListener('click', () => {
 });
 
 todayButton?.addEventListener('click', () => {
-  if (datePicker) {
-    datePicker.value = spec.dateLabel;
-    if (typeof datePicker.showPicker === 'function') {
-      datePicker.showPicker();
-    } else {
-      datePicker.click();
-    }
-  }
+  toggleCalendar();
   revealUi();
 });
 
@@ -569,13 +718,60 @@ datePicker?.addEventListener('change', () => {
   if (!datePicker.value) return;
   previewCount = 0;
   rebuild(datePicker.value, datePicker.value);
+  syncTodayMode(datePicker.value, datePicker.value);
   datePicker.blur();
+});
+
+calendarPanel.addEventListener('click', (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
+
+  const navValue = target.dataset.calendarNav;
+  if (navValue) {
+    calendarView.month += Number(navValue);
+    if (calendarView.month < 0) {
+      calendarView.month = 11;
+      calendarView.year -= 1;
+    }
+    if (calendarView.month > 11) {
+      calendarView.month = 0;
+      calendarView.year += 1;
+    }
+    renderCalendar();
+    positionCalendarPanel();
+    revealUi();
+    return;
+  }
+
+  const dateKey = target.dataset.calendarDate;
+  if (dateKey) {
+    selectCalendarDate(dateKey);
+  }
+});
+
+document.addEventListener('pointerdown', (event) => {
+  const target = event.target;
+  if (
+    calendarPanel.hidden ||
+    !(target instanceof Node) ||
+    calendarPanel.contains(target) ||
+    todayButton?.contains(target)
+  ) {
+    return;
+  }
+  closeCalendar();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeCalendar();
 });
 
 shuffleButton?.addEventListener('click', () => {
   const date = randomDateKey();
   previewCount = 0;
+  closeCalendar();
   rebuild(date, date);
+  syncTodayMode(date, date);
 });
 
 fullscreenButton?.addEventListener('click', async () => {
@@ -651,6 +847,7 @@ window.addEventListener('resize', () => {
     applyRotationSettings();
     setLabels();
   }
+  if (!calendarPanel.hidden) positionCalendarPanel();
 });
 
 ['pointermove', 'pointerdown', 'touchstart', 'keydown'].forEach((eventName) => {
@@ -659,6 +856,7 @@ window.addEventListener('resize', () => {
 
 window.addEventListener('beforeunload', () => scene.stop());
 window.addEventListener('beforeunload', () => window.clearInterval(debugTimer));
+window.addEventListener('beforeunload', () => window.clearTimeout(dateRolloverTimer));
 
 setLabels();
 setupDebugMode();
@@ -673,5 +871,6 @@ if (specialReference) {
 }
 applyRotationSettings();
 scene.setZoomOffset(manualZoom);
+scheduleDailyRollover();
 revealUi();
 scene.start();

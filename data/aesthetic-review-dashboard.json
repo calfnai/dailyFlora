@@ -1,14 +1,15 @@
 {
-  "updatedAt": "2026-06-26",
+  "updatedAt": "2026-07-02",
   "gate": {
     "status": "pass",
     "title": "花库验收达到及格线",
-    "summary": "用户已确认 Primitive Gate / 花库验收达到及格线。0.13 已将审美理解、流程、skill 和记忆写进项目；本轮根据山岗小花/热带丛林经验把 CosmosOpenFlower 补登记为第 16 类目标形态。16 类花材/叶材形态允许作为下一阶段 composition、palette、camera 改造的基础，但后续主视觉修改仍必须同步更新本 dashboard。",
+    "summary": "用户已确认 Primitive Gate / 花库验收达到及格线。0.13 已将审美理解、流程、skill 和记忆写进项目；本轮根据山岗小花/热带丛林经验把 CosmosOpenFlower 补登记为第 16 类目标形态。16 类花材/叶材形态允许作为下一阶段 composition、palette、camera 改造的基础。2026-07-02 Lychee Garden 彩虹生成已获用户确认通过；后续所有新增参考必须同步更新本 dashboard，新花必须有独立地址。",
     "rules": [
       "先复盘参考图，不直接改主花束视觉。",
       "Primitive Lab 已按 16 类主流花材/叶材形态达到用户验收及格线。",
       "旧 7 类只作为兼容别名和历史粗分类，不再代表完整覆盖。",
-      "后续可以进入整束 composition 改造准备，但任何主视觉修改必须同步更新本 dashboard 的状态和下一步任务。"
+      "后续可以进入整束 composition 改造准备，但任何主视觉修改必须同步更新本 dashboard 的状态和下一步任务。",
+      "新增 owner-provided 审美参考必须进入本 dashboard；一旦生成新花，必须有独立 theme/seed 地址，弃用时弃用该地址本身，不借用其他花束地址。"
     ],
     "links": [
       {
@@ -400,6 +401,72 @@
         "projectDirector": "允许作为原创候选加入项目；状态应保持 needs-owner-review，用户未确认前不把它当成新标准。",
         "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
         "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
+      }
+    },
+    {
+      "id": "lychee-garden-rainbow",
+      "title": "荔枝花园彩虹",
+      "englishTitle": "Lychee Garden Rainbow",
+      "kind": "accepted-owner-provided-generation",
+      "status": "pass",
+      "referenceLinks": [
+        {
+          "label": "原始短链",
+          "href": "http://xhslink.com/o/9eV2mywlykl"
+        },
+        {
+          "label": "读取证据",
+          "href": "../data/inbox/2026-07-02/notes.json"
+        },
+        {
+          "label": "灵感库 pending 项",
+          "href": "../data/inspiration-library.json"
+        },
+        {
+          "label": "打开生成花束",
+          "href": "../?date=2026-07-02&seed=lychee-garden-rainbow&theme=lychee-garden-rainbow&render=high&density=medium"
+        }
+      ],
+      "images": [],
+      "humanConclusion": "用户已确认这束新花“做得很好”。该方向作为 DailyFlora 的 owner-provided 彩虹/多巴胺多色增量样本通过当前审美审核：多色可以成立，但必须继续保持独立地址、花材角色分色、绿色和浅色空气缓冲，以及有枝条归属的果点。",
+      "positiveSignals": [
+        "彩虹式多色可以作为 DailyFlora 的增量方向，但颜色必须按花材角色分配。",
+        "多巴胺配色需要绿色、浅色花和空气距离来缓冲，避免变成一团噪色。",
+        "自然风花束信号要求轮廓保持空气感，不要压成紧凑圆球。",
+        "荔枝/果园感可以用小圆果、珍珠点、果点表达，但必须有枝条归属。",
+        "小花、果点、线形花应分不同尺度承载饱和色，而不是所有颜色挤在同一层。"
+      ],
+      "negativeConstraints": [
+        "不要把彩虹理解为平均铺满所有颜色。",
+        "不要做成无花材角色的彩色点云。",
+        "不要让果点随机漂浮，必须挂在枝条或材料结构上。",
+        "不要自动修改生成器或把这组标为 pass。",
+        "不要因为今日有新参考，就推翻 0.13 已确认的山岗小花、晨露莓园和叶材规则。"
+      ],
+      "primitives": [
+        "CosmosOpenFlower",
+        "DiskFlower",
+        "StarPinwheelFlower",
+        "FruitPodCluster",
+        "HangingBellFruit",
+        "SpikeFlower",
+        "FoliageGrassBranch",
+        "UmbelMiniCluster"
+      ],
+      "currentImplementation": "0.13.5 记录用户确认 `lychee-garden-rainbow` 通过当前审美审核；其独立 theme、同名 flowerPlan、bouquetScene primitive/palette 映射、花束样例页和 dashboard 链接继续保留。",
+      "failureReason": "无当前阻塞；后续每日生成可继承这组多色规则，但新花仍必须有独立地址。",
+      "nextTasks": [
+        "将 `lychee-garden-rainbow` 作为已通过的彩虹多色增量样本保留。",
+        "后续每日无新增 owner 输入时，按 0.13 审美系统、日期 seed 和已通过样本继续生成。",
+        "若以后新增固定花束，继续创建独立 theme/flowerPlan/URL，不能借用其他花束地址。",
+        "自动化每日闲时构建并推送 GitHub，保持线上 DailyFlora 更新。"
+      ],
+      "roleReview": {
+        "creativeDirector": "用户确认这束花方向好，说明彩虹/多巴胺多色在 DailyFlora 语境中可以成立，但仍需保持自然风和空气感。",
+        "artDirector": "通过点在于彩虹色没有只做成平均噪色，而是被小面花、星形线花、果点、浅色簇和绿色外开线分层承载。",
+        "projectDirector": "用户已验收当前视觉方向；dashboard 状态可从 needs-owner-review 改为 pass。每日自动生成发布任务已创建，但不得绕过新增参考和新增地址门禁。",
+        "cto": "独立 theme/flowerPlan/URL 路由已稳定，适合自动构建和 GitHub Pages 发布。",
+        "shapeCurator": "这组使用的形态均已在 16 类花库内，且新增花材方案有明确角色和比例，可作为后续彩虹多色方案的样本。"
       }
     },
     {

@@ -90,6 +90,24 @@ const plans: FlowerPlan[] = [
     ])
   },
   {
+    id: 'lychee-garden-rainbow',
+    cnName: '荔枝花园彩虹束',
+    enName: 'Lychee Garden Rainbow Bouquet',
+    reference: 'owner-provided: Lychee Garden｜捏一个彩虹🌈 / 2026-07-02',
+    silhouette: '自然风多色小花束，彩虹颜色分配到小面花、果点、星形线花和低位小簇；绿色枝线和浅色花负责透气。',
+    avoid: '避免借用其他主题地址，避免平均彩虹铺色，避免彩色点云，避免果点无枝条归属。',
+    items: normalizeShares([
+      { typeId: 'chamomile', cn: '奶白小面花', en: 'ivory open-face blooms', role: 'filler', share: 0.16, scale: 0.82, placement: 'mixed', note: '浅色缓冲，把彩虹色之间留出空气。' },
+      { typeId: 'chamomile', cn: '彩虹小面花', en: 'rainbow open-face sparks', role: 'filler', share: 0.14, scale: 0.76, placement: 'mixed', note: '用小花矩阵承载多色，不做大块平均彩虹。' },
+      { typeId: 'bellFruit', cn: '荔枝珍珠果点', en: 'lychee pearl fruit dots', role: 'fruit', share: 0.18, scale: 0.82, placement: 'mixed', note: '果点必须长在枝条上，形成果园记忆点。' },
+      { typeId: 'hydrangea', cn: '浅色空气小簇', en: 'pale airy mini clusters', role: 'cluster', share: 0.15, scale: 0.78, placement: 'low', note: '低位托住体积，避免彩色点散成噪声。' },
+      { typeId: 'orchid', cn: '彩虹星形线花', en: 'rainbow star line petals', role: 'line', share: 0.08, scale: 0.98, placement: 'spray', note: '少量外伸星形花，做彩虹亮点而不抢主花。' },
+      { typeId: 'liatris', cn: '嫩绿外开枝线', en: 'fresh green open branch lines', role: 'line', share: 0.12, scale: 1.04, placement: 'mixed', note: '继承山岗小花的外开线条和绿色空气缓冲。' },
+      { typeId: 'camelliaPeony', cn: '粉橙柔软团花', en: 'pink orange soft ruffled blooms', role: 'secondary', share: 0.12, scale: 0.9, placement: 'low', note: '少量柔软体积，不让彩虹小花失去中心。' },
+      { typeId: 'orchid', cn: '象牙杯形花', en: 'ivory cup blooms', role: 'main', share: 0.05, scale: 0.9, placement: 'outer', note: '提供安静停顿，避免全画面都在跳色。' }
+    ])
+  },
+  {
     id: 'autumn-juice',
     cnName: '秋日果汁束',
     enName: 'Autumn Juice Bouquet',
@@ -203,7 +221,8 @@ const themePlanIds: Record<string, string[]> = {
   'tropical-forest': ['berry-grove', 'foxtail-lily-vertical'],
   'moon-white': ['breathing-landscape', 'fairy-violet-air'],
   'starry-night': ['fairy-violet-air', 'berry-grove'],
-  'dewberry-morning': ['dewberry-morning-air']
+  'dewberry-morning': ['dewberry-morning-air'],
+  'lychee-garden-rainbow': ['lychee-garden-rainbow']
 };
 
 export function createFlowerPlan(seed: string, theme: BouquetTheme) {
