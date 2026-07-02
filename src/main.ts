@@ -5,9 +5,33 @@ import { createDailySpec, readParams } from './spec';
 import { resolveQuality } from './quality';
 import { BouquetScene } from './bouquetScene';
 import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
+import { themes } from './themes';
 
 type RotationDirection = 1 | -1;
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
+type AccountState = {
+  name: string;
+  email: string;
+};
+type FavoriteBouquet = {
+  id: string;
+  date: string;
+  seed: string;
+  themeId: string;
+  themeName: string;
+  themeEnglishName: string;
+  flowerPlanName: string;
+  flowers: string;
+  savedAt: string;
+};
+type ReferenceState = {
+  dataUrl: string;
+  fileName: string;
+  size: number;
+  averageColor: string;
+  themeId: string;
+  themeName: string;
+};
 
 const minRotationSpeed = 0.012;
 const maxRotationSpeed = 0.13;
@@ -21,6 +45,8 @@ const renderLabels: Record<Exclude<RenderQualityName, 'auto'>, string> = {
   medium: '清',
   high: '精'
 };
+const accountStorageKey = 'dailyflora.account.v1';
+const favoritesStorageKey = 'dailyflora.favorites.v1';
 const themeEnglishNames: Record<string, string> = {
   'tropical-forest': 'Tropical Forest',
   'moon-white': 'Moon White Hand-Tied',
@@ -125,6 +151,33 @@ const renderButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[
 const rotationSpeedInput = document.querySelector<HTMLInputElement>('#rotation-speed');
 const rotationDirectionButton = document.querySelector<HTMLButtonElement>('#rotation-direction-button');
 const rotationPresetButton = document.querySelector<HTMLButtonElement>('#rotation-preset-button');
+const accountDock = document.querySelector<HTMLElement>('#account-dock');
+const favoriteButton = document.querySelector<HTMLButtonElement>('#favorite-button');
+const accountOpenButton = document.querySelector<HTMLButtonElement>('#account-open-button');
+const accountCloseButton = document.querySelector<HTMLButtonElement>('#account-close-button');
+const accountPanel = document.querySelector<HTMLElement>('#account-panel');
+const accountAvatar = document.querySelector<HTMLElement>('#account-avatar');
+const accountOpenTitle = document.querySelector<HTMLElement>('#account-open-title');
+const accountOpenStatus = document.querySelector<HTMLElement>('#account-open-status');
+const accountPanelTitle = document.querySelector<HTMLElement>('#account-panel-title');
+const loginForm = document.querySelector<HTMLFormElement>('#login-form');
+const loginNameInput = document.querySelector<HTMLInputElement>('#login-name-input');
+const loginEmailInput = document.querySelector<HTMLInputElement>('#login-email-input');
+const accountProfile = document.querySelector<HTMLElement>('#account-profile');
+const profileAvatar = document.querySelector<HTMLElement>('#profile-avatar');
+const profileName = document.querySelector<HTMLElement>('#profile-name');
+const profileEmail = document.querySelector<HTMLElement>('#profile-email');
+const logoutButton = document.querySelector<HTMLButtonElement>('#logout-button');
+const collectionCount = document.querySelector<HTMLElement>('#collection-count');
+const collectionList = document.querySelector<HTMLElement>('#collection-list');
+const referenceFileInput = document.querySelector<HTMLInputElement>('#reference-file-input');
+const referencePreview = document.querySelector<HTMLElement>('#reference-preview');
+const referencePreviewImage = document.querySelector<HTMLImageElement>('#reference-preview-image');
+const referencePreviewTitle = document.querySelector<HTMLElement>('#reference-preview-title');
+const referencePreviewMeta = document.querySelector<HTMLElement>('#reference-preview-meta');
+const referenceNoteInput = document.querySelector<HTMLTextAreaElement>('#reference-note-input');
+const referenceGenerateButton = document.querySelector<HTMLButtonElement>('#reference-generate-button');
+const referenceResult = document.querySelector<HTMLElement>('#reference-result');
 
 if (
   !canvas ||
@@ -189,6 +242,9 @@ let specialAudioMuted = false;
 let debugTimer = 0;
 let dateRolloverTimer = 0;
 let calendarView = parseDateKey(spec.dateLabel);
+let accountState = readAccountState();
+let favoriteBouquets = readFavoriteBouquets();
+let referenceState: ReferenceState | null = null;
 
 calendarPanel.className = 'date-calendar';
 calendarPanel.id = 'date-calendar';
@@ -234,6 +290,294 @@ function flowerPlanText() {
   return spec.flowerPlan.items.map((item) => item.cn).join(' / ');
 }
 
+function safeJsonParse<T>(value: string | null, fallback: T): T {
+  if (!value) return fallback;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function readAccountState(): AccountState | null {
+  const account = safeJsonParse<AccountState | null>(window.localStorage.getItem(accountStorageKey), null);
+  if (!account?.email) return null;
+  return account;
+}
+
+function saveAccountState(nextAccount: AccountState | null) {
+  accountState = nextAccount;
+  if (nextAccount) {
+    window.localStorage.setItem(accountStorageKey, JSON.stringify(nextAccount));
+  } else {
+    window.localStorage.removeItem(accountStorageKey);
+  }
+  renderAccountState();
+}
+
+function readFavoriteBouquets(): FavoriteBouquet[] {
+  const favorites = safeJsonParse<FavoriteBouquet[]>(window.localStorage.getItem(favoritesStorageKey), []);
+  return Array.isArray(favorites) ? favorites : [];
+}
+
+function saveFavoriteBouquets(nextFavorites: FavoriteBouquet[]) {
+  favoriteBouquets = nextFavorites.slice(0, 24);
+  window.localStorage.setItem(favoritesStorageKey, JSON.stringify(favoriteBouquets));
+  renderAccountState();
+}
+
+function currentFavoriteId() {
+  return `${spec.dateLabel}:${spec.seed}:${spec.theme.id}`;
+}
+
+function currentFavorite() {
+  return favoriteBouquets.find((favorite) => favorite.id === currentFavoriteId()) || null;
+}
+
+function createFavorite(): FavoriteBouquet {
+  return {
+    id: currentFavoriteId(),
+    date: spec.dateLabel,
+    seed: spec.seed,
+    themeId: spec.theme.id,
+    themeName: spec.theme.name,
+    themeEnglishName: themeEnglishName(),
+    flowerPlanName: spec.flowerPlan.cnName,
+    flowers: flowerPlanText(),
+    savedAt: new Date().toISOString()
+  };
+}
+
+function initials(name: string, fallback: string) {
+  const trimmed = name.trim();
+  return trimmed ? trimmed.slice(0, 1).toUpperCase() : fallback;
+}
+
+function formatFileSize(size: number) {
+  if (size >= 1024 * 1024) return `${(size / 1024 / 1024).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(size / 1024))} KB`;
+}
+
+function rgbToHex(red: number, green: number, blue: number) {
+  return `#${[red, green, blue].map((value) => value.toString(16).padStart(2, '0')).join('')}`;
+}
+
+function rgbToHsl(red: number, green: number, blue: number) {
+  const r = red / 255;
+  const g = green / 255;
+  const b = blue / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const lightness = (max + min) / 2;
+  const delta = max - min;
+  if (delta === 0) return { hue: 0, saturation: 0, lightness };
+  const saturation = delta / (1 - Math.abs(2 * lightness - 1));
+  let hue = 0;
+  if (max === r) hue = ((g - b) / delta) % 6;
+  if (max === g) hue = (b - r) / delta + 2;
+  if (max === b) hue = (r - g) / delta + 4;
+  return { hue: (hue * 60 + 360) % 360, saturation, lightness };
+}
+
+function themeForAverageColor(red: number, green: number, blue: number) {
+  const { hue, saturation, lightness } = rgbToHsl(red, green, blue);
+  let themeId = 'sea-salt-lemon';
+  if (lightness > 0.76 && saturation < 0.28) themeId = 'moon-white';
+  else if (hue >= 245 && hue < 330) themeId = saturation > 0.34 ? 'fairy-violet' : 'starry-night';
+  else if (hue >= 330 || hue < 22) themeId = 'dewberry-morning';
+  else if (hue >= 22 && hue < 54) themeId = saturation > 0.42 ? 'summer-pinwheel' : 'hillside-wild';
+  else if (hue >= 54 && hue < 92) themeId = 'sea-salt-lemon';
+  else if (hue >= 92 && hue < 172) themeId = saturation > 0.32 ? 'tropical-forest' : 'hillside-wild';
+  else if (hue >= 172 && hue < 215) themeId = 'sea-salt-lemon';
+  else if (hue >= 215 && hue < 245) themeId = 'starry-night';
+  return themes.find((theme) => theme.id === themeId) || themes[0];
+}
+
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => resolve(String(reader.result || '')));
+    reader.addEventListener('error', () => reject(reader.error || new Error('Could not read reference image.')));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(dataUrl: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener('load', () => resolve(image));
+    image.addEventListener('error', () => reject(new Error('Could not load reference image.')));
+    image.src = dataUrl;
+  });
+}
+
+async function analyzeReferenceImage(file: File): Promise<ReferenceState> {
+  const dataUrl = await readFileAsDataUrl(file);
+  const image = await loadImage(dataUrl);
+  const canvasElement = document.createElement('canvas');
+  const size = 48;
+  canvasElement.width = size;
+  canvasElement.height = size;
+  const context = canvasElement.getContext('2d', { willReadFrequently: true });
+  if (!context) throw new Error('Could not analyze reference image.');
+  context.drawImage(image, 0, 0, size, size);
+  const pixels = context.getImageData(0, 0, size, size).data;
+  let red = 0;
+  let green = 0;
+  let blue = 0;
+  let count = 0;
+  for (let index = 0; index < pixels.length; index += 4) {
+    const alpha = pixels[index + 3] / 255;
+    if (alpha < 0.2) continue;
+    red += pixels[index] * alpha;
+    green += pixels[index + 1] * alpha;
+    blue += pixels[index + 2] * alpha;
+    count += alpha;
+  }
+  const averageRed = Math.round(red / Math.max(1, count));
+  const averageGreen = Math.round(green / Math.max(1, count));
+  const averageBlue = Math.round(blue / Math.max(1, count));
+  const theme = themeForAverageColor(averageRed, averageGreen, averageBlue);
+  return {
+    dataUrl,
+    fileName: file.name,
+    size: file.size,
+    averageColor: rgbToHex(averageRed, averageGreen, averageBlue),
+    themeId: theme.id,
+    themeName: theme.name
+  };
+}
+
+function renderReferenceState() {
+  if (!referencePreview || !referencePreviewImage || !referencePreviewMeta || !referenceGenerateButton) return;
+  const hasReference = Boolean(referenceState);
+  referencePreview.hidden = !hasReference;
+  referenceGenerateButton.disabled = !hasReference;
+  if (!referenceState) return;
+  referencePreviewImage.src = referenceState.dataUrl;
+  referencePreviewTitle && (referencePreviewTitle.textContent = referenceState.fileName);
+  referencePreviewMeta.textContent = `${formatFileSize(referenceState.size)} · ${referenceState.themeName} · ${referenceState.averageColor}`;
+  referencePreview.style.setProperty('--reference-color', referenceState.averageColor);
+}
+
+async function handleReferenceFile(file: File) {
+  if (!file.type.startsWith('image/')) return;
+  if (referenceResult) {
+    referenceResult.hidden = false;
+    referenceResult.textContent = '正在读取参考图...';
+  }
+  referenceState = await analyzeReferenceImage(file);
+  renderReferenceState();
+  if (referenceResult) {
+    referenceResult.textContent = `已匹配到 ${referenceState.themeName}，可以生成。`;
+  }
+}
+
+function generateFromReference() {
+  if (!referenceState) return;
+  const note = referenceNoteInput?.value.trim() || 'reference';
+  const date = todayKey();
+  const seed = `reference:${Date.now()}:${referenceState.fileName}:${note}`;
+  selectedTheme = referenceState.themeId;
+  previewCount = 0;
+  closeCalendar();
+  rebuild(date, seed);
+  syncTodayMode(date, seed);
+  if (referenceResult) {
+    referenceResult.hidden = false;
+    referenceResult.textContent = `已按 ${referenceState.themeName} 生成，可点爱心收藏。`;
+  }
+}
+
+function openAccountPanel() {
+  if (!accountPanel || !accountOpenButton) return;
+  accountPanel.hidden = false;
+  accountOpenButton.setAttribute('aria-expanded', 'true');
+  window.setTimeout(() => accountPanel.classList.add('is-open'), 20);
+  if (!accountState) {
+    loginNameInput?.focus();
+  }
+  revealUi();
+}
+
+function closeAccountPanel() {
+  if (!accountPanel || !accountOpenButton) return;
+  accountPanel.classList.remove('is-open');
+  accountOpenButton.setAttribute('aria-expanded', 'false');
+  window.setTimeout(() => {
+    if (!accountPanel.classList.contains('is-open')) accountPanel.hidden = true;
+  }, 220);
+}
+
+function toggleFavorite() {
+  if (!accountState) {
+    openAccountPanel();
+    return;
+  }
+
+  const favorite = currentFavorite();
+  if (favorite) {
+    saveFavoriteBouquets(favoriteBouquets.filter((item) => item.id !== favorite.id));
+    return;
+  }
+
+  saveFavoriteBouquets([createFavorite(), ...favoriteBouquets.filter((item) => item.id !== currentFavoriteId())]);
+}
+
+function renderFavoriteButton() {
+  if (!favoriteButton) return;
+  const saved = Boolean(currentFavorite());
+  favoriteButton.classList.toggle('is-saved', saved);
+  favoriteButton.setAttribute('aria-pressed', String(saved));
+  favoriteButton.title = saved ? '已收藏今日花束' : '收藏今日花束';
+}
+
+function renderCollectionList() {
+  if (!collectionList || !collectionCount) return;
+  collectionCount.textContent = String(favoriteBouquets.length);
+  if (favoriteBouquets.length === 0) {
+    collectionList.innerHTML = `
+      <div class="empty-collection">
+        <strong>还没有收藏</strong>
+        <span>点亮爱心后，这束花会留在这里。</span>
+      </div>
+    `;
+    return;
+  }
+
+  collectionList.innerHTML = favoriteBouquets
+    .map(
+      (favorite) => `
+        <button class="collection-item" type="button" data-favorite-id="${favorite.id}">
+          <span class="collection-item-date">${favorite.date}</span>
+          <span class="collection-item-title">${favorite.themeName}</span>
+          <span class="collection-item-meta">${favorite.flowerPlanName} · ${favorite.themeEnglishName}</span>
+        </button>
+      `
+    )
+    .join('');
+}
+
+function renderAccountState() {
+  const signedIn = Boolean(accountState);
+  accountDock?.classList.toggle('is-signed-in', signedIn);
+  if (accountOpenTitle) accountOpenTitle.textContent = signedIn ? accountState?.name || '个人花园' : '个人花园';
+  if (accountOpenStatus) {
+    accountOpenStatus.textContent = signedIn
+      ? `${favoriteBouquets.length} 个收藏`
+      : '登录后同步收藏';
+  }
+  if (accountAvatar) accountAvatar.textContent = signedIn ? initials(accountState?.name || '', '花') : '访';
+  if (accountPanelTitle) accountPanelTitle.textContent = signedIn ? '你的 DailyFlora 收藏' : '把今天的花束收进个人花园';
+  if (loginForm) loginForm.hidden = signedIn;
+  if (accountProfile) accountProfile.hidden = !signedIn;
+  if (profileAvatar) profileAvatar.textContent = initials(accountState?.name || '', '花');
+  if (profileName) profileName.textContent = accountState?.name || 'DailyFlora 用户';
+  if (profileEmail) profileEmail.textContent = accountState?.email || '';
+  renderFavoriteButton();
+  renderCollectionList();
+}
+
 function setLabels() {
   const english = themeEnglishName();
   ui.dateLabel.textContent = spec.dateLabel;
@@ -255,6 +599,7 @@ function setLabels() {
     renderCalendar();
     positionCalendarPanel();
   }
+  renderFavoriteButton();
 }
 
 function formatCount(value: number) {
@@ -695,6 +1040,80 @@ function setRender(nextRender: RenderQualityName) {
   rebuildQuality();
 }
 
+accountOpenButton?.addEventListener('click', () => {
+  if (accountPanel?.classList.contains('is-open')) {
+    closeAccountPanel();
+  } else {
+    openAccountPanel();
+  }
+});
+
+accountCloseButton?.addEventListener('click', closeAccountPanel);
+
+favoriteButton?.addEventListener('click', () => {
+  toggleFavorite();
+  revealUi();
+});
+
+loginForm?.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const name = loginNameInput?.value.trim() || 'DailyFlora 用户';
+  const email = loginEmailInput?.value.trim() || `${name.replace(/\s+/g, '').toLowerCase()}@dailyflora.local`;
+  saveAccountState({ name, email });
+  if (!currentFavorite()) {
+    saveFavoriteBouquets([createFavorite(), ...favoriteBouquets]);
+  }
+});
+
+logoutButton?.addEventListener('click', () => {
+  saveAccountState(null);
+});
+
+collectionList?.addEventListener('click', (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
+  const button = target.closest<HTMLButtonElement>('[data-favorite-id]');
+  if (!button) return;
+  const favorite = favoriteBouquets.find((item) => item.id === button.dataset.favoriteId);
+  if (!favorite) return;
+  previewCount = 0;
+  closeCalendar();
+  rebuild(favorite.date, favorite.seed);
+  syncTodayMode(favorite.date, favorite.seed);
+  closeAccountPanel();
+});
+
+referenceFileInput?.addEventListener('change', async () => {
+  const file = referenceFileInput.files?.[0];
+  if (!file) return;
+  try {
+    await handleReferenceFile(file);
+  } catch {
+    referenceState = null;
+    renderReferenceState();
+    if (referenceResult) {
+      referenceResult.hidden = false;
+      referenceResult.textContent = '这张图暂时读不了，换一张试试。';
+    }
+  }
+});
+
+referenceGenerateButton?.addEventListener('click', generateFromReference);
+
+document.addEventListener('pointerdown', (event) => {
+  const target = event.target;
+  if (!accountPanel) return;
+  if (
+    accountPanel.hidden ||
+    !(target instanceof Node) ||
+    accountPanel.contains(target) ||
+    accountDock?.contains(target)
+  ) {
+    return;
+  }
+  closeAccountPanel();
+});
+
 controlsToggleButton?.addEventListener('click', () => {
   setControlsExpanded(!controls.classList.contains('is-expanded'));
 });
@@ -763,7 +1182,10 @@ document.addEventListener('pointerdown', (event) => {
 });
 
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') closeCalendar();
+  if (event.key === 'Escape') {
+    closeCalendar();
+    closeAccountPanel();
+  }
 });
 
 shuffleButton?.addEventListener('click', () => {
@@ -859,6 +1281,7 @@ window.addEventListener('beforeunload', () => window.clearInterval(debugTimer));
 window.addEventListener('beforeunload', () => window.clearTimeout(dateRolloverTimer));
 
 setLabels();
+renderAccountState();
 setupDebugMode();
 if (specialReference) {
   rotationSpeed = 0.024;

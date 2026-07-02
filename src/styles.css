@@ -37,6 +37,10 @@ button {
   font: inherit;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -145,6 +149,533 @@ button {
   line-height: 1;
   text-align: center;
   backdrop-filter: blur(14px);
+}
+
+.account-dock {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(18px, env(safe-area-inset-right));
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgb(255 250 235 / 84%);
+}
+
+.account-favorite-button,
+.account-open-button,
+.account-close-button {
+  border: 0;
+  color: inherit;
+  background: rgb(8 9 12 / 42%);
+  box-shadow: 0 16px 48px rgb(0 0 0 / 28%);
+  backdrop-filter: blur(18px);
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    transform 180ms ease,
+    border-color 180ms ease;
+}
+
+.account-favorite-button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 50%;
+}
+
+.account-favorite-button svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.account-favorite-button.is-saved {
+  color: #ffdfb5;
+  border-color: rgb(255 223 181 / 32%);
+  background: rgb(255 187 141 / 14%);
+}
+
+.account-favorite-button.is-saved svg {
+  fill: currentColor;
+}
+
+.account-open-button {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  min-width: 166px;
+  min-height: 44px;
+  padding: 6px 12px 6px 7px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 999px;
+  text-align: left;
+}
+
+.account-favorite-button:hover,
+.account-favorite-button:focus-visible,
+.account-open-button:hover,
+.account-open-button:focus-visible,
+.account-close-button:hover,
+.account-close-button:focus-visible {
+  color: #fff8d8;
+  border-color: rgb(255 248 216 / 26%);
+  background: rgb(255 255 255 / 13%);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.account-avatar,
+.profile-avatar {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #16120c;
+  background:
+    radial-gradient(circle at 35% 28%, #fff8d8, transparent 38%),
+    linear-gradient(135deg, #ffd8a8, #d6f0cc 54%, #b8d8ff);
+  font-weight: 680;
+}
+
+.account-avatar {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+}
+
+.account-open-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.account-open-copy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-open-copy span:first-child {
+  font-size: 13px;
+  font-weight: 620;
+  line-height: 1.05;
+}
+
+.account-open-copy span:last-child {
+  color: rgb(255 250 235 / 50%);
+  font-size: 11px;
+  line-height: 1.1;
+}
+
+.account-panel {
+  position: fixed;
+  top: max(72px, calc(env(safe-area-inset-top) + 72px));
+  right: max(18px, env(safe-area-inset-right));
+  z-index: 5;
+  display: grid;
+  gap: 16px;
+  width: min(380px, calc(100vw - 36px));
+  max-height: calc(100vh - 104px);
+  overflow: auto;
+  padding: 18px;
+  border: 1px solid rgb(255 246 220 / 15%);
+  border-radius: 8px;
+  color: rgb(255 250 235 / 88%);
+  background:
+    linear-gradient(180deg, rgb(18 20 24 / 88%), rgb(8 9 12 / 82%)),
+    rgb(8 9 12 / 84%);
+  box-shadow: 0 26px 90px rgb(0 0 0 / 48%);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+  backdrop-filter: blur(22px) saturate(120%);
+}
+
+.account-panel.is-open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.account-panel[hidden],
+.login-card[hidden],
+.account-profile[hidden] {
+  display: none;
+}
+
+.account-panel-header,
+.collection-header,
+.profile-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.account-eyebrow,
+.account-panel h2,
+.collection-header h3 {
+  margin: 0;
+}
+
+.account-eyebrow {
+  margin-bottom: 5px;
+  color: rgb(255 250 235 / 46%);
+  font-size: 11px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.account-panel h2 {
+  max-width: 13em;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.16;
+}
+
+.account-close-button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 50%;
+}
+
+.account-close-button svg {
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+}
+
+.login-card {
+  display: grid;
+  gap: 10px;
+}
+
+.login-card label {
+  display: grid;
+  gap: 7px;
+  color: rgb(255 250 235 / 58%);
+  font-size: 12px;
+}
+
+.login-card input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 8px;
+  padding: 0 12px;
+  color: rgb(255 250 235 / 92%);
+  background: rgb(255 255 255 / 7%);
+  outline: none;
+}
+
+.login-card input:focus {
+  border-color: rgb(255 238 170 / 38%);
+  background: rgb(255 255 255 / 10%);
+}
+
+.primary-action,
+.ghost-action {
+  min-height: 38px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.primary-action {
+  margin-top: 4px;
+  color: #17120a;
+  background: #f4e681;
+  font-weight: 650;
+}
+
+.ghost-action {
+  padding: 0 12px;
+  color: rgb(255 250 235 / 62%);
+  background: rgb(255 255 255 / 7%);
+}
+
+.profile-card {
+  padding: 10px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 6%);
+}
+
+.profile-avatar {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+}
+
+.profile-card div {
+  display: grid;
+  min-width: 0;
+  margin-right: auto;
+}
+
+.profile-card strong,
+.profile-card span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-card strong {
+  font-size: 14px;
+  font-weight: 620;
+}
+
+.profile-card span {
+  color: rgb(255 250 235 / 48%);
+  font-size: 11px;
+}
+
+.collection-section {
+  display: grid;
+  gap: 10px;
+}
+
+.reference-card {
+  display: grid;
+  gap: 11px;
+  padding: 12px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 5%);
+}
+
+.reference-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.reference-copy h3,
+.reference-copy p {
+  margin: 0;
+}
+
+.reference-copy h3 {
+  font-size: 16px;
+  font-weight: 620;
+}
+
+.reference-copy p:last-child {
+  color: rgb(255 250 235 / 54%);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.reference-upload-zone {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 7px 10px 7px 7px;
+  border: 1px dashed rgb(255 255 255 / 18%);
+  border-radius: 8px;
+  color: rgb(255 250 235 / 72%);
+  background: rgb(255 255 255 / 5%);
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.reference-upload-zone:hover,
+.reference-upload-zone:focus-within {
+  color: rgb(255 250 235 / 92%);
+  border-color: rgb(255 238 170 / 32%);
+  background: rgb(255 255 255 / 8%);
+}
+
+.reference-upload-zone input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.reference-upload-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: #17120a;
+  background: #f4e681;
+}
+
+.reference-upload-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.reference-preview {
+  --reference-color: #f4e681;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+  padding: 8px;
+  border: 1px solid color-mix(in srgb, var(--reference-color) 34%, transparent);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--reference-color) 14%, transparent), transparent),
+    rgb(255 255 255 / 5%);
+}
+
+.reference-preview img {
+  width: 56px;
+  height: 56px;
+  border-radius: 7px;
+  object-fit: cover;
+  background: rgb(255 255 255 / 8%);
+}
+
+.reference-preview div,
+.reference-note-label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.reference-preview strong,
+.reference-preview span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reference-preview strong {
+  color: rgb(255 250 235 / 88%);
+  font-size: 13px;
+}
+
+.reference-preview span,
+.reference-note-label span,
+.reference-result {
+  color: rgb(255 250 235 / 50%);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.reference-note-label textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 54px;
+  max-height: 96px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 8px;
+  padding: 10px 11px;
+  color: rgb(255 250 235 / 92%);
+  background: rgb(255 255 255 / 7%);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.35;
+  outline: none;
+}
+
+.reference-note-label textarea:focus {
+  border-color: rgb(255 238 170 / 38%);
+  background: rgb(255 255 255 / 10%);
+}
+
+.reference-result {
+  margin: -2px 0 0;
+}
+
+.primary-action:disabled {
+  color: rgb(255 250 235 / 32%);
+  background: rgb(255 255 255 / 8%);
+  cursor: not-allowed;
+}
+
+.collection-header h3 {
+  font-size: 16px;
+  font-weight: 620;
+}
+
+.collection-count {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  color: #17120a;
+  background: rgb(244 230 129 / 88%);
+  font-size: 12px;
+  font-weight: 680;
+}
+
+.collection-list {
+  display: grid;
+  gap: 8px;
+}
+
+.collection-item,
+.empty-collection {
+  display: grid;
+  width: 100%;
+  gap: 4px;
+  padding: 11px 12px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 8px;
+  color: inherit;
+  background: rgb(255 255 255 / 6%);
+  text-align: left;
+}
+
+.collection-item {
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.collection-item:hover,
+.collection-item:focus-visible {
+  border-color: rgb(255 248 216 / 24%);
+  background: rgb(255 255 255 / 11%);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.collection-item-date,
+.empty-collection span {
+  color: rgb(255 250 235 / 48%);
+  font-size: 11px;
+}
+
+.collection-item-title,
+.empty-collection strong {
+  color: rgb(255 250 235 / 88%);
+  font-size: 14px;
+  font-weight: 620;
+}
+
+.collection-item-meta {
+  overflow: hidden;
+  color: rgb(255 250 235 / 58%);
+  font-size: 12px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .debug-panel {
@@ -818,6 +1349,44 @@ button {
     left: 14px;
     top: 12px;
     gap: 8px;
+    max-width: calc(100vw - 122px);
+  }
+
+  .account-dock {
+    top: 12px;
+    right: 14px;
+    gap: 6px;
+  }
+
+  .account-favorite-button,
+  .account-open-button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+  }
+
+  .account-open-button {
+    display: grid;
+    grid-template-columns: 1fr;
+    place-items: center;
+  }
+
+  .account-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .account-open-copy {
+    display: none;
+  }
+
+  .account-panel {
+    top: 62px;
+    right: 14px;
+    width: min(360px, calc(100vw - 28px));
+    max-height: calc(100vh - 150px);
   }
 
   .controls {
