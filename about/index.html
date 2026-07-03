@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About DailyFlora</title>
+    <style>
+      :root { color-scheme: dark; --bg: #080a07; --text: #f7f0e3; --muted: rgb(247 240 227 / 68%); --line: rgb(247 240 227 / 14%); --accent: #f2cb62; }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text); background: radial-gradient(circle at 12% 0%, rgb(242 203 98 / 11%), transparent 28%), linear-gradient(180deg, #080a07, #0d110c); }
+      main { width: min(920px, 100%); margin: 0 auto; padding: 34px 20px 56px; }
+      a { color: var(--accent); }
+      header { display: grid; gap: 14px; padding: 26px; border: 1px solid var(--line); border-radius: 8px; background: rgb(17 22 15 / 78%); }
+      h1, h2, p { margin: 0; }
+      h1 { font-size: clamp(40px, 8vw, 86px); line-height: .96; letter-spacing: 0; }
+      h2 { margin-top: 26px; font-size: 26px; }
+      p { color: var(--muted); line-height: 1.72; }
+      .nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+      .nav a { padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; text-decoration: none; background: rgb(255 255 255 / 4%); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p>DailyFlora / about</p>
+        <h1>一束每天生成的数字花</h1>
+        <p>DailyFlora 现在是一个个人开发中的 3D 花束项目：每天用日期、主题、seed 和花材规则生成一束可观看、可收藏、可继续演化的花。</p>
+      </header>
+      <h2>当前阶段</h2>
+      <p>项目先以低成本 MVP 推进：页面结构、审美系统、花材库和用户流程先跑通；真实账号、数据库、支付和后台权限后续按商业化需要逐步接入。</p>
+      <div class="nav">
+        <a href="../">回到首页</a>
+        <a href="../docs/dev-index.html">开发组目录</a>
+      </div>
+    </main>
+  </body>
+</html>

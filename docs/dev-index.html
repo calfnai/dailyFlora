@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DailyFlora 开发组目录</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #080a07;
+        --surface: #11160f;
+        --line: rgb(247 240 227 / 14%);
+        --text: #f7f0e3;
+        --muted: rgb(247 240 227 / 68%);
+        --accent: #f2cb62;
+        --cool: #9fc6ff;
+        --good: #87d486;
+        --warn: #efb960;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 12% 0%, rgb(242 203 98 / 11%), transparent 28%),
+          radial-gradient(circle at 88% 10%, rgb(135 212 134 / 8%), transparent 24%),
+          linear-gradient(180deg, #080a07, #0d110c 58%, #080a07);
+      }
+
+      main {
+        width: min(1200px, 100%);
+        margin: 0 auto;
+        padding: 28px 20px 56px;
+      }
+
+      header,
+      .card,
+      .map,
+      .table-wrap {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgb(17 22 15 / 78%);
+      }
+
+      header {
+        display: grid;
+        gap: 14px;
+        padding: 26px;
+        background: linear-gradient(145deg, rgb(17 22 15 / 96%), rgb(24 31 21 / 84%));
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 11ch;
+        font-size: clamp(38px, 7vw, 76px);
+        line-height: 0.96;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        margin-top: 26px;
+        font-size: clamp(24px, 3vw, 36px);
+      }
+
+      h3 {
+        font-size: 17px;
+      }
+
+      p,
+      td {
+        color: var(--muted);
+        line-height: 1.62;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      code {
+        color: rgb(247 240 227 / 88%);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .eyebrow {
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .lead {
+        max-width: 82ch;
+        font-size: 16px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 14px;
+      }
+
+      .card {
+        display: grid;
+        gap: 10px;
+        min-height: 150px;
+        padding: 16px;
+      }
+
+      .card:hover,
+      .card:focus-visible {
+        border-color: rgb(242 203 98 / 46%);
+        outline: none;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        min-height: 24px;
+        padding: 0 8px;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+        color: var(--cool);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .tag.good {
+        color: var(--good);
+      }
+
+      .tag.warn {
+        color: var(--warn);
+      }
+
+      .map {
+        display: grid;
+        gap: 12px;
+        margin-top: 14px;
+        padding: 16px;
+      }
+
+      .lane {
+        display: grid;
+        grid-template-columns: 150px repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .node {
+        display: grid;
+        align-content: center;
+        min-height: 58px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgb(255 255 255 / 4%);
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .node strong {
+        color: var(--text);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 13px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: rgb(247 240 227 / 86%);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: rgb(255 255 255 / 4%);
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .lane {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">DailyFlora internal map</p>
+        <h1>开发组目录</h1>
+        <p class="lead">
+          这个页面是 DailyFlora 的低成本 MVP 导航层：把客户页面、开发预览、版本化实验页和临时平台管理放在一个地方。
+          真实数据库、支付和正式权限先不绑定；当前先用静态页面与 JSON 数据模型把业务边界跑通。
+        </p>
+      </header>
+
+      <h2>客户页面预览</h2>
+      <section class="grid" aria-label="客户页面">
+        <a class="card" href="../">
+          <span class="tag good">public</span>
+          <h3>首页 dailyFlora</h3>
+          <p>每日 3D 花花、特别花束、收藏、上传参考图、debug 入口。</p>
+          <code>/</code>
+        </a>
+        <a class="card" href="../about/">
+          <span class="tag">draft</span>
+          <h3>About</h3>
+          <p>项目介绍、当前阶段、为什么做 dailyFlora。</p>
+          <code>/about/</code>
+        </a>
+        <a class="card" href="../bouquet-shop/">
+          <span class="tag">draft</span>
+          <h3>Bouquet Shop</h3>
+          <p>门店加盟中，先做占位，不接真实商务流程。</p>
+          <code>/bouquet-shop/</code>
+        </a>
+        <a class="card" href="../member/">
+          <span class="tag warn">mock</span>
+          <h3>Member</h3>
+          <p>用户中心公开入口，MVP 阶段先指向假数据体验。</p>
+          <code>/member/</code>
+        </a>
+        <a class="card" href="../downloads/">
+          <span class="tag">draft</span>
+          <h3>Downloads</h3>
+          <p>iOS、macOS、Android APK、电视 APK 敬请期待。</p>
+          <code>/downloads/</code>
+        </a>
+        <a class="card" href="../special0629-v4/">
+          <span class="tag good">special</span>
+          <h3>特别花束</h3>
+          <p>当前特别花束入口，未来可扩展为精选花花详情页。</p>
+          <code>/special0629-v4/</code>
+        </a>
+      </section>
+
+      <h2>开发与版本化入口</h2>
+      <section class="grid" aria-label="开发页面">
+        <a class="card" href="./aesthetic-review-dashboard.html?debug=1">
+          <span class="tag warn">needs version list</span>
+          <h3>审美复盘 Dashboard</h3>
+          <p>后续要先进入版本列表，再进入每个版本详情；当前先保留 0.13 页面。</p>
+          <code>/docs/aesthetic-review-dashboard.html</code>
+        </a>
+        <a class="card" href="./primitive-lab.html">
+          <span class="tag warn">needs version list</span>
+          <h3>Primitive Lab</h3>
+          <p>花材库验收页，后续同样要增加版本罗列。</p>
+          <code>/docs/primitive-lab.html</code>
+        </a>
+        <a class="card" href="./dailyflora-reference-gallery.html">
+          <span class="tag">library</span>
+          <h3>参考图库</h3>
+          <p>按参考批次和审美版本倒序整理。</p>
+          <code>/docs/dailyflora-reference-gallery.html</code>
+        </a>
+        <a class="card" href="./dailyflora-flower-plan-samples.html">
+          <span class="tag good">optimized</span>
+          <h3>固定样例库</h3>
+          <p>默认轻量卡片，不再一次性加载多组实时渲染 iframe。</p>
+          <code>/docs/dailyflora-flower-plan-samples.html</code>
+        </a>
+        <a class="card" href="./member-test.html">
+          <span class="tag warn">mock</span>
+          <h3>用户页面测试</h3>
+          <p>替代单纯头像实验，覆盖资料、上传、生成记录、积分和订单占位。</p>
+          <code>/docs/member-test.html</code>
+        </a>
+        <a class="card" href="./development-document-summary.html">
+          <span class="tag">planning</span>
+          <h3>开发文档总结</h3>
+          <p>整理原开发文档、缺漏、冲突和低成本 MVP 思路。</p>
+          <code>/docs/development-document-summary.html</code>
+        </a>
+      </section>
+
+      <h2>临时平台管理</h2>
+      <section class="grid" aria-label="平台管理">
+        <a class="card" href="./admin-bouquets.html">
+          <span class="tag warn">mock admin</span>
+          <h3>管理花花库</h3>
+          <p>查看每日花花、固定样例、来源用户、公开状态。</p>
+          <code>/docs/admin-bouquets.html</code>
+        </a>
+        <a class="card" href="./admin-users.html">
+          <span class="tag warn">mock admin</span>
+          <h3>管理注册用户</h3>
+          <p>用户、上传、生成、积分、订阅状态和人工操作日志。</p>
+          <code>/docs/admin-users.html</code>
+        </a>
+        <a class="card" href="#data-model">
+          <span class="tag">future db</span>
+          <h3>未来数据库分布</h3>
+          <p>现在只定义数据边界，不绑定具体数据库或支付方式。</p>
+          <code>users / bouquets / generations / credits</code>
+        </a>
+      </section>
+
+      <h2>路由图</h2>
+      <section class="map" aria-label="路由图">
+        <div class="lane">
+          <div class="node"><strong>客户侧</strong></div>
+          <div class="node"><strong>/</strong><br />每日花花</div>
+          <div class="node"><strong>/about</strong><br />关于项目</div>
+          <div class="node"><strong>/member</strong><br />用户中心</div>
+          <div class="node"><strong>/downloads</strong><br />下载占位</div>
+        </div>
+        <div class="lane">
+          <div class="node"><strong>开发侧</strong></div>
+          <div class="node"><strong>/docs/dev-index.html</strong><br />总目录</div>
+          <div class="node"><strong>版本化实验页</strong><br />审美 / 花库 / 样例</div>
+          <div class="node"><strong>debug 入口</strong><br />集中进入</div>
+          <div class="node"><strong>member-test</strong><br />用户页假数据</div>
+        </div>
+        <div class="lane">
+          <div class="node"><strong>管理侧</strong></div>
+          <div class="node"><strong>admin-bouquets</strong><br />花花库</div>
+          <div class="node"><strong>admin-users</strong><br />用户与积分</div>
+          <div class="node"><strong>audit logs</strong><br />操作留痕</div>
+          <div class="node"><strong>future backend</strong><br />后续剥离</div>
+        </div>
+      </section>
+
+      <h2 id="data-model">未来数据库分布</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>数据域</th>
+              <th>低成本 MVP 做法</th>
+              <th>未来数据库职责</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>users</code></td>
+              <td>先用假数据或静态 JSON 展示资料页。</td>
+              <td>用户资料、联系方式、头像、状态；正式权限以后再接认证。</td>
+            </tr>
+            <tr>
+              <td><code>bouquets</code></td>
+              <td>固定样例先写在页面数据里。</td>
+              <td>每日展示、精选状态、来源用户、日期、主题、seed、公开状态。</td>
+            </tr>
+            <tr>
+              <td><code>generations</code></td>
+              <td>member-test 用 mock 列表表达流程。</td>
+              <td>生成参数、文字描述、参考图、消耗积分、结果状态；支持复制再生成，不热改旧记录。</td>
+            </tr>
+            <tr>
+              <td><code>uploads</code></td>
+              <td>只展示上传卡片，不实际上传。</td>
+              <td>图片和文字描述的归属、缩略图、文件地址、关联生成记录。</td>
+            </tr>
+            <tr>
+              <td><code>credits</code></td>
+              <td>只展示积分流水样例，不接支付。</td>
+              <td>发放、消耗、获奖返还、人工调整；余额可缓存，但流水必须保留。</td>
+            </tr>
+            <tr>
+              <td><code>admin_audit_logs</code></td>
+              <td>admin-users 先展示操作日志样式。</td>
+              <td>记录操作员、时间、IP、原因、变更前后值，尤其用于积分和用户资料。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </body>
+</html>

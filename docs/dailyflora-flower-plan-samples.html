@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DailyFlora 精度花型样例</title>
+    <title>DailyFlora 固定样例库</title>
     <style>
       :root {
         color-scheme: dark;
@@ -13,6 +13,7 @@
         --text: #f7efe2;
         --muted: rgb(247 239 226 / 68%);
         --accent: #f3d35f;
+        --good: #87d486;
       }
 
       * {
@@ -35,45 +36,108 @@
         padding: 28px 18px 48px;
       }
 
-      h1 {
+      h1,
+      h2,
+      p {
         margin: 0;
+      }
+
+      h1 {
         font-size: clamp(30px, 4vw, 54px);
         line-height: 1;
+        letter-spacing: 0;
       }
 
       .lead {
-        max-width: 76ch;
+        max-width: 80ch;
+        margin-top: 12px;
         color: var(--muted);
         line-height: 1.7;
       }
 
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: end;
+        margin: 22px 0 18px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgb(18 23 16 / 70%);
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      select {
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 0 10px;
+        color: var(--text);
+        background: rgb(255 255 255 / 7%);
+        font: inherit;
+      }
+
+      .count {
+        margin-left: auto;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
       .grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
       }
 
       .card {
         overflow: hidden;
         border: 1px solid var(--line);
-        border-radius: 24px;
+        border-radius: 8px;
         background: linear-gradient(180deg, var(--panel), rgb(10 13 10 / 92%));
-        box-shadow: 0 24px 70px rgb(0 0 0 / 34%);
+        box-shadow: 0 20px 54px rgb(0 0 0 / 28%);
+      }
+
+      .preview {
+        display: grid;
+        place-items: center;
+        min-height: 170px;
+        padding: 18px;
+        color: var(--muted);
+        background:
+          radial-gradient(circle at 40% 38%, var(--preview-a), transparent 20%),
+          radial-gradient(circle at 58% 44%, var(--preview-b), transparent 24%),
+          radial-gradient(circle at 50% 62%, var(--preview-c), transparent 28%),
+          #050609;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      .preview strong {
+        max-width: 18ch;
+        color: rgb(255 248 226 / 86%);
+        font-size: 18px;
+        line-height: 1.2;
       }
 
       .body {
         display: grid;
         gap: 10px;
-        padding: 16px 18px 18px;
+        padding: 15px;
       }
 
       h2 {
-        margin: 0;
-        font-size: 20px;
+        font-size: 18px;
+        line-height: 1.24;
       }
 
       p {
-        margin: 0;
         color: var(--muted);
         line-height: 1.55;
       }
@@ -93,153 +157,300 @@
         font-size: 12px;
       }
 
-      iframe {
-        display: block;
-        width: 100%;
-        height: 460px;
-        border: 0;
-        background: #050609;
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
       }
 
-      a {
-        color: var(--accent);
+      a.button {
+        display: inline-flex;
+        min-height: 34px;
+        align-items: center;
+        padding: 0 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--text);
+        background: rgb(255 255 255 / 5%);
+        font-size: 13px;
+        text-decoration: none;
       }
 
-      @media (max-width: 860px) {
+      a.button.primary {
+        color: #141307;
+        border-color: transparent;
+        background: var(--accent);
+        font-weight: 800;
+      }
+
+      .pager {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 18px;
+      }
+
+      button {
+        min-height: 34px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 0 10px;
+        color: var(--text);
+        background: rgb(255 255 255 / 5%);
+        font: inherit;
+        cursor: pointer;
+      }
+
+      button[aria-pressed="true"] {
+        color: #141307;
+        border-color: transparent;
+        background: var(--accent);
+        font-weight: 800;
+      }
+
+      .note {
+        margin-top: 14px;
+        color: rgb(247 239 226 / 56%);
+        font-size: 13px;
+      }
+
+      @media (max-width: 980px) {
+        .grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 680px) {
         .grid {
           grid-template-columns: 1fr;
         }
 
-        iframe {
-          height: 380px;
+        .count {
+          width: 100%;
+          margin-left: 0;
         }
       }
     </style>
   </head>
   <body>
     <main>
-      <h1>DailyFlora 精度花型样例</h1>
+      <h1>DailyFlora 固定样例库</h1>
       <p class="lead">
-        这些不是随机截图，而是用固定日期和主题生成的可复查样例。每束都对应一个 flowerPlan：
-        先写明要用什么花型，再由 <code>render=high</code> 调用模型。这样你可以直接判断“计划写得对不对、模型像不像、该改哪一种花型”。
+        这里改成轻量列表：默认不再一次性加载多个实时 3D iframe，避免滚动和加载卡顿。需要复查时再点击“实时打开”，进入单独渲染页面。
       </p>
 
-      <section class="grid">
-        <article class="card">
-          <iframe src="https://calfnai.github.io/dailyFlora/?date=2026-07-11&amp;seed=summer-pinwheel-detail&amp;theme=summer-pinwheel&amp;render=high&amp;density=medium" title="夏日风车细节束"></iframe>
-          <div class="body">
-            <h2>夏日风车细节束 / Summer Pinwheel Detail</h2>
-            <p>参考：夏日风车、多色花束。目标是多色但不乱，外圈有上扬线，中心不能被单朵大花压住。</p>
-            <div class="tags">
-              <span class="tag">蝴蝶兰形</span>
-              <span class="tag">洋甘菊形</span>
-              <span class="tag">玫瑰层叠形</span>
-              <span class="tag">金鱼草穗形</span>
-              <span class="tag">绣球簇形</span>
-              <span class="tag">风铃果形</span>
-            </div>
-            <p><a href="https://calfnai.github.io/dailyFlora/?date=2026-07-11&amp;seed=summer-pinwheel-detail&amp;theme=summer-pinwheel&amp;render=high&amp;density=medium" target="_blank">打开单独页面</a></p>
-          </div>
-        </article>
-
-        <article class="card">
-          <iframe src="https://calfnai.github.io/dailyFlora/?date=2026-08-03&amp;seed=fairy-violet-air&amp;theme=fairy-violet&amp;render=high&amp;density=medium" title="梦幻紫空气束"></iframe>
-          <div class="body">
-            <h2>梦幻紫空气束 / Fairy Violet Air</h2>
-            <p>参考：梦幻紫。目标是蓝紫统一但不闷，靠细长穗线、小花雾气和少量不对称花瓣拉开空气。</p>
-            <div class="tags">
-              <span class="tag">风信子穗形</span>
-              <span class="tag">蛇鞭菊线形</span>
-              <span class="tag">蝴蝶兰形</span>
-              <span class="tag">小雏菊形</span>
-              <span class="tag">山茶牡丹形</span>
-              <span class="tag">绣球雾团形</span>
-            </div>
-            <p><a href="https://calfnai.github.io/dailyFlora/?date=2026-08-03&amp;seed=fairy-violet-air&amp;theme=fairy-violet&amp;render=high&amp;density=medium" target="_blank">打开单独页面</a></p>
-          </div>
-        </article>
-
-        <article class="card">
-          <iframe src="https://calfnai.github.io/dailyFlora/?date=2026-09-18&amp;seed=foxtail-lily-vertical&amp;theme=hillside-wild&amp;render=high&amp;density=medium" title="狐尾百合竖线束"></iframe>
-          <div class="body">
-            <h2>狐尾百合竖线束 / Foxtail Lily Vertical</h2>
-            <p>参考：狐尾百合。目标是强竖向线条，但底部需要小花和簇团支撑，不能变成僵硬柱子。</p>
-            <div class="tags">
-              <span class="tag">蛇鞭菊线形</span>
-              <span class="tag">风信子穗形</span>
-              <span class="tag">金鱼草穗形</span>
-              <span class="tag">洋甘菊形</span>
-              <span class="tag">风铃果形</span>
-              <span class="tag">绣球簇形</span>
-            </div>
-            <p><a href="https://calfnai.github.io/dailyFlora/?date=2026-09-18&amp;seed=foxtail-lily-vertical&amp;theme=hillside-wild&amp;render=high&amp;density=medium" target="_blank">打开单独页面</a></p>
-          </div>
-        </article>
-
-        <article class="card">
-          <iframe src="https://calfnai.github.io/dailyFlora/?date=2026-10-06&amp;seed=berry-grove&amp;theme=tropical-forest&amp;render=high&amp;density=medium" title="浆果森林束"></iframe>
-          <div class="body">
-            <h2>浆果森林束 / Berry Grove</h2>
-            <p>参考：浆果森林、蓝莓形状参考。目标是小果、小花、枝叶混合的童话感，减少端庄大花。</p>
-            <div class="tags">
-              <span class="tag">浆果风铃果形</span>
-              <span class="tag">小绣球簇形</span>
-              <span class="tag">小雏菊形</span>
-              <span class="tag">细线花材</span>
-              <span class="tag">小蝴蝶兰形</span>
-              <span class="tag">乒乓菊球形</span>
-            </div>
-            <p><a href="https://calfnai.github.io/dailyFlora/?date=2026-10-06&amp;seed=berry-grove&amp;theme=tropical-forest&amp;render=high&amp;density=medium" target="_blank">打开单独页面</a></p>
-          </div>
-        </article>
-
-        <article class="card">
-          <iframe src="https://calfnai.github.io/dailyFlora/?date=2026-11-12&amp;seed=autumn-juice&amp;theme=sea-salt-lemon&amp;render=high&amp;density=medium" title="秋日果汁束"></iframe>
-          <div class="body">
-            <h2>秋日果汁束 / Autumn Juice Bouquet</h2>
-            <p>参考：秋日果汁、浪漫具象化。目标是暖橙黄、饱满但不沉，有层叠主花和果感跳点。</p>
-            <div class="tags">
-              <span class="tag">玫瑰形</span>
-              <span class="tag">山茶牡丹形</span>
-              <span class="tag">洋甘菊形</span>
-              <span class="tag">风铃果形</span>
-              <span class="tag">金鱼草形</span>
-              <span class="tag">绣球簇形</span>
-            </div>
-            <p><a href="https://calfnai.github.io/dailyFlora/?date=2026-11-12&amp;seed=autumn-juice&amp;theme=sea-salt-lemon&amp;render=high&amp;density=medium" target="_blank">打开单独页面</a></p>
-          </div>
-        </article>
-
-        <article class="card">
-          <iframe src="https://calfnai.github.io/dailyFlora/?date=2026-12-05&amp;seed=breathing-landscape&amp;theme=moon-white&amp;render=high&amp;density=medium" title="会呼吸的风景束"></iframe>
-          <div class="body">
-            <h2>会呼吸的风景束 / Breathing Landscape Bouquet</h2>
-            <p>参考：会呼吸的风景、洋水仙。目标是主体留空、前后层次和白黄季节感。</p>
-            <div class="tags">
-              <span class="tag">洋水仙/蝴蝶兰开口形</span>
-              <span class="tag">洋甘菊形</span>
-              <span class="tag">细线花材</span>
-              <span class="tag">风信子穗形</span>
-              <span class="tag">风铃果形</span>
-              <span class="tag">小绣球簇</span>
-            </div>
-            <p><a href="https://calfnai.github.io/dailyFlora/?date=2026-12-05&amp;seed=breathing-landscape&amp;theme=moon-white&amp;render=high&amp;density=medium" target="_blank">打开单独页面</a></p>
-          </div>
-        </article>
+      <section class="toolbar" aria-label="样例筛选">
+        <label>
+          分类
+          <select id="category-select">
+            <option value="all">全部分类</option>
+            <option value="color">多色/彩虹</option>
+            <option value="air">空气感</option>
+            <option value="line">竖向线条</option>
+            <option value="fruit">果材/浆果</option>
+            <option value="warm">暖色饱满</option>
+          </select>
+        </label>
+        <label>
+          排序
+          <select id="sort-select">
+            <option value="newest">最新在前</option>
+            <option value="oldest">最早在前</option>
+            <option value="name">名称 A-Z</option>
+          </select>
+        </label>
+        <label>
+          每页显示
+          <select id="page-size-select">
+            <option value="20">20 项</option>
+            <option value="50">50 项</option>
+          </select>
+        </label>
+        <span class="count" id="result-count"></span>
       </section>
+
+      <section class="grid" id="sample-grid" aria-label="固定花束样例"></section>
+      <nav class="pager" id="pager" aria-label="分页"></nav>
+      <p class="note">未来可以把这些卡片的预览替换成构建时生成的截图；当前用轻量色块占位，保留实时链接。</p>
     </main>
+
     <script>
-      if (window.location.protocol !== 'file:') {
-        const localApp = new URL('../index.html', window.location.href);
-        document
-          .querySelectorAll('iframe[src^="https://calfnai.github.io/dailyFlora/"], a[href^="https://calfnai.github.io/dailyFlora/"]')
-          .forEach((node) => {
-            const remote = new URL(node.getAttribute(node.tagName === 'IFRAME' ? 'src' : 'href'));
-            const next = new URL(localApp.href);
-            next.search = remote.search;
-            node.setAttribute(node.tagName === 'IFRAME' ? 'src' : 'href', next.href);
+      const samples = [
+        {
+          title: '会呼吸的风景束',
+          en: 'Breathing Landscape Bouquet',
+          date: '2026-12-05',
+          category: 'air',
+          seed: 'breathing-landscape',
+          theme: 'moon-white',
+          summary: '参考：会呼吸的风景、洋水仙。目标是主体留空、前后层次和白黄季节感。',
+          tags: ['洋水仙/蝴蝶兰开口形', '洋甘菊形', '细线花材', '风信子穗形', '风铃果形', '小绣球簇'],
+          colors: ['#fff7df', '#f3d35f', '#86b86f']
+        },
+        {
+          title: '秋日果汁束',
+          en: 'Autumn Juice Bouquet',
+          date: '2026-11-12',
+          category: 'warm',
+          seed: 'autumn-juice',
+          theme: 'sea-salt-lemon',
+          summary: '参考：秋日果汁、浪漫具象化。目标是暖橙黄、饱满但不沉，有层叠主花和果感跳点。',
+          tags: ['玫瑰形', '山茶牡丹形', '洋甘菊形', '风铃果形', '金鱼草形', '绣球簇形'],
+          colors: ['#f3d35f', '#f08b36', '#8fbf62']
+        },
+        {
+          title: '浆果森林束',
+          en: 'Berry Grove',
+          date: '2026-10-06',
+          category: 'fruit',
+          seed: 'berry-grove',
+          theme: 'tropical-forest',
+          summary: '参考：浆果森林、蓝莓形状参考。目标是小果、小花、枝叶混合的童话感，减少端庄大花。',
+          tags: ['浆果风铃果形', '小绣球簇形', '小雏菊形', '细线花材', '小蝴蝶兰形', '乒乓菊球形'],
+          colors: ['#4566d9', '#7aa65a', '#f8f0c8']
+        },
+        {
+          title: '狐尾百合竖线束',
+          en: 'Foxtail Lily Vertical',
+          date: '2026-09-18',
+          category: 'line',
+          seed: 'foxtail-lily-vertical',
+          theme: 'hillside-wild',
+          summary: '参考：狐尾百合。目标是强竖向线条，但底部需要小花和簇团支撑，不能变成僵硬柱子。',
+          tags: ['蛇鞭菊线形', '风信子穗形', '金鱼草穗形', '洋甘菊形', '风铃果形', '绣球簇形'],
+          colors: ['#f6efdc', '#d8b661', '#6f9a56']
+        },
+        {
+          title: '梦幻紫空气束',
+          en: 'Fairy Violet Air',
+          date: '2026-08-03',
+          category: 'air',
+          seed: 'fairy-violet-air',
+          theme: 'fairy-violet',
+          summary: '参考：梦幻紫。目标是蓝紫统一但不闷，靠细长穗线、小花雾气和少量不对称花瓣拉开空气。',
+          tags: ['风信子穗形', '蛇鞭菊线形', '蝴蝶兰形', '小雏菊形', '山茶牡丹形', '绣球雾团形'],
+          colors: ['#b99cff', '#7dc9ff', '#f6efff']
+        },
+        {
+          title: '夏日风车细节束',
+          en: 'Summer Pinwheel Detail',
+          date: '2026-07-11',
+          category: 'color',
+          seed: 'summer-pinwheel-detail',
+          theme: 'summer-pinwheel',
+          summary: '参考：夏日风车、多色花束。目标是多色但不乱，外圈有上扬线，中心不能被单朵大花压住。',
+          tags: ['蝴蝶兰形', '洋甘菊形', '玫瑰层叠形', '金鱼草穗形', '绣球簇形', '风铃果形'],
+          colors: ['#ffcf5a', '#7fd7e8', '#ff8fab']
+        },
+        {
+          title: '荔枝花园彩虹束',
+          en: 'Lychee Garden Rainbow Bouquet',
+          date: '2026-07-02',
+          category: 'color',
+          seed: 'lychee-garden-rainbow',
+          theme: 'lychee-garden-rainbow',
+          summary: 'owner-provided 待确认参考：Lychee Garden｜捏一个彩虹。目标是自然风彩虹多色。',
+          tags: ['奶白小面花', '彩虹小面花', '荔枝珍珠果点', '浅色空气小簇', '彩虹星形线花', '嫩绿外开枝线'],
+          colors: ['#fff6e7', '#ff9fbd', '#8ee9d0']
+        },
+        {
+          title: '晨露莓园空气束',
+          en: 'Dewberry Morning Air',
+          date: '2026-06-26',
+          category: 'air',
+          seed: 'dewberry-morning-air',
+          theme: 'dewberry-morning',
+          summary: '原创候选：学习山岗小花的空间语法，但换成清晨莓园方向。',
+          tags: ['奶白小面花', '柠檬黄小雏菊', '蓝紫雾状小簇', '莓红露珠果材', '象牙杯形花', '嫩绿外开穗线'],
+          colors: ['#fff7df', '#bfe878', '#7dc9ff']
+        }
+      ];
+
+      const grid = document.querySelector('#sample-grid');
+      const pager = document.querySelector('#pager');
+      const resultCount = document.querySelector('#result-count');
+      const categorySelect = document.querySelector('#category-select');
+      const sortSelect = document.querySelector('#sort-select');
+      const pageSizeSelect = document.querySelector('#page-size-select');
+      let page = 1;
+
+      function hrefFor(sample) {
+        const local = new URL('../index.html', window.location.href);
+        local.search = new URLSearchParams({
+          date: sample.date,
+          seed: sample.seed,
+          theme: sample.theme,
+          render: 'high',
+          density: 'medium'
+        }).toString();
+
+        if (window.location.protocol !== 'file:') return local.href;
+        return `https://calfnai.github.io/dailyFlora/${local.search}`;
+      }
+
+      function currentItems() {
+        const category = categorySelect.value;
+        const sort = sortSelect.value;
+        return samples
+          .filter((sample) => category === 'all' || sample.category === category)
+          .sort((a, b) => {
+            if (sort === 'oldest') return a.date.localeCompare(b.date);
+            if (sort === 'name') return a.en.localeCompare(b.en);
+            return b.date.localeCompare(a.date);
           });
       }
+
+      function render() {
+        const items = currentItems();
+        const pageSize = Number(pageSizeSelect.value);
+        const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
+        page = Math.min(page, pageCount);
+        const pageItems = items.slice((page - 1) * pageSize, page * pageSize);
+
+        resultCount.textContent = `${items.length} 项 · 第 ${page} / ${pageCount} 页`;
+        grid.innerHTML = pageItems
+          .map((sample) => {
+            const href = hrefFor(sample);
+            return `
+              <article class="card">
+                <a class="preview" style="--preview-a:${sample.colors[0]};--preview-b:${sample.colors[1]};--preview-c:${sample.colors[2]}" href="${href}" target="_blank" rel="noopener">
+                  <strong>${sample.title}</strong>
+                </a>
+                <div class="body">
+                  <h2>${sample.title} / ${sample.en}</h2>
+                  <p>${sample.summary}</p>
+                  <div class="tags">${sample.tags.map((tag) => `<span class="tag">${tag}</span>`).join('')}</div>
+                  <div class="actions">
+                    <a class="button primary" href="${href}" target="_blank" rel="noopener">实时打开</a>
+                    <a class="button" href="${href}&debug=1" target="_blank" rel="noopener">debug</a>
+                  </div>
+                </div>
+              </article>
+            `;
+          })
+          .join('');
+
+        pager.innerHTML = Array.from({ length: pageCount }, (_, index) => {
+          const number = index + 1;
+          return `<button type="button" aria-pressed="${number === page}" data-page="${number}">${number}</button>`;
+        }).join('');
+      }
+
+      [categorySelect, sortSelect, pageSizeSelect].forEach((control) => {
+        control.addEventListener('change', () => {
+          page = 1;
+          render();
+        });
+      });
+
+      pager.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-page]');
+        if (!button) return;
+        page = Number(button.dataset.page);
+        render();
+      });
+
+      render();
     </script>
   </body>
 </html>

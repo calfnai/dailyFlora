@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DailyFlora 用户页面测试</title>
+    <style>
+      :root { color-scheme: dark; --bg: #080a07; --surface: #11160f; --line: rgb(247 240 227 / 14%); --text: #f7f0e3; --muted: rgb(247 240 227 / 68%); --accent: #f2cb62; --good: #87d486; --warn: #efb960; }
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text); background: radial-gradient(circle at 12% 0%, rgb(242 203 98 / 10%), transparent 28%), #080a07; }
+      main { width: min(1180px, 100%); margin: 0 auto; padding: 28px 20px 56px; }
+      h1, h2, h3, p { margin: 0; }
+      h1 { font-size: clamp(36px, 7vw, 76px); line-height: .96; letter-spacing: 0; }
+      h2 { margin-top: 26px; font-size: 28px; }
+      h3 { font-size: 17px; }
+      p, li { color: var(--muted); line-height: 1.62; }
+      a { color: var(--accent); }
+      header, .card, .panel { border: 1px solid var(--line); border-radius: 8px; background: rgb(17 22 15 / 78%); }
+      header { display: grid; gap: 14px; padding: 26px; background: linear-gradient(145deg, rgb(17 22 15 / 96%), rgb(24 31 21 / 84%)); }
+      .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 14px; }
+      .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .card { display: grid; gap: 10px; padding: 16px; }
+      .profile { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 16px; align-items: center; }
+      .avatar { display: grid; place-items: center; width: 84px; aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--line); background: radial-gradient(circle at 50% 38%, #f2cb62, #87d486 52%, #182416); color: #10150f; font-size: 32px; font-weight: 900; }
+      .tag { display: inline-flex; width: fit-content; min-height: 24px; align-items: center; padding: 0 8px; border: 1px solid currentColor; border-radius: 999px; color: var(--warn); font-size: 12px; font-weight: 700; }
+      .tag.good { color: var(--good); }
+      .panel { margin-top: 14px; overflow: hidden; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 13px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+      th { color: rgb(247 240 227 / 86%); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: rgb(255 255 255 / 4%); }
+      td { color: var(--muted); }
+      tr:last-child td { border-bottom: 0; }
+      code { color: rgb(247 240 227 / 88%); }
+      @media (max-width: 860px) { .grid, .grid.two { grid-template-columns: 1fr; } .profile { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p>Member test / mock data</p>
+        <h1>用户页面测试</h1>
+        <p>这个页面替代原来的头像单点实验，用来测试用户中心的信息架构。当前不接真实登录、数据库或付款方式，只把未来需要的数据域先排出来。</p>
+      </header>
+
+      <h2>用户资料</h2>
+      <section class="grid two">
+        <article class="card profile">
+          <div class="avatar">花</div>
+          <div>
+            <h3>小花 / gardenia@example.com</h3>
+            <p>可修改昵称、头像和密码。正式版需要认证和安全流程；MVP 先做界面和状态。</p>
+          </div>
+        </article>
+        <article class="card">
+          <span class="tag good">credits mock</span>
+          <h3>积分余额：128</h3>
+          <p>月度订阅未来也按积分发放。现在只展示流水模型，不决定付款方式。</p>
+        </article>
+      </section>
+
+      <h2>生成记录</h2>
+      <div class="panel">
+        <table>
+          <thead><tr><th>花花</th><th>来源</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>晨露莓园空气束<br /><code>seed=dewberry-morning-air</code></td>
+              <td>上传参考图 + “更清透、枝条外扩”</td>
+              <td>已生成，消耗 12 积分</td>
+              <td>复制参数，重新生成一份；旧记录不热修改。</td>
+            </tr>
+            <tr>
+              <td>荔枝花园彩虹束<br /><code>seed=lychee-garden-rainbow</code></td>
+              <td>文字描述 + 参考图库</td>
+              <td>候选精选，等待审核</td>
+              <td>查看详情、复制生成。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>上传、订单和获奖</h2>
+      <section class="grid">
+        <article class="card">
+          <span class="tag">uploads</span>
+          <h3>上传记录</h3>
+          <p>未来存照片文件地址、缩略图、描述、归属用户、关联生成记录。MVP 先用假卡片。</p>
+        </article>
+        <article class="card">
+          <span class="tag">orders</span>
+          <h3>订单入口</h3>
+          <p>付款方式未决定，当前只保留订单/发票入口和“暂未开放”状态。</p>
+        </article>
+        <article class="card">
+          <span class="tag good">reward</span>
+          <h3>获奖返还</h3>
+          <p>用户生成的花花若被选为 dailyFlora，每次生成消耗积分乘以 10 返还。</p>
+        </article>
+      </section>
+
+      <p style="margin-top:24px"><a href="./dev-index.html">回到开发组目录</a> · <a href="../">回到首页</a></p>
+    </main>
+  </body>
+</html>
