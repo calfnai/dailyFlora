@@ -36,7 +36,8 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         aestheticReviewDashboard: resolve(__dirname, 'docs/aesthetic-review-dashboard.html'),
-        primitiveLab: resolve(__dirname, 'docs/primitive-lab.html')
+        primitiveLab: resolve(__dirname, 'docs/primitive-lab.html'),
+        avatarLab: resolve(__dirname, 'docs/avatar-lab.html')
       }
     }
   }
