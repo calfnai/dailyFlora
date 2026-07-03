@@ -4,10 +4,34 @@ import { todayKey } from './random';
 import { createDailySpec, readParams } from './spec';
 import { resolveQuality } from './quality';
 import { BouquetScene } from './bouquetScene';
-import { createSpecialSpec, readSpecialId, special0629Pathname, specialReferences, withBasePath } from './special';
+import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
+import { themes } from './themes';
 
 type RotationDirection = 1 | -1;
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
+type AccountState = {
+  name: string;
+  email: string;
+};
+type FavoriteBouquet = {
+  id: string;
+  date: string;
+  seed: string;
+  themeId: string;
+  themeName: string;
+  themeEnglishName: string;
+  flowerPlanName: string;
+  flowers: string;
+  savedAt: string;
+};
+type ReferenceState = {
+  dataUrl: string;
+  fileName: string;
+  size: number;
+  averageColor: string;
+  themeId: string;
+  themeName: string;
+};
 
 const minRotationSpeed = 0.012;
 const maxRotationSpeed = 0.13;
@@ -21,6 +45,8 @@ const renderLabels: Record<Exclude<RenderQualityName, 'auto'>, string> = {
   medium: '清',
   high: '精'
 };
+const accountStorageKey = 'dailyflora.account.v1';
+const favoritesStorageKey = 'dailyflora.favorites.v1';
 const themeEnglishNames: Record<string, string> = {
   'tropical-forest': 'Tropical Forest',
   'moon-white': 'Moon White Hand-Tied',
@@ -30,7 +56,12 @@ const themeEnglishNames: Record<string, string> = {
   'summer-pinwheel': 'Summer Pinwheel',
   'dopamine-field': 'Dopamine Field',
   'starry-night': 'Starry Night',
-  'her-january-sky': 'Her January Sky'
+  'dewberry-morning': 'Dewberry Morning',
+  'lychee-garden-rainbow': 'Lychee Garden Rainbow',
+  'her-january-sky': 'Her January Sky',
+  'her-january-sky-v2': 'Her January Sky v2',
+  'her-january-sky-v3': 'Her January Sky v3',
+  'her-real-bouquet-v4': 'Her Real Bouquet v4'
 };
 const rotationPresets: Array<{
   speed: number;
@@ -97,13 +128,20 @@ const rotationPresets: Array<{
 const canvas = document.querySelector<HTMLCanvasElement>('#flora-canvas');
 const hud = document.querySelector<HTMLElement>('#hud');
 const controls = document.querySelector<HTMLElement>('#controls');
+const controlsToggleButton = document.querySelector<HTMLButtonElement>('#controls-toggle');
+const controlsPanel = document.querySelector<HTMLElement>('#controls-panel');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
 const themeLabel = document.querySelector<HTMLElement>('#daily-theme');
+const themeCnLabel = document.querySelector<HTMLElement>('#daily-theme-cn');
+const themeEnLabel = document.querySelector<HTMLElement>('#daily-theme-en');
 const flowerPlanLabel = document.querySelector<HTMLElement>('#flower-plan-mark');
 const qualityLabel = document.querySelector<HTMLElement>('#quality-mark');
+const reviewDashboardLink = document.querySelector<HTMLAnchorElement>('#review-dashboard-link');
+const debugPanel = document.querySelector<HTMLElement>('#debug-panel');
 const pauseButton = document.querySelector<HTMLButtonElement>('#pause-button');
 const todayButton = document.querySelector<HTMLButtonElement>('#today-button');
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker');
+const calendarPanel = document.createElement('div');
 const shuffleButton = document.querySelector<HTMLButtonElement>('#shuffle-button');
 const fullscreenButton = document.querySelector<HTMLButtonElement>('#fullscreen-button');
 const zoomInButton = document.querySelector<HTMLButtonElement>('#zoom-in-button');
@@ -113,8 +151,47 @@ const renderButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[
 const rotationSpeedInput = document.querySelector<HTMLInputElement>('#rotation-speed');
 const rotationDirectionButton = document.querySelector<HTMLButtonElement>('#rotation-direction-button');
 const rotationPresetButton = document.querySelector<HTMLButtonElement>('#rotation-preset-button');
+const accountDock = document.querySelector<HTMLElement>('#account-dock');
+const favoriteButton = document.querySelector<HTMLButtonElement>('#favorite-button');
+const accountOpenButton = document.querySelector<HTMLButtonElement>('#account-open-button');
+const accountCloseButton = document.querySelector<HTMLButtonElement>('#account-close-button');
+const accountPanel = document.querySelector<HTMLElement>('#account-panel');
+const accountAvatar = document.querySelector<HTMLElement>('#account-avatar');
+const accountOpenTitle = document.querySelector<HTMLElement>('#account-open-title');
+const accountOpenStatus = document.querySelector<HTMLElement>('#account-open-status');
+const accountPanelTitle = document.querySelector<HTMLElement>('#account-panel-title');
+const loginForm = document.querySelector<HTMLFormElement>('#login-form');
+const loginNameInput = document.querySelector<HTMLInputElement>('#login-name-input');
+const loginEmailInput = document.querySelector<HTMLInputElement>('#login-email-input');
+const accountProfile = document.querySelector<HTMLElement>('#account-profile');
+const profileAvatar = document.querySelector<HTMLElement>('#profile-avatar');
+const profileName = document.querySelector<HTMLElement>('#profile-name');
+const profileEmail = document.querySelector<HTMLElement>('#profile-email');
+const logoutButton = document.querySelector<HTMLButtonElement>('#logout-button');
+const collectionCount = document.querySelector<HTMLElement>('#collection-count');
+const collectionList = document.querySelector<HTMLElement>('#collection-list');
+const referenceFileInput = document.querySelector<HTMLInputElement>('#reference-file-input');
+const referencePreview = document.querySelector<HTMLElement>('#reference-preview');
+const referencePreviewImage = document.querySelector<HTMLImageElement>('#reference-preview-image');
+const referencePreviewTitle = document.querySelector<HTMLElement>('#reference-preview-title');
+const referencePreviewMeta = document.querySelector<HTMLElement>('#reference-preview-meta');
+const referenceNoteInput = document.querySelector<HTMLTextAreaElement>('#reference-note-input');
+const referenceGenerateButton = document.querySelector<HTMLButtonElement>('#reference-generate-button');
+const referenceResult = document.querySelector<HTMLElement>('#reference-result');
 
-if (!canvas || !hud || !controls || !dateLabel || !themeLabel || !flowerPlanLabel || !qualityLabel) {
+if (
+  !canvas ||
+  !hud ||
+  !controls ||
+  !controlsToggleButton ||
+  !controlsPanel ||
+  !dateLabel ||
+  !themeLabel ||
+  !themeCnLabel ||
+  !themeEnLabel ||
+  !flowerPlanLabel ||
+  !qualityLabel
+) {
   throw new Error('DailyFlora could not find the required page elements.');
 }
 
@@ -122,8 +199,12 @@ const ui = {
   canvas,
   hud,
   controls,
+  controlsToggleButton,
+  controlsPanel,
   dateLabel,
   themeLabel,
+  themeCnLabel,
+  themeEnLabel,
   flowerPlanLabel,
   qualityLabel
 };
@@ -133,6 +214,8 @@ const specialId = readSpecialId();
 const specialReference = specialId ? specialReferences[specialId] : null;
 let selectedDensity = specialReference ? 'medium' : normalizeDensity(params.density);
 const searchParams = new URLSearchParams(window.location.search);
+const debugValue = searchParams.get('debug');
+const debugMode = searchParams.has('debug') && debugValue !== '0' && debugValue !== 'false';
 let selectedRender = specialReference && !searchParams.has('render') && !searchParams.has('quality')
   ? 'high'
   : normalizeRender(params.render);
@@ -141,6 +224,7 @@ let quality = resolveQuality(selectedDensity, selectedRender);
 let spec = specialReference
   ? createSpecialSpec(specialReference, new URLSearchParams(window.location.search).get('date') || undefined)
   : createDailySpec(params.date, params.seed, selectedTheme);
+let followsToday = !specialReference && !searchParams.has('date') && !searchParams.has('seed');
 let scene = new BouquetScene(ui.canvas, spec, quality);
 let hideTimer = 0;
 let previewCount = 0;
@@ -154,6 +238,23 @@ let targetYAmplitude = 0;
 let manualRotation = false;
 let manualZoom = 0;
 let specialAudio: HTMLAudioElement | null = null;
+let specialAudioMuted = false;
+let debugTimer = 0;
+let dateRolloverTimer = 0;
+let calendarView = parseDateKey(spec.dateLabel);
+let accountState = readAccountState();
+let favoriteBouquets = readFavoriteBouquets();
+let referenceState: ReferenceState | null = null;
+
+calendarPanel.className = 'date-calendar';
+calendarPanel.id = 'date-calendar';
+calendarPanel.hidden = true;
+calendarPanel.setAttribute('role', 'dialog');
+calendarPanel.setAttribute('aria-label', 'Pick bouquet date');
+document.body.append(calendarPanel);
+todayButton?.setAttribute('aria-haspopup', 'dialog');
+todayButton?.setAttribute('aria-controls', 'date-calendar');
+todayButton?.setAttribute('aria-expanded', 'false');
 
 function THREEClamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -181,13 +282,307 @@ function bouquetHoverTitle() {
   return `${spec.theme.name} / ${english}`;
 }
 
+function themeEnglishName() {
+  return themeEnglishNames[spec.theme.id] || spec.theme.id;
+}
+
 function flowerPlanText() {
   return spec.flowerPlan.items.map((item) => item.cn).join(' / ');
 }
 
+function safeJsonParse<T>(value: string | null, fallback: T): T {
+  if (!value) return fallback;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function readAccountState(): AccountState | null {
+  const account = safeJsonParse<AccountState | null>(window.localStorage.getItem(accountStorageKey), null);
+  if (!account?.email) return null;
+  return account;
+}
+
+function saveAccountState(nextAccount: AccountState | null) {
+  accountState = nextAccount;
+  if (nextAccount) {
+    window.localStorage.setItem(accountStorageKey, JSON.stringify(nextAccount));
+  } else {
+    window.localStorage.removeItem(accountStorageKey);
+  }
+  renderAccountState();
+}
+
+function readFavoriteBouquets(): FavoriteBouquet[] {
+  const favorites = safeJsonParse<FavoriteBouquet[]>(window.localStorage.getItem(favoritesStorageKey), []);
+  return Array.isArray(favorites) ? favorites : [];
+}
+
+function saveFavoriteBouquets(nextFavorites: FavoriteBouquet[]) {
+  favoriteBouquets = nextFavorites.slice(0, 24);
+  window.localStorage.setItem(favoritesStorageKey, JSON.stringify(favoriteBouquets));
+  renderAccountState();
+}
+
+function currentFavoriteId() {
+  return `${spec.dateLabel}:${spec.seed}:${spec.theme.id}`;
+}
+
+function currentFavorite() {
+  return favoriteBouquets.find((favorite) => favorite.id === currentFavoriteId()) || null;
+}
+
+function createFavorite(): FavoriteBouquet {
+  return {
+    id: currentFavoriteId(),
+    date: spec.dateLabel,
+    seed: spec.seed,
+    themeId: spec.theme.id,
+    themeName: spec.theme.name,
+    themeEnglishName: themeEnglishName(),
+    flowerPlanName: spec.flowerPlan.cnName,
+    flowers: flowerPlanText(),
+    savedAt: new Date().toISOString()
+  };
+}
+
+function initials(name: string, fallback: string) {
+  const trimmed = name.trim();
+  return trimmed ? trimmed.slice(0, 1).toUpperCase() : fallback;
+}
+
+function formatFileSize(size: number) {
+  if (size >= 1024 * 1024) return `${(size / 1024 / 1024).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(size / 1024))} KB`;
+}
+
+function rgbToHex(red: number, green: number, blue: number) {
+  return `#${[red, green, blue].map((value) => value.toString(16).padStart(2, '0')).join('')}`;
+}
+
+function rgbToHsl(red: number, green: number, blue: number) {
+  const r = red / 255;
+  const g = green / 255;
+  const b = blue / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const lightness = (max + min) / 2;
+  const delta = max - min;
+  if (delta === 0) return { hue: 0, saturation: 0, lightness };
+  const saturation = delta / (1 - Math.abs(2 * lightness - 1));
+  let hue = 0;
+  if (max === r) hue = ((g - b) / delta) % 6;
+  if (max === g) hue = (b - r) / delta + 2;
+  if (max === b) hue = (r - g) / delta + 4;
+  return { hue: (hue * 60 + 360) % 360, saturation, lightness };
+}
+
+function themeForAverageColor(red: number, green: number, blue: number) {
+  const { hue, saturation, lightness } = rgbToHsl(red, green, blue);
+  let themeId = 'sea-salt-lemon';
+  if (lightness > 0.76 && saturation < 0.28) themeId = 'moon-white';
+  else if (hue >= 245 && hue < 330) themeId = saturation > 0.34 ? 'fairy-violet' : 'starry-night';
+  else if (hue >= 330 || hue < 22) themeId = 'dewberry-morning';
+  else if (hue >= 22 && hue < 54) themeId = saturation > 0.42 ? 'summer-pinwheel' : 'hillside-wild';
+  else if (hue >= 54 && hue < 92) themeId = 'sea-salt-lemon';
+  else if (hue >= 92 && hue < 172) themeId = saturation > 0.32 ? 'tropical-forest' : 'hillside-wild';
+  else if (hue >= 172 && hue < 215) themeId = 'sea-salt-lemon';
+  else if (hue >= 215 && hue < 245) themeId = 'starry-night';
+  return themes.find((theme) => theme.id === themeId) || themes[0];
+}
+
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => resolve(String(reader.result || '')));
+    reader.addEventListener('error', () => reject(reader.error || new Error('Could not read reference image.')));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(dataUrl: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener('load', () => resolve(image));
+    image.addEventListener('error', () => reject(new Error('Could not load reference image.')));
+    image.src = dataUrl;
+  });
+}
+
+async function analyzeReferenceImage(file: File): Promise<ReferenceState> {
+  const dataUrl = await readFileAsDataUrl(file);
+  const image = await loadImage(dataUrl);
+  const canvasElement = document.createElement('canvas');
+  const size = 48;
+  canvasElement.width = size;
+  canvasElement.height = size;
+  const context = canvasElement.getContext('2d', { willReadFrequently: true });
+  if (!context) throw new Error('Could not analyze reference image.');
+  context.drawImage(image, 0, 0, size, size);
+  const pixels = context.getImageData(0, 0, size, size).data;
+  let red = 0;
+  let green = 0;
+  let blue = 0;
+  let count = 0;
+  for (let index = 0; index < pixels.length; index += 4) {
+    const alpha = pixels[index + 3] / 255;
+    if (alpha < 0.2) continue;
+    red += pixels[index] * alpha;
+    green += pixels[index + 1] * alpha;
+    blue += pixels[index + 2] * alpha;
+    count += alpha;
+  }
+  const averageRed = Math.round(red / Math.max(1, count));
+  const averageGreen = Math.round(green / Math.max(1, count));
+  const averageBlue = Math.round(blue / Math.max(1, count));
+  const theme = themeForAverageColor(averageRed, averageGreen, averageBlue);
+  return {
+    dataUrl,
+    fileName: file.name,
+    size: file.size,
+    averageColor: rgbToHex(averageRed, averageGreen, averageBlue),
+    themeId: theme.id,
+    themeName: theme.name
+  };
+}
+
+function renderReferenceState() {
+  if (!referencePreview || !referencePreviewImage || !referencePreviewMeta || !referenceGenerateButton) return;
+  const hasReference = Boolean(referenceState);
+  referencePreview.hidden = !hasReference;
+  referenceGenerateButton.disabled = !hasReference;
+  if (!referenceState) return;
+  referencePreviewImage.src = referenceState.dataUrl;
+  referencePreviewTitle && (referencePreviewTitle.textContent = referenceState.fileName);
+  referencePreviewMeta.textContent = `${formatFileSize(referenceState.size)} · ${referenceState.themeName} · ${referenceState.averageColor}`;
+  referencePreview.style.setProperty('--reference-color', referenceState.averageColor);
+}
+
+async function handleReferenceFile(file: File) {
+  if (!file.type.startsWith('image/')) return;
+  if (referenceResult) {
+    referenceResult.hidden = false;
+    referenceResult.textContent = '正在读取参考图...';
+  }
+  referenceState = await analyzeReferenceImage(file);
+  renderReferenceState();
+  if (referenceResult) {
+    referenceResult.textContent = `已匹配到 ${referenceState.themeName}，可以生成。`;
+  }
+}
+
+function generateFromReference() {
+  if (!referenceState) return;
+  const note = referenceNoteInput?.value.trim() || 'reference';
+  const date = todayKey();
+  const seed = `reference:${Date.now()}:${referenceState.fileName}:${note}`;
+  selectedTheme = referenceState.themeId;
+  previewCount = 0;
+  closeCalendar();
+  rebuild(date, seed);
+  syncTodayMode(date, seed);
+  if (referenceResult) {
+    referenceResult.hidden = false;
+    referenceResult.textContent = `已按 ${referenceState.themeName} 生成，可点爱心收藏。`;
+  }
+}
+
+function openAccountPanel() {
+  if (!accountPanel || !accountOpenButton) return;
+  accountPanel.hidden = false;
+  accountOpenButton.setAttribute('aria-expanded', 'true');
+  window.setTimeout(() => accountPanel.classList.add('is-open'), 20);
+  if (!accountState) {
+    loginNameInput?.focus();
+  }
+  revealUi();
+}
+
+function closeAccountPanel() {
+  if (!accountPanel || !accountOpenButton) return;
+  accountPanel.classList.remove('is-open');
+  accountOpenButton.setAttribute('aria-expanded', 'false');
+  window.setTimeout(() => {
+    if (!accountPanel.classList.contains('is-open')) accountPanel.hidden = true;
+  }, 220);
+}
+
+function toggleFavorite() {
+  if (!accountState) {
+    openAccountPanel();
+    return;
+  }
+
+  const favorite = currentFavorite();
+  if (favorite) {
+    saveFavoriteBouquets(favoriteBouquets.filter((item) => item.id !== favorite.id));
+    return;
+  }
+
+  saveFavoriteBouquets([createFavorite(), ...favoriteBouquets.filter((item) => item.id !== currentFavoriteId())]);
+}
+
+function renderFavoriteButton() {
+  if (!favoriteButton) return;
+  const saved = Boolean(currentFavorite());
+  favoriteButton.classList.toggle('is-saved', saved);
+  favoriteButton.setAttribute('aria-pressed', String(saved));
+  favoriteButton.title = saved ? '已收藏今日花束' : '收藏今日花束';
+}
+
+function renderCollectionList() {
+  if (!collectionList || !collectionCount) return;
+  collectionCount.textContent = String(favoriteBouquets.length);
+  if (favoriteBouquets.length === 0) {
+    collectionList.innerHTML = `
+      <div class="empty-collection">
+        <strong>还没有收藏</strong>
+        <span>点亮爱心后，这束花会留在这里。</span>
+      </div>
+    `;
+    return;
+  }
+
+  collectionList.innerHTML = favoriteBouquets
+    .map(
+      (favorite) => `
+        <button class="collection-item" type="button" data-favorite-id="${favorite.id}">
+          <span class="collection-item-date">${favorite.date}</span>
+          <span class="collection-item-title">${favorite.themeName}</span>
+          <span class="collection-item-meta">${favorite.flowerPlanName} · ${favorite.themeEnglishName}</span>
+        </button>
+      `
+    )
+    .join('');
+}
+
+function renderAccountState() {
+  const signedIn = Boolean(accountState);
+  accountDock?.classList.toggle('is-signed-in', signedIn);
+  if (accountOpenTitle) accountOpenTitle.textContent = signedIn ? accountState?.name || '个人花园' : '个人花园';
+  if (accountOpenStatus) {
+    accountOpenStatus.textContent = signedIn
+      ? `${favoriteBouquets.length} 个收藏`
+      : '登录后同步收藏';
+  }
+  if (accountAvatar) accountAvatar.textContent = signedIn ? initials(accountState?.name || '', '花') : '访';
+  if (accountPanelTitle) accountPanelTitle.textContent = signedIn ? '你的 DailyFlora 收藏' : '把今天的花束收进个人花园';
+  if (loginForm) loginForm.hidden = signedIn;
+  if (accountProfile) accountProfile.hidden = !signedIn;
+  if (profileAvatar) profileAvatar.textContent = initials(accountState?.name || '', '花');
+  if (profileName) profileName.textContent = accountState?.name || 'DailyFlora 用户';
+  if (profileEmail) profileEmail.textContent = accountState?.email || '';
+  renderFavoriteButton();
+  renderCollectionList();
+}
+
 function setLabels() {
+  const english = themeEnglishName();
   ui.dateLabel.textContent = spec.dateLabel;
-  ui.themeLabel.textContent = spec.theme.name;
+  ui.themeCnLabel.textContent = spec.theme.name;
+  ui.themeEnLabel.textContent = english;
   ui.flowerPlanLabel.textContent = `${spec.flowerPlan.cnName} · ${flowerPlanText()}`;
   ui.flowerPlanLabel.title = `${spec.flowerPlan.reference}\n${spec.flowerPlan.silhouette}\n避免：${spec.flowerPlan.avoid}`;
   if (datePicker) datePicker.value = spec.dateLabel;
@@ -199,7 +594,47 @@ function setLabels() {
   const renderLabel =
     selectedRender === 'auto' ? `自/${renderLabels[quality.renderName]}` : renderLabels[quality.renderName];
   ui.qualityLabel.textContent = `${densityLabels[quality.densityName]} · ${renderLabel}`;
-  document.title = `DailyFlora - ${spec.theme.name}`;
+  document.title = `DailyFlora - ${spec.theme.name} / ${english}`;
+  if (!calendarPanel.hidden) {
+    renderCalendar();
+    positionCalendarPanel();
+  }
+  renderFavoriteButton();
+}
+
+function formatCount(value: number) {
+  return value >= 1000 ? value.toLocaleString('en-US') : String(value);
+}
+
+function updateDebugPanel() {
+  if (!debugMode || !debugPanel) return;
+  const stats = scene.getDebugStats();
+  const heapText = stats.jsHeapUsedMb === null
+    ? 'n/a'
+    : `${stats.jsHeapUsedMb}/${stats.jsHeapTotalMb} MB`;
+  debugPanel.innerHTML = `
+    <div class="debug-row"><span>FPS</span><strong>${stats.fps || '--'} / ${stats.targetFps}</strong></div>
+    <div class="debug-row"><span>Render</span><strong>${stats.render} · ${stats.density}</strong></div>
+    <div class="debug-row"><span>Canvas</span><strong>${stats.canvasWidth}×${stats.canvasHeight} @ ${stats.pixelRatio.toFixed(2)}</strong></div>
+    <div class="debug-row"><span>Draw</span><strong>${stats.calls} calls · ${formatCount(stats.triangles)} tris</strong></div>
+    <div class="debug-row"><span>Points/Lines</span><strong>${formatCount(stats.points)} / ${formatCount(stats.lines)}</strong></div>
+    <div class="debug-row"><span>GPU res</span><strong>${stats.geometries} geo · ${stats.textures} tex</strong></div>
+    <div class="debug-row"><span>JS heap</span><strong>${heapText}</strong></div>
+  `;
+}
+
+function setupDebugMode() {
+  document.body.classList.toggle('is-debug', debugMode);
+  if (reviewDashboardLink) {
+    reviewDashboardLink.hidden = !debugMode;
+    reviewDashboardLink.href = withBasePath('docs/aesthetic-review-dashboard.html?debug=1');
+  }
+  if (debugPanel) {
+    debugPanel.hidden = !debugMode;
+  }
+  if (!debugMode) return;
+  updateDebugPanel();
+  debugTimer = window.setInterval(updateDebugPanel, 650);
 }
 
 function syncControls() {
@@ -234,14 +669,17 @@ function revealUi() {
   hideTimer = window.setTimeout(() => {
     ui.hud.classList.add('is-hidden');
     ui.controls.classList.add('is-hidden');
-  }, 3200);
+  }, ui.controls.classList.contains('is-expanded') ? 7000 : 3200);
 }
 
-function positionDatePicker() {
-  if (!datePicker || !todayButton) return;
-  const rect = todayButton.getBoundingClientRect();
-  datePicker.style.left = `${Math.round(rect.left)}px`;
-  datePicker.style.top = `${Math.round(rect.top)}px`;
+function setControlsExpanded(expanded: boolean) {
+  ui.controls.classList.toggle('is-expanded', expanded);
+  ui.controls.classList.toggle('is-collapsed', !expanded);
+  ui.controlsPanel.hidden = !expanded;
+  ui.controlsToggleButton.setAttribute('aria-expanded', String(expanded));
+  ui.controlsToggleButton.setAttribute('aria-label', expanded ? 'Hide viewing controls' : 'Show viewing controls');
+  ui.controlsToggleButton.title = expanded ? 'Hide viewing controls' : 'Show viewing controls';
+  revealUi();
 }
 
 function updateUrl(date: string, seed: string) {
@@ -273,7 +711,7 @@ function updateUrl(date: string, seed: string) {
     next.searchParams.set('theme', selectedTheme);
   }
   if (specialReference) {
-    next.pathname = special0629Pathname();
+    next.pathname = specialPathname(specialReference);
     next.searchParams.delete('special');
     next.searchParams.delete('seed');
     if (date === specialReference.date) {
@@ -283,6 +721,124 @@ function updateUrl(date: string, seed: string) {
     }
   }
   window.history.replaceState({}, '', next);
+}
+
+function syncTodayMode(date: string, seed: string) {
+  followsToday = !specialReference && date === todayKey() && seed === date;
+}
+
+function parseDateKey(dateKey: string) {
+  const [year, month, day] = dateKey.split('-').map((part) => Number(part));
+  const fallback = new Date();
+  return {
+    year: Number.isFinite(year) ? year : fallback.getFullYear(),
+    month: Number.isFinite(month) ? THREEClamp(month - 1, 0, 11) : fallback.getMonth(),
+    day: Number.isFinite(day) ? THREEClamp(day, 1, 31) : fallback.getDate()
+  };
+}
+
+function dateKeyFromParts(year: number, month: number, day: number) {
+  const paddedMonth = String(month + 1).padStart(2, '0');
+  const paddedDay = String(day).padStart(2, '0');
+  return `${year}-${paddedMonth}-${paddedDay}`;
+}
+
+function daysInMonth(year: number, month: number) {
+  return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+}
+
+function firstWeekday(year: number, month: number) {
+  return new Date(Date.UTC(year, month, 1)).getUTCDay();
+}
+
+function selectCalendarDate(dateKey: string) {
+  previewCount = 0;
+  rebuild(dateKey, dateKey);
+  syncTodayMode(dateKey, dateKey);
+  closeCalendar();
+}
+
+function closeCalendar() {
+  if (calendarPanel.hidden) return;
+  calendarPanel.hidden = true;
+  todayButton?.setAttribute('aria-expanded', 'false');
+}
+
+function positionCalendarPanel() {
+  if (!todayButton) return;
+  const margin = 12;
+  const buttonRect = todayButton.getBoundingClientRect();
+  const panelRect = calendarPanel.getBoundingClientRect();
+  const panelWidth = panelRect.width || 292;
+  const panelHeight = panelRect.height || 332;
+  const viewportWidth = document.documentElement.clientWidth;
+  const viewportHeight = document.documentElement.clientHeight;
+  const preferredLeft = buttonRect.right - panelWidth;
+  const left = THREEClamp(preferredLeft, margin, Math.max(margin, viewportWidth - panelWidth - margin));
+  const aboveTop = buttonRect.top - panelHeight - 10;
+  const belowTop = buttonRect.bottom + 10;
+  const hasRoomAbove = aboveTop >= margin;
+  const preferredTop = hasRoomAbove ? aboveTop : belowTop;
+  const top = THREEClamp(preferredTop, margin, Math.max(margin, viewportHeight - panelHeight - margin));
+
+  calendarPanel.style.left = `${left}px`;
+  calendarPanel.style.top = `${top}px`;
+}
+
+function renderCalendar() {
+  const selected = parseDateKey(spec.dateLabel);
+  const today = parseDateKey(todayKey());
+  const totalDays = daysInMonth(calendarView.year, calendarView.month);
+  const leadingDays = firstWeekday(calendarView.year, calendarView.month);
+  const monthLabel = `${calendarView.year}.${String(calendarView.month + 1).padStart(2, '0')}`;
+  const dayButtons: string[] = [];
+
+  for (let index = 0; index < leadingDays; index += 1) {
+    dayButtons.push('<span class="calendar-day is-empty" aria-hidden="true"></span>');
+  }
+
+  for (let day = 1; day <= totalDays; day += 1) {
+    const dateKey = dateKeyFromParts(calendarView.year, calendarView.month, day);
+    const isSelected =
+      selected.year === calendarView.year && selected.month === calendarView.month && selected.day === day;
+    const isToday = today.year === calendarView.year && today.month === calendarView.month && today.day === day;
+    dayButtons.push(`
+      <button
+        class="calendar-day${isSelected ? ' is-selected' : ''}${isToday ? ' is-today' : ''}"
+        type="button"
+        data-calendar-date="${dateKey}"
+        aria-pressed="${isSelected}"
+      >${day}</button>
+    `);
+  }
+
+  calendarPanel.innerHTML = `
+    <div class="calendar-header">
+      <button class="calendar-nav-button" type="button" data-calendar-nav="-1" aria-label="Previous month">‹</button>
+      <strong>${monthLabel}</strong>
+      <button class="calendar-nav-button" type="button" data-calendar-nav="1" aria-label="Next month">›</button>
+    </div>
+    <div class="calendar-weekdays" aria-hidden="true">
+      <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+    </div>
+    <div class="calendar-grid">${dayButtons.join('')}</div>
+  `;
+}
+
+function openCalendar() {
+  calendarView = parseDateKey(spec.dateLabel);
+  renderCalendar();
+  calendarPanel.hidden = false;
+  todayButton?.setAttribute('aria-expanded', 'true');
+  positionCalendarPanel();
+}
+
+function toggleCalendar() {
+  if (calendarPanel.hidden) {
+    openCalendar();
+  } else {
+    closeCalendar();
+  }
 }
 
 function applyRotationSettings(pitch?: number) {
@@ -348,6 +904,25 @@ function rebuild(date: string, seed: string) {
   revealUi();
 }
 
+function scheduleDailyRollover() {
+  if (specialReference) return;
+
+  window.clearTimeout(dateRolloverTimer);
+  const now = new Date();
+  const nextDay = new Date(now);
+  nextDay.setHours(24, 0, 3, 0);
+  const delay = Math.max(1000, nextDay.getTime() - now.getTime());
+
+  dateRolloverTimer = window.setTimeout(() => {
+    const date = todayKey();
+    if (followsToday && spec.dateLabel !== date) {
+      rebuild(date, date);
+      syncTodayMode(date, date);
+    }
+    scheduleDailyRollover();
+  }, delay);
+}
+
 function createSpecialOverlay() {
   if (!specialReference) return;
   document.body.classList.add('is-special');
@@ -365,29 +940,64 @@ function createSpecialOverlay() {
 
   const caption = document.createElement('aside');
   caption.className = 'special-caption';
+  const versionText = specialReference.versionLabel ? ` · ${specialReference.versionLabel}` : '';
   caption.innerHTML = `
     <p>NGC 2787 · seen by Hubble</p>
-    <p>A bouquet remembered for 2026.06.29</p>
+    <p>A bouquet remembered for 2026.06.29${versionText}</p>
   `;
 
   const quote = document.createElement('aside');
-  quote.className = 'special-quote';
-  quote.innerHTML = `
-    <p>Some flowers last for days.<br />Some light travels long enough to arrive as a memory.</p>
-    <p lang="zh-CN">有些花会谢。<br />有些光，会走很久才抵达。</p>
-  `;
+  quote.className = specialReference.quoteStanzas ? 'special-quote is-custom' : 'special-quote';
+  if (specialReference.quoteStanzas) {
+    const zh = specialReference.quoteStanzas
+      .map((stanza) => `<p lang="zh-CN">${stanza.replace(/\n/g, '<br />')}</p>`)
+      .join('');
+    const en = (specialReference.quoteTranslationStanzas || [])
+      .map((stanza) => `<p lang="en">${stanza.replace(/\n/g, '<br />')}</p>`)
+      .join('');
+    quote.innerHTML = `
+      <div class="special-quote-language special-quote-zh">${zh}</div>
+      ${en ? `<div class="special-quote-language special-quote-en">${en}</div>` : ''}
+    `;
+  } else {
+    quote.innerHTML = `
+      <p>Some flowers last for days.<br />Some light travels long enough to arrive as a memory.</p>
+      <p lang="zh-CN">有些花会谢。<br />有些光，会走很久才抵达。</p>
+    `;
+  }
 
   const credit = document.createElement('aside');
   credit.className = 'special-credit';
   credit.textContent = 'Image source: NASA / ESA / Hubble';
 
-  document.body.append(overlay, caption, quote, credit);
+  const muteButton = document.createElement('button');
+  muteButton.className = 'special-mute-button';
+  muteButton.type = 'button';
+  muteButton.hidden = true;
+  const syncMuteButton = () => {
+    muteButton.classList.toggle('is-muted', specialAudioMuted);
+    muteButton.setAttribute('aria-pressed', String(specialAudioMuted));
+    muteButton.setAttribute('aria-label', specialAudioMuted ? 'Unmute audio' : 'Mute audio');
+    muteButton.title = specialAudioMuted ? 'Unmute audio' : 'Mute audio';
+    muteButton.innerHTML = specialAudioMuted
+      ? '<svg class="special-audio-glyph" viewBox="0 0 32 32" aria-hidden="true"><path d="M9.2 18.5H6.9a1.25 1.25 0 0 1-1.25-1.25v-2.5A1.25 1.25 0 0 1 6.9 13.5h2.3l5.15-4.05v13.1L9.2 18.5Z" /><path d="M19.2 11.4l5.2 9.2" /></svg>'
+      : '<svg class="special-audio-glyph" viewBox="0 0 32 32" aria-hidden="true"><path d="M9.2 18.5H6.9a1.25 1.25 0 0 1-1.25-1.25v-2.5A1.25 1.25 0 0 1 6.9 13.5h2.3l5.15-4.05v13.1L9.2 18.5Z" /><path d="M18.55 12.6c.95.9 1.45 2.05 1.45 3.4s-.5 2.5-1.45 3.4" /><path d="M21.45 10.05c1.6 1.6 2.45 3.65 2.45 5.95s-.85 4.35-2.45 5.95" /></svg>';
+  };
+  syncMuteButton();
+  muteButton.addEventListener('click', () => {
+    specialAudioMuted = !specialAudioMuted;
+    if (specialAudio) specialAudio.muted = specialAudioMuted;
+    syncMuteButton();
+  });
+
+  document.body.append(overlay, caption, quote, credit, muteButton);
 
   try {
     specialAudio = new Audio(withBasePath(specialReference.audioPath));
     specialAudio.loop = true;
     specialAudio.preload = 'auto';
     specialAudio.volume = 0.42;
+    specialAudio.muted = false;
   } catch {
     specialAudio = null;
   }
@@ -396,8 +1006,10 @@ function createSpecialOverlay() {
     overlay.classList.add('is-dismissed');
     try {
       await specialAudio?.play();
+      muteButton.hidden = !specialAudio;
     } catch {
       specialAudio = null;
+      muteButton.hidden = true;
     }
     window.setTimeout(() => overlay.remove(), 900);
   });
@@ -428,6 +1040,84 @@ function setRender(nextRender: RenderQualityName) {
   rebuildQuality();
 }
 
+accountOpenButton?.addEventListener('click', () => {
+  if (accountPanel?.classList.contains('is-open')) {
+    closeAccountPanel();
+  } else {
+    openAccountPanel();
+  }
+});
+
+accountCloseButton?.addEventListener('click', closeAccountPanel);
+
+favoriteButton?.addEventListener('click', () => {
+  toggleFavorite();
+  revealUi();
+});
+
+loginForm?.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const name = loginNameInput?.value.trim() || 'DailyFlora 用户';
+  const email = loginEmailInput?.value.trim() || `${name.replace(/\s+/g, '').toLowerCase()}@dailyflora.local`;
+  saveAccountState({ name, email });
+  if (!currentFavorite()) {
+    saveFavoriteBouquets([createFavorite(), ...favoriteBouquets]);
+  }
+});
+
+logoutButton?.addEventListener('click', () => {
+  saveAccountState(null);
+});
+
+collectionList?.addEventListener('click', (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
+  const button = target.closest<HTMLButtonElement>('[data-favorite-id]');
+  if (!button) return;
+  const favorite = favoriteBouquets.find((item) => item.id === button.dataset.favoriteId);
+  if (!favorite) return;
+  previewCount = 0;
+  closeCalendar();
+  rebuild(favorite.date, favorite.seed);
+  syncTodayMode(favorite.date, favorite.seed);
+  closeAccountPanel();
+});
+
+referenceFileInput?.addEventListener('change', async () => {
+  const file = referenceFileInput.files?.[0];
+  if (!file) return;
+  try {
+    await handleReferenceFile(file);
+  } catch {
+    referenceState = null;
+    renderReferenceState();
+    if (referenceResult) {
+      referenceResult.hidden = false;
+      referenceResult.textContent = '这张图暂时读不了，换一张试试。';
+    }
+  }
+});
+
+referenceGenerateButton?.addEventListener('click', generateFromReference);
+
+document.addEventListener('pointerdown', (event) => {
+  const target = event.target;
+  if (!accountPanel) return;
+  if (
+    accountPanel.hidden ||
+    !(target instanceof Node) ||
+    accountPanel.contains(target) ||
+    accountDock?.contains(target)
+  ) {
+    return;
+  }
+  closeAccountPanel();
+});
+
+controlsToggleButton?.addEventListener('click', () => {
+  setControlsExpanded(!controls.classList.contains('is-expanded'));
+});
+
 pauseButton?.addEventListener('click', () => {
   const paused = scene.togglePause();
   pauseButton.setAttribute('aria-label', paused ? 'Resume rotation' : 'Pause rotation');
@@ -439,15 +1129,7 @@ pauseButton?.addEventListener('click', () => {
 });
 
 todayButton?.addEventListener('click', () => {
-  if (datePicker) {
-    positionDatePicker();
-    datePicker.value = spec.dateLabel;
-    if (typeof datePicker.showPicker === 'function') {
-      datePicker.showPicker();
-    } else {
-      datePicker.click();
-    }
-  }
+  toggleCalendar();
   revealUi();
 });
 
@@ -455,13 +1137,63 @@ datePicker?.addEventListener('change', () => {
   if (!datePicker.value) return;
   previewCount = 0;
   rebuild(datePicker.value, datePicker.value);
+  syncTodayMode(datePicker.value, datePicker.value);
   datePicker.blur();
+});
+
+calendarPanel.addEventListener('click', (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
+
+  const navValue = target.dataset.calendarNav;
+  if (navValue) {
+    calendarView.month += Number(navValue);
+    if (calendarView.month < 0) {
+      calendarView.month = 11;
+      calendarView.year -= 1;
+    }
+    if (calendarView.month > 11) {
+      calendarView.month = 0;
+      calendarView.year += 1;
+    }
+    renderCalendar();
+    positionCalendarPanel();
+    revealUi();
+    return;
+  }
+
+  const dateKey = target.dataset.calendarDate;
+  if (dateKey) {
+    selectCalendarDate(dateKey);
+  }
+});
+
+document.addEventListener('pointerdown', (event) => {
+  const target = event.target;
+  if (
+    calendarPanel.hidden ||
+    !(target instanceof Node) ||
+    calendarPanel.contains(target) ||
+    todayButton?.contains(target)
+  ) {
+    return;
+  }
+  closeCalendar();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeCalendar();
+    closeAccountPanel();
+  }
 });
 
 shuffleButton?.addEventListener('click', () => {
   const date = randomDateKey();
   previewCount = 0;
+  closeCalendar();
   rebuild(date, date);
+  syncTodayMode(date, date);
 });
 
 fullscreenButton?.addEventListener('click', async () => {
@@ -537,7 +1269,7 @@ window.addEventListener('resize', () => {
     applyRotationSettings();
     setLabels();
   }
-  positionDatePicker();
+  if (!calendarPanel.hidden) positionCalendarPanel();
 });
 
 ['pointermove', 'pointerdown', 'touchstart', 'keydown'].forEach((eventName) => {
@@ -545,8 +1277,12 @@ window.addEventListener('resize', () => {
 });
 
 window.addEventListener('beforeunload', () => scene.stop());
+window.addEventListener('beforeunload', () => window.clearInterval(debugTimer));
+window.addEventListener('beforeunload', () => window.clearTimeout(dateRolloverTimer));
 
 setLabels();
+renderAccountState();
+setupDebugMode();
 if (specialReference) {
   rotationSpeed = 0.024;
   cameraRouteMode = 'figure-eight';
@@ -558,5 +1294,6 @@ if (specialReference) {
 }
 applyRotationSettings();
 scene.setZoomOffset(manualZoom);
+scheduleDailyRollover();
 revealUi();
 scene.start();

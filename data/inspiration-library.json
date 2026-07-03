@@ -171,10 +171,43 @@
       }
     }
   ],
-  "pendingRecommendations": [],
+  "pendingRecommendations": [
+    {
+      "id": "inspiration-2026-07-02-6a43d3580000000015027e28",
+      "creatorId": "5af130214eacab7cd886e7ad",
+      "creatorName": "丽诗的花园LycheeGarden",
+      "sourceUrl": "https://www.xiaohongshu.com/discovery/item/6a43d3580000000015027e28?app_platform=ios&app_version=9.36&share_from_user_hidden=true&xsec_source=app_share&type=normal&xsec_token=CB4hp21avUfLWoBoki134Ea3-5lZGf7QGqPSdpEs5YSBE=&author_share=1&xhsshare=CopyLink&shareRedId=N0c5RUdIOUI6TEZFSko0Njw2Ozc4STY5&apptime=1782907008&share_id=fa41713c09ea42fd83cf714bf1a22308",
+      "title": "Lychee Garden｜捏一个彩虹🌈",
+      "observedAt": "2026-07-02",
+      "colorNotes": [
+        "rainbow palette signal; use multiple clear hues but keep green, pale flowers, and air gaps as buffers",
+        "lychee garden cue; keep pink-red sweetness balanced with fresh green and pale highlights"
+      ],
+      "spatialNotes": [
+        "multi-color bouquet cue; distribute color by material role instead of making one noisy color cloud",
+        "natural bouquet cue; keep the silhouette airy instead of a compact dome"
+      ],
+      "materialNotes": [
+        "use small blooms, fruit points, and line flowers to carry saturated colors at different scales",
+        "fruit-garden cue; consider small rounded fruit or pearl accents only when attached to stems",
+        "increase branch, leaf, grass, and small filler rhythm around the outer shell"
+      ],
+      "parameterSuggestions": [
+        "increase controlled multi-hue variation while preserving readable flower roles and outer air",
+        "treat fruit dots as branch-owned accents, not loose random particles",
+        "raise outer branch/grass count and vary stem heights for a field-like structure"
+      ],
+      "status": "pending-confirmation",
+      "inboxEvidence": {
+        "file": "data/inbox/2026-07-02/notes.json",
+        "imagePaths": [],
+        "caption": "#纷享花礼[话题]# #自然风花束[话题]# #绚丽的色彩[话题]# #彩虹🌈[话题]# #彩虹花束[话题]# #番禺花店[话题]# #花艺设计[话题]# #生活是彩色的[话题]# #多巴胺配色[话题]# #彩色让你没烦恼[话题]#"
+      }
+    }
+  ],
   "lastIngest": {
-    "at": "2026-06-14T23:01:26.441Z",
-    "input": "data/inbox/2026-06-15/notes.json",
+    "at": "2026-07-01T16:16:48.386Z",
+    "input": "data/inbox/2026-07-02/notes.json",
     "added": 1,
     "accessIssues": []
   },

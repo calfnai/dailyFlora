@@ -71,6 +71,11 @@ export interface BouquetTheme {
 export interface SpecialBouquetReference {
   id: string;
   title: string;
+  versionLabel?: string;
+  routePath?: string;
+  flowerPlanId?: string;
+  quoteStanzas?: string[];
+  quoteTranslationStanzas?: string[];
   date: string;
   seed: string;
   theme: BouquetTheme;
@@ -111,6 +116,14 @@ export interface SpecialBouquetReference {
     dustColors: string[];
     galaxyTint: string;
     warmCore: string;
+    galaxyOpacity?: number;
+    galaxyScale?: number;
+    galaxyPosition?: [number, number, number];
+    galaxyRotation?: number;
+    galaxyAlphaMap?: boolean;
+    galaxyDepthTest?: boolean;
+    coreOpacity?: number;
+    coreRadius?: number;
   };
 }
 

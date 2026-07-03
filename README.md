@@ -5,14 +5,15 @@ frontend 3D bouquet screensaver: it generates a new spatial bouquet every day
 from a deterministic date seed, then slowly rotates it so the bouquet reads from
 every angle.
 
-Current product version: `0.12E`.
+Current product version: `0.14`.
 
-`E` means Extended. Extended versions keep the web-first visual work, while
-reserving product-layer capabilities such as lightweight user data, favorites,
-share history, personal aesthetic inputs, usage limits, credits, terms, and EULA
-records. Read `docs/project-abstract.md` together with `CHANGELOG.md`; the
-abstract records product intent and version meaning, while the changelog records
-completed changes.
+`0.14` keeps the `0.13` aesthetic operating-system memory and adds the first
+MVP route structure: public placeholders, an internal development index,
+mock member/admin surfaces, and a lighter fixed-bouquet sample library. The
+current dashboard groups are accepted as a baseline; future changes should come
+from concrete feedback on the running pages. Read `docs/project-abstract.md`,
+`docs/dailyflora-aesthetic-system-0.13.md`, `docs/dailyflora-codex-skill.md`,
+and `CHANGELOG.md` together.
 
 ## Run Locally
 
@@ -34,6 +35,12 @@ The build output is static and can be hosted on GitHub Pages.
 Before changing the main bouquet visuals, review
 `docs/aesthetic-review-dashboard.html`. It maps reference groups to visual
 signals, primitive requirements, role reviews, current status, and next tasks.
+
+For the 0.13 aesthetic memory and Codex workflow, read:
+
+- `docs/dailyflora-aesthetic-system-0.13.md`
+- `docs/dailyflora-codex-skill.md`
+- `.codex/skills/dailyflora/SKILL.md`
 
 ## Deploy To GitHub Pages
 
@@ -92,9 +99,10 @@ the long-term sync point.
 - `?date=YYYY-MM-DD` previews a specific day.
 - `?seed=...` shares a fixed bouquet.
 - `?theme=random` lets the date or seed choose the bouquet family.
-- `?theme=dopamine-field|summer-pinwheel|fairy-violet|moon-white|tropical-forest|sea-salt-lemon|hillside-wild|starry-night` previews a specific bouquet family.
+- `?theme=dopamine-field|summer-pinwheel|fairy-violet|moon-white|tropical-forest|sea-salt-lemon|hillside-wild|starry-night|dewberry-morning|lychee-garden-rainbow` previews a specific bouquet family.
 - `?density=low|medium|high` controls bouquet density.
 - `?render=auto|low|medium|high` controls rendering precision.
+- `?debug` or `?debug=1` shows debug-only controls, the aesthetic review entry, and rendering/resource stats.
 
 ## Inspiration Workflow
 

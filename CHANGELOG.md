@@ -1,5 +1,126 @@
 # DailyFlora Changelog
 
+## 0.14.0 - 2026-07-03
+
+MVP route structure and accepted aesthetic baseline.
+
+- Added the low-cost MVP route structure: public placeholders for `about`, `bouquet-shop`, `member`, and `downloads`, plus the internal development index and mock member/admin pages.
+- Reworked the fixed bouquet sample page into a lightweight card library with category, sorting, page-size controls, and explicit live-render links instead of loading many 3D iframes at once.
+- Recorded the owner's confirmation that the current aesthetic groups can be marked as `pass`: Dewberry Morning, Summer Pinwheel, Fairy Violet, Narcissus Season, Breathing Landscape, Foxtail Lily, Berry Grove, Autumn Juice, Lychee Garden Rainbow, and the negative boundary set.
+- Promoted the dashboard gate to the 0.14 accepted aesthetic baseline; future changes should come from actual running-page feedback rather than treating these groups as pending blockers.
+- Bumped the npm version to `0.14.0` and product version to `0.14`.
+
+## 0.13.5 - 2026-07-02
+
+Lychee Garden accepted and daily automation scheduled.
+
+- Recorded the owner's acceptance that `荔枝花园彩虹 / Lychee Garden Rainbow` is good.
+- Moved the Lychee Garden dashboard card from `needs-owner-review` to `pass`.
+- Preserved the dedicated `lychee-garden-rainbow` address as the accepted route for this bouquet.
+- Created a daily idle-time Codex automation to build the daily bouquet and deploy DailyFlora to GitHub.
+
+## 0.13.4 - 2026-07-02
+
+Dedicated Lychee Garden bouquet address.
+
+- Added a standalone `lychee-garden-rainbow` theme instead of previewing the new bouquet through `dopamine-field`.
+- Added the matching `lychee-garden-rainbow` flowerPlan with owner-provided reference notes, role-specific rainbow color distribution, branch-owned lychee fruit dots, airy pale clusters, and green outward branch lines.
+- Added dedicated primitive and palette mappings for the new plan in the high-quality bouquet renderer.
+- Added the dedicated URL to the flower-plan sample page and aesthetic review dashboard.
+- Recorded the rule that a new flower needs its own address; if the flower is rejected later, discard that address instead of reusing another bouquet address.
+
+## 0.13.3 - 2026-07-02
+
+Owner-provided daily inspiration intake.
+
+- Added the owner-provided Xiaohongshu reference `Lychee Garden｜捏一个彩虹🌈` as a pending inspiration item, preserving the original short link and resolved public note URL.
+- Extended the owner-link ingest script so `xhslink.com` short links resolve before note-id extraction.
+- Added compact inference for rainbow / multi-color and lychee-garden cues: controlled multi-hue color, green and pale-air buffers, branch-owned fruit points, small blooms, and airy natural silhouette.
+- Added the same reference to the aesthetic review dashboard as `荔枝花园彩虹 / Lychee Garden Rainbow`, with role review, positive signals, negative constraints, primitive mapping, and next tasks.
+- Kept the reference pending-confirmation; it does not automatically change generation rules or mark a new aesthetic direction as passed.
+
+## 0.13.2 - 2026-07-01
+
+Daily rollover behavior.
+
+- Added an automatic local-midnight rollover for the default daily bouquet mode, so a page left open overnight rebuilds into the new day's date seed.
+- Kept manually selected dates, random date previews, fixed shared seeds, and special bouquet routes pinned instead of forcing them back to today.
+
+## 0.13.1 - 2026-06-26
+
+Review role and primitive vocabulary correction.
+
+- Replaced the loose `CTO` review role with `生成架构审查`, focused on controllable Three.js structure, scale, placement, orientation, performance, and debug data.
+- Added `花材库管理员` as a dashboard review role so reusable shapes used in flower plans or renderers must be registered in the Target Shape Vocabulary.
+- Registered `CosmosOpenFlower / 波斯菊/小面花型` as the 16th target shape after the user identified the untracked small open-face flower in `山岗小花` and `热带丛林`.
+- Reduced `CallaCurledBract` scale inside full bouquet composition while keeping the accepted single primitive intact.
+- Shortened and faded the lower green fake stems on `UmbelMiniCluster` so distant/high placements no longer read as an unnatural inverted triangle.
+- Recorded the related `FruitPodCluster` structural risk as lighter and currently observation-only.
+
+## 0.13.0 - 2026-06-26
+
+Aesthetic operating-system release.
+
+- Added `docs/dailyflora-aesthetic-system-0.13.md` as the project-level aesthetic memory: target bouquet taste, negative constraints, foliage rules, primitive gate, composition lessons, color rules, review workflow, and debug review entry.
+- Added `docs/dailyflora-codex-skill.md` as the project Codex skill for future DailyFlora work.
+- Added `.codex/skills/dailyflora/SKILL.md` as a project-local skill entrypoint.
+- Updated README, project abstract, and handoff docs so new Codex threads start from the 0.13 memory instead of relying on chat context.
+- Added the 0.13 aesthetic memory link to the review dashboard and copied key markdown review docs into the GitHub Pages deploy output.
+- Bumped `package.json` to `0.13.0` and `productVersion` to `0.13`.
+
+## 0.12.26 - 2026-06-26
+
+Review library page restoration.
+
+- Fixed the GitHub Pages deploy step so it no longer overwrites Vite-built dashboard pages with raw source HTML.
+- Restored working compiled scripts for the aesthetic dashboard and Primitive Lab on the published site.
+- Added fixed dashboard entry cards for the reference image library, primitive flower library, and fixed bouquet sample library.
+- Added the reference gallery and legacy reference card page to the source deploy manifest.
+- Updated dashboard copy so the 15 primitive library is shown as user-confirmed passing the minimum gate, not still waiting for review.
+
+## 0.12.25 - 2026-06-26
+
+Debug mode and interaction corrections.
+
+- Added URL-gated debug mode with `?debug` / `?debug=1`.
+- Moved aesthetic-review dashboard access into debug mode only; the dashboard page itself now requires the debug parameter.
+- Added a debug stats panel showing current render FPS, target FPS, render/density mode, canvas/DPR, draw calls, triangles, point/line counts, GPU resource counts, and JS heap when available.
+- Reversed only the vertical drag pitch direction; horizontal drag behavior is unchanged.
+- Moved the play/pause button into the camera route control, immediately left of the reverse button.
+
+## 0.12.24 - 2026-06-26
+
+Aesthetic review entry and original bouquet candidate.
+
+- Restored a visible aesthetic-review dashboard entry in the main controls, available even when viewing controls are collapsed.
+- Added the original `dewberry-morning` / `晨露莓园` bouquet theme and `dewberry-morning-air` flower plan.
+- Mapped the new plan to accepted primitives with dedicated palette rules: small open flowers, mist clusters, dewberry fruit dots, cup blooms, ruffled low blooms, outward spike lines, and coral star line petals.
+- Added the new bouquet candidate to the aesthetic dashboard as `needs-owner-review`, not as a passed direction.
+
+## 0.12.23 - 2026-06-26
+
+HUD and calendar control restoration.
+
+- Restored the visible bilingual bouquet title in the HUD instead of keeping English only in hover text.
+- Anchored the native date picker to the calendar button wrapper so the picker opens from the right UI location.
+- Recorded hillside-wild as the current strongest composition reference: small-flower matrix, interspersed line flowers, low cluster support, and outward air.
+
+## 0.12.22 - 2026-06-26
+
+Open spike direction correction.
+
+- Kept the interspersed spike placement from `0.12.21`, but changed spike orientation to open outward from the bouquet structure.
+- Reduced inward-gathering spike angles so vertical flowers read as airy and expansive instead of converging.
+- Added only light side-crossing variation to preserve natural weaving without closing the silhouette.
+
+## 0.12.21 - 2026-06-26
+
+Spike composition correction.
+
+- Varied each main-bouquet `SpikeFlower` orientation so straight spikes no longer all extend in one uniform direction.
+- Rebalanced the hillside / foxtail-lily plan so spike flowers intersperse through the bouquet instead of forming a top-heavy patch.
+- Reduced hillside spike dominance by moving more share into small flowers and low cluster volume.
+
 ## 0.12.20 - 2026-06-26
 
 Foliage primitive spatial correction.

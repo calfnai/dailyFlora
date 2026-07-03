@@ -188,11 +188,16 @@
 
       .role-grid,
       .rules-grid,
+      .library-grid,
       .shape-grid,
       .primitive-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 12px;
+      }
+
+      .library-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
 
       .rules-grid {
@@ -209,6 +214,30 @@
 
       .panel {
         padding: 14px;
+      }
+
+      .library-card {
+        display: grid;
+        gap: 10px;
+        min-height: 156px;
+        padding: 16px;
+        text-decoration: none;
+      }
+
+      .library-card strong {
+        font-size: 20px;
+      }
+
+      .library-card span {
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .library-card em {
+        color: var(--warn);
+        font-style: normal;
+        font-size: 13px;
+        font-weight: 800;
       }
 
       .panel h3 {
@@ -349,6 +378,7 @@
         .group-grid,
         .split,
         .rules-grid,
+        .library-grid,
         .shape-grid,
         .role-review {
           grid-template-columns: 1fr;
@@ -377,9 +407,36 @@
 
         .role-grid,
         .primitive-grid,
+        .library-grid,
         .thumb-strip {
           grid-template-columns: 1fr;
         }
+      }
+
+      .debug-lock {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .debug-lock-card {
+        max-width: 520px;
+        padding: 24px;
+        border: 1px solid rgb(255 255 255 / 12%);
+        border-radius: 12px;
+        background: rgb(255 255 255 / 6%);
+      }
+
+      .debug-lock-card h1 {
+        margin: 0 0 10px;
+        font-size: 24px;
+      }
+
+      .debug-lock-card p {
+        margin: 0 0 16px;
+        color: var(--muted);
+        line-height: 1.7;
       }
     </style>
   </head>
@@ -399,9 +456,41 @@
       <section class="section">
         <div class="section-head">
           <div>
+            <p class="kicker">Review library</p>
+            <h2>审美资料入口</h2>
+            <p class="section-copy">这里固定保留四类可检查材料：你给过的参考图片、已经及格的花库模型、可直接打开的花束样例、以及 0.13 审美记忆。</p>
+          </div>
+        </div>
+        <div class="library-grid">
+          <a class="panel library-card" href="./dailyflora-reference-gallery.html">
+            <em>参考图片页</em>
+            <strong>审美图片库</strong>
+            <span>查看夏日风车、梦幻紫、洋水仙、会呼吸的风景、狐尾百合、浆果森林、秋日果汁和反向样本。</span>
+          </a>
+          <a class="panel library-card" href="./primitive-lab.html">
+            <em>花库罗列</em>
+            <strong>Primitive Lab</strong>
+            <span>逐个查看已达到及格线的花材/叶材 primitive，包含隐藏标签、隔离观察和模型状态。</span>
+          </a>
+          <a class="panel library-card" href="./dailyflora-flower-plan-samples.html">
+            <em>花束库</em>
+            <strong>固定花束样例</strong>
+            <span>打开已固定的高精度花束样例，包括晨露莓园空气束，用来判断 composition 是否继续沿正确方向走。</span>
+          </a>
+          <a class="panel library-card" href="./dailyflora-aesthetic-system-0.13.md">
+            <em>0.13 项目记忆</em>
+            <strong>审美系统总纲</strong>
+            <span>读取 DailyFlora 当前目标花束、反向约束、叶材规则、花库门禁、composition 经验和后续流程。</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
             <p class="kicker">Review roles</p>
-            <h2>四角色复盘</h2>
-            <p class="section-copy">角色不是隐藏人格表演，而是页面上可检查的判断栏。每个参考组都必须留下四类结论。</p>
+            <h2>审查角色</h2>
+            <p class="section-copy">角色不是隐藏人格表演，而是页面上可检查的判断栏。生成架构审查负责结构和可控参数，花材库管理员防止“代码里用了但词表没登记”的漏项。</p>
           </div>
         </div>
         <div class="role-grid" id="role-grid"></div>
@@ -422,8 +511,8 @@
         <div class="section-head">
           <div>
             <p class="kicker">Target shape vocabulary</p>
-            <h2>15 类目标形态词表</h2>
-            <p class="section-copy">这 15 类已经进入 Primitive Lab，当前等待用户逐类验收。旧 7 类只保留为历史粗分类和兼容别名。</p>
+            <h2>16 类目标形态词表</h2>
+            <p class="section-copy">这 16 类已经进入 Primitive Lab，并已达到用户确认的花库及格线。CosmosOpenFlower 是从山岗小花/热带丛林经验中补登记的小面花，旧 7 类只保留为历史粗分类和兼容别名。</p>
           </div>
         </div>
         <div class="shape-grid" id="shape-grid"></div>
@@ -434,7 +523,7 @@
           <div>
             <p class="kicker">Primitive gate</p>
             <h2>花库验收</h2>
-            <p class="section-copy">隐藏标签后，单个形态应能被用户判断为对应的花材/叶材类型。当前不是通过状态，而是等待用户验收。</p>
+            <p class="section-copy">隐藏标签后，单个形态应能被用户判断为对应的花材/叶材类型。当前结论是花库验收达到及格线，可以作为下一阶段整束 composition 的基础。</p>
           </div>
           <a class="pill" href="./primitive-lab.html">打开 Primitive Lab</a>
         </div>
@@ -446,7 +535,7 @@
           <div>
             <p class="kicker">Reference topology</p>
             <h2>参考图到执行任务</h2>
-            <p class="section-copy">每组卡片固定呈现：人话结论、正向信号、负向约束、对应 primitive、当前实现、失败原因、下一步任务和四角色复盘。</p>
+            <p class="section-copy">每组卡片固定呈现：人话结论、正向信号、负向约束、对应 primitive、当前实现、失败原因、下一步任务和审查角色复盘。</p>
           </div>
           <div class="filters" id="filters" aria-label="筛选复盘卡"></div>
         </div>
@@ -459,11 +548,17 @@
       {
         "updatedAt": "2026-06-25",
         "gate": {
-          "status": "blocked",
-          "title": "15 primitive shapes are implemented for owner review",
-          "summary": "Primitive Lab 已扩展到 15 类，等待用户逐类验收。",
-          "rules": ["先复盘参考图，不直接改主花束视觉。"],
-          "links": [{"label": "Primitive Lab", "href": "./primitive-lab.html"}]
+          "status": "pass",
+          "title": "花库验收达到及格线",
+          "summary": "Primitive Lab 已扩展到 16 类，并已达到用户确认的花库及格线。",
+          "rules": ["先复盘参考图，不直接改主花束视觉。", "后续主视觉修改必须同步更新 dashboard。"],
+          "links": [
+            {"label": "参考图库", "href": "./dailyflora-reference-gallery.html"},
+            {"label": "Primitive Lab", "href": "./primitive-lab.html"},
+            {"label": "花束库", "href": "./dailyflora-flower-plan-samples.html"},
+            {"label": "0.13 审美系统", "href": "./dailyflora-aesthetic-system-0.13.md"},
+            {"label": "Codex Skill", "href": "./dailyflora-codex-skill.md"}
+          ]
         },
         "roles": [],
         "primitiveGate": [],
@@ -476,6 +571,22 @@
       import * as THREE from 'three';
       import { floraPrimitiveFactories } from '../src/floraPrimitives.ts';
 
+      const dashboardDebugValue = new URLSearchParams(window.location.search).get('debug');
+      const dashboardDebugMode = new URLSearchParams(window.location.search).has('debug') && dashboardDebugValue !== '0' && dashboardDebugValue !== 'false';
+      if (!dashboardDebugMode) {
+        document.body.innerHTML = `
+          <main class="debug-lock">
+            <section class="debug-lock-card">
+              <p class="eyebrow">DailyFlora debug gate</p>
+              <h1>审美复盘只在 debug 版开放</h1>
+              <p>在主页面 URL 加上 <code>?debug=1</code> 后，从右下角的“审美审核”按钮进入。普通观赏模式不显示这页入口。</p>
+              <a class="pill" href="../?debug=1">打开 debug 版</a>
+            </section>
+          </main>
+        `;
+        throw new Error('Aesthetic review dashboard requires debug mode.');
+      }
+
       const statusText = {
         blocked: 'blocked',
         'needs-work': 'needs-work',
@@ -486,11 +597,13 @@
         creativeDirector: '创意总监',
         artDirector: '美术指导',
         projectDirector: '项目主任',
-        cto: 'CTO'
+        cto: '生成架构审查',
+        shapeCurator: '花材库管理员'
       };
 
       const primitiveNames = {
         DiskFlower: '盘状花',
+        CosmosOpenFlower: '波斯菊/小面花型',
         LayeredDahliaFlower: '层叠大丽花/团瓣型',
         RuffledRoseFlower: '褶皱玫瑰型',
         StarPinwheelFlower: '星形/风车型',
@@ -514,6 +627,7 @@
 
       const targetPrimitiveByShapeId = {
         'disk-face-flower': 'DiskFlower',
+        'cosmos-open-face': 'CosmosOpenFlower',
         'layered-dahlia-form': 'LayeredDahliaFlower',
         'ruffled-rose-form': 'RuffledRoseFlower',
         'star-pinwheel-form': 'StarPinwheelFlower',
@@ -532,6 +646,7 @@
 
       const previewPalettes = {
         DiskFlower: ['#fff8e7', '#f7edd2', '#f0c83a', '#7f8e3e'],
+        CosmosOpenFlower: ['#fffdf2', '#f6efdc', '#f4cf2e', '#7f8e3e'],
         LayeredDahliaFlower: ['#f8c9d8', '#fff1f5', '#e7a7bb', '#86a762'],
         RuffledRoseFlower: ['#f8b9cf', '#fff3f6', '#e77da0', '#9bb36b'],
         StarPinwheelFlower: ['#ff8b32', '#ffd15a', '#e9565d', '#7aa65a'],
@@ -713,7 +828,7 @@
             curvature: ['SpikeFlower', 'FoliageGrassBranch', 'CallaCurledBract'].includes(primitive) ? 0.86 : 0.42,
             role: ['SpikeFlower', 'FoliageGrassBranch'].includes(primitive) ? 'line' : 'secondary'
           });
-          model.rotation.x = ['DiskFlower', 'LayeredDahliaFlower', 'RuffledRoseFlower', 'StarPinwheelFlower', 'TrumpetThroatFlower'].includes(primitive) ? -0.7 : primitive === 'FoliageGrassBranch' ? -0.34 : -0.1;
+          model.rotation.x = ['DiskFlower', 'CosmosOpenFlower', 'LayeredDahliaFlower', 'RuffledRoseFlower', 'StarPinwheelFlower', 'TrumpetThroatFlower'].includes(primitive) ? -0.7 : primitive === 'FoliageGrassBranch' ? -0.34 : -0.1;
           if (primitive === 'FoliageGrassBranch') model.rotation.z = -0.38;
           scene.add(model);
           previewScenes.push({ renderer, scene, camera, model, canvas, primitive });

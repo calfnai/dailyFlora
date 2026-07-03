@@ -108,5 +108,39 @@ export const themes: BouquetTheme[] = [
     densityBias: 1.05,
     verticalBias: 1.0,
     wildness: 1.3
+  },
+  {
+    id: 'dewberry-morning',
+    name: '晨露莓园',
+    palette: ['#fffaf0', '#ff78a8', '#ffd95a', '#8fd8ff', '#d9bcff', '#ff8f5a', '#8eea92'],
+    leafPalette: ['#124a34', '#2f8056', '#69b96a', '#bddf82'],
+    stem: '#5d7f4f',
+    background: '#05090a',
+    floor: '#18251f',
+    glow: '#fff0a8',
+    densityBias: 1.12,
+    verticalBias: 1.02,
+    wildness: 1.26,
+    branchBias: 1.12,
+    leafBias: 1.08,
+    flowerBias: 1.04,
+    outerLineBias: 1.18
+  },
+  {
+    id: 'lychee-garden-rainbow',
+    name: '荔枝花园彩虹',
+    palette: ['#ff5f8f', '#ffb33f', '#fff46a', '#7fe36d', '#63d8ff', '#9a8cff', '#fff7df'],
+    leafPalette: ['#12583a', '#2f8a56', '#75c46b', '#c8e37a'],
+    stem: '#5d8750',
+    background: '#050907',
+    floor: '#18251c',
+    glow: '#fff28a',
+    densityBias: 1.1,
+    verticalBias: 1.04,
+    wildness: 1.28,
+    branchBias: 1.14,
+    leafBias: 1.12,
+    flowerBias: 1.03,
+    outerLineBias: 1.2
   }
 ];

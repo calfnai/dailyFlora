@@ -1,26 +1,37 @@
-import { herJanuarySkyReference } from './specialBouquetReference';
+import {
+  herJanuarySkyReference,
+  herJanuarySkyReferenceV2,
+  herJanuarySkyReferenceV3,
+  herRealBouquetReferenceV4
+} from './specialBouquetReference';
 import { getFlowerPlanById } from './flowerPlans';
 import type { DailyBouquetSpec, SpecialBouquetReference } from './types';
 
 export const specialReferences: Record<string, SpecialBouquetReference> = {
-  ngc2787: herJanuarySkyReference
+  ngc2787: herJanuarySkyReference,
+  ngc2787v2: herJanuarySkyReferenceV2,
+  ngc2787v3: herJanuarySkyReferenceV3,
+  ngc2787v4: herRealBouquetReferenceV4
 };
 
 export function readSpecialId(search = window.location.search) {
   const pathname = window.location.pathname.replace(/\/+$/, '');
-  if (pathname.endsWith('/special0629')) return 'ngc2787';
+  for (const [id, reference] of Object.entries(specialReferences)) {
+    if (reference.routePath && pathname.endsWith(`/${reference.routePath}`)) return id;
+  }
 
   const params = new URLSearchParams(search);
   const id = params.get('special');
   return id && specialReferences[id] ? id : null;
 }
 
-export function special0629Pathname() {
+export function specialPathname(reference: SpecialBouquetReference) {
+  const routePath = reference.routePath || 'special0629';
   const pathname = window.location.pathname;
-  const match = pathname.match(/^(.*?\/special0629)(?:\/.*)?$/);
-  if (match) return match[1];
+  const match = pathname.match(/^(.*?\/)special0629(?:-v\d+)?(?:\/.*)?$/);
+  if (match) return `${match[1]}${routePath}`;
   const basePath = pathname.endsWith('/') ? pathname : pathname.replace(/\/[^/]*$/, '/');
-  return `${basePath}special0629`;
+  return `${basePath}${routePath}`;
 }
 
 export function withBasePath(path: string) {
@@ -29,6 +40,8 @@ export function withBasePath(path: string) {
 }
 
 export function createSpecialSpec(reference: SpecialBouquetReference, dateOverride?: string): DailyBouquetSpec {
+  const flowerPlan = getFlowerPlanById(reference.flowerPlanId || 'her-january-sky-memory');
+
   return {
     seed: reference.seed,
     dateLabel: dateOverride || reference.date,
@@ -40,7 +53,7 @@ export function createSpecialSpec(reference: SpecialBouquetReference, dateOverri
     rotationSpeed: 0.025,
     asymmetry: reference.shape.asymmetry,
     haloLift: reference.shape.verticalLift,
-    flowerPlan: getFlowerPlanById('her-january-sky-memory')!,
+    flowerPlan: flowerPlan || getFlowerPlanById('her-january-sky-memory')!,
     special: reference
   };
 }

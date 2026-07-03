@@ -1,14 +1,14 @@
 # DailyFlora Codex 接入与美感来源维护
 
-最后更新：2026-06-25
+最后更新：2026-07-03
 
 这份文档用于在另一台电脑上接入 DailyFlora，并让新的 Codex 线程继续维护美感来源、版本进度和生成规则。
 
 ## 当前项目状态快照
 
-- 当前 npm 版本：`0.12.20`
-- 当前产品层标记：`0.12E`
-- 当前主要开发分支：`codex/low-poly-petal-flowers`
+- 当前 npm 版本：`0.14.0`
+- 当前产品层标记：`0.14`
+- 当前主要同步分支：`main`
 - 线上入口：<https://calfnai.github.io/dailyFlora/>
 - 线上参考图库：<https://calfnai.github.io/dailyFlora/docs/dailyflora-reference-gallery.html>
 - 本地参考图库：`docs/dailyflora-reference-gallery.html`
@@ -16,20 +16,26 @@
 - 花材识别文档：`docs/reference-flower-identification.md`
 - 花型计划样例页：`docs/dailyflora-flower-plan-samples.html`
 - 花材形态实验页：`docs/primitive-lab.html`
+- 0.13 审美系统总纲：`docs/dailyflora-aesthetic-system-0.13.md`
+- 项目 Codex skill：`docs/dailyflora-codex-skill.md`
+- 项目本地 skill 入口：`.codex/skills/dailyflora/SKILL.md`
 - 版本提要：`CHANGELOG.md`
 
 另一台机器的 Codex 必须先读：
 
-1. `docs/codex-aesthetic-handoff.md`
-2. `CHANGELOG.md`
-3. `docs/aesthetic-review-dashboard.html`
-4. `data/aesthetic-review-dashboard.json`
-5. `docs/dailyflora-reference-gallery.html`
-6. `docs/reference-flower-identification.md`
-7. `src/flowerPlans.ts`
-8. `src/bouquetScene.ts`
-9. `src/floraPrimitives.ts`
-10. `docs/primitive-lab.html`
+1. `docs/dailyflora-aesthetic-system-0.13.md`
+2. `docs/dailyflora-codex-skill.md`
+3. `.codex/skills/dailyflora/SKILL.md`
+4. `docs/codex-aesthetic-handoff.md`
+5. `CHANGELOG.md`
+6. `docs/aesthetic-review-dashboard.html`
+7. `data/aesthetic-review-dashboard.json`
+8. `docs/dailyflora-reference-gallery.html`
+9. `docs/reference-flower-identification.md`
+10. `src/flowerPlans.ts`
+11. `src/bouquetScene.ts`
+12. `src/floraPrimitives.ts`
+13. `docs/primitive-lab.html`
 
 不要只看代码。这个项目的生成判断依赖用户连续纠正过的审美规则。
 
@@ -39,6 +45,7 @@
 - 暂停直接使用 Lobster 作为默认 handoff；除非用户明确要求，不要重新启用 Lobster 流程。
 - 不要直接浏览小红书。只使用用户给出的链接、截图、本地图片、手动下载后的资料。
 - 不要在没有用户确认的情况下改变生成规则。
+- 用户不给每日审美输入时，默认继续按 0.13 审美系统和日期 seed 生成每日花束；用户给的新链接只作为增量校准，先进入 pending。
 - 版本必须连续记录；当前线索从 `0.1`、`0.11`、`0.12.0` 到 `0.12.5`。
 - 每次重大改动必须更新 `CHANGELOG.md`。
 
@@ -53,10 +60,17 @@
 ## 当前交互规则
 
 - 日历按钮：打开日期选择器，位置必须贴近日历按钮，不能跑出浏览器可触控范围。
+- 日历 input 必须和日历按钮处在同一个定位容器里，不能再用全局 fixed 坐标临时覆盖按钮。
 - 选完日期后：日期选择器应自动关闭或失焦。
+- 默认今日花束页如果整晚打开，应在本地跨日后自动切到新日期；手动选择日期、随机日期、固定 seed 和特殊花束不能被强制改回今天。
 - random 日期按钮：随机跳到某一天对应的花束页面。
 - 圆形 reverse 按钮：只反转当前镜头路线。
 - 星形/预设按钮：随机生成新的镜头路线预设。
+- 审美审核入口只在 debug 版主界面可见，不能只靠用户记住 `docs/aesthetic-review-dashboard.html`。
+- debug 版由 URL 参数 `?debug` 或 `?debug=1` 开启；debug 版必须显示当前 FPS 和资源占用信息。
+- 普通观赏模式不显示审美审核入口，审美复盘页本身也必须检查 `debug` 参数。
+- GitHub Pages 发布时不能用原始 HTML 覆盖 Vite 已编译的 `docs/aesthetic-review-dashboard.html`；否则 dashboard 和 Primitive Lab 的脚本不会执行，页面会退化成只剩静态文字。
+- 新增关键审美记忆或 skill 文档时，必须同时加入 `scripts/deploy-source-files.json`；如果 dashboard 要在线上链接这些文档，还要在部署脚本中复制到 `dist/docs`。
 - 自动隐藏 UI 上的按钮必须有清楚的人话提示。
 
 ## 当前审美判断
@@ -101,12 +115,39 @@
 
 2026-06-26 十四次确认：用户指出 `foliage-grass-branch / 叶材草线枝条型` 在空旷位置出现时很诡异，因为旧 primitive 是上宽下窄的根部草束形态，只在根部成立。`0.12.20` 已改为沿一段枝线分布叶片和草线的空间材料，并减少主花束中孤立悬浮的叶材 accent。
 
+2026-06-26 十五次确认：用户认为繁星夜色、海盐柠檬、月光手捧整体已可接受，主要问题是整束中的竖直穗状花延伸方向太统一。山岗小花更严重，顶部出现一大片穗状花不自然；穗状花应穿插在花丛中。`0.12.21` 只改 composition：穗状花单体仍保持直，但整束摆放增加随机倾斜方向；山岗/狐尾 plan 降低顶部穗花占比，把穗花混入中层、外圈和小花/簇花之间。
+
+2026-06-26 十六次确认：用户确认穗状花“穿插”的感觉对了，但指出新版穗状花全部朝聚拢方向，缺少开洋感。`0.12.22` 保留穿插位置，只改整束朝向：穗状花倾斜方向改为基于实际空间位置向外打开，少量侧向交叉，避免整体向内收束。
+
+2026-06-26 十七次确认：用户指出当前综合效果最好的是山岗小花，并质问标题中英双语消失、日历选择框位置仍不正确。`0.12.23` 将山岗小花记录为当前 composition 正向样本：小花矩阵承接饱和色，低位簇花托住体积，穗状花穿插而不成片，线条外开形成空气。UI 上恢复 HUD 可见中英双语标题，并把日历 input 锚定在按钮同一容器中。
+
+2026-06-26 十八次确认：用户要求恢复审美审核页面入口，因为需要看到 Codex 对审美理解的进度；并要求按 Codex 当前理解凭空生成一组新花束加入项目。`0.12.24` 在主界面恢复可见审美审核按钮，新增原创主题 `晨露莓园 / Dewberry Morning`，并在 dashboard 中将它登记为 `needs-owner-review` 候选。该候选学习山岗小花的空间语法：小花矩阵、低位簇花、果点归属、穗线穿插外开、绿色托住空气，但不能自动宣布通过。
+
+2026-06-26 十九次确认：用户认可晨露莓园空气束方向不错，并要求新增 debug 版开关：只有 URL 带 `debug` 才能打开 debug 版；只有 debug 版能进入审美复盘；debug 版显示当前渲染 FPS 和资源占用。同时指出上下拖拽方向反直觉，左右拖拽保留；UI 上播放按钮要放在 reverse 按钮左边。`0.12.25` 已实现这些交互和门禁。
+
+2026-06-26 二十次确认：用户要求把 Codex 对审美的理解、流程、skills 和记忆写进项目，作为一个大版本。`0.13.0` 已将项目审美系统固化为 `docs/dailyflora-aesthetic-system-0.13.md`，将项目 Codex skill 固化为 `docs/dailyflora-codex-skill.md` 和 `.codex/skills/dailyflora/SKILL.md`，并把这些文件接入 README、project abstract、dashboard 和发布清单。后续新线程不得只依赖聊天上下文，必须先读这些项目内记忆。
+
+2026-06-26 二十一次确认：用户指出 0.13 没有继续追问和修正 CTO 口径，也没有兑现角色是否合并/新增的讨论；同时指出山岗小花和热带丛林中有一种好看的小面花未进入 TARGET SHAPE VOCABULARY。`0.13.1` 将 CTO 改为“生成架构审查”，新增“花材库管理员”视角，正式把 `CosmosOpenFlower / 波斯菊/小面花型` 登记为第 16 类目标形态。另按用户反馈：马蹄莲单体保留但整束比例下调；伞状/小簇型绿色假茎缩短并降低透明度；果材/荚果型暂记为同类风险较轻，继续观察。
+
+2026-07-02 二十二次确认：用户提供 `Lychee Garden｜捏一个彩虹🌈` 作为今日审美参考，并明确如果日后没有每日输入，Codex 也已掌握足够审美每日生成。`0.13.3` 将该链接写入 `data/inbox/2026-07-02/`、`data/inspiration-library.json` 的 pendingRecommendations，并同步新增 `data/aesthetic-review-dashboard.json` 的 `荔枝花园彩虹 / Lychee Garden Rainbow` 审美审核卡；公开可读信号是自然风、彩虹、多巴胺配色、绚丽色彩。该信号只能作为多色/彩虹方向的增量参考：颜色按花材角色分配，保留绿色和空气缓冲，果点必须有枝条归属；不自动修改生成器、不标记通过。
+
+2026-07-02 二十三次确认：用户纠正“新增参考的时候，要放在审美审核里”。后续任何 owner-provided 审美参考，即使只是短链、文字标题或 pending 状态，也必须进 `data/aesthetic-review-dashboard.json`，并至少包含人话结论、正向信号、负向约束、primitive 映射、当前实现、未通过原因、下一步任务和角色复盘；不能只写 inspiration library。
+
+2026-07-02 二十四次确认：用户纠正“新的花花就应该有新的地址”。后续新增花束不能借用别的主题地址展示；必须创建独立 theme/flowerPlan/URL。即使用户之后不用，也应弃用该地址本身，而不是把它改指向其他花束。`0.13.4` 因此新增 `lychee-garden-rainbow` 专属主题、同名 flowerPlan、专属 primitive/palette 映射，并把 dashboard 的“打开生成花束”指向 `?date=2026-07-02&seed=lychee-garden-rainbow&theme=lychee-garden-rainbow&render=high&density=medium`。
+
+2026-07-02 二十五次确认：用户确认“这个花花做得很好”。`lychee-garden-rainbow` 可以从待确认改为 pass，作为 DailyFlora 已通过的彩虹/多巴胺多色增量样本。用户还要求后续每天挑 token 剩余 95% 以上的闲时执行每日花花生成并自动推到 GitHub；已创建 Codex cron 自动化 `DailyFlora 每日花花生成并发布`，每天本机 03:35 运行，任务必须先确认上下文余量、构建、部署 GitHub，并检查线上入口。
+
+2026-07-03 二十六次确认：用户确认之前临时允许的审美现在都可以通过，后续会根据实际运行页面写反馈。`0.14.0` 将 dashboard 中的晨露莓园、夏日风车、梦幻紫、洋水仙季节、会呼吸的风景、狐尾百合、浆果森林、秋日果汁、荔枝花园彩虹和反向边界统一作为当前通过审美基线。后续不要把这些组当作 pending blocker；如果页面实际表现有问题，新增反馈和修正记录。
+
 ## 当前决定性文件
 
+- `docs/dailyflora-aesthetic-system-0.13.md`：0.13 审美系统总纲，记录目标花束、反向约束、叶材规则、花库门禁、composition 经验和流程。
+- `docs/dailyflora-codex-skill.md`：项目内 Codex skill，记录接手项目时必须执行的工作方法。
+- `.codex/skills/dailyflora/SKILL.md`：项目本地 skill 入口，指向完整 skill 文档。
 - `src/bouquetScene.ts`：最终 Three.js 花束形态和材质，决定视觉结果。
 - `src/floraPrimitives.ts`：可复用花材 primitive，后续应逐步替换 `精` 渲染里的匿名几何。
 - `src/flowerPlans.ts`：生成前花型计划，决定 `精` 模式尝试哪些花材角色。
-- `data/aesthetic-review-dashboard.json`：参考图到 primitive、验收状态和四角色复盘的数据源。
+- `data/aesthetic-review-dashboard.json`：参考图到 primitive、验收状态和审查角色复盘的数据源。
 - `docs/aesthetic-review-dashboard.html`：继续改主视觉前必须阅读的人类可读门禁页。
 - `src/spec.ts`：每天的 seed、主题和 flowerPlan 生成入口。
 - `src/main.ts`：UI、日期、random、镜头路线、HUD 文案。
@@ -136,6 +177,19 @@
 - `0.12.18` 将穗状花回直，并为主网页增加手动缩放。
 - `0.12.19` 拉远默认镜头，让整束花默认可读。
 - `0.12.20` 修正叶材/草线/枝条型，避免空中出现上宽下窄的根部草束。
+- `0.12.21` 修正整束 composition 中的穗状花：方向不再统一，山岗小花不再把穗花集中堆在顶部。
+- `0.12.22` 修正穗状花外开方向：保留穿插，但避免朝内聚拢，恢复开洋感。
+- `0.12.23` 恢复 HUD 中英双语标题，修正日历选择器按钮锚点，并把山岗小花确定为当前 composition 正向样本。
+- `0.12.24` 恢复主界面审美审核入口，并新增原创候选花束 `晨露莓园 / Dewberry Morning`。
+- `0.12.25` 将审美审核入口收进 `?debug` 模式，增加 FPS/资源 debug 面板，修正上下拖拽方向，并把播放按钮放到 reverse 左侧。
+- `0.12.26` 修复发布脚本覆盖编译页的问题，恢复 dashboard、Primitive Lab、参考图库和花束库在线可用。
+- `0.13.0` 将 DailyFlora 审美理解、流程、项目 skill 和记忆写入仓库，形成后续 Codex 必须读取的 0.13 审美操作系统。
+- `0.13.1` 修正审查角色机制，新增花材库管理员，并将 CosmosOpenFlower 补登记为第 16 类目标形态；同时修 Calla 整束比例和 Umbel 假茎倒三角问题。
+- `0.13.2` 补齐默认今日花束页的本地跨日自动重建逻辑；固定日期、随机预览、固定 seed 和特殊花束保持锁定。
+- `0.13.3` 接收 `Lychee Garden｜捏一个彩虹🌈` 作为 owner-provided pending inspiration，补齐 `xhslink.com` 短链读取，将新增参考同步放入审美审核 dashboard，并记录“无每日输入也按既有审美系统每日生成”的工作方式。
+- `0.13.4` 将 `Lychee Garden Rainbow` 从 borrowed preview 改为独立花束地址：新增 `lychee-garden-rainbow` theme、同名 flowerPlan 和专属 renderer 映射；记录新花必须有新地址，弃用时弃用该地址本身。
+- `0.13.5` 记录用户确认 `Lychee Garden Rainbow` 做得好，将 dashboard 状态改为 pass，并创建每日自动构建和 GitHub 发布任务。
+- `0.14.0` 建立低成本 MVP 路由结构，新增开发组目录、客户占位页、member/admin mock 页和轻量固定样例库；同时记录用户确认当前审美组全部进入 pass 基线，未来按实际运行页面反馈迭代。
 
 下一台机器继续开发时，不要重复 `0.12.0` 的错误：不要为了“更多花型”破坏花束整体轮廓。
 
@@ -234,10 +288,10 @@ https://calfnai.github.io/dailyFlora/
 在另一台电脑上，用 Codex 打开 `dailyFlora` 文件夹，然后给 Codex 这段提示：
 
 ```text
-这是 DailyFlora 项目。请先阅读 docs/aesthetic-rating-board.md 和 docs/codex-aesthetic-handoff.md。
-维护美感来源时，只更新评分板和灵感库，不要直接改变生成规则。
-所有新审美来源先进入评分，不自动采纳。
-国外花艺网站不能作为默认审美来源；中国当代花艺和小红书语境优先。
+这是 DailyFlora 0.13 项目。请先阅读 docs/dailyflora-aesthetic-system-0.13.md、docs/dailyflora-codex-skill.md、docs/codex-aesthetic-handoff.md 和 CHANGELOG.md。
+不要只凭“理解了”继续改视觉。先判断问题属于 primitive、composition、palette、camera/UI 还是 deploy。
+用户是当前审美验收人；未经用户确认，不要把 Codex 的判断写成 pass。
+国外花艺网站和 Lobster 不能作为默认审美来源；用户给过的参考图和文字优先。
 ```
 
 如果只是整理美感来源，不需要运行构建，也不需要改 `src/`。

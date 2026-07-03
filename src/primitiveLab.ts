@@ -26,6 +26,7 @@ const primitiveReviewPanel = reviewPanel;
 
 const primitiveNames: FloraPrimitiveName[] = [
   'DiskFlower',
+  'CosmosOpenFlower',
   'LayeredDahliaFlower',
   'RuffledRoseFlower',
   'StarPinwheelFlower',
@@ -44,6 +45,7 @@ const primitiveNames: FloraPrimitiveName[] = [
 
 const palettes: Record<FloraPrimitiveName, string[]> = {
   DiskFlower: ['#fff8e7', '#f7edd2', '#f0c83a', '#7f8e3e'],
+  CosmosOpenFlower: ['#fffdf2', '#f6efdc', '#f4cf2e', '#7f8e3e'],
   LayeredDahliaFlower: ['#f8c9d8', '#fff1f5', '#e7a7bb', '#86a762'],
   RuffledRoseFlower: ['#f8b9cf', '#fff3f6', '#e77da0', '#9bb36b'],
   LayeredRoseFlower: ['#ff9fbd', '#f6c1d2', '#f06b86', '#ffe2a9'],
@@ -69,6 +71,10 @@ const palettes: Record<FloraPrimitiveName, string[]> = {
 };
 
 const reviewNotes: Partial<Record<FloraPrimitiveName, { status: string; note: string }>> = {
+  CosmosOpenFlower: {
+    status: '新增登记：山岗/热带小面花',
+    note: '用户指出山岗小花和热带丛林里有一种未登记的小面花；已把 CosmosOpenFlower 正式登记进 TARGET SHAPE VOCABULARY。'
+  },
   LayeredDahliaFlower: {
     status: '2 与 3 太像：已拆分',
     note: '已改成细长尖瓣、多层放射的大丽花/团瓣方向，避免和褶皱玫瑰混成一个形。'
@@ -98,16 +104,16 @@ const reviewNotes: Partial<Record<FloraPrimitiveName, { status: string; note: st
     note: '保留这次比例和花蕊，把花瓣角度往上上版更正确的方向回调。'
   },
   CallaCurledBract: {
-    status: '9 接近，继续闭合卷曲',
-    note: '沿当前角度拉长外圈卷曲部分，让单片苞片更接近闭合。'
+    status: '9 单看通过，整束需缩小',
+    note: '单体形态可用；在整束 composition 中比例偏大，已只在整束渲染里下调尺度，不破坏单体花库。'
   },
   SpikeFlower: {
     status: '10 回退为直立穗状',
     note: '已取消统一弯曲度，改回直立中轴，只保留极小随机偏移和小花错落。'
   },
   UmbelMiniCluster: {
-    status: '11 需要 360 可看',
-    note: '已调整小花面向角度，并增加花心，减少单面观察性。'
+    status: '11 假茎倒三角修正',
+    note: '已把下半部分绿色假茎改短并降低透明度，避免高处或远处出现上宽下窄的倒三角。'
   },
   FruitPodCluster: {
     status: '13 球太大、密度不够',
@@ -186,7 +192,7 @@ primitiveIsolateSelect.innerHTML = [
 function updateReviewPanel() {
   const selected = primitiveIsolateSelect.value as FloraPrimitiveName | 'all';
   if (selected === 'all') {
-    primitiveReviewPanel.innerHTML = '<strong>花库验收已达及格线</strong><span>用户已确认 Primitive Gate 可以进入下一阶段；后续主视觉修改仍要同步 dashboard。</span>';
+    primitiveReviewPanel.innerHTML = '<strong>16 类花库验收已达及格线</strong><span>CosmosOpenFlower 已从山岗小花/热带丛林经验中补登记；后续主视觉修改仍要同步 dashboard。</span>';
     return;
   }
   const note = reviewNotes[selected];

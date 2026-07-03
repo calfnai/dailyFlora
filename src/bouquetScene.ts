@@ -473,6 +473,58 @@ function geometryForFlowerType(typeId: FlowerTypeId, radius: number) {
 }
 
 function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimitiveName {
+  if (planId === 'lychee-garden-rainbow') {
+    if (item.typeId === 'chamomile') return 'CosmosOpenFlower';
+    if (item.typeId === 'bellFruit') return 'FruitPodCluster';
+    if (item.typeId === 'hydrangea') return 'UmbelMiniCluster';
+    if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
+    if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
+    if (item.typeId === 'liatris') return 'FoliageGrassBranch';
+    if (item.typeId === 'camelliaPeony' || item.typeId === 'rose') return 'RuffledRoseFlower';
+  }
+
+  if (planId === 'dewberry-morning-air') {
+    if (item.typeId === 'chamomile') return 'CosmosOpenFlower';
+    if (item.typeId === 'hydrangea') return 'UmbelMiniCluster';
+    if (item.typeId === 'bellFruit') return 'FruitPodCluster';
+    if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
+    if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
+    if (item.typeId === 'camelliaPeony') return 'RuffledRoseFlower';
+    if (item.typeId === 'liatris') return 'SpikeFlower';
+  }
+
+  if (planId === 'her-real-bouquet-memory-v4') {
+    if (item.typeId === 'chamomile' && item.cn.includes('黄色')) return 'DiskFlower';
+    if (item.typeId === 'chamomile') return 'CosmosOpenFlower';
+    if (item.typeId === 'camelliaPeony') return 'RuffledRoseFlower';
+    if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
+    if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
+    if (item.typeId === 'orchid' && item.role === 'secondary') return 'OrchidButterflyFlower';
+    if (item.typeId === 'hydrangea') return 'UmbelMiniCluster';
+    if (item.typeId === 'bellFruit') return 'AirFiller';
+    if (item.typeId === 'liatris') return 'FoliageGrassBranch';
+  }
+
+  if (planId === 'her-january-sky-memory-v3') {
+    if (item.typeId === 'camelliaPeony' || item.typeId === 'rose') return 'RuffledRoseFlower';
+    if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
+    if (item.typeId === 'orchid' && item.role === 'secondary') return 'OrchidButterflyFlower';
+    if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
+    if (item.typeId === 'hydrangea') return 'UmbelMiniCluster';
+    if (item.typeId === 'bellFruit') return 'AirFiller';
+    if (item.typeId === 'liatris') return 'FoliageGrassBranch';
+  }
+
+  if (planId === 'her-january-sky-memory-v2') {
+    if (item.typeId === 'camelliaPeony') return 'RuffledRoseFlower';
+    if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
+    if (item.typeId === 'orchid' && item.role === 'secondary') return 'CallaCurledBract';
+    if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
+    if (item.typeId === 'hydrangea') return 'UmbelMiniCluster';
+    if (item.typeId === 'bellFruit') return 'AirFiller';
+    if (item.typeId === 'liatris') return 'FoliageGrassBranch';
+  }
+
   if (planId === 'her-january-sky-memory') {
     if (item.typeId === 'orchid' && item.role === 'main') return 'TulipCupFlower';
     if (item.typeId === 'orchid' && item.role === 'line') return 'StarPinwheelFlower';
@@ -493,6 +545,7 @@ function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimit
   }
 
   if (item.typeId === 'chamomile') {
+    if (['berry-grove', 'foxtail-lily-vertical', 'fairy-violet-air'].includes(planId)) return 'CosmosOpenFlower';
     return planId === 'summer-pinwheel-detail' && item.role === 'filler' ? 'StarPinwheelFlower' : 'DiskFlower';
   }
 
@@ -522,12 +575,93 @@ function primitiveRoleForPlanItem(item: FlowerPlanItem): FloraPrimitiveRole {
   return 'secondary';
 }
 
-function primitivePalette(spec: DailyBouquetSpec, primitive: FloraPrimitiveName, rng: ReturnType<typeof createRng>) {
+function compositionScaleForPrimitive(primitive: FloraPrimitiveName) {
+  if (primitive === 'CallaCurledBract') return 0.82;
+  return 1;
+}
+
+function settleSpikeAnchor(
+  point: THREE.Vector3,
+  placement: FlowerPlanItem['placement'],
+  rng: ReturnType<typeof createRng>
+) {
+  const maxYByPlacement: Record<FlowerPlanItem['placement'], number> = {
+    center: 1.0,
+    outer: 1.08,
+    high: 1.24,
+    low: 0.86,
+    spray: 1.12,
+    mixed: 1.02
+  };
+  const maxY = maxYByPlacement[placement] + (rng.value() < 0.16 ? rng.range(0.12, 0.24) : 0);
+
+  if (point.y > maxY) {
+    point.y = maxY - rng.range(0.02, 0.18);
+  }
+
+  if (placement !== 'high' && point.y > 0.88 && rng.value() < 0.68) {
+    point.y -= rng.range(0.12, 0.32);
+  }
+
+  if (placement === 'high' && point.y < 0.78) {
+    point.y += rng.range(0.08, 0.2);
+  }
+
+  return point;
+}
+
+function spikeLeanRange(placement: FlowerPlanItem['placement']): [number, number] {
+  if (placement === 'high') return [0.14, 0.42];
+  if (placement === 'spray') return [0.22, 0.58];
+  if (placement === 'outer') return [0.18, 0.5];
+  if (placement === 'mixed') return [0.14, 0.46];
+  return [0.1, 0.32];
+}
+
+function primitivePalette(
+  spec: DailyBouquetSpec,
+  primitive: FloraPrimitiveName,
+  rng: ReturnType<typeof createRng>,
+  item?: FlowerPlanItem
+) {
   const flower = spec.theme.palette;
   const leaf = spec.theme.leafPalette;
   const color = (index: number) => flower[index % flower.length];
   const leafColor = (index: number) => leaf[index % leaf.length];
   const warm = color(Math.floor(rng.value() * flower.length));
+
+  if (spec.flowerPlan.id === 'lychee-garden-rainbow' && item) {
+    if (item.cn.includes('奶白')) return ['#fff7df', '#fff0c9', '#fff46a', leafColor(2)];
+    if (item.cn.includes('彩虹小面')) return [color(Math.floor(rng.value() * 6)), color(Math.floor(rng.value() * 6) + 1), '#fff7df', leafColor(2)];
+    if (item.cn.includes('荔枝')) return ['#ff5f8f', '#fff7df', '#ffb33f', leafColor(1)];
+    if (item.cn.includes('浅色空气')) return ['#fff7df', '#63d8ff', '#9a8cff', leafColor(2)];
+    if (item.cn.includes('彩虹星形')) return ['#ff5f8f', '#fff46a', '#63d8ff', leafColor(2)];
+    if (item.cn.includes('嫩绿')) return ['#7fe36d', '#c8e37a', '#fff7df', leafColor(1)];
+    if (item.cn.includes('粉橙')) return ['#ff8aac', '#ffb33f', '#fff0d7', leafColor(2)];
+    if (item.cn.includes('象牙')) return ['#fff7df', '#fff0c9', '#ffb33f', leafColor(1)];
+  }
+
+  if (spec.flowerPlan.id === 'dewberry-morning-air' && item) {
+    if (item.cn.includes('奶白')) return ['#fffaf0', '#f5ead6', '#f3ca43', leafColor(2)];
+    if (item.cn.includes('柠檬黄')) return ['#ffdf50', '#fff5a6', '#f6f2dc', leafColor(1)];
+    if (item.cn.includes('蓝紫')) return ['#8fd8ff', '#d9bcff', '#fffaf0', leafColor(2)];
+    if (item.cn.includes('莓红')) return ['#ff78a8', '#c84b80', '#ffd8e6', leafColor(1)];
+    if (item.cn.includes('象牙')) return ['#fffaf0', '#f7e6bf', '#ffd95a', leafColor(1)];
+    if (item.cn.includes('粉莓')) return ['#f5adc6', '#fff1ec', '#ff78a8', leafColor(2)];
+    if (item.cn.includes('嫩绿')) return ['#8eea92', '#bddf82', '#fffaf0', leafColor(1)];
+    if (item.cn.includes('珊瑚')) return ['#ff8f5a', '#ffd95a', '#ff78a8', leafColor(2)];
+  }
+
+  if (spec.flowerPlan.id === 'her-real-bouquet-memory-v4' && item) {
+    if (item.cn.includes('白色波斯菊')) return ['#fffdf2', '#f6efdc', '#f4cf2e', leafColor(2)];
+    if (item.cn.includes('黄色春日')) return ['#ffe132', '#fff58c', '#7c691f', leafColor(1)];
+    if (item.cn.includes('红黄嘉兰')) return ['#f36b45', '#ffe05c', '#c83f56', '#79a33d'];
+    if (item.cn.includes('浅粉')) return ['#f5c0cf', '#f1d8e8', '#fff2e3', leafColor(2)];
+    if (item.cn.includes('白色杯形')) return ['#fff8e6', '#f7ecd4', '#f3d36d', leafColor(1)];
+    if (item.cn.includes('淡紫')) return ['#d8c4f0', '#f0e8fb', '#b7d6ff', leafColor(2)];
+    if (item.cn.includes('蓝色')) return ['#84bdf4', '#b9d8f6', '#f0f6ff', leafColor(2)];
+    if (item.cn.includes('满天星')) return ['#fffdf4', '#eff7ff', '#dfe9c9', leafColor(1)];
+  }
 
   if (primitive === 'FoliageGrassBranch') return [leafColor(0), leafColor(1), leafColor(2), spec.theme.stem];
   if (primitive === 'FruitPodCluster') return [color(4), color(3), leafColor(1), color(2)];
@@ -545,10 +679,12 @@ function orientPrimitiveGroup(
   primitive: FloraPrimitiveName,
   point: THREE.Vector3,
   theta: number,
-  rng: ReturnType<typeof createRng>
+  rng: ReturnType<typeof createRng>,
+  placement: FlowerPlanItem['placement'] = 'mixed'
 ) {
   const outward = point.clone().setY(point.y * 0.55 + 0.48).normalize();
   const facePrimitives: FloraPrimitiveName[] = [
+    'CosmosOpenFlower',
     'DiskFlower',
     'LayeredDahliaFlower',
     'RuffledRoseFlower',
@@ -565,7 +701,26 @@ function orientPrimitiveGroup(
     return;
   }
 
-  if (primitive === 'SpikeFlower' || primitive === 'FoliageGrassBranch') {
+  if (primitive === 'SpikeFlower') {
+    const [minLean, maxLean] = spikeLeanRange(placement);
+    const lean = rng.range(minLean, maxLean);
+    const radial = new THREE.Vector3(point.x, 0, point.z);
+    if (radial.lengthSq() < 0.0001) radial.set(Math.cos(theta), 0, Math.sin(theta));
+    radial.normalize();
+    const side = new THREE.Vector3(-radial.z, 0, radial.x).multiplyScalar(rng.range(-0.42, 0.42));
+    const openBias = rng.value() < 0.86 ? rng.range(0.82, 1.2) : rng.range(0.28, 0.62);
+    const horizontal = radial.multiplyScalar(openBias).add(side).normalize().multiplyScalar(lean);
+    const target = new THREE.Vector3(
+      horizontal.x,
+      rng.range(0.92, 1.14),
+      horizontal.z
+    ).normalize();
+    group.quaternion.setFromUnitVectors(up, target);
+    group.rotateY(rng.range(-Math.PI, Math.PI));
+    return;
+  }
+
+  if (primitive === 'FoliageGrassBranch') {
     group.quaternion.setFromUnitVectors(up, new THREE.Vector3(Math.cos(theta) * 0.22, 1, Math.sin(theta) * 0.22).normalize());
     group.rotateY(rng.range(-0.45, 0.45));
     return;
@@ -582,7 +737,8 @@ function orientPrimitiveGroup(
 
 function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   const plannedCount = Math.floor(quality.flowerCount * spec.flowerDensity);
-  const count = Math.max(64, Math.floor(plannedCount * (spec.special ? 0.34 : 0.44)));
+  const specialPrimitiveRatio = spec.flowerPlan.id === 'her-real-bouquet-memory-v4' ? 0.5 : 0.34;
+  const count = Math.max(64, Math.floor(plannedCount * (spec.special ? specialPrimitiveRatio : 0.44)));
   const group = new THREE.Group();
   const batches = spec.flowerPlan.items;
   let used = 0;
@@ -596,6 +752,7 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
 
     for (let i = 0; i < batchCount; i += 1) {
       const { p, theta } = placementPoint(spec, localRng, batch.placement);
+      if (primitive === 'SpikeFlower') settleSpikeAnchor(p, batch.placement, localRng);
       const roleScale =
         batch.role === 'main' ? 0.26 :
         batch.role === 'line' ? 0.25 :
@@ -608,15 +765,15 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
       const primitiveGroup = factory({
         seed: `${spec.seed}:bouquet-primitive:${primitive}:${batch.typeId}:${i}`,
         position: p,
-        scale: roleScale * batch.scale * localRng.range(0.82, 1.22) * specialScale,
-        colorPalette: primitivePalette(spec, primitive, localRng),
+        scale: roleScale * batch.scale * compositionScaleForPrimitive(primitive) * localRng.range(0.82, 1.22) * specialScale,
+        colorPalette: primitivePalette(spec, primitive, localRng, batch),
         openness: ['OrchidButterflyFlower', 'TrumpetThroatFlower', 'DaturaTrumpetFlower', 'CallaCurledBract'].includes(primitive) ? 0.94 : localRng.range(0.62, 0.86),
         density: ['UmbelMiniCluster', 'FullHydrangeaCloud', 'FruitPodCluster'].includes(primitive) ? 1.08 : localRng.range(0.86, 1.02),
         curvature: ['SpikeFlower', 'FoliageGrassBranch', 'CallaCurledBract'].includes(primitive) ? 0.86 : 0.42,
         role: primitiveRoleForPlanItem(batch)
       });
       primitiveGroup.name = `${primitive}:${batch.cn}`;
-      orientPrimitiveGroup(primitiveGroup, primitive, p, theta, localRng);
+      orientPrimitiveGroup(primitiveGroup, primitive, p, theta, localRng, batch.placement);
       group.add(primitiveGroup);
     }
   });
@@ -1005,32 +1162,69 @@ function buildSpecialCosmicLayer(spec: DailyBouquetSpec, quality: QualityProfile
 
   const galaxyTexture = new THREE.TextureLoader().load(withBasePath(spec.special.hubbleImagePath));
   galaxyTexture.colorSpace = THREE.SRGBColorSpace;
+  const galaxyScale = spec.special.cosmic.galaxyScale ?? 1;
+  const galaxyPosition = spec.special.cosmic.galaxyPosition ?? [0.42, 0.62, -9.1];
+  const galaxyMaterial = spec.special.cosmic.galaxyAlphaMap
+    ? new THREE.ShaderMaterial({
+        uniforms: {
+          map: { value: galaxyTexture },
+          tint: { value: new THREE.Color(spec.special.cosmic.galaxyTint) },
+          opacity: { value: spec.special.cosmic.galaxyOpacity ?? 0.34 }
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform sampler2D map;
+          uniform vec3 tint;
+          uniform float opacity;
+          varying vec2 vUv;
+
+          void main() {
+            vec4 tex = texture2D(map, vUv);
+            float luminance = dot(tex.rgb, vec3(0.299, 0.587, 0.114));
+            float alpha = smoothstep(0.045, 0.42, luminance) * opacity;
+            vec3 lifted = pow(tex.rgb, vec3(0.52)) * tint * 1.7;
+            gl_FragColor = vec4(lifted, alpha);
+          }
+        `,
+        transparent: true,
+        depthWrite: false,
+        depthTest: spec.special.cosmic.galaxyDepthTest ?? true
+      })
+    : new THREE.MeshBasicMaterial({
+        map: galaxyTexture,
+        color: spec.special.cosmic.galaxyTint,
+        transparent: true,
+        opacity: spec.special.cosmic.galaxyOpacity ?? 0.34,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        depthTest: spec.special.cosmic.galaxyDepthTest ?? true
+      });
   const galaxy = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.5, 4.4),
-    new THREE.MeshBasicMaterial({
-      map: galaxyTexture,
-      color: spec.special.cosmic.galaxyTint,
-      transparent: true,
-      opacity: 0.34,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    })
+    new THREE.PlaneGeometry(4.5 * galaxyScale, 4.4 * galaxyScale),
+    galaxyMaterial
   );
-  galaxy.position.set(0.42, 0.62, -9.1);
-  galaxy.rotation.z = -0.2;
+  galaxy.position.set(galaxyPosition[0], galaxyPosition[1], galaxyPosition[2]);
+  galaxy.rotation.z = spec.special.cosmic.galaxyRotation ?? -0.2;
   group.add(galaxy);
 
   const core = new THREE.Mesh(
-    new THREE.CircleGeometry(0.72, 48),
+    new THREE.CircleGeometry(spec.special.cosmic.coreRadius ?? 0.72, 48),
     new THREE.MeshBasicMaterial({
       color: spec.special.cosmic.warmCore,
       transparent: true,
-      opacity: 0.16,
+      opacity: spec.special.cosmic.coreOpacity ?? 0.16,
       blending: THREE.AdditiveBlending,
-      depthWrite: false
+      depthWrite: false,
+      depthTest: spec.special.cosmic.galaxyDepthTest ?? true
     })
   );
-  core.position.set(0.24, 0.58, -9.05);
+  core.position.set(galaxyPosition[0] - 0.18, galaxyPosition[1] - 0.04, galaxyPosition[2] + 0.05);
   group.add(core);
   return group;
 }
@@ -1075,6 +1269,9 @@ export class BouquetScene {
   private targetCameraTargetY = 0.7;
   private floorMaterial?: THREE.MeshBasicMaterial;
   private animationId = 0;
+  private debugFrameCount = 0;
+  private debugFps = 0;
+  private debugSampleAt = performance.now();
 
   constructor(canvas: HTMLCanvasElement, spec: DailyBouquetSpec, quality: QualityProfile) {
     this.canvas = canvas;
@@ -1244,6 +1441,47 @@ export class BouquetScene {
     }
     this.updateCamera(routeOffsets);
     this.renderer.render(this.scene, this.camera);
+    this.updateDebugFps();
+  }
+
+  private updateDebugFps() {
+    this.debugFrameCount += 1;
+    const now = performance.now();
+    const elapsed = now - this.debugSampleAt;
+    if (elapsed < 500) return;
+    this.debugFps = Math.round((this.debugFrameCount * 1000) / elapsed);
+    this.debugFrameCount = 0;
+    this.debugSampleAt = now;
+  }
+
+  getDebugStats() {
+    const size = this.renderer.getSize(new THREE.Vector2());
+    const heap = (performance as Performance & {
+      memory?: {
+        usedJSHeapSize: number;
+        totalJSHeapSize: number;
+        jsHeapSizeLimit: number;
+      };
+    }).memory;
+
+    return {
+      fps: this.debugFps,
+      targetFps: this.quality.targetFps,
+      density: this.quality.densityName,
+      render: this.quality.renderName,
+      pixelRatio: this.renderer.getPixelRatio(),
+      canvasWidth: Math.round(size.x),
+      canvasHeight: Math.round(size.y),
+      geometries: this.renderer.info.memory.geometries,
+      textures: this.renderer.info.memory.textures,
+      calls: this.renderer.info.render.calls,
+      triangles: this.renderer.info.render.triangles,
+      points: this.renderer.info.render.points,
+      lines: this.renderer.info.render.lines,
+      jsHeapUsedMb: heap ? Math.round(heap.usedJSHeapSize / 1024 / 1024) : null,
+      jsHeapTotalMb: heap ? Math.round(heap.totalJSHeapSize / 1024 / 1024) : null,
+      jsHeapLimitMb: heap ? Math.round(heap.jsHeapSizeLimit / 1024 / 1024) : null
+    };
   }
 
   private updateCamera(routeOffsets: CameraRouteOffsets) {
@@ -1365,7 +1603,7 @@ export class BouquetScene {
       this.dragY = event.clientY;
       this.targetCameraYaw -= dx * 0.008;
       this.targetCameraPitch = THREE.MathUtils.clamp(
-        this.targetCameraPitch - dy * 0.0058,
+        this.targetCameraPitch + dy * 0.0058,
         minCameraPitch,
         maxCameraPitch
       );
