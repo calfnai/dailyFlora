@@ -1,13 +1,13 @@
 # DailyFlora Codex 接入与美感来源维护
 
-最后更新：2026-07-02
+最后更新：2026-07-03
 
 这份文档用于在另一台电脑上接入 DailyFlora，并让新的 Codex 线程继续维护美感来源、版本进度和生成规则。
 
 ## 当前项目状态快照
 
-- 当前 npm 版本：`0.13.5`
-- 当前产品层标记：`0.13`
+- 当前 npm 版本：`0.14.0`
+- 当前产品层标记：`0.14`
 - 当前主要同步分支：`main`
 - 线上入口：<https://calfnai.github.io/dailyFlora/>
 - 线上参考图库：<https://calfnai.github.io/dailyFlora/docs/dailyflora-reference-gallery.html>
@@ -137,6 +137,8 @@
 
 2026-07-02 二十五次确认：用户确认“这个花花做得很好”。`lychee-garden-rainbow` 可以从待确认改为 pass，作为 DailyFlora 已通过的彩虹/多巴胺多色增量样本。用户还要求后续每天挑 token 剩余 95% 以上的闲时执行每日花花生成并自动推到 GitHub；已创建 Codex cron 自动化 `DailyFlora 每日花花生成并发布`，每天本机 03:35 运行，任务必须先确认上下文余量、构建、部署 GitHub，并检查线上入口。
 
+2026-07-03 二十六次确认：用户确认之前临时允许的审美现在都可以通过，后续会根据实际运行页面写反馈。`0.14.0` 将 dashboard 中的晨露莓园、夏日风车、梦幻紫、洋水仙季节、会呼吸的风景、狐尾百合、浆果森林、秋日果汁、荔枝花园彩虹和反向边界统一作为当前通过审美基线。后续不要把这些组当作 pending blocker；如果页面实际表现有问题，新增反馈和修正记录。
+
 ## 当前决定性文件
 
 - `docs/dailyflora-aesthetic-system-0.13.md`：0.13 审美系统总纲，记录目标花束、反向约束、叶材规则、花库门禁、composition 经验和流程。
@@ -187,6 +189,7 @@
 - `0.13.3` 接收 `Lychee Garden｜捏一个彩虹🌈` 作为 owner-provided pending inspiration，补齐 `xhslink.com` 短链读取，将新增参考同步放入审美审核 dashboard，并记录“无每日输入也按既有审美系统每日生成”的工作方式。
 - `0.13.4` 将 `Lychee Garden Rainbow` 从 borrowed preview 改为独立花束地址：新增 `lychee-garden-rainbow` theme、同名 flowerPlan 和专属 renderer 映射；记录新花必须有新地址，弃用时弃用该地址本身。
 - `0.13.5` 记录用户确认 `Lychee Garden Rainbow` 做得好，将 dashboard 状态改为 pass，并创建每日自动构建和 GitHub 发布任务。
+- `0.14.0` 建立低成本 MVP 路由结构，新增开发组目录、客户占位页、member/admin mock 页和轻量固定样例库；同时记录用户确认当前审美组全部进入 pass 基线，未来按实际运行页面反馈迭代。
 
 下一台机器继续开发时，不要重复 `0.12.0` 的错误：不要为了“更多花型”破坏花束整体轮廓。
 

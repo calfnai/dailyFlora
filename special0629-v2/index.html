@@ -9,9 +9,9 @@
       content="DailyFlora creates a low-power 3D particle bouquet that changes every day."
     />
     <title>DailyFlora</title>
-    <script type="module" crossorigin src="./assets/main-DkUsiwkL.js"></script>
+    <script type="module" crossorigin src="./assets/main-CP1buEkJ.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/floraPrimitives-DTeKYRlc.js">
-    <link rel="stylesheet" crossorigin href="./assets/main-C5qFrSRw.css">
+    <link rel="stylesheet" crossorigin href="./assets/main-NwPCKfXY.css">
   </head>
   <body>
     <main class="app-shell" aria-label="DailyFlora 3D bouquet screensaver">
@@ -29,92 +29,19 @@
         <div class="quality-mark" id="quality-mark"></div>
       </section>
 
-      <section class="account-dock" id="account-dock" aria-label="Personal DailyFlora account">
-        <button class="account-favorite-button" id="favorite-button" type="button" aria-pressed="false" title="收藏今日花束">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.6l-1.1-1C5.7 15 2.5 12.1 2.5 8.5A5 5 0 0 1 7.6 3.4c1.7 0 3.3.8 4.4 2.1a5.7 5.7 0 0 1 4.4-2.1 5 5 0 0 1 5.1 5.1c0 3.6-3.2 6.5-8.4 11.1z" /></svg>
+      <nav class="site-menu" id="site-menu" aria-label="DailyFlora site menu">
+        <button class="site-menu-toggle" id="site-menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu-panel" data-tooltip="菜单">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" /></svg>
         </button>
-        <button class="account-open-button" id="account-open-button" type="button" aria-expanded="false" aria-controls="account-panel">
-          <span class="account-avatar" id="account-avatar">访</span>
-          <span class="account-open-copy">
-            <span id="account-open-title">个人花园</span>
-            <span id="account-open-status">登录后同步收藏</span>
-          </span>
-        </button>
-      </section>
-
-      <aside class="account-panel" id="account-panel" aria-label="Personal collection" hidden>
-        <div class="account-panel-header">
-          <div>
-            <p class="account-eyebrow">DailyFlora ID</p>
-            <h2 id="account-panel-title">把今天的花束收进个人花园</h2>
-          </div>
-          <button class="account-close-button" id="account-close-button" type="button" aria-label="关闭个人花园">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.4 5 12 10.6 17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12 5 6.4z" /></svg>
-          </button>
+        <div class="site-menu-panel" id="site-menu-panel" hidden>
+          <a href="./about/">About</a>
+          <a href="./member/">Member</a>
+          <a href="./downloads/">Downloads</a>
+          <a href="./bouquet-shop/">Bouquet Shop</a>
+          <a class="site-menu-primary" href="./signup/">收藏这束花</a>
+          <a id="site-menu-debug-link" href="./docs/aesthetic-review-dashboard.html?debug=1" hidden>审美审核</a>
         </div>
-
-        <form class="login-card" id="login-form">
-          <label>
-            <span>昵称</span>
-            <input id="login-name-input" type="text" name="name" autocomplete="name" maxlength="18" placeholder="例如：小花" />
-          </label>
-          <label>
-            <span>邮箱</span>
-            <input id="login-email-input" type="email" name="email" autocomplete="email" placeholder="you@example.com" />
-          </label>
-          <button class="primary-action" type="submit">登录并保存收藏</button>
-        </form>
-
-        <div class="account-profile" id="account-profile" hidden>
-          <div class="profile-card">
-            <span class="profile-avatar" id="profile-avatar">花</span>
-            <div>
-              <strong id="profile-name">DailyFlora 用户</strong>
-              <span id="profile-email"></span>
-            </div>
-            <button class="ghost-action" id="logout-button" type="button">退出</button>
-          </div>
-        </div>
-
-        <section class="reference-card" aria-label="Upload reference bouquet">
-          <div class="reference-copy">
-            <p class="account-eyebrow">Reference</p>
-            <h3>上传你的参考</h3>
-            <p>用照片的色调和氛围生成一束 DailyFlora。</p>
-          </div>
-          <label class="reference-upload-zone" id="reference-upload-zone">
-            <input id="reference-file-input" type="file" accept="image/*" />
-            <span class="reference-upload-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M11 16V7.8l-3.1 3.1-1.4-1.4L12 4l5.5 5.5-1.4 1.4L13 7.8V16z" /><path d="M5 18h14v2H5z" /></svg>
-            </span>
-            <span id="reference-upload-text">选择参考图</span>
-          </label>
-          <div class="reference-preview" id="reference-preview" hidden>
-            <img id="reference-preview-image" alt="上传的参考图预览" />
-            <div>
-              <strong id="reference-preview-title">参考图已载入</strong>
-              <span id="reference-preview-meta"></span>
-            </div>
-          </div>
-          <label class="reference-note-label">
-            <span>偏好</span>
-            <textarea id="reference-note-input" rows="2" maxlength="80" placeholder="例如：更清透、枝条外扩、不要太满"></textarea>
-          </label>
-          <button class="primary-action" id="reference-generate-button" type="button" disabled>生成这束花</button>
-          <p class="reference-result" id="reference-result" hidden></p>
-        </section>
-
-        <div class="collection-section">
-          <div class="collection-header">
-            <div>
-              <p class="account-eyebrow">Collection</p>
-              <h3>我的收藏</h3>
-            </div>
-            <span class="collection-count" id="collection-count">0</span>
-          </div>
-          <div class="collection-list" id="collection-list"></div>
-        </div>
-      </aside>
+      </nav>
 
       <nav class="controls is-collapsed" id="controls" aria-label="Viewing controls">
         <button class="icon-button controls-toggle" id="controls-toggle" type="button" title="Show viewing controls" aria-label="Show viewing controls" aria-expanded="false" aria-controls="controls-panel" data-tooltip="观看设置">

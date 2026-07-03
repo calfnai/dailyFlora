@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DailyFlora 开发文档总结</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #080a07;
+        --surface: #11160f;
+        --surface-2: #171f15;
+        --line: rgb(247 240 227 / 14%);
+        --text: #f7f0e3;
+        --muted: rgb(247 240 227 / 68%);
+        --accent: #f2cb62;
+        --good: #87d486;
+        --warn: #efb960;
+        --bad: #ef8b73;
+        --cool: #9fc6ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 12% 0%, rgb(242 203 98 / 11%), transparent 26%),
+          radial-gradient(circle at 88% 8%, rgb(135 212 134 / 8%), transparent 24%),
+          linear-gradient(180deg, #080a07, #0d110c 58%, #080a07);
+      }
+
+      main {
+        width: min(1180px, 100%);
+        margin: 0 auto;
+        padding: 28px 20px 56px;
+      }
+
+      header {
+        display: grid;
+        gap: 14px;
+        padding: 26px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: linear-gradient(145deg, rgb(17 22 15 / 96%), rgb(24 31 21 / 84%));
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 12ch;
+        font-size: clamp(36px, 6vw, 72px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        font-size: clamp(24px, 3vw, 36px);
+        line-height: 1.08;
+      }
+
+      h3 {
+        font-size: 17px;
+      }
+
+      p,
+      li {
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      code {
+        color: rgb(247 240 227 / 88%);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      .eyebrow {
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .lead {
+        max-width: 78ch;
+        font-size: 16px;
+      }
+
+      .section {
+        margin-top: 24px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 14px;
+      }
+
+      .grid.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .card,
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgb(17 22 15 / 78%);
+      }
+
+      .card {
+        display: grid;
+        gap: 9px;
+        padding: 16px;
+      }
+
+      .panel {
+        overflow: hidden;
+        margin-top: 14px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 13px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: rgb(247 240 227 / 86%);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: rgb(255 255 255 / 4%);
+      }
+
+      td {
+        color: var(--muted);
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        padding: 0 8px;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .status.good {
+        color: var(--good);
+      }
+
+      .status.warn {
+        color: var(--warn);
+      }
+
+      .status.bad {
+        color: var(--bad);
+      }
+
+      .status.cool {
+        color: var(--cool);
+      }
+
+      .notes {
+        display: grid;
+        gap: 10px;
+        padding-left: 20px;
+      }
+
+      .route-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .route {
+        display: grid;
+        grid-template-columns: minmax(210px, 0.7fr) minmax(0, 1.3fr);
+        gap: 12px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgb(255 255 255 / 4%);
+      }
+
+      .route strong {
+        color: var(--text);
+      }
+
+      @media (max-width: 860px) {
+        .grid,
+        .grid.two {
+          grid-template-columns: 1fr;
+        }
+
+        .route {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">DailyFlora product planning</p>
+        <h1>开发文档总结</h1>
+        <p class="lead">
+          来源：<code>/Users/ziqing/Downloads/开发文档.md</code>。这份文档的核心方向是把当前散落在
+          <code>/docs/</code> 下的实验页、审美页、样例页整理成一个可浏览、可分层、可继续扩展的产品后台和客户页面体系。
+        </p>
+      </header>
+
+      <section class="section">
+        <h2>一句话总结</h2>
+        <div class="grid">
+          <article class="card">
+            <span class="status cool">开发组</span>
+            <h3>先做目录入口</h3>
+            <p>需要一个开发中的页面总目录：能看到所有条目、版本、debug 入口，再进入每个详细页面。</p>
+          </article>
+          <article class="card">
+            <span class="status warn">平台管理</span>
+            <h3>先混放，后剥离</h3>
+            <p>管理花花库和注册用户暂时放在开发组入口里，但将来应该拆成独立后台。</p>
+          </article>
+          <article class="card">
+            <span class="status good">客户页面</span>
+            <h3>补齐公开导航</h3>
+            <p>客户侧需要首页、about、Bouquet Shop、member、downloads，以及特别花束入口的清晰关系。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>页面改造清单</h2>
+        <div class="panel">
+          <table>
+            <thead>
+              <tr>
+                <th>页面</th>
+                <th>文档要求</th>
+                <th>当前判断</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>/docs/aesthetic-review-dashboard.html</code></td>
+                <td>先进入版本罗列页，说明每个版本相对上一版的特点，再点进版本详情；最新版本在最前。</td>
+                <td><span class="status warn">需重构入口</span> 当前是单个 dashboard，不是版本列表。</td>
+              </tr>
+              <tr>
+                <td><code>/docs/primitive-lab.html</code></td>
+                <td>花材库测试也要带版本罗列。</td>
+                <td><span class="status warn">需补版本层</span> 当前是直接进入 lab。</td>
+              </tr>
+              <tr>
+                <td><code>/docs/dailyflora-reference-gallery.html</code></td>
+                <td>参考图库最新版本放在列表最前。</td>
+                <td><span class="status warn">需定义版本字段</span> 需要先确定“版本”按上传批次、审美版本还是图片组计算。</td>
+              </tr>
+              <tr>
+                <td><code>/docs/dailyflora-flower-plan-samples.html</code></td>
+                <td>每个版本可点进详情；最新最前；列表要轻，避免多个实时渲染导致卡顿；可用截图、分页、排序、分类。</td>
+                <td><span class="status bad">优先优化</span> 当前页面使用多个远程 iframe 实时渲染，正好命中文档指出的性能问题。</td>
+              </tr>
+              <tr>
+                <td><code>/docs/avatar-lab.html</code></td>
+                <td>用完删除，改成用户页面测试页：资料、头像、密码、生成记录、上传照片和文字、复制再生成、充值、订单、积分、获奖返还。</td>
+                <td><span class="status bad">方向变化大</span> 现页面是头像实验室，需要改成 member/user page 原型，而不是继续做头像单点测试。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>建议路由结构</h2>
+        <div class="route-list">
+          <div class="route">
+            <strong><code>/docs/dev-index.html</code></strong>
+            <p>开发组总目录：列出开发中页面、客户页面 debug 版、版本列表、平台管理临时入口。</p>
+          </div>
+          <div class="route">
+            <strong><code>/docs/reviews/</code></strong>
+            <p>审美复盘版本列表；每个版本进入对应 dashboard 详情。</p>
+          </div>
+          <div class="route">
+            <strong><code>/docs/primitives/</code></strong>
+            <p>花材库版本列表；每个版本进入对应 Primitive Lab。</p>
+          </div>
+          <div class="route">
+            <strong><code>/docs/flower-plans/</code></strong>
+            <p>固定样例列表；默认截图卡片，支持每页 20/50、分类、排序、进入实时详情。</p>
+          </div>
+          <div class="route">
+            <strong><code>/member</code> 或 <code>/docs/member-test.html</code></strong>
+            <p>用户页面测试：资料、头像、密码、生成历史、上传记录、积分、订阅、订单、获奖返还。</p>
+          </div>
+          <div class="route">
+            <strong><code>/admin</code> 或 <code>/docs/admin-test.html</code></strong>
+            <p>平台管理临时页：花花库、用户、订阅、积分操作日志；将来应从开发组剥离。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>缺漏检查</h2>
+        <div class="grid two">
+          <article class="card">
+            <span class="status bad">缺入口策略</span>
+            <h3>哪些页面公开，哪些只给开发组</h3>
+            <p>文档说 debug 版都要显示在开发组页面，但没有定义这些入口是否能被公开访问。当前项目是静态站，<code>/docs/</code> 页面通常可直接访问。</p>
+          </article>
+          <article class="card">
+            <span class="status bad">缺账号系统边界</span>
+            <h3>用户、订单、充值、积分需要后端</h3>
+            <p>member 和管理者页面涉及登录、密码、订单、订阅、积分、操作日志，目前文档没有说明数据源、权限、支付、审计存储。</p>
+          </article>
+          <article class="card">
+            <span class="status warn">缺版本模型</span>
+            <h3>“版本”还没有统一定义</h3>
+            <p>审美复盘、Primitive Lab、参考图库、固定样例都要求最新版本优先，但文档没有说明版本号、发布日期、变更摘要、状态字段。</p>
+          </article>
+          <article class="card">
+            <span class="status warn">缺生成记录规则</span>
+            <h3>复制再生成与不允许热修改</h3>
+            <p>文档说用户能复制并重新生成新一份，同时“不允许热修改”。需要明确：旧记录不可编辑，新记录通过复制参数创建。</p>
+          </article>
+          <article class="card">
+            <span class="status warn">缺获奖结算规则</span>
+            <h3>返还积分需要定义触发条件</h3>
+            <p>“生成一次花花的积分乘以 10 返还”需要定义基准积分、评选状态、返还时间、是否可撤销、是否允许人工调整。</p>
+          </article>
+          <article class="card">
+            <span class="status warn">缺移动端和加载策略</span>
+            <h3>样例页性能要求需要落地</h3>
+            <p>文档提出截图、分页、排序和分类，但没有确定默认方案。建议默认截图列表，点击后才加载实时渲染。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>互联网参考后的补充要求</h2>
+        <div class="panel">
+          <table>
+            <thead>
+              <tr>
+                <th>模块</th>
+                <th>可借鉴能力</th>
+                <th>落到 DailyFlora</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>充值、订阅、订单</td>
+                <td>Stripe Customer Portal 支持用户管理付款方式、订阅、账单资料和历史发票。</td>
+                <td>member 页先不要自己造完整支付后台；原型里应拆成“积分余额、订阅状态、订单/发票、充值入口、取消/变更订阅入口”。</td>
+              </tr>
+              <tr>
+                <td>密码和账号安全</td>
+                <td>OWASP 和 NIST 都强调密码重置、认证流程和 MFA 不能成为账号薄弱点。</td>
+                <td>“修改密码”不应只是表单，需要补：当前密码验证、重置邮件/验证码、登录设备/会话、异常提示不泄露账号是否存在。</td>
+              </tr>
+              <tr>
+                <td>平台管理操作</td>
+                <td>OWASP 对高价值交易建议保留带完整性的审计轨迹，避免被篡改或删除。</td>
+                <td>手动开订阅、增减积分、改用户资料、标记获奖，都必须记录操作员、时间、IP、变更前后值、原因。</td>
+              </tr>
+              <tr>
+                <td>固定样例页性能</td>
+                <td>MDN 说明 iframe 支持 lazy loading，延迟加载能减少首屏阻塞；但截图列表更适合大量预览。</td>
+                <td>短期可给 iframe 加 <code>loading="lazy"</code>；中期改成截图卡片，点击后才打开实时渲染详情。</td>
+              </tr>
+              <tr>
+                <td>后台权限</td>
+                <td>OWASP Authorization 指南强调授权逻辑要和业务风险匹配，不能只依赖页面隐藏。</td>
+                <td>开发组目录可以列入口，但涉及手机号、电邮、积分、订单的管理页不能作为公开静态 docs 暴露。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>冲突或风险</h2>
+        <ul class="notes">
+          <li>平台管理页面“先跟开发组放在一起”和“查看用户手机号/电邮”有权限风险。即使是临时页，也需要最少访问控制，不能和公开 docs 页面同等暴露。</li>
+          <li>所有客户页面 debug 版集中展示很方便开发，但如果部署到公开站，会暴露未完成页面、测试数据或内部入口。</li>
+          <li><code>/docs/avatar-lab.html</code> 说“用完之后就删掉”，但它当前已经是构建入口之一。删除前要同步 <code>vite.config.ts</code> 和任何导航链接。</li>
+          <li>文档末尾的 <code>/special0629-v4/</code> 路由图片段不完整，像是 Mermaid 图粘贴中断，需要补全后才能作为路由依据。</li>
+          <li>客户侧 <code>member</code> 和开发组里的用户页面测试功能高度重叠，需要决定一个源页面，避免做两套。</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>建议优先级</h2>
+        <div class="panel">
+          <table>
+            <thead>
+              <tr>
+                <th>优先级</th>
+                <th>事项</th>
+                <th>原因</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="status bad">P0</span></td>
+                <td>新增开发组总目录</td>
+                <td>这是后续所有页面版本、debug 入口和管理临时页的入口骨架。</td>
+              </tr>
+              <tr>
+                <td><span class="status bad">P0</span></td>
+                <td>把固定样例页改为轻量列表</td>
+                <td>当前多个实时 iframe 会影响滚动和加载，文档明确指出这是问题。</td>
+              </tr>
+              <tr>
+                <td><span class="status warn">P1</span></td>
+                <td>定义统一版本数据结构</td>
+                <td>审美复盘、花材库、参考图库、样例页都依赖“最新版本在前”。</td>
+              </tr>
+              <tr>
+                <td><span class="status warn">P1</span></td>
+                <td>把 Avatar Lab 改造成用户页面测试页</td>
+                <td>用户体系是后续积分、订阅、生成记录和获奖返还的核心。</td>
+              </tr>
+              <tr>
+                <td><span class="status cool">P2</span></td>
+                <td>补客户公开页面</td>
+                <td>about、Bouquet Shop、downloads 可以先做占位，保持导航完整。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>参考资料</h2>
+        <ul class="notes">
+          <li><a href="https://docs.stripe.com/customer-management">Stripe Customer Portal documentation</a>：用于理解订阅、付款方式、账单资料和发票管理可以如何组织。</li>
+          <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html">OWASP Authentication Cheat Sheet</a>：用于补充登录、密码、账号安全缺口。</li>
+          <li><a href="https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/09-Testing_for_Weak_Password_Change_or_Reset_Functionalities">OWASP password reset testing guide</a>：用于检查修改密码和找回密码流程。</li>
+          <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html">OWASP Logging Cheat Sheet</a> 与 <a href="https://owasp.org/Top10/2021/A09_2021-Security_Logging_and_Monitoring_Failures/">OWASP A09 Logging and Monitoring Failures</a>：用于定义后台人工操作日志。</li>
+          <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html">OWASP Authorization Cheat Sheet</a>：用于判断开发组、客户页、平台管理页的权限边界。</li>
+          <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/loading">MDN iframe loading property</a> 与 <a href="https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/Lazy_loading">MDN lazy loading guide</a>：用于固定样例页的加载优化。</li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>

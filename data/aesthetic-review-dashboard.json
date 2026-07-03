@@ -1,15 +1,16 @@
 {
-  "updatedAt": "2026-07-02",
+  "updatedAt": "2026-07-03",
   "gate": {
     "status": "pass",
-    "title": "花库验收达到及格线",
-    "summary": "用户已确认 Primitive Gate / 花库验收达到及格线。0.13 已将审美理解、流程、skill 和记忆写进项目；本轮根据山岗小花/热带丛林经验把 CosmosOpenFlower 补登记为第 16 类目标形态。16 类花材/叶材形态允许作为下一阶段 composition、palette、camera 改造的基础。2026-07-02 Lychee Garden 彩虹生成已获用户确认通过；后续所有新增参考必须同步更新本 dashboard，新花必须有独立地址。",
+    "title": "0.14 审美基线通过",
+    "summary": "用户已确认当前 dashboard 中的主要审美组都可以标记为 pass。16 类花材/叶材形态、晨露莓园原创候选、荔枝花园彩虹、多组参考花束方向和反向边界共同构成 0.14 的可用审美基线；后续调整以实际运行页面反馈为准。",
     "rules": [
       "先复盘参考图，不直接改主花束视觉。",
       "Primitive Lab 已按 16 类主流花材/叶材形态达到用户验收及格线。",
       "旧 7 类只作为兼容别名和历史粗分类，不再代表完整覆盖。",
       "后续可以进入整束 composition 改造准备，但任何主视觉修改必须同步更新本 dashboard 的状态和下一步任务。",
-      "新增 owner-provided 审美参考必须进入本 dashboard；一旦生成新花，必须有独立 theme/seed 地址，弃用时弃用该地址本身，不借用其他花束地址。"
+      "新增 owner-provided 审美参考必须进入本 dashboard；一旦生成新花，必须有独立 theme/seed 地址，弃用时弃用该地址本身，不借用其他花束地址。",
+      "2026-07-03 用户确认当前审美组可标记为 pass；未来如需调整，按实际运行页面反馈新增修正记录，不回退本次验收历史。"
     ],
     "links": [
       {
@@ -350,8 +351,8 @@
       "id": "dewberry-morning",
       "title": "晨露莓园",
       "englishTitle": "Dewberry Morning",
-      "kind": "generated-candidate",
-      "status": "needs-owner-review",
+      "kind": "accepted-generated-candidate",
+      "status": "pass",
       "referenceLinks": [
         {
           "label": "打开生成花束",
@@ -388,17 +389,17 @@
         "StarPinwheelFlower",
         "FoliageGrassBranch"
       ],
-      "currentImplementation": "0.12.24 新增 `dewberry-morning` theme 和 `dewberry-morning-air` flowerPlan，并为该 plan 指定 primitive 映射与专属配色。",
-      "failureReason": "这是 Codex 按当前审美理解生成的候选，还没有经过用户视觉验收；不能自动标记为通过。",
+      "currentImplementation": "0.12.24 新增 `dewberry-morning` theme 和 `dewberry-morning-air` flowerPlan，并为该 plan 指定 primitive 映射与专属配色。 0.14.0 根据用户确认将该审美组纳入通过基线。",
+      "failureReason": "无当前阻塞；用户已确认这组审美方向在当前阶段可以标记为 pass。后续若实际运行页面暴露问题，再按页面反馈新增修正项。",
       "nextTasks": [
-        "请用户查看生成花束，判断是否真的继承了山岗小花的空间语法，而不是只换了颜色。",
-        "如果通过，再考虑把其中的 composition 经验迁移到繁星夜色、海盐柠檬、月光手捧等主题。",
-        "如果不通过，按 palette、composition、primitive、camera/UI 四类拆开记录失败原因。"
+        "保留为 0.14 审美基线的一部分。",
+        "后续根据实际运行页面反馈调整 palette、composition、primitive、camera/UI，不再把本组视为待验收阻塞。",
+        "如果新增固定花束，继续创建独立 theme/flowerPlan/URL，不能借用其他花束地址。"
       ],
       "roleReview": {
-        "creativeDirector": "方向符合 DailyFlora：当代、鲜活、有春意，不走欧美婚礼或粗糙市场束。但它必须被用户验收，不能由 Codex 自宣通过。",
+        "creativeDirector": "方向符合 DailyFlora：当代、鲜活、有春意，不走欧美婚礼或粗糙市场束。但它必须被用户验收，不能由 Codex 自宣通过。 0.14.0：方向纳入通过基线，后续只按实际页面反馈做局部修正。",
         "artDirector": "采用白黄小花矩阵、低位冷色小簇、莓红果点、少量杯形停顿和外开绿线，目标是湿润、轻盈、可呼吸。",
-        "projectDirector": "允许作为原创候选加入项目；状态应保持 needs-owner-review，用户未确认前不把它当成新标准。",
+        "projectDirector": "用户已确认当前阶段可以通过；该组不再阻塞 MVP 路由和后续实际页面反馈迭代。",
         "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
         "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
@@ -473,8 +474,8 @@
       "id": "summer-pinwheel",
       "title": "夏日风车",
       "englishTitle": "Summer Pinwheel",
-      "kind": "positive",
-      "status": "needs-work",
+      "kind": "accepted-positive-reference",
+      "status": "pass",
       "referenceLinks": [
         {
           "label": "参考图库定位",
@@ -507,16 +508,17 @@
         "BerryCluster",
         "AirFiller"
       ],
-      "currentImplementation": "已有 flowerPlan，但主花束精细渲染仍主要使用旧 flower type geometry；primitive 尚未作为整束花语法回接。",
-      "failureReason": "花库单体已达到用户验收及格线；本组尚未通过的是整束 composition 还没有验证，仍要检查花材比例、层级、空气感、叶材位置和相机呈现。",
+      "currentImplementation": "已有 flowerPlan，但主花束精细渲染仍主要使用旧 flower type geometry；primitive 尚未作为整束花语法回接。 0.14.0 根据用户确认将该审美组纳入通过基线。",
+      "failureReason": "无当前阻塞；用户已确认这组审美方向在当前阶段可以标记为 pass。后续若实际运行页面暴露问题，再按页面反馈新增修正项。",
       "nextTasks": [
-        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
-        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+        "保留为 0.14 审美基线的一部分。",
+        "后续根据实际运行页面反馈调整 palette、composition、primitive、camera/UI，不再把本组视为待验收阻塞。",
+        "如果新增固定花束，继续创建独立 theme/flowerPlan/URL，不能借用其他花束地址。"
       ],
       "roleReview": {
-        "creativeDirector": "方向符合 DailyFlora，重点是明亮、多色、轻快，但不能滑向艳俗堆色。",
+        "creativeDirector": "方向符合 DailyFlora，重点是明亮、多色、轻快，但不能滑向艳俗堆色。 0.14.0：方向纳入通过基线，后续只按实际页面反馈做局部修正。",
         "artDirector": "需要橙、蓝、白、绿各自承担材料角色，而不是只做 palette。",
-        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "projectDirector": "用户已确认当前阶段可以通过；该组不再阻塞 MVP 路由和后续实际页面反馈迭代。",
         "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
         "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
@@ -525,8 +527,8 @@
       "id": "fairy-violet",
       "title": "梦幻紫",
       "englishTitle": "Fairy Violet",
-      "kind": "positive",
-      "status": "needs-work",
+      "kind": "accepted-positive-reference",
+      "status": "pass",
       "referenceLinks": [
         {
           "label": "参考图库定位",
@@ -558,16 +560,17 @@
         "OpenSculptureFlower",
         "AirFiller"
       ],
-      "currentImplementation": "flowerPlan 中已有 fairy-violet-air，但 primitive 与参考图的映射还停留在计划层。",
-      "failureReason": "花库单体已达到用户验收及格线；本组尚未通过的是整束 composition 还没有验证，仍要检查花材比例、层级、空气感、叶材位置和相机呈现。",
+      "currentImplementation": "flowerPlan 中已有 fairy-violet-air，但 primitive 与参考图的映射还停留在计划层。 0.14.0 根据用户确认将该审美组纳入通过基线。",
+      "failureReason": "无当前阻塞；用户已确认这组审美方向在当前阶段可以标记为 pass。后续若实际运行页面暴露问题，再按页面反馈新增修正项。",
       "nextTasks": [
-        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
-        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+        "保留为 0.14 审美基线的一部分。",
+        "后续根据实际运行页面反馈调整 palette、composition、primitive、camera/UI，不再把本组视为待验收阻塞。",
+        "如果新增固定花束，继续创建独立 theme/flowerPlan/URL，不能借用其他花束地址。"
       ],
       "roleReview": {
-        "creativeDirector": "方向可用，但紫色必须轻；闷块是主要风险。",
+        "creativeDirector": "方向可用，但紫色必须轻；闷块是主要风险。 0.14.0：方向纳入通过基线，后续只按实际页面反馈做局部修正。",
         "artDirector": "蓝紫主体必须被白点、枝线和局部浅色打散。",
-        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "projectDirector": "用户已确认当前阶段可以通过；该组不再阻塞 MVP 路由和后续实际页面反馈迭代。",
         "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
         "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
@@ -576,8 +579,8 @@
       "id": "narcissus-season",
       "title": "洋水仙季节",
       "englishTitle": "Narcissus Season",
-      "kind": "positive",
-      "status": "needs-work",
+      "kind": "accepted-positive-reference",
+      "status": "pass",
       "referenceLinks": [
         {
           "label": "参考图库定位",
@@ -608,16 +611,17 @@
         "AirFiller",
         "SpikeFlower"
       ],
-      "currentImplementation": "OpenSculptureFlower 有喉部和主瓣雏形，但还未作为洋水仙语法进入整束花。",
-      "failureReason": "花库单体已达到用户验收及格线；本组尚未通过的是整束 composition 还没有验证，仍要检查花材比例、层级、空气感、叶材位置和相机呈现。",
+      "currentImplementation": "OpenSculptureFlower 有喉部和主瓣雏形，但还未作为洋水仙语法进入整束花。 0.14.0 根据用户确认将该审美组纳入通过基线。",
+      "failureReason": "无当前阻塞；用户已确认这组审美方向在当前阶段可以标记为 pass。后续若实际运行页面暴露问题，再按页面反馈新增修正项。",
       "nextTasks": [
-        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
-        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+        "保留为 0.14 审美基线的一部分。",
+        "后续根据实际运行页面反馈调整 palette、composition、primitive、camera/UI，不再把本组视为待验收阻塞。",
+        "如果新增固定花束，继续创建独立 theme/flowerPlan/URL，不能借用其他花束地址。"
       ],
       "roleReview": {
-        "creativeDirector": "方向可用，关键是季节性而非泛白黄配色。",
+        "creativeDirector": "方向可用，关键是季节性而非泛白黄配色。 0.14.0：方向纳入通过基线，后续只按实际页面反馈做局部修正。",
         "artDirector": "开口花、长叶、细枝必须同时出现，且主次清楚。",
-        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "projectDirector": "用户已确认当前阶段可以通过；该组不再阻塞 MVP 路由和后续实际页面反馈迭代。",
         "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
         "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
@@ -626,8 +630,8 @@
       "id": "breathing-landscape",
       "title": "会呼吸的风景",
       "englishTitle": "Breathing Landscape",
-      "kind": "positive",
-      "status": "needs-work",
+      "kind": "accepted-positive-reference",
+      "status": "pass",
       "referenceLinks": [
         {
           "label": "参考图库定位",
@@ -659,16 +663,17 @@
         "AirFiller",
         "SpikeFlower"
       ],
-      "currentImplementation": "当前主场景有 branches、outer lines 和 leaves，但植物材料还未具备可识别角色。",
-      "failureReason": "花库单体已达到用户验收及格线；本组尚未通过的是整束 composition 还没有验证，仍要检查花材比例、层级、空气感、叶材位置和相机呈现。",
+      "currentImplementation": "当前主场景有 branches、outer lines 和 leaves，但植物材料还未具备可识别角色。 0.14.0 根据用户确认将该审美组纳入通过基线。",
+      "failureReason": "无当前阻塞；用户已确认这组审美方向在当前阶段可以标记为 pass。后续若实际运行页面暴露问题，再按页面反馈新增修正项。",
       "nextTasks": [
-        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
-        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+        "保留为 0.14 审美基线的一部分。",
+        "后续根据实际运行页面反馈调整 palette、composition、primitive、camera/UI，不再把本组视为待验收阻塞。",
+        "如果新增固定花束，继续创建独立 theme/flowerPlan/URL，不能借用其他花束地址。"
       ],
       "roleReview": {
-        "creativeDirector": "方向符合项目气质，但不能只是留白模板。",
+        "creativeDirector": "方向符合项目气质，但不能只是留白模板。 0.14.0：方向纳入通过基线，后续只按实际页面反馈做局部修正。",
         "artDirector": "绿色、黄花、蓝点、细枝必须形成前中后空间。",
-        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "projectDirector": "用户已确认当前阶段可以通过；该组不再阻塞 MVP 路由和后续实际页面反馈迭代。",
         "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
         "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
@@ -677,8 +682,8 @@
       "id": "foxtail-lily",
       "title": "狐尾百合",
       "englishTitle": "Foxtail Lily",
-      "kind": "positive",
-      "status": "needs-work",
+      "kind": "accepted-positive-reference",
+      "status": "pass",
       "referenceLinks": [
         {
           "label": "参考图库定位",
@@ -711,16 +716,17 @@
         "DiskFlower",
         "CosmosOpenFlower"
       ],
-      "currentImplementation": "SpikeFlower 已有底密顶疏尝试，但整束高低构图还未建立门禁。",
-      "failureReason": "花库单体已达到用户验收及格线；本组尚未通过的是整束 composition 还没有验证，仍要检查花材比例、层级、空气感、叶材位置和相机呈现。",
+      "currentImplementation": "SpikeFlower 已有底密顶疏尝试，但整束高低构图还未建立门禁。 0.14.0 根据用户确认将该审美组纳入通过基线。",
+      "failureReason": "无当前阻塞；用户已确认这组审美方向在当前阶段可以标记为 pass。后续若实际运行页面暴露问题，再按页面反馈新增修正项。",
       "nextTasks": [
-        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
-        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+        "保留为 0.14 审美基线的一部分。",
+        "后续根据实际运行页面反馈调整 palette、composition、primitive、camera/UI，不再把本组视为待验收阻塞。",
+        "如果新增固定花束，继续创建独立 theme/flowerPlan/URL，不能借用其他花束地址。"
       ],
       "roleReview": {
-        "creativeDirector": "方向可用，强识别但不能压迫。",
+        "creativeDirector": "方向可用，强识别但不能压迫。 0.14.0：方向纳入通过基线，后续只按实际页面反馈做局部修正。",
         "artDirector": "竖线、底部、小花停顿三者都必须出现。",
-        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "projectDirector": "用户已确认当前阶段可以通过；该组不再阻塞 MVP 路由和后续实际页面反馈迭代。",
         "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
         "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
@@ -729,8 +735,8 @@
       "id": "berry-grove",
       "title": "浆果森林",
       "englishTitle": "Berry Grove",
-      "kind": "positive",
-      "status": "needs-work",
+      "kind": "accepted-positive-reference",
+      "status": "pass",
       "referenceLinks": [
         {
           "label": "参考图库定位",
@@ -763,16 +769,17 @@
         "CosmosOpenFlower",
         "AirFiller"
       ],
-      "currentImplementation": "BerryCluster 已有枝端果粒结构，但主花束仍未使用该 primitive。",
-      "failureReason": "花库单体已达到用户验收及格线；本组尚未通过的是整束 composition 还没有验证，仍要检查花材比例、层级、空气感、叶材位置和相机呈现。",
+      "currentImplementation": "BerryCluster 已有枝端果粒结构，但主花束仍未使用该 primitive。 0.14.0 根据用户确认将该审美组纳入通过基线。",
+      "failureReason": "无当前阻塞；用户已确认这组审美方向在当前阶段可以标记为 pass。后续若实际运行页面暴露问题，再按页面反馈新增修正项。",
       "nextTasks": [
-        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
-        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+        "保留为 0.14 审美基线的一部分。",
+        "后续根据实际运行页面反馈调整 palette、composition、primitive、camera/UI，不再把本组视为待验收阻塞。",
+        "如果新增固定花束，继续创建独立 theme/flowerPlan/URL，不能借用其他花束地址。"
       ],
       "roleReview": {
-        "creativeDirector": "方向高度符合可爱、轻、当代小红书语境。",
+        "creativeDirector": "方向高度符合可爱、轻、当代小红书语境。 0.14.0：方向纳入通过基线，后续只按实际页面反馈做局部修正。",
         "artDirector": "果点必须有枝条归属，小花负责童话感，不能端庄化。",
-        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "projectDirector": "用户已确认当前阶段可以通过；该组不再阻塞 MVP 路由和后续实际页面反馈迭代。",
         "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
         "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
@@ -781,8 +788,8 @@
       "id": "autumn-juice",
       "title": "秋日果汁",
       "englishTitle": "Autumn Juice",
-      "kind": "positive",
-      "status": "needs-work",
+      "kind": "accepted-positive-reference",
+      "status": "pass",
       "referenceLinks": [
         {
           "label": "参考图库定位",
@@ -814,16 +821,17 @@
         "BerryCluster",
         "ClusterFlower"
       ],
-      "currentImplementation": "autumn-juice flowerPlan 已存在，但 high render 的层叠花仍非新 primitive。",
-      "failureReason": "LayeredRoundFlower 若不通过，秋日果汁只能靠颜色，缺少饱满花材质感。",
+      "currentImplementation": "autumn-juice flowerPlan 已存在，但 high render 的层叠花仍非新 primitive。 0.14.0 根据用户确认将该审美组纳入通过基线。",
+      "failureReason": "无当前阻塞；用户已确认这组审美方向在当前阶段可以标记为 pass。后续若实际运行页面暴露问题，再按页面反馈新增修正项。",
       "nextTasks": [
-        "进入 composition 验证：把已及格的花库 primitive 按本组参考图的花材角色、比例和层次组合起来。",
-        "继续同步 dashboard：每次主视觉修改都记录采用了哪些视觉信号、哪里仍不达标。"
+        "保留为 0.14 审美基线的一部分。",
+        "后续根据实际运行页面反馈调整 palette、composition、primitive、camera/UI，不再把本组视为待验收阻塞。",
+        "如果新增固定花束，继续创建独立 theme/flowerPlan/URL，不能借用其他花束地址。"
       ],
       "roleReview": {
-        "creativeDirector": "方向可用，温暖甜感明确。",
+        "creativeDirector": "方向可用，温暖甜感明确。 0.14.0：方向纳入通过基线，后续只按实际页面反馈做局部修正。",
         "artDirector": "饱满必须由层叠形态支撑，不能只靠高密度。",
-        "projectDirector": "花库验收已达及格线；允许进入下一阶段 composition 验证，但本组仍需用 dashboard 同步验收。",
+        "projectDirector": "用户已确认当前阶段可以通过；该组不再阻塞 MVP 路由和后续实际页面反馈迭代。",
         "cto": "检查当前生成结构是否有足够可控参数：primitive 映射、尺度上限、placement、朝向、密度和 debug 数据必须能支撑审美验收；不能用“技术上能画出来”替代“比例和空间关系正确”。",
         "shapeCurator": "核对本组参考信号是否已经进入 TARGET SHAPE VOCABULARY 和 Primitive Lab；如果 flowerPlan 或 renderer 已经使用某类形态，必须在 dashboard 中登记。"
       }
