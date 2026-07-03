@@ -47,6 +47,7 @@
   "scripts/ingest-lobster-inbox.mjs",
   "scripts/ingest-owner-links.mjs",
   "scripts/lobster-xhs-plan.mjs",
+  "signup/index.html",
   "src/avatarLab.ts",
   "src/bouquetScene.ts",
   "src/extendedTypes.ts",
