@@ -136,4 +136,3 @@
 - Mac App：先做全屏 ambient app，再考虑 Mac App Store。
 - 屏保平台：优先输出 HTML/WebGL 包或视频素材。
 - TouchDesigner：用于视觉实验和参数母版，不作为公开网页的运行时。
-

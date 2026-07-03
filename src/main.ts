@@ -130,6 +130,10 @@ const hud = document.querySelector<HTMLElement>('#hud');
 const controls = document.querySelector<HTMLElement>('#controls');
 const controlsToggleButton = document.querySelector<HTMLButtonElement>('#controls-toggle');
 const controlsPanel = document.querySelector<HTMLElement>('#controls-panel');
+const siteMenu = document.querySelector<HTMLElement>('#site-menu');
+const siteMenuToggle = document.querySelector<HTMLButtonElement>('#site-menu-toggle');
+const siteMenuPanel = document.querySelector<HTMLElement>('#site-menu-panel');
+const siteMenuDebugLink = document.querySelector<HTMLAnchorElement>('#site-menu-debug-link');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
 const themeLabel = document.querySelector<HTMLElement>('#daily-theme');
 const themeCnLabel = document.querySelector<HTMLElement>('#daily-theme-cn');
@@ -216,6 +220,7 @@ let selectedDensity = specialReference ? 'medium' : normalizeDensity(params.dens
 const searchParams = new URLSearchParams(window.location.search);
 const debugValue = searchParams.get('debug');
 const debugMode = searchParams.has('debug') && debugValue !== '0' && debugValue !== 'false';
+siteMenuDebugLink && (siteMenuDebugLink.hidden = !debugMode);
 let selectedRender = specialReference && !searchParams.has('render') && !searchParams.has('quality')
   ? 'high'
   : normalizeRender(params.render);
@@ -507,6 +512,13 @@ function closeAccountPanel() {
   window.setTimeout(() => {
     if (!accountPanel.classList.contains('is-open')) accountPanel.hidden = true;
   }, 220);
+}
+
+function toggleSiteMenu(forceOpen?: boolean) {
+  if (!siteMenuToggle || !siteMenuPanel) return;
+  const open = forceOpen ?? siteMenuPanel.hidden;
+  siteMenuPanel.hidden = !open;
+  siteMenuToggle.setAttribute('aria-expanded', String(open));
 }
 
 function toggleFavorite() {
@@ -1100,8 +1112,16 @@ referenceFileInput?.addEventListener('change', async () => {
 
 referenceGenerateButton?.addEventListener('click', generateFromReference);
 
+siteMenuToggle?.addEventListener('click', () => {
+  toggleSiteMenu();
+  revealUi();
+});
+
 document.addEventListener('pointerdown', (event) => {
   const target = event.target;
+  if (siteMenuPanel && siteMenu && !siteMenuPanel.hidden && target instanceof Node && !siteMenu.contains(target)) {
+    toggleSiteMenu(false);
+  }
   if (!accountPanel) return;
   if (
     accountPanel.hidden ||
@@ -1112,6 +1132,12 @@ document.addEventListener('pointerdown', (event) => {
     return;
   }
   closeAccountPanel();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    toggleSiteMenu(false);
+  }
 });
 
 controlsToggleButton?.addEventListener('click', () => {

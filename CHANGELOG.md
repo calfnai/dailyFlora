@@ -1,5 +1,32 @@
 # DailyFlora Changelog
 
+## 0.14.2 - 2026-07-03
+
+Simpler home page navigation and signup landing.
+
+- Removed the home-page personal garden panel, favorite button, collection list, and reference-upload flow so the bouquet viewing page stays visually quiet.
+- Added a top-right site menu with About, Member, Downloads, Bouquet Shop, signup/favorite guidance, and the debug review link when debug mode is enabled.
+- Added `signup/index.html` as the registration landing page explaining why users would register: saving bouquets, uploading references, generating personal flowers, keeping history, and future credits.
+- Kept collections and generated bouquets inside the member flow instead of the public home page.
+
+## 0.14.1 - 2026-07-03
+
+Member mockup upload-to-bouquet flow.
+
+- Rebuilt `docs/member-test.html` from an information outline into a product-style user center mockup with account stats, credits, navigation, generation history, and account/order placeholders.
+- Added a front-end upload recognition demo: image preview, average-color palette extraction, preference/style inference, primitive chips, mock bouquet preview, live bouquet link, and append-only generated records.
+- Kept the flow local-only for MVP: no real upload, no database write, no payment integration.
+
+## 0.14.0 - 2026-07-03
+
+MVP route structure and accepted aesthetic baseline.
+
+- Added the low-cost MVP route structure: public placeholders for `about`, `bouquet-shop`, `member`, and `downloads`, plus the internal development index and mock member/admin pages.
+- Reworked the fixed bouquet sample page into a lightweight card library with category, sorting, page-size controls, and explicit live-render links instead of loading many 3D iframes at once.
+- Recorded the owner's confirmation that the current aesthetic groups can be marked as `pass`: Dewberry Morning, Summer Pinwheel, Fairy Violet, Narcissus Season, Breathing Landscape, Foxtail Lily, Berry Grove, Autumn Juice, Lychee Garden Rainbow, and the negative boundary set.
+- Promoted the dashboard gate to the 0.14 accepted aesthetic baseline; future changes should come from actual running-page feedback rather than treating these groups as pending blockers.
+- Bumped the npm version to `0.14.0` and product version to `0.14`.
+
 ## 0.13.5 - 2026-07-02
 
 Lychee Garden accepted and daily automation scheduled.

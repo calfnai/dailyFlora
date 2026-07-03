@@ -1,12 +1,12 @@
 # DailyFlora Project Abstract
 
-最后更新：2026-06-26
+最后更新：2026-07-03
 
 ## 当前产品版本
 
-`0.13`
+`0.14`
 
-`0.13` 是审美操作系统版本。它继承 `0.12E` 预留的轻量产品能力，但本版本的核心不是继续堆功能，而是把 DailyFlora 的审美判断、协作流程、Codex skill 和项目记忆写进仓库。
+`0.14` 是审美基线通过和低成本 MVP 路由版本。它继承 `0.13` 的审美操作系统，把当前 dashboard 中的主要审美组标记为通过基线，并补上客户页占位、开发组目录、用户中心测试、临时后台和轻量固定样例库。
 
 `package.json` 的 `version` 字段继续使用 npm 合法版本格式。面向产品、文档和路线图时，以 `productVersion` 和本 abstract 中的版本为准。
 
@@ -41,6 +41,18 @@ DailyFlora 的起点不是做一个功能很多的花店工具，而是做一个
 - `docs/dailyflora-codex-skill.md`
 - `.codex/skills/dailyflora/SKILL.md`
 - `docs/codex-aesthetic-handoff.md`
+
+## 0.14 的定位
+
+0.14 不急着接真实数据库、支付或完整后台。它先把页面结构和数据边界摆出来：
+
+1. 客户侧：`/about/`、`/bouquet-shop/`、`/member/`、`/downloads/`。
+2. 开发侧：`/docs/dev-index.html` 作为开发组总目录。
+3. 用户侧原型：`/docs/member-test.html` 展示资料、生成记录、上传、积分、订单和获奖入口。
+4. 管理侧原型：`/docs/admin-bouquets.html` 和 `/docs/admin-users.html` 展示未来花花库、用户、积分和审计日志。
+5. 固定样例库：默认轻量卡片，点击后再实时渲染，避免多个 iframe 同时拖慢页面。
+
+数据库仍是未来能力。当前只记录 `users`、`bouquets`、`generations`、`uploads`、`credits`、`subscriptions`、`orders`、`admin_audit_logs` 等数据域，不绑定具体服务商或付款方式。
 
 ## 0.12E 的定位
 

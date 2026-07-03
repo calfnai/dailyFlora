@@ -1,8 +1,8 @@
 {
   "name": "daily-flora",
   "private": true,
-  "version": "0.13.5",
-  "productVersion": "0.13",
+  "version": "0.14.2",
+  "productVersion": "0.14",
   "type": "module",
   "engines": {
     "node": "18.x",

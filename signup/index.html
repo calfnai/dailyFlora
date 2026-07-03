@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>加入 DailyFlora</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #080a07;
+        --surface: rgb(17 22 15 / 82%);
+        --line: rgb(247 240 227 / 14%);
+        --text: #f7f0e3;
+        --muted: rgb(247 240 227 / 68%);
+        --accent: #f2cb62;
+        --good: #87d486;
+        --cool: #9fc6ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        min-height: 100vh;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 18% 0%, rgb(242 203 98 / 13%), transparent 28%),
+          radial-gradient(circle at 82% 12%, rgb(135 212 134 / 10%), transparent 26%),
+          linear-gradient(180deg, #080a07, #0d110c 58%, #080a07);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      main {
+        width: min(1120px, 100%);
+        margin: 0 auto;
+        padding: 28px 20px 58px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+        gap: 22px;
+        align-items: stretch;
+      }
+
+      .copy,
+      .signup-card,
+      .feature,
+      .mock-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+
+      .copy {
+        display: grid;
+        align-content: center;
+        gap: 18px;
+        min-height: 520px;
+        padding: 32px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 10ch;
+        font-size: clamp(44px, 8vw, 92px);
+        line-height: 0.94;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        font-size: clamp(24px, 3vw, 36px);
+        line-height: 1.08;
+      }
+
+      p {
+        color: var(--muted);
+        line-height: 1.68;
+      }
+
+      .lead {
+        max-width: 68ch;
+        font-size: 17px;
+      }
+
+      .pill {
+        display: inline-flex;
+        width: fit-content;
+        min-height: 26px;
+        align-items: center;
+        padding: 0 9px;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgb(255 255 255 / 5%);
+      }
+
+      .button.primary {
+        color: #151307;
+        border-color: transparent;
+        background: var(--accent);
+        font-weight: 850;
+      }
+
+      .signup-card {
+        display: grid;
+        align-content: start;
+        gap: 16px;
+        padding: 22px;
+      }
+
+      .mock-card {
+        display: grid;
+        gap: 12px;
+        min-height: 280px;
+        padding: 18px;
+        background:
+          radial-gradient(circle at 42% 32%, rgb(242 203 98 / 28%), transparent 18%),
+          radial-gradient(circle at 62% 44%, rgb(135 212 134 / 25%), transparent 24%),
+          radial-gradient(circle at 48% 64%, rgb(159 198 255 / 18%), transparent 28%),
+          var(--surface);
+      }
+
+      .flower-chip-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .flower-chip {
+        min-height: 74px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          radial-gradient(circle at 46% 36%, var(--a), transparent 24%),
+          radial-gradient(circle at 60% 54%, var(--b), transparent 28%),
+          #071008;
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .feature {
+        display: grid;
+        gap: 10px;
+        min-height: 170px;
+        padding: 16px;
+      }
+
+      .feature strong {
+        color: var(--text);
+      }
+
+      .note {
+        margin-top: 18px;
+        color: rgb(247 240 227 / 54%);
+        font-size: 13px;
+      }
+
+      @media (max-width: 880px) {
+        .hero,
+        .features {
+          grid-template-columns: 1fr;
+        }
+
+        .copy {
+          min-height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <div class="copy">
+          <span class="pill">DailyFlora ID</span>
+          <h1>把你的花花收进个人花园</h1>
+          <p class="lead">注册后，DailyFlora 不只是每天看一束花。你可以收藏今日花花、上传参考图识别成新花花、保存生成历史，也可以把喜欢的花花重新复制生成一份。</p>
+          <div class="actions">
+            <a class="button primary" href="../member/">进入用户中心 mockup</a>
+            <a class="button" href="../">先继续看今日花花</a>
+          </div>
+        </div>
+
+        <aside class="signup-card">
+          <div>
+            <h2>注册后有什么好玩</h2>
+            <p>当前是 MVP 预览，不接真实支付。先把“收藏、上传、生成、历史、积分”的体验跑通。</p>
+          </div>
+          <div class="mock-card" aria-label="个人花园预览">
+            <span class="pill">个人花园</span>
+            <h3>小花的生成记录</h3>
+            <div class="flower-chip-grid">
+              <span class="flower-chip" style="--a:#fff7df;--b:#bfe878"></span>
+              <span class="flower-chip" style="--a:#ff9fbd;--b:#8ee9d0"></span>
+              <span class="flower-chip" style="--a:#f3d35f;--b:#ef8b73"></span>
+            </div>
+            <p>上传一张图，DailyFlora 会先识别颜色和氛围，再生成一份可保存的新花花方案。</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="features">
+        <article class="feature">
+          <span class="pill">收藏</span>
+          <strong>保存今天看到的花</strong>
+          <p>把喜欢的每日花花放进个人花园，之后可以找回来继续看。</p>
+        </article>
+        <article class="feature">
+          <span class="pill">上传识别</span>
+          <strong>把照片变成花花方案</strong>
+          <p>上传参考图，先 mock 识别主色、空气感、果点、花材角色。</p>
+        </article>
+        <article class="feature">
+          <span class="pill">生成历史</span>
+          <strong>复制再生成</strong>
+          <p>旧记录不热修改，复制参数会生成一份新的花花。</p>
+        </article>
+        <article class="feature">
+          <span class="pill">积分</span>
+          <strong>为商业化预留</strong>
+          <p>未来订阅、生成消耗和获奖返还都可以走积分流水。</p>
+        </article>
+      </section>
+
+      <p class="note">正式注册、数据库、支付和订阅方式还没有决定。这个页面只负责解释为什么值得注册，以及引导进入用户中心 mockup。</p>
+    </main>
+  </body>
+</html>
