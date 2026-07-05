@@ -65,7 +65,7 @@ Known remote-control assumptions:
 
 - Most Android TV remotes map D-pad to browser `Arrow*` key events.
 - The OK button normally maps to `Enter`.
-- Some TV brands map Back to native Back rather than DOM `Escape`; this still needs real-device testing after APK installation.
+- Some TV brands map Back outside the web layer; this still needs real-device testing after APK installation.
 
 ## Local build
 
@@ -115,7 +115,7 @@ Do not redesign the flower scene. Keep changes scoped to Android TV packaging, b
 
 This first APK version is still a packaging and interaction baseline. It needs real-device checks for:
 
-- Whether the remote Back key arrives as DOM Escape or is consumed by native Back.
+- Whether the remote Back key reaches the web page.
 - Performance on low-memory TV hardware.
 - Idle / burn-in behavior for long display sessions.
 - Whether the default TV render quality should stay `low` or be raised to `medium`.
