@@ -65,7 +65,7 @@ Known remote-control assumptions:
 
 - Most Android TV remotes map D-pad to browser `Arrow*` key events.
 - The OK button normally maps to `Enter`.
-- Some TV brands map Back outside the web layer; this still needs real-device testing after APK installation.
+- Some TV brands route Back outside the web layer; this still needs real-device testing after APK installation.
 
 ## Local build
 
