@@ -17,12 +17,19 @@
     "deploy:pages": "node scripts/deploy-github-pages.mjs --main=skip",
     "lobster:plan": "node scripts/lobster-xhs-plan.mjs",
     "inspiration:links": "node scripts/ingest-owner-links.mjs",
-    "inspiration:ingest": "node scripts/ingest-lobster-inbox.mjs"
+    "inspiration:ingest": "node scripts/ingest-lobster-inbox.mjs",
+    "android:tv:prepare": "node scripts/android-tv-prepare.mjs",
+    "android:tv:build": "node scripts/android-tv-build.mjs",
+    "android:tv:apk": "node scripts/android-tv-build.mjs --apk",
+    "android:tv:open": "npx cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
     "three": "^0.171.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
     "@types/three": "^0.184.1",
     "typescript": "^5.7.2",
     "vite": "^6.0.5"
