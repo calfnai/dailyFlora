@@ -1,0 +1,51 @@
+name: Android TV APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - android-tv-apk-v1
+    paths:
+      - 'package.json'
+      - 'capacitor.config.json'
+      - 'src/**'
+      - 'public/**'
+      - 'scripts/android-tv-*.mjs'
+      - '.github/workflows/android-tv-apk.yml'
+
+jobs:
+  build-debug-apk:
+    name: Build Android TV debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Android TV APK
+        run: npm run android:tv:apk
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: dailyflora-tv-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
