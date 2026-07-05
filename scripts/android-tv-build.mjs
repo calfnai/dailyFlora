@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, chmodSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 
@@ -32,5 +32,8 @@ run(commandName('npm'), ['run', 'android:tv:prepare']);
 
 if (wantsApk) {
   const gradleCommand = isWindows ? 'gradlew.bat' : './gradlew';
+  if (!isWindows && existsSync(join(process.cwd(), 'android/gradlew'))) {
+    chmodSync(join(process.cwd(), 'android/gradlew'), 0o755);
+  }
   run(gradleCommand, ['assembleDebug'], { cwd: join(process.cwd(), 'android') });
 }
