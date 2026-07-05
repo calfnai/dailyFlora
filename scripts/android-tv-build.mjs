@@ -1,4 +1,4 @@
-import { existsSync, chmodSync } from 'node:fs';
+import { existsSync, chmodSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 
@@ -21,7 +21,23 @@ function run(command, args, options = {}) {
   }
 }
 
+function prepareTvWebBuild() {
+  const indexPath = join(process.cwd(), 'dist/index.html');
+  if (!existsSync(indexPath)) return;
+  const source = readFileSync(indexPath, 'utf8');
+  if (source.includes('__DAILYFLORA_DEVICE__')) return;
+  const marker = `<script>
+      window.__DAILYFLORA_DEVICE__ = 'tv';
+      const dailyFloraTvUrl = new URL(window.location.href);
+      if (!dailyFloraTvUrl.searchParams.has('device')) dailyFloraTvUrl.searchParams.set('device', 'tv');
+      if (!dailyFloraTvUrl.searchParams.has('render') && !dailyFloraTvUrl.searchParams.has('quality')) dailyFloraTvUrl.searchParams.set('render', 'low');
+      window.history.replaceState({}, '', dailyFloraTvUrl);
+    </script>`;
+  writeFileSync(indexPath, source.replace('</head>', `    ${marker}\n  </head>`));
+}
+
 run(commandName('npm'), ['run', 'build']);
+prepareTvWebBuild();
 
 if (!existsSync('android')) {
   run(commandName('npx'), ['cap', 'add', 'android']);
