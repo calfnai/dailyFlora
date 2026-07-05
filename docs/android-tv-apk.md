@@ -22,7 +22,8 @@ DailyFlora is already a static Vite app. Capacitor lets the existing `dist/` bui
 ## Files added in this branch
 
 - `capacitor.config.json` - points Capacitor to the Vite `dist/` output.
-- `scripts/android-tv-build.mjs` - builds the web app, creates/syncs the Android platform, optionally builds the APK.
+- `src/tvMode.ts` - adds a TV-only remote-control interaction layer.
+- `scripts/android-tv-build.mjs` - builds the web app, injects TV defaults, creates/syncs the Android platform, optionally builds the APK.
 - `scripts/android-tv-prepare.mjs` - patches the generated Android project for TV installability.
 - `.github/workflows/android-tv-apk.yml` - builds a downloadable debug APK artifact from GitHub Actions.
 
@@ -37,6 +38,34 @@ The preparation script patches the generated Android manifest with:
 - landscape screen orientation.
 - a basic TV banner drawable.
 - `minSdkVersion = 24` in the generated Android variables file.
+
+## TV interaction behavior
+
+The Android TV build injects:
+
+```js
+window.__DAILYFLORA_DEVICE__ = 'tv'
+```
+
+It also adds `device=tv` and defaults to `render=low` when the URL has no explicit render choice. This avoids a 2021 TV entering the high render profile just because the TV reports a large screen.
+
+In TV mode:
+
+- HUD and viewing controls stay visible; the auto-hide class is overridden.
+- The control panel is pinned open.
+- A large TV focus ring is added.
+- A remote hint is shown on screen.
+- Arrow keys move between controls.
+- OK / Enter activates the focused control.
+- Left / right adjusts the rotation speed slider when it is focused.
+- Up / down jumps focus by larger steps, or adjusts the slider when the slider is focused.
+- Escape closes the current top layer, such as menu or calendar.
+
+Known remote-control assumptions:
+
+- Most Android TV remotes map D-pad to browser `Arrow*` key events.
+- The OK button normally maps to `Enter`.
+- Some TV brands map Back to Android native back rather than DOM `Escape`; this still needs real-device testing after APK installation.
 
 ## Local build
 
@@ -61,16 +90,36 @@ Output artifact:
 dailyflora-tv-debug-apk
 ```
 
+## Codex one-shot prompt
+
+Use this as the first message in a new Codex conversation:
+
+```text
+Clone and build the DailyFlora Android TV APK branch.
+
+Repository: https://github.com/calfnai/dailyFlora
+Branch: android-tv-apk-v1
+
+Steps:
+1. Clone the repository and checkout android-tv-apk-v1.
+2. Run npm install.
+3. Run npm run android:tv:apk.
+4. If the build fails, inspect the error, fix only the Android TV packaging/build issue, and rerun the command.
+5. Confirm the final APK path, expected to be android/app/build/outputs/apk/debug/app-debug.apk.
+6. Summarize whether the TV mode loads src/tvMode.ts and whether dist/index.html receives the TV bootstrap marker.
+
+Do not redesign the flower scene. Keep changes scoped to Android TV packaging, build, and remote-control interaction.
+```
+
 ## Known limitations
 
-This first APK version is only a packaging baseline. It may install and render, but it still needs TV-specific UX testing:
+This first APK version is still a packaging and interaction baseline. It needs real-device checks for:
 
-- Remote-control focus behavior.
+- Whether the remote Back key arrives as DOM Escape or is consumed by native Android.
 - Performance on low-memory TV hardware.
 - Idle / burn-in behavior for long display sessions.
-- Whether animation quality should be lowered by default on TV.
-- Whether a dedicated TV route should hide mobile controls and use bigger typography.
+- Whether the default TV render quality should stay `low` or be raised to `medium`.
 
 ## Recommended next step
 
-After the first APK artifact installs successfully, add a dedicated TV mode such as `?device=tv` or `/tv/`. That mode should simplify UI, enlarge text, reduce interaction dependency, and expose only TV-safe controls.
+After the first APK artifact installs successfully, add a more deliberate TV route such as `/tv/`. That mode can remove non-TV features, simplify UI, and tune animation/performance for long-running living-room display.
