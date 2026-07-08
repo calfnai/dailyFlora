@@ -220,6 +220,9 @@ let selectedDensity = specialReference ? 'medium' : normalizeDensity(params.dens
 const searchParams = new URLSearchParams(window.location.search);
 const debugValue = searchParams.get('debug');
 const debugMode = searchParams.has('debug') && debugValue !== '0' && debugValue !== 'false';
+const previewValue = searchParams.get('preview');
+const previewMode = searchParams.has('preview') && previewValue !== '0' && previewValue !== 'false';
+document.body.classList.toggle('is-preview', previewMode);
 siteMenuDebugLink && (siteMenuDebugLink.hidden = !debugMode);
 let selectedRender = specialReference && !searchParams.has('render') && !searchParams.has('quality')
   ? 'high'

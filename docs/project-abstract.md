@@ -50,7 +50,7 @@ DailyFlora 的起点不是做一个功能很多的花店工具，而是做一个
 2. 开发侧：`/docs/dev-index.html` 作为开发组总目录。
 3. 用户侧原型：`/docs/member-test.html` 展示资料、生成记录、上传、积分、订单和获奖入口。
 4. 管理侧原型：`/docs/admin-bouquets.html` 和 `/docs/admin-users.html` 展示未来花花库、用户、积分和审计日志。
-5. 固定样例库：默认轻量卡片，点击后再实时渲染，避免多个 iframe 同时拖慢页面。
+5. 固定样例库：直接嵌入 3D 花束预览，用分页和 `preview=1` 模式控制加载压力。
 
 数据库仍是未来能力。当前只记录 `users`、`bouquets`、`generations`、`uploads`、`credits`、`subscriptions`、`orders`、`admin_audit_logs` 等数据域，不绑定具体服务商或付款方式。
 
