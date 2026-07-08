@@ -148,33 +148,93 @@
       }
 
       .map {
-        display: grid;
-        gap: 12px;
         margin-top: 14px;
-        padding: 16px;
+        padding: 0;
+        overflow: hidden;
       }
 
-      .lane {
-        display: grid;
-        grid-template-columns: 150px repeat(4, minmax(0, 1fr));
-        gap: 10px;
-        align-items: stretch;
+      .route-diagram {
+        display: block;
+        width: 100%;
+        height: auto;
+        min-height: 520px;
+        background:
+          radial-gradient(circle at 48% 18%, rgb(242 203 98 / 8%), transparent 22%),
+          radial-gradient(circle at 82% 78%, rgb(159 198 255 / 7%), transparent 24%),
+          rgb(8 11 8 / 44%);
       }
 
-      .node {
-        display: grid;
-        align-content: center;
-        min-height: 58px;
-        padding: 10px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: rgb(255 255 255 / 4%);
-        color: var(--muted);
-        font-size: 13px;
+      .route-diagram text {
+        fill: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0;
       }
 
-      .node strong {
-        color: var(--text);
+      .route-diagram .route-label {
+        fill: rgb(247 240 227 / 62%);
+        font-size: 12px;
+        font-weight: 760;
+      }
+
+      .route-diagram .node-title {
+        font-size: 16px;
+        font-weight: 800;
+      }
+
+      .route-diagram .node-path {
+        fill: rgb(247 240 227 / 64%);
+        font-size: 12px;
+      }
+
+      .route-diagram .node-box {
+        fill: rgb(255 255 255 / 5%);
+        stroke: rgb(247 240 227 / 18%);
+        stroke-width: 1;
+      }
+
+      .route-diagram .node-box.entry {
+        fill: rgb(242 203 98 / 16%);
+        stroke: rgb(242 203 98 / 46%);
+      }
+
+      .route-diagram .node-box.customer {
+        stroke: rgb(135 212 134 / 46%);
+      }
+
+      .route-diagram .node-box.dev {
+        stroke: rgb(159 198 255 / 46%);
+      }
+
+      .route-diagram .node-box.admin {
+        stroke: rgb(239 185 96 / 48%);
+      }
+
+      .route-diagram .node-box.data {
+        fill: rgb(255 255 255 / 3%);
+        stroke: rgb(247 240 227 / 22%);
+      }
+
+      .route-diagram .route-line {
+        fill: none;
+        stroke: rgb(247 240 227 / 26%);
+        stroke-width: 2;
+      }
+
+      .route-diagram .route-line.customer {
+        stroke: rgb(135 212 134 / 52%);
+      }
+
+      .route-diagram .route-line.dev {
+        stroke: rgb(159 198 255 / 52%);
+      }
+
+      .route-diagram .route-line.admin {
+        stroke: rgb(239 185 96 / 54%);
+      }
+
+      .route-diagram .route-line.data {
+        stroke-dasharray: 7 7;
+        stroke: rgb(247 240 227 / 32%);
       }
 
       table {
@@ -207,8 +267,12 @@
           grid-template-columns: 1fr;
         }
 
-        .lane {
-          grid-template-columns: 1fr;
+        .route-diagram {
+          min-width: 940px;
+        }
+
+        .map {
+          overflow-x: auto;
         }
       }
     </style>
@@ -293,7 +357,7 @@
         <a class="card" href="./dailyflora-flower-plan-samples.html">
           <span class="tag good">optimized</span>
           <h3>固定样例库</h3>
-          <p>默认轻量卡片，不再一次性加载多组实时渲染 iframe。</p>
+          <p>直接嵌入 3D 花束预览，用来快速检查固定日期、seed、主题和花型计划。</p>
           <code>/docs/dailyflora-flower-plan-samples.html</code>
         </a>
         <a class="card" href="./member-test.html">
@@ -334,27 +398,93 @@
 
       <h2>路由图</h2>
       <section class="map" aria-label="路由图">
-        <div class="lane">
-          <div class="node"><strong>客户侧</strong></div>
-          <div class="node"><strong>/</strong><br />每日花花</div>
-          <div class="node"><strong>/about</strong><br />关于项目</div>
-          <div class="node"><strong>/member</strong><br />用户中心</div>
-          <div class="node"><strong>/downloads</strong><br />下载占位</div>
-        </div>
-        <div class="lane">
-          <div class="node"><strong>开发侧</strong></div>
-          <div class="node"><strong>/docs/dev-index.html</strong><br />总目录</div>
-          <div class="node"><strong>版本化实验页</strong><br />审美 / 花库 / 样例</div>
-          <div class="node"><strong>debug 入口</strong><br />集中进入</div>
-          <div class="node"><strong>member-test</strong><br />用户页假数据</div>
-        </div>
-        <div class="lane">
-          <div class="node"><strong>管理侧</strong></div>
-          <div class="node"><strong>admin-bouquets</strong><br />花花库</div>
-          <div class="node"><strong>admin-users</strong><br />用户与积分</div>
-          <div class="node"><strong>audit logs</strong><br />操作留痕</div>
-          <div class="node"><strong>future backend</strong><br />后续剥离</div>
-        </div>
+        <svg class="route-diagram" viewBox="0 0 1120 560" role="img" aria-labelledby="route-title route-desc">
+          <title id="route-title">DailyFlora MVP 路由图</title>
+          <desc id="route-desc">从 DailyFlora 入口分流到客户页面、开发组页面、临时管理页面和未来数据库的数据关系图。</desc>
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="rgb(247 240 227 / 42%)"></path>
+            </marker>
+            <marker id="arrow-customer" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="rgb(135 212 134 / 72%)"></path>
+            </marker>
+            <marker id="arrow-dev" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="rgb(159 198 255 / 72%)"></path>
+            </marker>
+            <marker id="arrow-admin" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="rgb(239 185 96 / 74%)"></path>
+            </marker>
+          </defs>
+
+          <text class="route-label" x="70" y="56">PUBLIC</text>
+          <text class="route-label" x="426" y="56">INTERNAL DOCS</text>
+          <text class="route-label" x="822" y="56">FUTURE DATA</text>
+
+          <rect class="node-box entry" x="440" y="88" width="240" height="76" rx="8"></rect>
+          <text class="node-title" x="560" y="120" text-anchor="middle">DailyFlora</text>
+          <text class="node-path" x="560" y="144" text-anchor="middle">/</text>
+
+          <path class="route-line customer" d="M440 126 C336 126 296 126 226 126" marker-end="url(#arrow-customer)"></path>
+          <path class="route-line dev" d="M560 164 C560 208 560 218 560 248" marker-end="url(#arrow-dev)"></path>
+          <path class="route-line admin" d="M680 126 C782 126 820 126 894 126" marker-end="url(#arrow-admin)"></path>
+
+          <rect class="node-box customer" x="70" y="88" width="156" height="76" rx="8"></rect>
+          <text class="node-title" x="148" y="120" text-anchor="middle">首页</text>
+          <text class="node-path" x="148" y="144" text-anchor="middle">每日 3D 花花</text>
+
+          <path class="route-line customer" d="M148 164 C148 202 148 212 148 242" marker-end="url(#arrow-customer)"></path>
+          <rect class="node-box customer" x="42" y="242" width="212" height="74" rx="8"></rect>
+          <text class="node-title" x="148" y="272" text-anchor="middle">注册引导</text>
+          <text class="node-path" x="148" y="296" text-anchor="middle">/signup/</text>
+
+          <path class="route-line customer" d="M42 279 C8 279 8 368 42 368" marker-end="url(#arrow-customer)"></path>
+          <rect class="node-box customer" x="42" y="368" width="212" height="74" rx="8"></rect>
+          <text class="node-title" x="148" y="398" text-anchor="middle">公开页面</text>
+          <text class="node-path" x="148" y="422" text-anchor="middle">about / shop / downloads</text>
+
+          <path class="route-line customer" d="M254 279 C302 279 322 326 370 326" marker-end="url(#arrow-customer)"></path>
+          <rect class="node-box customer" x="370" y="290" width="178" height="72" rx="8"></rect>
+          <text class="node-title" x="459" y="319" text-anchor="middle">Member</text>
+          <text class="node-path" x="459" y="342" text-anchor="middle">/member/</text>
+
+          <rect class="node-box dev" x="444" y="248" width="232" height="76" rx="8"></rect>
+          <text class="node-title" x="560" y="280" text-anchor="middle">开发组目录</text>
+          <text class="node-path" x="560" y="304" text-anchor="middle">/docs/dev-index.html</text>
+
+          <path class="route-line dev" d="M560 324 C560 350 560 358 560 384" marker-end="url(#arrow-dev)"></path>
+          <rect class="node-box dev" x="318" y="384" width="188" height="76" rx="8"></rect>
+          <text class="node-title" x="412" y="416" text-anchor="middle">审美复盘</text>
+          <text class="node-path" x="412" y="440" text-anchor="middle">dashboard / debug</text>
+
+          <rect class="node-box dev" x="526" y="384" width="188" height="76" rx="8"></rect>
+          <text class="node-title" x="620" y="416" text-anchor="middle">固定样例库</text>
+          <text class="node-path" x="620" y="440" text-anchor="middle">3D previews</text>
+
+          <rect class="node-box dev" x="734" y="384" width="188" height="76" rx="8"></rect>
+          <text class="node-title" x="828" y="416" text-anchor="middle">用户页测试</text>
+          <text class="node-path" x="828" y="440" text-anchor="middle">upload / generate</text>
+
+          <path class="route-line dev" d="M560 344 C488 360 438 360 412 384" marker-end="url(#arrow-dev)"></path>
+          <path class="route-line dev" d="M582 344 C608 360 616 360 620 384" marker-end="url(#arrow-dev)"></path>
+          <path class="route-line dev" d="M676 286 C764 304 812 338 828 384" marker-end="url(#arrow-dev)"></path>
+
+          <rect class="node-box admin" x="894" y="88" width="172" height="76" rx="8"></rect>
+          <text class="node-title" x="980" y="120" text-anchor="middle">临时管理</text>
+          <text class="node-path" x="980" y="144" text-anchor="middle">docs/admin-*</text>
+
+          <path class="route-line admin" d="M980 164 C980 200 954 214 954 248" marker-end="url(#arrow-admin)"></path>
+          <rect class="node-box admin" x="842" y="248" width="224" height="76" rx="8"></rect>
+          <text class="node-title" x="954" y="280" text-anchor="middle">管理花花 / 用户</text>
+          <text class="node-path" x="954" y="304" text-anchor="middle">bouquets / users / credits</text>
+
+          <path class="route-line data" d="M954 324 C954 364 954 380 954 420" marker-end="url(#arrow)"></path>
+          <rect class="node-box data" x="842" y="420" width="224" height="76" rx="8"></rect>
+          <text class="node-title" x="954" y="452" text-anchor="middle">未来数据库</text>
+          <text class="node-path" x="954" y="476" text-anchor="middle">users / bouquets / logs</text>
+
+          <path class="route-line data" d="M828 460 C828 502 900 502 954 496" marker-end="url(#arrow)"></path>
+          <path class="route-line data" d="M459 362 C516 518 770 520 842 470" marker-end="url(#arrow)"></path>
+        </svg>
       </section>
 
       <h2 id="data-model">未来数据库分布</h2>
