@@ -33,6 +33,14 @@ body.is-special {
   background: #050408;
 }
 
+body.is-preview .site-menu,
+body.is-preview .controls,
+body.is-preview .debug-panel,
+body.is-preview .account-dock,
+body.is-preview .account-panel {
+  display: none !important;
+}
+
 button {
   font: inherit;
 }
@@ -175,6 +183,31 @@ button {
   gap: 12px;
   color: rgb(255 250 235 / 76%);
   text-shadow: 0 1px 18px rgb(0 0 0 / 70%);
+}
+
+body.is-preview .hud {
+  left: 12px;
+  top: auto;
+  right: 12px;
+  bottom: 10px;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgb(255 246 220 / 12%);
+  border-radius: 8px;
+  background: rgb(5 6 9 / 54%);
+  backdrop-filter: blur(14px);
+}
+
+body.is-preview .daily-date,
+body.is-preview .daily-theme-en,
+body.is-preview .flower-plan-mark,
+body.is-preview .quality-mark {
+  display: none;
+}
+
+body.is-preview .daily-theme {
+  font-size: 13px;
+  line-height: 1.1;
 }
 
 .daily-mark {

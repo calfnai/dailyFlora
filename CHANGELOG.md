@@ -1,5 +1,14 @@
 # DailyFlora Changelog
 
+## 0.14.3 - 2026-07-08
+
+Fixed bouquet sample library 3D preview restoration.
+
+- Replaced the fixed sample library's color-block placeholders with live embedded 3D bouquet previews.
+- Added `preview=1` mode for clean embedded bouquet rendering without the public page menu or viewing controls.
+- Updated the sample library copy, page size, and development index description so the page is clearly for direct 3D review.
+- Replaced the development index route-list section with an SVG route diagram for public, internal, admin, and future data paths.
+
 ## 0.14.2 - 2026-07-03
 
 Simpler home page navigation and signup landing.

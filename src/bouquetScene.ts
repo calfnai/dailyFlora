@@ -738,7 +738,7 @@ function orientPrimitiveGroup(
 function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   const plannedCount = Math.floor(quality.flowerCount * spec.flowerDensity);
   const specialPrimitiveRatio = spec.flowerPlan.id === 'her-real-bouquet-memory-v4' ? 0.5 : 0.34;
-  const count = Math.max(64, Math.floor(plannedCount * (spec.special ? specialPrimitiveRatio : 0.44)));
+  const count = Math.max(64, Math.floor(plannedCount * (spec.special ? specialPrimitiveRatio : 0.34)));
   const group = new THREE.Group();
   const batches = spec.flowerPlan.items;
   let used = 0;
@@ -1342,11 +1342,17 @@ export class BouquetScene {
     this.clock.start();
     const animate = () => {
       this.animationId = window.requestAnimationFrame(animate);
-      const delta = this.clock.getDelta();
+      const delta = Math.min(this.clock.getDelta(), 0.1);
+      if (this.quality.targetFps >= 58) {
+        this.accumulator = 0;
+        this.tick(delta);
+        return;
+      }
       this.accumulator += delta;
       if (this.accumulator < this.frameInterval) return;
-      this.accumulator = 0;
-      this.tick(delta);
+      const step = this.accumulator;
+      this.accumulator %= this.frameInterval;
+      this.tick(step);
     };
     animate();
   }

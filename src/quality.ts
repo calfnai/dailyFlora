@@ -40,7 +40,7 @@ export const renderProfiles: Record<Exclude<RenderQualityName, 'auto'>, RenderSe
     targetFps: 42
   },
   high: {
-    pixelRatio: 1.55,
+    pixelRatio: 1.25,
     targetFps: 60
   }
 };

@@ -105,25 +105,43 @@
       }
 
       .preview {
-        display: grid;
-        place-items: center;
-        min-height: 170px;
-        padding: 18px;
-        color: var(--muted);
-        background:
-          radial-gradient(circle at 40% 38%, var(--preview-a), transparent 20%),
-          radial-gradient(circle at 58% 44%, var(--preview-b), transparent 24%),
-          radial-gradient(circle at 50% 62%, var(--preview-c), transparent 28%),
-          #050609;
-        text-align: center;
+        position: relative;
+        min-height: 280px;
+        overflow: hidden;
+        background: #050609;
+      }
+
+      .preview iframe {
+        display: block;
+        width: 100%;
+        height: 280px;
+        border: 0;
+        background: #050609;
+      }
+
+      .preview-link {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: block;
+        color: transparent;
         text-decoration: none;
       }
 
-      .preview strong {
-        max-width: 18ch;
-        color: rgb(255 248 226 / 86%);
-        font-size: 18px;
-        line-height: 1.2;
+      .preview-chip {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        z-index: 3;
+        max-width: calc(100% - 20px);
+        padding: 6px 8px;
+        border: 1px solid rgb(255 246 220 / 14%);
+        border-radius: 8px;
+        color: rgb(255 248 226 / 82%);
+        background: rgb(5 6 9 / 58%);
+        font-size: 12px;
+        line-height: 1.15;
+        backdrop-filter: blur(12px);
       }
 
       .body {
@@ -236,7 +254,7 @@
     <main>
       <h1>DailyFlora 固定样例库</h1>
       <p class="lead">
-        这里改成轻量列表：默认不再一次性加载多个实时 3D iframe，避免滚动和加载卡顿。需要复查时再点击“实时打开”，进入单独渲染页面。
+        这里直接展示固定日期与 seed 对应的 3D 花束预览，用来快速检查构图、颜色、花型和空间层次。需要细看时点击预览或“打开大图”进入完整实时页面。
       </p>
 
       <section class="toolbar" aria-label="样例筛选">
@@ -262,8 +280,8 @@
         <label>
           每页显示
           <select id="page-size-select">
-            <option value="20">20 项</option>
-            <option value="50">50 项</option>
+            <option value="6">6 项</option>
+            <option value="12">12 项</option>
           </select>
         </label>
         <span class="count" id="result-count"></span>
@@ -271,7 +289,7 @@
 
       <section class="grid" id="sample-grid" aria-label="固定花束样例"></section>
       <nav class="pager" id="pager" aria-label="分页"></nav>
-      <p class="note">未来可以把这些卡片的预览替换成构建时生成的截图；当前用轻量色块占位，保留实时链接。</p>
+      <p class="note">每张卡片直接加载对应 3D 花束预览；点击预览或“打开大图”进入完整页面。</p>
     </main>
 
     <script>
@@ -388,6 +406,13 @@
         return `https://calfnai.github.io/dailyFlora/${local.search}`;
       }
 
+      function previewHrefFor(sample) {
+        const url = new URL(hrefFor(sample));
+        url.searchParams.set('preview', '1');
+        url.searchParams.set('render', 'medium');
+        return url.href;
+      }
+
       function currentItems() {
         const category = categorySelect.value;
         const sort = sortSelect.value;
@@ -411,17 +436,20 @@
         grid.innerHTML = pageItems
           .map((sample) => {
             const href = hrefFor(sample);
+            const previewHref = previewHrefFor(sample);
             return `
               <article class="card">
-                <a class="preview" style="--preview-a:${sample.colors[0]};--preview-b:${sample.colors[1]};--preview-c:${sample.colors[2]}" href="${href}" target="_blank" rel="noopener">
-                  <strong>${sample.title}</strong>
-                </a>
+                <div class="preview">
+                  <iframe src="${previewHref}" title="${sample.title} 3D 预览" loading="lazy"></iframe>
+                  <span class="preview-chip">${sample.title}</span>
+                  <a class="preview-link" href="${href}" target="_blank" rel="noopener" aria-label="打开 ${sample.title} 3D 花束"></a>
+                </div>
                 <div class="body">
                   <h2>${sample.title} / ${sample.en}</h2>
                   <p>${sample.summary}</p>
                   <div class="tags">${sample.tags.map((tag) => `<span class="tag">${tag}</span>`).join('')}</div>
                   <div class="actions">
-                    <a class="button primary" href="${href}" target="_blank" rel="noopener">实时打开</a>
+                    <a class="button primary" href="${href}" target="_blank" rel="noopener">打开大图</a>
                     <a class="button" href="${href}&debug=1" target="_blank" rel="noopener">debug</a>
                   </div>
                 </div>
