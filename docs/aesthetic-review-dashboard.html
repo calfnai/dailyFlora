@@ -124,6 +124,10 @@
         color: var(--warn);
       }
 
+      .status.needs-owner-review {
+        color: var(--warn);
+      }
+
       .status.pass {
         color: var(--good);
       }
@@ -216,6 +220,11 @@
         padding: 14px;
       }
 
+      .candidate-panel {
+        border-color: rgb(242 203 98 / 34%);
+        background: rgb(242 203 98 / 6%);
+      }
+
       .library-card {
         display: grid;
         gap: 10px;
@@ -260,6 +269,15 @@
         display: block;
         width: 100%;
         height: 100%;
+      }
+
+      .candidate-preview-link {
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        color: var(--warn);
+        text-align: center;
+        line-height: 1.55;
       }
 
       .panel p,
@@ -439,8 +457,8 @@
         line-height: 1.7;
       }
     </style>
-    <script type="module" crossorigin src="../assets/aestheticReviewDashboard-CgACO-Df.js"></script>
-    <link rel="modulepreload" crossorigin href="../assets/floraPrimitives-DTeKYRlc.js">
+    <script type="module" crossorigin src="../assets/aestheticReviewDashboard-CXyjs2Sc.js"></script>
+    <link rel="modulepreload" crossorigin href="../assets/floraPrimitives-BORtS2FS.js">
   </head>
   <body>
     <main class="shell">
@@ -460,7 +478,7 @@
           <div>
             <p class="kicker">Review library</p>
             <h2>审美资料入口</h2>
-            <p class="section-copy">这里固定保留四类可检查材料：你给过的参考图片、已经及格的花库模型、可直接打开的花束样例、以及 0.13 审美记忆。</p>
+            <p class="section-copy">这里固定保留参考图片、抽象花型词表、偏写实花型、固定花束样例和项目审美记忆。</p>
           </div>
         </div>
         <div class="library-grid">
@@ -473,6 +491,11 @@
             <em>花库罗列</em>
             <strong>Primitive Lab</strong>
             <span>逐个查看已达到及格线的花材/叶材 primitive，包含隐藏标签、隔离观察和模型状态。</span>
+          </a>
+          <a class="panel library-card" href="./realistic-flower-lab.html">
+            <em>25 种具象花型</em>
+            <strong>偏写实花型 LAB</strong>
+            <span>查看删除洋桔梗后的 25 种具体花材表达，以及面向 3D 打印的花托、花梗和实体分枝连接。</span>
           </a>
           <a class="panel library-card" href="./dailyflora-flower-plan-samples.html">
             <em>花束库</em>
@@ -518,6 +541,18 @@
           </div>
         </div>
         <div class="shape-grid" id="shape-grid"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Candidate shape vocabulary</p>
+            <h2>待验收候选花型</h2>
+            <p class="section-copy">候选只进入实验和复盘，不自动改写正式 16 类。只有用户确认其正面、侧面和 360° 旋转都真正成立，才升级为新的正式花型。</p>
+          </div>
+          <a class="pill" href="./primitive-lab.html#candidate-title">在 Primitive Lab 验收</a>
+        </div>
+        <div class="shape-grid" id="candidate-shape-grid"></div>
       </section>
 
       <section class="section">
