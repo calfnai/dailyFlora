@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 import dashboardData from '../data/aesthetic-review-dashboard.json';
 import { floraPrimitiveFactories, type FloraPrimitiveName } from './floraPrimitives';
+import {
+  createRealisticFlower,
+  realisticFlowerDefinitions,
+  type RealisticFlowerDefinition
+} from './realisticFlowerForms';
 
 type ViewName = 'front' | 'side' | 'top';
 
@@ -27,9 +32,14 @@ type GateEntry = {
 };
 
 type DisplayShape = {
-  shape: ShapeEntry | CandidateShapeEntry;
-  primitive: FloraPrimitiveName;
+  id: string;
+  name: string;
+  englishName: string;
+  description: string;
+  primitive: FloraPrimitiveName | null;
+  realisticDefinition: RealisticFlowerDefinition | null;
   candidate: boolean;
+  family: 'candidate' | 'target' | 'concrete';
   indexLabel: string;
   statusLabel: string;
 };
@@ -124,20 +134,45 @@ const densePrimitives: FloraPrimitiveName[] = [
 const shapeEntries = dashboardData.targetShapeVocabulary as ShapeEntry[];
 const candidateEntries = dashboardData.candidateShapeVocabulary as CandidateShapeEntry[];
 const gateEntries = dashboardData.primitiveGate as GateEntry[];
+const promotedRealisticDefinitions = realisticFlowerDefinitions.filter(
+  (definition) => definition.category !== 'spike' && definition.category !== 'cluster'
+);
 const displayShapes: DisplayShape[] = [
   ...candidateEntries.map((shape, index) => ({
-    shape,
+    id: shape.id,
+    name: shape.name,
+    englishName: shape.englishName,
+    description: '六片花被、褶边副冠、深喉、花蕊与绿色连接点；待用户确认后才登记。',
     primitive: shape.primitive,
+    realisticDefinition: null,
     candidate: true,
+    family: 'candidate' as const,
     indexLabel: `C${String(index + 1).padStart(2, '0')}`,
     statusLabel: 'candidate'
   })),
   ...shapeEntries.map((shape, index) => ({
-    shape,
+    id: shape.id,
+    name: shape.name,
+    englishName: shape.englishName,
+    description: shape.examples,
     primitive: targetPrimitiveByShapeId[shape.id],
+    realisticDefinition: null,
     candidate: false,
+    family: 'target' as const,
     indexLabel: String(index + 1).padStart(2, '0'),
     statusLabel: gateEntries.find((item) => item.primitive === targetPrimitiveByShapeId[shape.id])?.status || 'pass'
+  })),
+  ...promotedRealisticDefinitions.map((definition, index) => ({
+    id: definition.id,
+    name: definition.cn,
+    englishName: definition.en,
+    description: `${definition.description} ${definition.printStructure}`,
+    primitive: null,
+    realisticDefinition: definition,
+    candidate: false,
+    family: 'concrete' as const,
+    indexLabel: `R${String(index + 1).padStart(2, '0')}`,
+    statusLabel: 'concrete'
   }))
 ];
 
@@ -170,24 +205,20 @@ function escapeHtml(value: unknown) {
 
 function renderLabels() {
   labelLayer.innerHTML = displayShapes.map((item) => {
-    const candidate = item.candidate ? item.shape as CandidateShapeEntry : null;
-    const description = candidate
-      ? '六片花被、褶边副冠、深喉、花蕊与绿色连接点；待用户确认后才登记。'
-      : item.shape.examples;
     return `
-      <article class="shape-cell${item.candidate ? ' is-candidate' : ''}" data-primitive="${escapeHtml(item.primitive)}">
+      <article class="shape-cell${item.candidate ? ' is-candidate' : ''}${item.family === 'concrete' ? ' is-concrete' : ''}" data-shape="${escapeHtml(item.id)}">
         <div class="shape-copy">
           <div class="shape-index"><span>${escapeHtml(item.indexLabel)}</span><span class="shape-status">${escapeHtml(item.statusLabel)}</span></div>
-          <h3>${escapeHtml(item.shape.name)}</h3>
-          <p class="shape-english">${escapeHtml(item.shape.englishName)}</p>
-          <p class="shape-description">${escapeHtml(description)}</p>
+          <h3>${escapeHtml(item.name)}</h3>
+          <p class="shape-english">${escapeHtml(item.englishName)}</p>
+          <p class="shape-description">${escapeHtml(item.description)}</p>
         </div>
       </article>
     `;
   }).join('');
 }
 
-function modelScale(primitive: FloraPrimitiveName) {
+function primitiveModelScale(primitive: FloraPrimitiveName) {
   if (primitive === 'FoliageGrassBranch') return 0.66;
   if (primitive === 'SpikeFlower') return 0.62;
   if (primitive === 'FrilledNarcissusFlower') return 0.68;
@@ -195,8 +226,14 @@ function modelScale(primitive: FloraPrimitiveName) {
   return 0.74;
 }
 
+function realisticModelScale(definition: RealisticFlowerDefinition) {
+  if (definition.id === 'calla') return 0.68;
+  if (definition.id === 'narcissus') return 0.62;
+  return 0.64;
+}
+
 function setCameraView(preview: PreviewScene, view: ViewName) {
-  const distance = tallPrimitives.includes(preview.primitive) ? 5.1 : 4.35;
+  const distance = preview.primitive && tallPrimitives.includes(preview.primitive) ? 5.1 : preview.realisticDefinition ? 4.7 : 4.35;
   if (view === 'side') preview.camera.position.set(distance, 0.2, 0);
   else if (view === 'top') preview.camera.position.set(0, distance + 0.25, 0.01);
   else preview.camera.position.set(0, 0.2, distance);
@@ -233,9 +270,8 @@ function initScenes() {
   let totalPoints = 0;
 
   displayShapes.forEach((item, index) => {
-    const factory = floraPrimitiveFactories[item.primitive];
     const cell = cells[index];
-    if (!factory || !cell) return;
+    if (!cell) return;
 
     const scene = new THREE.Scene();
     scene.add(new THREE.HemisphereLight('#fff4dc', '#182014', 1.9));
@@ -244,18 +280,30 @@ function initScenes() {
     scene.add(key);
 
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 30);
-    const model = factory({
-      seed: `primitive-gallery:${item.primitive}`,
-      position: new THREE.Vector3(-0.72, 0, 0),
-      scale: modelScale(item.primitive),
-      colorPalette: palettes[item.primitive] || ['#ffffff', '#f7d78a', '#80ad65', '#cc8b4f'],
-      openness: openPrimitives.includes(item.primitive) ? 0.95 : 0.7,
-      density: densePrimitives.includes(item.primitive) ? 1.08 : 0.92,
-      curvature: ['SpikeFlower', 'FoliageGrassBranch', 'CallaCurledBract'].includes(item.primitive) ? 0.86 : 0.42,
-      role: tallPrimitives.includes(item.primitive) ? 'line' : 'secondary'
-    });
-    model.rotation.x = faceForwardPrimitives.includes(item.primitive) ? -0.64 : item.primitive === 'FoliageGrassBranch' ? -0.34 : -0.1;
-    if (item.primitive === 'FoliageGrassBranch') model.rotation.z = -0.38;
+    let model: THREE.Group;
+    if (item.realisticDefinition) {
+      model = createRealisticFlower(item.realisticDefinition, `primitive-gallery:realistic:${item.realisticDefinition.id}`);
+      model.scale.setScalar(realisticModelScale(item.realisticDefinition));
+      model.position.x = -0.72;
+      model.rotation.x = -0.58;
+    } else if (item.primitive) {
+      const factory = floraPrimitiveFactories[item.primitive];
+      if (!factory) return;
+      model = factory({
+        seed: `primitive-gallery:${item.primitive}`,
+        position: new THREE.Vector3(-0.72, 0, 0),
+        scale: primitiveModelScale(item.primitive),
+        colorPalette: palettes[item.primitive] || ['#ffffff', '#f7d78a', '#80ad65', '#cc8b4f'],
+        openness: openPrimitives.includes(item.primitive) ? 0.95 : 0.7,
+        density: densePrimitives.includes(item.primitive) ? 1.08 : 0.92,
+        curvature: ['SpikeFlower', 'FoliageGrassBranch', 'CallaCurledBract'].includes(item.primitive) ? 0.86 : 0.42,
+        role: tallPrimitives.includes(item.primitive) ? 'line' : 'secondary'
+      });
+      model.rotation.x = faceForwardPrimitives.includes(item.primitive) ? -0.64 : item.primitive === 'FoliageGrassBranch' ? -0.34 : -0.1;
+      if (item.primitive === 'FoliageGrassBranch') model.rotation.z = -0.38;
+    } else {
+      return;
+    }
     scene.add(model);
 
     const grid = new THREE.GridHelper(3.2, 8, '#526153', '#2a342b');
@@ -264,7 +312,9 @@ function initScenes() {
     grid.material.opacity = 0.38;
     scene.add(grid);
 
-    const preview: PreviewScene = { ...item, cell, scene, camera, model, grid, yaw: index * 0.16 };
+    const concreteIndex = item.family === 'concrete' ? promotedRealisticDefinitions.findIndex((definition) => definition.id === item.id) : -1;
+    const initialYaw = concreteIndex >= 0 ? concreteIndex * 0.018 : index * 0.16;
+    const preview: PreviewScene = { ...item, cell, scene, camera, model, grid, yaw: initialYaw };
     setCameraView(preview, activeView);
     previews.push(preview);
 

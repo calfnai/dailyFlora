@@ -1,5 +1,14 @@
 # DailyFlora Changelog
 
+## 0.14.6 - 2026-07-12
+
+Expanded Primitive Lab with approved concrete single-flower forms.
+
+- Promoted 16 face, layered, and sculptural forms from the realistic lab into Primitive Lab as concrete vocabulary extensions.
+- Kept the five spike forms and four cluster forms shown in the user's screenshot out of Primitive Lab pending a separate revision discussion.
+- Expanded the shared Primitive Lab canvas from 17 to 33 displayed forms without adding another WebGL rendering context.
+- Preserved the original 16 abstract target shapes and the pending narcissus candidate as distinct statuses instead of replacing the compatibility vocabulary.
+
 ## 0.14.5 - 2026-07-11
 
 Added a separate realistic flower-form lab and print-aware structural vocabulary.
