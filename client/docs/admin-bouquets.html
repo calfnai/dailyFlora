@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DailyFlora 管理花花库</title>
+    <style>
+      :root { color-scheme: dark; --bg: #080a07; --surface: #11160f; --line: rgb(247 240 227 / 14%); --text: #f7f0e3; --muted: rgb(247 240 227 / 68%); --accent: #f2cb62; --good: #87d486; --warn: #efb960; }
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text); background: #080a07; }
+      main { width: min(1180px, 100%); margin: 0 auto; padding: 28px 20px 56px; }
+      h1, h2, p { margin: 0; }
+      h1 { font-size: clamp(36px, 7vw, 76px); line-height: .96; letter-spacing: 0; }
+      h2 { margin-top: 26px; font-size: 28px; }
+      p, td { color: var(--muted); line-height: 1.62; }
+      a { color: var(--accent); }
+      header, .panel { border: 1px solid var(--line); border-radius: 8px; background: rgb(17 22 15 / 78%); }
+      header { display: grid; gap: 14px; padding: 26px; }
+      .panel { margin-top: 14px; overflow: hidden; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 13px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+      th { color: rgb(247 240 227 / 86%); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: rgb(255 255 255 / 4%); }
+      tr:last-child td { border-bottom: 0; }
+      .pill { display: inline-flex; min-height: 24px; align-items: center; padding: 0 8px; border: 1px solid currentColor; border-radius: 999px; color: var(--warn); font-size: 12px; font-weight: 700; }
+      .pill.good { color: var(--good); }
+      code { color: rgb(247 240 227 / 88%); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p>Admin mock / bouquets</p>
+        <h1>管理花花库</h1>
+        <p>这是临时放在开发组里的后台原型。正式商业化前必须剥离到有权限控制的后台，不能把用户联系方式暴露在公开静态页面。</p>
+      </header>
+
+      <h2>每日展示与来源</h2>
+      <div class="panel">
+        <table>
+          <thead><tr><th>花花</th><th>展示日期</th><th>来源</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>晨露莓园空气束<br /><code>dewberry-morning-air</code></td>
+              <td>2026-06-26</td>
+              <td>系统原创候选</td>
+              <td><span class="pill good">published</span></td>
+            </tr>
+            <tr>
+              <td>荔枝花园彩虹束<br /><code>lychee-garden-rainbow</code></td>
+              <td>2026-07-02</td>
+              <td>用户生成：小花<br />联系方式字段未来从 <code>users</code> 读取</td>
+              <td><span class="pill">candidate</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>未来字段</h2>
+      <p>建议 <code>bouquets</code> 表至少包含：id、date、seed、theme、flower_plan_id、source_type、source_user_id、status、published_at、created_at、updated_at。</p>
+      <p style="margin-top:24px"><a href="./dev-index.html">回到开发组目录</a></p>
+    </main>
+  </body>
+</html>
