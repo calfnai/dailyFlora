@@ -103,27 +103,42 @@
     {
       "id": "creative-director",
       "name": "创意总监",
-      "brief": "判断整体方向是否符合 DailyFlora，不允许跑偏到欧美婚礼、粗糙市场束、单一大主花。"
+      "brief": "判断整体方向是否符合 DailyFlora，不允许跑偏到欧美婚礼、粗糙市场束、单一大主花。",
+      "status": "保留 · 按需启用",
+      "cadence": "新主题、新花束方向或用户指出整体跑偏时",
+      "audit": "仍有独立价值，负责方向边界，不参与每个几何细节。"
     },
     {
       "id": "art-director",
       "name": "美术指导",
-      "brief": "拆解色彩、轮廓、花材层级、花叶朝向、空气感、前后关系和叶材合理性。"
+      "brief": "拆解色彩、轮廓、花材层级、花叶朝向、空气感、前后关系、叶材合理性和模型展示可读性。",
+      "status": "保留 · 核心职责",
+      "cadence": "每次视觉、构图、LAB 展示和响应式 UI 修改",
+      "audit": "本次文字遮挡模型说明该职责必须覆盖展示层，而不只审查花束本体。"
     },
     {
       "id": "project-director",
       "name": "项目主任",
-      "brief": "决定当前阶段是否允许进入下一层，比如 primitive 未过就不能进 composition。"
+      "brief": "在关键里程碑检查是否允许进入下一层，比如 primitive 未过就不能进 composition。",
+      "status": "降级 · 里程碑启用",
+      "cadence": "版本阶段切换、用户验收或发布门禁变化时",
+      "audit": "与既有门禁流程重叠，不再参与每张复盘卡；只在阶段决策时启用。"
     },
     {
       "id": "cto",
       "name": "生成架构审查",
-      "brief": "判断 Three.js 生成结构、参数暴露、比例控制、实例化性能和调试数据是否足够支撑审美目标；不替代美术判断。"
+      "brief": "判断 Three.js 生成结构、参数暴露、比例控制、实例化性能和调试数据是否足够支撑审美目标；不替代美术判断。",
+      "status": "保留 · 技术触发",
+      "cadence": "Three.js、性能、构建、部署或生成参数变化时",
+      "audit": "本次 viewport 与文字区域分离属于其职责，但最终可读性仍由美术指导验收。"
     },
     {
       "id": "shape-curator",
       "name": "花材库管理员",
-      "brief": "检查 flowerPlan、renderer、Primitive Lab 和 TARGET SHAPE VOCABULARY 是否一致；代码里用到的花型必须登记，参考图里反复出现的形态不能遗漏。"
+      "brief": "检查 flowerPlan、renderer、Primitive Lab 和 TARGET SHAPE VOCABULARY 是否一致；代码里用到的花型必须登记，参考图里反复出现的形态不能遗漏。",
+      "status": "保留 · 花库触发",
+      "cadence": "新增、删除、重命名或升级花型时",
+      "audit": "仍有明确所有权，避免实验花型、正式词表和生成器之间再次失配。"
     }
   ],
   "reusableAestheticRules": [

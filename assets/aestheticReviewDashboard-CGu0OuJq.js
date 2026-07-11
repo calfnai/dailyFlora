@@ -21,6 +21,9 @@ import{S as m,H as b,D as v,P as F,W as $,a as y,V as S,f as k}from"./floraPrimi
               <article class="panel">
                 <h3>${t(a.name)}</h3>
                 <p>${t(a.brief)}</p>
+                <p><strong>状态：</strong>${t(a.status||"按需启用")}</p>
+                <p><strong>启用频率：</strong>${t(a.cadence||"任务需要时")}</p>
+                <p><strong>本次审计：</strong>${t(a.audit||"保留观察")}</p>
               </article>
             `).join("")}function M(e){document.querySelector("#primitive-grid").innerHTML=e.primitiveGate.map(a=>{const r=a.ownerStatus?`<p><strong>用户判定：</strong>${t(a.ownerStatus)}</p>`:"",s=a.ownerFeedback?`<p><strong>反馈口径：</strong>${t(a.ownerFeedback)}</p>`:"",i=a.ownerAcceptance?`<p><strong>验收结论：</strong>${t(a.ownerAcceptance)}</p>`:"";return`
                 <article class="panel">
@@ -142,4 +145,4 @@ import{S as m,H as b,D as v,P as F,W as $,a as y,V as S,f as k}from"./floraPrimi
                 ${r}
               </button>
             `).join("")}function U(){const e=Array.from(document.querySelectorAll(".filter-button")),a=Array.from(document.querySelectorAll(".group-card")),r=document.querySelector("#empty");e.forEach(s=>{s.addEventListener("click",()=>{const i=s.dataset.filter;e.forEach(l=>l.setAttribute("aria-pressed",String(l===s)));let o=0;a.forEach(l=>{const n=i==="all"||l.dataset.status===i||l.dataset.kind===i;l.classList.toggle("is-hidden",!n),n&&(o+=1)}),r.hidden=o>0})})}R().then(e=>{D(e),H(e),j(e),q(e),G(e),A(e),N(),g(),M(e),O(e),E(),U()});
-//# sourceMappingURL=aestheticReviewDashboard-XlMNi-Dm.js.map
+//# sourceMappingURL=aestheticReviewDashboard-CGu0OuJq.js.map
