@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-03",
+  "updatedAt": "2026-07-12",
   "gate": {
     "status": "pass",
     "title": "0.14 审美基线通过",
@@ -22,6 +22,10 @@
         "href": "./primitive-lab.html"
       },
       {
+        "label": "偏写实花型 LAB",
+        "href": "./realistic-flower-lab.html"
+      },
+      {
         "label": "花束库",
         "href": "./dailyflora-flower-plan-samples.html"
       },
@@ -42,6 +46,58 @@
         "href": "./aesthetic-rating-board.md"
       }
     ]
+  },
+  "dailyBouquetCorrections": [
+    {
+      "date": "2026-07-07",
+      "name": "星点果汁风车",
+      "status": "needs-owner-review",
+      "ownerFeedback": "中心铺得太满，缺少星星点点和缤纷感，整体像一坨球形花头，脱离中国主流审美。",
+      "correction": "降低总花量、中心主花与低位簇花的权重和尺寸；提高小花、果点、枝线、闪点与径向留白，让轮廓从密球改成有空气的多色节奏。",
+      "url": "../?date=2026-07-07&render=high&density=medium"
+    },
+    {
+      "date": "2026-07-11",
+      "name": "紫雾游枝",
+      "status": "needs-owner-review",
+      "ownerFeedback": "穗状花角度过于统一、长度不合理，在半空出现且没有花茎连接；各枝走向也不像来自同一个花瓶。",
+      "correction": "缩短并下沉穗花、降低重复线花权重；所有穗花从共同扎口推导轴线，并以连续实体花茎连接扎口和花穗底部。",
+      "url": "../?date=2026-07-11&render=high&density=medium"
+    }
+  ],
+  "primitiveLabConcreteExpansion": {
+    "updatedAt": "2026-07-12",
+    "summary": "用户确认偏写实花型是扩充生成花库的有趣方向；将截图之外的 16 种具体单花加入 Primitive Lab，共享同一个 WebGL 画布。",
+    "included": [
+      "雏菊",
+      "洋甘菊",
+      "非洲菊",
+      "太阳花",
+      "银莲花",
+      "波斯菊",
+      "大丽花",
+      "玫瑰",
+      "花毛茛",
+      "山茶",
+      "牡丹",
+      "乒乓菊",
+      "郁金香",
+      "洋水仙",
+      "蝴蝶兰",
+      "马蹄莲"
+    ],
+    "heldForRevision": [
+      "飞燕草",
+      "金鱼草",
+      "风信子",
+      "狐尾百合",
+      "蛇鞭菊",
+      "蕾丝花",
+      "绣球",
+      "满天星",
+      "米花"
+    ],
+    "ownerAcceptance": "16 种具体单花可以进入 Primitive Lab；截图中的 9 种穗状与簇状花先不加入，后续再讨论修改。"
   },
   "roles": [
     {
@@ -90,106 +146,180 @@
         "全是花、没有绿色缓冲，画面变腻。"
       ],
       "ownerAcceptance": "由用户最终验收；Codex 只能整理证据和提出修正，不能替用户宣布叶材审美通过。"
+    },
+    {
+      "id": "exclude-lisianthus",
+      "title": "明确排除洋桔梗",
+      "summary": "用户明确表示个人特别讨厌洋桔梗；它不进入偏写实花型 LAB，也不作为玫瑰型或柔软团花的默认参考。",
+      "principles": [
+        "25 种偏写实花型名单由原 26 种删除洋桔梗后形成。",
+        "未来花型和花束计划不主动使用洋桔梗。"
+      ],
+      "rejectSignals": [
+        "把洋桔梗重新混回玫瑰型示例。",
+        "用洋桔梗补柔软团花而未获用户明确同意。"
+      ],
+      "ownerAcceptance": "用户明确排除。"
     }
   ],
   "targetShapeVocabulary": [
     {
       "id": "disk-face-flower",
       "name": "盘状花",
+      "englishName": "Disk / Face Flower",
       "examples": "雏菊、洋甘菊、非洲菊、太阳花感、银莲花/波斯菊感",
       "whyNeeded": "承担清楚的脸盘识别和明亮停顿。"
     },
     {
       "id": "cosmos-open-face",
       "name": "波斯菊/小面花型",
+      "englishName": "Cosmos Open-Face Flower",
       "examples": "波斯菊、山岗小花里的薄瓣小面花、热带丛林里的轻薄小花、真实春日花束里的白色开面花",
       "whyNeeded": "它比盘状花更轻薄、更少瓣、更像小花矩阵的呼吸点；山岗小花和热带丛林好看的部分不能继续藏在 chamomile/disk 下面。"
     },
     {
       "id": "layered-dahlia-form",
       "name": "层叠大丽花/团瓣型",
+      "englishName": "Layered Dahlia Form",
       "examples": "大丽花、层层放射的浅粉团瓣、其他正面参考2里的大花头",
       "whyNeeded": "承担层层展开、饱满但不玫瑰化的大型团瓣主花。"
     },
     {
       "id": "ruffled-rose-form",
       "name": "褶皱玫瑰型",
-      "examples": "更接近玫瑰、洋桔梗、皱边轻软花头",
+      "englishName": "Ruffled Rose Form",
+      "examples": "更接近玫瑰的内卷、皱边轻软花头",
       "whyNeeded": "承担比层叠大丽花更内卷、更柔软、更玫瑰感的花头。"
     },
     {
       "id": "star-pinwheel-form",
       "name": "星形/风车型",
+      "englishName": "Star / Pinwheel Flower",
       "examples": "长窄瓣放射花、夏日风车参考里的橙色星形花",
       "whyNeeded": "对应夏日风车、多色花束里的放射局部记忆点。"
     },
     {
       "id": "tulip-cup-form",
       "name": "郁金香/杯型",
+      "englishName": "Tulip / Cup Form",
       "examples": "郁金香、半闭合杯状花、柔软杯形花苞",
       "whyNeeded": "表达半开、含蓄、杯状体积，避免所有开口花都摊平。"
     },
     {
       "id": "trumpet-throat-form",
       "name": "洋水仙管心型",
+      "englishName": "Narcissus Trumpet-Throat Form",
       "examples": "洋水仙、带 trumpet center 的白黄季节花",
       "whyNeeded": "洋水仙季节不能只靠白黄配色，必须有管心识别。"
     },
     {
       "id": "datura-trumpet-form",
       "name": "大喇叭型",
+      "englishName": "Datura Trumpet Form",
       "examples": "Datura / devil's trumpet 这类大喇叭、深喉部、外翻口缘花",
       "whyNeeded": "它和洋水仙小管心不是同一类，应该单独表达大喇叭体积和深喉部。"
     },
     {
       "id": "orchid-butterfly-form",
       "name": "兰花/蝴蝶型",
+      "englishName": "Orchid / Butterfly Form",
       "examples": "蝴蝶兰、蝴蝶形不对称开口花",
       "whyNeeded": "承担不对称、轻盈、飘逸的雕塑花局部。"
     },
     {
       "id": "calla-curled-bract",
       "name": "马蹄莲/卷曲苞片型",
+      "englishName": "Calla Curled-Bract Form",
       "examples": "马蹄莲、单片包裹、卷曲苞片、曲线雕塑花",
       "whyNeeded": "对应会呼吸的风景等参考里的曲线植物形态。"
     },
     {
       "id": "spike-vertical-form",
       "name": "穗状花",
+      "englishName": "Spike / Vertical Flower",
       "examples": "飞燕草、金鱼草、风信子、狐尾百合、蛇鞭菊",
       "whyNeeded": "提供竖向节奏、高度和空间方向。"
     },
     {
       "id": "umbel-mini-cluster",
       "name": "伞状/小簇型",
+      "englishName": "Umbel / Mini-Cluster Form",
       "examples": "蕾丝花、伞形小花、白色填充小簇",
       "whyNeeded": "补足小白花、米花、伞状填充，不应全归为空气点。"
     },
     {
       "id": "hydrangea-cloud-cluster",
       "name": "绣球/云团型",
+      "englishName": "Hydrangea Cloud Cluster",
       "examples": "绣球、绿色云团、小花面团、密集云状簇",
       "whyNeeded": "承担成片簇团和柔软体积，不等同于小簇填充。"
     },
     {
       "id": "fruit-pod-form",
       "name": "果材/荚果型",
+      "englishName": "Fruit / Pod Form",
       "examples": "蓝莓感浆果、小圆果、荚果、枝端果粒",
       "whyNeeded": "对应蓝莓、浆果森林和枝端果粒，不等于吊下来的风铃果。"
     },
     {
       "id": "hanging-bell-fruit",
       "name": "吊坠风铃果型",
+      "englishName": "Hanging Bell Fruit",
       "examples": "夏日风车第5张里的橙色吊坠果/风铃果",
       "whyNeeded": "补足向下悬挂、灯笼状、风铃状果材，这是普通浆果/荚果无法概括的形态。"
     },
     {
       "id": "foliage-grass-branch",
       "name": "叶材/草线/枝条型",
+      "englishName": "Foliage / Grass / Branch Form",
       "examples": "长叶、蕨叶、草线、藤线、黑枝、外逸线、绿色支撑材料",
       "whyNeeded": "叶材与绿色部分是空间、层次、春意和饱和度缓冲的关键，不是背景噪声。"
     }
   ],
+  "candidateShapeVocabulary": [
+    {
+      "id": "frilled-narcissus-corona",
+      "name": "褶边副冠水仙型",
+      "englishName": "Frilled Narcissus Corona Flower",
+      "primitive": "FrilledNarcissusFlower",
+      "status": "needs-owner-review",
+      "source": "2026-07-05 trumpet-throat v1/v3 realism experiment",
+      "examples": "六片略向后反折的花被、明显杯状副冠、波浪褶边、深喉、可见花蕊和背部绿色连接点",
+      "whyNeeded": "保留 v1/v3 被认可的正面基准，并把 cup/corona 的深度、褶边和花蕊做成真正可旋转的 3D 结构；它必须与简化洋水仙管心型和 Datura 大喇叭型明显不同。",
+      "acceptance": "正面应先读成六片花被围绕褶边副冠；侧面能看出副冠突出与深喉，但不能变成单纯喇叭。360° 旋转时花瓣、褶边、花蕊和绿色连接点都应连续成立。",
+      "ownerNote": "先作为候选花型完善；只有用户确认它真的做得很好，才把正式花库从 16 类扩为 17 类。"
+    },
+    {
+      "id": "orbital-pulse-flower",
+      "name": "星环脉冲花型",
+      "englishName": "Orbital Pulse Flower",
+      "primitive": "OrbitalPulseFlower",
+      "status": "liked-color-control",
+      "source": "2026-07-12 realistic-skeleton palette-control experiment",
+      "examples": "中心能量核、双层放射花瓣、两组实体星环、光脉花蕊和背部生命连接点",
+      "whyNeeded": "作为写实花朵骨架叠加非现实配色的对照组，帮助区分科幻感究竟来自形态还是来自颜色。",
+      "acceptance": "正面应先读成花而不是机械徽章；星环必须通过实体辐条连接花心，侧面能看出能量核、轨道倾角、花蕊高度和背部连接点。360° 旋转时不能出现漂浮圆环。",
+      "ownerNote": "用户很喜欢这朵花，但明确指出它的结构仍然写实，只是使用了科幻配色；保留为配色对照，不能代表真正的科幻形态。"
+    }
+  ],
+  "sciFiFlowerExperiment": {
+    "updatedAt": "2026-07-12",
+    "title": "科幻花型 LAB · 用户配色版",
+    "hypothesis": "真正的科幻花型必须在灰模状态下仍然显得非现实；配色是可由用户独立控制的第二层变量。",
+    "control": "星环脉冲花：用户喜欢，但归类为写实骨架 × 非现实配色。",
+    "morphologyTests": [
+      "莫比乌斯翻面花：连续单面花瓣环。",
+      "递归裂枝花：花瓣在生长途中反复分叉。",
+      "相位折叠花：同一花瓣穿过前后两个相位平面。",
+      "奇点内向花：花瓣围绕中心奇点向内生长。"
+    ],
+    "paletteUi": [
+      "一键配色预设",
+      "随机配色",
+      "主色、辅色、能量色、节点色、生命基座五个用户色选项"
+    ],
+    "ownerAcceptance": "作为重点测试项目；如果 UI 调色效果好，再纳入主体项目。"
+  },
   "primitiveGate": [
     {
       "primitive": "DiskFlower",
@@ -223,7 +353,7 @@
       "primitive": "RuffledRoseFlower",
       "humanName": "褶皱玫瑰型",
       "status": "pass",
-      "acceptance": "隐藏标签后应读成更内卷、更柔软、更接近玫瑰/洋桔梗的花头。",
+      "acceptance": "隐藏标签后应读成更内卷、更柔软、更接近玫瑰的花头。",
       "ownerStatus": "3 与 2 更像了：需要拆分",
       "ownerFeedback": "2 和 3 看起来简直一样，3 应继续承担更玫瑰、更内卷、更柔软的方向。",
       "nextTask": "已改为宽瓣、内卷、柔软褶皱玫瑰方向，已达到花库及格线；下一步用于 composition 改造验证。",

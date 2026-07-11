@@ -1,7 +1,7 @@
 import './styles.css';
 import type { DensityName, RenderQualityName } from './types';
 import { todayKey } from './random';
-import { createDailySpec, readParams } from './spec';
+import { bouquetDisplayName, createDailySpec, readParams } from './spec';
 import { resolveQuality } from './quality';
 import { BouquetScene } from './bouquetScene';
 import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
@@ -286,8 +286,8 @@ function sliderToSpeed(value: string) {
 }
 
 function bouquetHoverTitle() {
-  const english = themeEnglishNames[spec.theme.id] || spec.theme.id;
-  return `${spec.theme.name} / ${english}`;
+  const name = bouquetDisplayName(spec);
+  return `${name.cn} / ${name.en}`;
 }
 
 function themeEnglishName() {
@@ -343,13 +343,14 @@ function currentFavorite() {
 }
 
 function createFavorite(): FavoriteBouquet {
+  const name = bouquetDisplayName(spec);
   return {
     id: currentFavoriteId(),
     date: spec.dateLabel,
     seed: spec.seed,
     themeId: spec.theme.id,
-    themeName: spec.theme.name,
-    themeEnglishName: themeEnglishName(),
+    themeName: name.cn,
+    themeEnglishName: name.en,
     flowerPlanName: spec.flowerPlan.cnName,
     flowers: flowerPlanText(),
     savedAt: new Date().toISOString()
@@ -594,11 +595,11 @@ function renderAccountState() {
 }
 
 function setLabels() {
-  const english = themeEnglishName();
+  const name = bouquetDisplayName(spec);
   ui.dateLabel.textContent = spec.dateLabel;
-  ui.themeCnLabel.textContent = spec.theme.name;
-  ui.themeEnLabel.textContent = english;
-  ui.flowerPlanLabel.textContent = `${spec.flowerPlan.cnName} · ${flowerPlanText()}`;
+  ui.themeCnLabel.textContent = name.cn;
+  ui.themeEnLabel.textContent = name.en;
+  ui.flowerPlanLabel.textContent = `${spec.theme.name} · ${spec.flowerPlan.cnName} · ${flowerPlanText()}`;
   ui.flowerPlanLabel.title = `${spec.flowerPlan.reference}\n${spec.flowerPlan.silhouette}\n避免：${spec.flowerPlan.avoid}`;
   if (datePicker) datePicker.value = spec.dateLabel;
   ui.themeLabel.title = bouquetHoverTitle();
@@ -609,7 +610,7 @@ function setLabels() {
   const renderLabel =
     selectedRender === 'auto' ? `自/${renderLabels[quality.renderName]}` : renderLabels[quality.renderName];
   ui.qualityLabel.textContent = `${densityLabels[quality.densityName]} · ${renderLabel}`;
-  document.title = `DailyFlora - ${spec.theme.name} / ${english}`;
+  document.title = `DailyFlora - ${name.cn} / ${name.en}`;
   if (!calendarPanel.hidden) {
     renderCalendar();
     positionCalendarPanel();

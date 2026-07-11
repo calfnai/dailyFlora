@@ -3,211 +3,325 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DailyFlora Primitive Lab</title>
+    <title>DailyFlora Primitive Lab · 34 项花型词表</title>
     <style>
       :root {
         color-scheme: dark;
-        --bg: #070907;
-        --text: #f8f0df;
-        --muted: rgb(248 240 223 / 68%);
-        --line: rgb(248 240 223 / 16%);
-        --panel: rgb(12 17 12 / 86%);
+        --bg: #080a07;
+        --text: #f7f0e3;
+        --muted: rgb(247 240 227 / 68%);
+        --line: rgb(247 240 227 / 15%);
+        --good: #87d486;
+        --warn: #f2cb62;
       }
 
-      * {
-        box-sizing: border-box;
-      }
-
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
       body {
         margin: 0;
         min-height: 100vh;
-        overflow: hidden;
         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         color: var(--text);
         background:
-          radial-gradient(circle at 12% 0%, rgb(255 210 94 / 12%), transparent 28%),
-          radial-gradient(circle at 88% 12%, rgb(105 184 143 / 10%), transparent 30%),
-          var(--bg);
+          radial-gradient(circle at 12% 0%, rgb(242 203 98 / 13%), transparent 28%),
+          radial-gradient(circle at 88% 8%, rgb(135 212 134 / 10%), transparent 26%),
+          linear-gradient(180deg, #080a07, #0d110c 58%, #080a07);
       }
+
+      button, a { font: inherit; }
+      a { color: inherit; }
+      h1, h2, h3, p { margin-top: 0; }
 
       .shell {
-        display: grid;
-        grid-template-rows: auto 1fr;
-        width: 100vw;
-        height: 100vh;
+        width: min(1480px, 100%);
+        margin: 0 auto;
+        padding: 24px;
       }
 
-      header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 18px 22px 12px;
-        border-bottom: 1px solid var(--line);
-        background: linear-gradient(180deg, rgb(7 9 7 / 92%), rgb(7 9 7 / 64%));
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+        gap: 24px;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: linear-gradient(145deg, rgb(16 21 15 / 96%), rgb(25 32 23 / 84%));
+      }
+
+      .eyebrow {
+        margin-bottom: 10px;
+        color: var(--warn);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
       }
 
       h1 {
-        margin: 0;
-        font-size: clamp(20px, 2.5vw, 34px);
-        letter-spacing: 0;
+        max-width: 13ch;
+        margin-bottom: 14px;
+        font-size: clamp(38px, 6vw, 78px);
+        line-height: 0.98;
+        letter-spacing: -0.045em;
       }
 
-      p {
-        max-width: 76ch;
-        margin: 6px 0 0;
+      .hero-copy, .section-copy {
+        max-width: 82ch;
+        margin-bottom: 0;
         color: var(--muted);
-        line-height: 1.5;
-        font-size: 14px;
+        font-size: 15px;
+        line-height: 1.72;
       }
 
-      .tools {
+      .hero-side {
+        display: grid;
+        align-content: space-between;
+        gap: 20px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgb(8 10 7 / 48%);
+      }
+
+      .hero-number {
+        color: var(--good);
+        font-size: clamp(58px, 8vw, 108px);
+        font-weight: 800;
+        line-height: 0.85;
+      }
+
+      .hero-number small {
+        color: var(--warn);
+        font-size: 0.28em;
+      }
+
+      .hero-side strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 18px;
+      }
+
+      .link-row, .tools {
         display: flex;
-        align-items: center;
-        justify-content: flex-end;
         flex-wrap: wrap;
         gap: 8px;
-        max-width: 520px;
       }
 
-      button,
-      select,
-      output {
-        flex: 0 0 auto;
-        min-height: 36px;
+      .pill, button, output {
+        display: inline-flex;
+        min-height: 38px;
+        align-items: center;
+        justify-content: center;
         padding: 0 13px;
         border: 1px solid var(--line);
-        border-radius: 8px;
+        border-radius: 999px;
         color: var(--text);
-        background: var(--panel);
-        font: inherit;
+        background: rgb(16 21 15 / 88%);
         font-size: 13px;
+        text-decoration: none;
       }
 
-      button,
-      select {
-        cursor: pointer;
+      button { cursor: pointer; }
+      button:hover, button[aria-pressed="true"], .pill:hover {
+        border-color: rgb(242 203 98 / 58%);
+        background: rgb(242 203 98 / 12%);
       }
 
       output {
-        display: inline-flex;
-        align-items: center;
         color: var(--muted);
         font-variant-numeric: tabular-nums;
       }
 
-      #primitive-review {
-        position: absolute;
-        top: 18px;
-        left: 18px;
-        z-index: 2;
-        max-width: min(380px, calc(100% - 36px));
-        padding: 12px 14px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: rgb(8 11 8 / 78%);
-        color: var(--text);
-        pointer-events: none;
+      .lab-section { margin-top: 24px; }
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 14px;
       }
 
-      #primitive-review strong {
-        display: block;
-        margin-bottom: 4px;
-        font-size: 13px;
+      .section-head h2 {
+        margin-bottom: 8px;
+        font-size: clamp(28px, 3vw, 44px);
+        line-height: 1.06;
       }
 
-      #primitive-review span {
-        display: block;
-        color: var(--muted);
-        font-size: 12px;
-        line-height: 1.5;
+      .tools {
+        position: sticky;
+        top: 10px;
+        z-index: 20;
+        align-items: center;
+        justify-content: flex-end;
+        max-width: 760px;
+        padding: 10px;
+        background: rgb(8 10 7 / 88%);
+        backdrop-filter: blur(18px);
       }
 
-      .stage {
+      .gallery-stage {
         position: relative;
-        min-height: 0;
+        min-height: 1400px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background:
+          radial-gradient(circle at 50% 0%, rgb(247 240 227 / 7%), transparent 32%),
+          linear-gradient(180deg, rgb(16 21 15 / 88%), rgb(8 10 7 / 82%));
       }
 
       #primitive-canvas {
+        position: absolute;
+        inset: 0;
         display: block;
         width: 100%;
         height: 100%;
         cursor: grab;
+        touch-action: none;
       }
 
-      #primitive-canvas:active {
-        cursor: grabbing;
-      }
+      #primitive-canvas:active { cursor: grabbing; }
 
-      #primitive-labels {
+      .shape-labels {
         position: absolute;
-        inset: auto 24px 24px;
+        inset: 0;
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 10px;
         pointer-events: none;
       }
 
-      .primitive-label {
+      .shape-cell {
+        position: relative;
         min-width: 0;
-        padding: 8px 10px;
+        border-right: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .shape-cell.is-candidate {
+        background: linear-gradient(135deg, rgb(242 203 98 / 8%), transparent 55%);
+      }
+
+      .shape-cell.is-concrete {
+        background: linear-gradient(135deg, rgb(135 212 134 / 7%), transparent 56%);
+      }
+
+      .shape-copy {
+        position: absolute;
+        top: 50%;
+        right: 14px;
+        width: 44%;
+        transform: translateY(-50%);
+        padding: 11px 12px;
         border: 1px solid var(--line);
-        border-radius: 8px;
-        color: rgb(248 240 223 / 86%);
-        background: rgb(8 11 8 / 72%);
-        text-align: center;
+        border-radius: 10px;
+        background: rgb(8 10 7 / 76%);
+        backdrop-filter: blur(10px);
+      }
+
+      .shape-index {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+      }
+
+      .shape-status { color: var(--good); }
+      .is-candidate .shape-status { color: var(--warn); }
+
+      .shape-copy h3 {
+        margin-bottom: 4px;
+        font-size: 17px;
+        line-height: 1.2;
+      }
+
+      .shape-english {
+        margin-bottom: 8px;
+        color: var(--warn);
         font-size: 12px;
-        overflow-wrap: anywhere;
+        font-weight: 700;
+        line-height: 1.35;
       }
 
-      #primitive-labels.is-hidden {
-        display: none;
+      .shape-description {
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.52;
       }
 
-      @media (max-width: 720px) {
-        body {
-          overflow: auto;
-        }
+      .stage-note {
+        position: absolute;
+        right: 14px;
+        bottom: 12px;
+        z-index: 3;
+        color: rgb(247 240 227 / 48%);
+        font-size: 10px;
+        pointer-events: none;
+      }
 
-        .shell {
-          min-height: 100vh;
-          height: 760px;
-        }
+      @media (max-width: 1040px) {
+        .hero { grid-template-columns: 1fr; }
+        .section-head { align-items: stretch; flex-direction: column; }
+        .tools { position: static; justify-content: flex-start; }
+      }
 
-        header {
-          align-items: flex-start;
-          flex-direction: column;
-        }
-
-        #primitive-labels {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          inset: auto 12px 12px;
-        }
+      @media (max-width: 680px) {
+        .shell { padding: 14px; }
+        .hero { padding: 20px; }
+        .shape-copy { width: 48%; right: 8px; padding: 9px; }
+        .shape-copy h3 { font-size: 15px; }
+        .shape-description { font-size: 10px; }
       }
     </style>
   </head>
   <body>
     <main class="shell">
-      <header>
+      <header class="hero">
         <div>
-          <h1>DailyFlora Primitive Lab</h1>
-          <p>16 类花材/叶材 primitive 已达到本轮花库验收及格线。CosmosOpenFlower 已从山岗小花/热带丛林经验中补登记；后续主视觉修改仍要同步 dashboard。</p>
+          <p class="eyebrow">Target shape vocabulary · Primitive Lab</p>
+          <h1>花型词表 · 34 项</h1>
+          <p class="hero-copy">16 类抽象目标形态、16 种具体单花，加上 trumpet-throat 候选与星环配色对照，共 34 项放在同一个 3D 花库画布里。真正的结构科幻花型移到独立科幻 LAB 测试。</p>
         </div>
-        <div class="tools" aria-label="Primitive lab controls">
-          <select id="isolate-primitive" aria-label="Isolate primitive"></select>
-          <button type="button" data-view="front">正面</button>
-          <button type="button" data-view="side">侧面</button>
-          <button type="button" data-view="top">顶视</button>
-          <button id="silhouette-button" type="button" aria-pressed="false">轮廓</button>
-          <button id="grid-button" type="button" aria-pressed="true">网格</button>
-          <button id="toggle-labels" type="button" aria-pressed="false">标签</button>
-          <output id="primitive-stats" aria-label="Performance stats">draw 0 · tri 0 · pts 0</output>
-        </div>
+        <aside class="hero-side">
+          <div>
+            <div class="hero-number">34 <small>one canvas</small></div>
+            <strong>16 抽象类 + 16 具象花型 + 2 候选</strong>
+            <p class="hero-copy">星环脉冲花已归为“写实骨架 × 非现实配色”对照；截图中的 9 种穗状和簇状偏写实花型仍不并入，等待后续单独讨论修改。</p>
+          </div>
+          <div class="link-row">
+            <a class="pill" href="./aesthetic-review-dashboard.html?debug=1">返回审美 Dashboard</a>
+            <a class="pill" href="./dailyflora-reference-gallery.html">查看参考图库</a>
+            <a class="pill" href="./scifi-flower-lab.html">科幻花型与配色测试</a>
+          </div>
+        </aside>
       </header>
-      <section class="stage" aria-label="Floral primitive test scene">
-        <canvas id="primitive-canvas"></canvas>
-        <div id="primitive-review" aria-live="polite"></div>
-        <div id="primitive-labels"></div>
+
+      <section class="lab-section" aria-labelledby="shape-list-title">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">One canvas · thirty-four flower forms</p>
+            <h2 id="shape-list-title">在一个大框里看完整花库</h2>
+            <p class="section-copy">拖动某一朵花所在区域可单独旋转。下方工具统一切换观察角度、轮廓、网格和自动旋转。</p>
+          </div>
+          <div class="tools" aria-label="Primitive lab controls">
+            <button type="button" data-view="front" aria-pressed="true">正面</button>
+            <button type="button" data-view="side" aria-pressed="false">侧面</button>
+            <button type="button" data-view="top" aria-pressed="false">顶视</button>
+            <button id="silhouette-button" type="button" aria-pressed="false">轮廓</button>
+            <button id="grid-button" type="button" aria-pressed="true">网格</button>
+            <button id="rotate-button" type="button" aria-pressed="true">自动旋转</button>
+            <output id="primitive-stats" aria-label="Performance stats">载入 34 个模型…</output>
+          </div>
+        </div>
+        <div class="gallery-stage" id="gallery-stage">
+          <canvas id="primitive-canvas" aria-label="DailyFlora 16 类抽象花型、16 种具象单花和 2 个候选花型 3D 总览"></canvas>
+          <div class="shape-labels" id="shape-labels"></div>
+          <span class="stage-note">拖动花朵区域旋转 · drag a flower area to rotate</span>
+        </div>
       </section>
     </main>
     <script type="module" src="/src/primitiveLab.ts"></script>

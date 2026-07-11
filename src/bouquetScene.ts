@@ -618,6 +618,36 @@ function spikeLeanRange(placement: FlowerPlanItem['placement']): [number, number
   return [0.1, 0.32];
 }
 
+const bouquetTiePoint = new THREE.Vector3(0, -0.98, 0);
+
+function buildSpikeStemConnector(
+  spec: DailyBouquetSpec,
+  spike: THREE.Group,
+  rng: ReturnType<typeof createRng>
+) {
+  spike.updateMatrix();
+  const spikeBase = new THREE.Vector3(0, -0.98, 0).applyMatrix4(spike.matrix);
+  const tie = bouquetTiePoint.clone().add(new THREE.Vector3(rng.range(-0.06, 0.06), 0, rng.range(-0.06, 0.06)));
+  const lower = tie.clone().lerp(spikeBase, 0.38);
+  lower.x *= 0.56;
+  lower.z *= 0.56;
+  const upper = tie.clone().lerp(spikeBase, 0.76);
+  upper.x *= 0.88;
+  upper.z *= 0.88;
+  const curve = new THREE.CatmullRomCurve3([tie, lower, upper, spikeBase]);
+  const geometry = new THREE.TubeGeometry(curve, 10, 0.009, 5, false);
+  const material = new THREE.MeshStandardMaterial({
+    color: spec.theme.stem,
+    roughness: 0.92,
+    metalness: 0,
+    transparent: true,
+    opacity: 0.72
+  });
+  const stem = new THREE.Mesh(geometry, material);
+  stem.name = 'SpikeFlower:connected-stem';
+  return stem;
+}
+
 function primitivePalette(
   spec: DailyBouquetSpec,
   primitive: FloraPrimitiveName,
@@ -703,18 +733,10 @@ function orientPrimitiveGroup(
 
   if (primitive === 'SpikeFlower') {
     const [minLean, maxLean] = spikeLeanRange(placement);
-    const lean = rng.range(minLean, maxLean);
-    const radial = new THREE.Vector3(point.x, 0, point.z);
-    if (radial.lengthSq() < 0.0001) radial.set(Math.cos(theta), 0, Math.sin(theta));
-    radial.normalize();
-    const side = new THREE.Vector3(-radial.z, 0, radial.x).multiplyScalar(rng.range(-0.42, 0.42));
-    const openBias = rng.value() < 0.86 ? rng.range(0.82, 1.2) : rng.range(0.28, 0.62);
-    const horizontal = radial.multiplyScalar(openBias).add(side).normalize().multiplyScalar(lean);
-    const target = new THREE.Vector3(
-      horizontal.x,
-      rng.range(0.92, 1.14),
-      horizontal.z
-    ).normalize();
+    const target = point.clone().sub(bouquetTiePoint).normalize();
+    const tangent = new THREE.Vector3(-target.z, 0, target.x).normalize();
+    const leanVariation = rng.range(minLean, maxLean) * rng.range(-0.28, 0.28);
+    target.addScaledVector(tangent, leanVariation).normalize();
     group.quaternion.setFromUnitVectors(up, target);
     group.rotateY(rng.range(-Math.PI, Math.PI));
     return;
@@ -741,10 +763,14 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
   const count = Math.max(64, Math.floor(plannedCount * (spec.special ? specialPrimitiveRatio : 0.34)));
   const group = new THREE.Group();
   const batches = spec.flowerPlan.items;
+  const roleShares = spec.compositionTuning?.roleShare;
+  const weightedShares = batches.map((batch) => batch.share * (roleShares?.[batch.role] ?? 1));
+  const shareTotal = weightedShares.reduce((sum, share) => sum + share, 0) || 1;
   let used = 0;
 
   batches.forEach((batch, index) => {
-    const batchCount = index === batches.length - 1 ? count - used : Math.max(1, Math.floor(count * batch.share));
+    const adjustedShare = weightedShares[index] / shareTotal;
+    const batchCount = index === batches.length - 1 ? count - used : Math.max(1, Math.floor(count * adjustedShare));
     used += batchCount;
     const primitive = primitiveForPlanItem(batch, spec.flowerPlan.id);
     const factory = floraPrimitiveFactories[primitive];
@@ -752,7 +778,10 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
 
     for (let i = 0; i < batchCount; i += 1) {
       const { p, theta } = placementPoint(spec, localRng, batch.placement);
-      if (primitive === 'SpikeFlower') settleSpikeAnchor(p, batch.placement, localRng);
+      if (primitive === 'SpikeFlower') {
+        settleSpikeAnchor(p, batch.placement, localRng);
+        p.y += spec.compositionTuning?.spikeAnchorLift ?? 0;
+      }
       const roleScale =
         batch.role === 'main' ? 0.26 :
         batch.role === 'line' ? 0.25 :
@@ -762,10 +791,12 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
         0.21;
       const bloom = spec.special?.bloomScale;
       const specialScale = bloom ? localRng.range(bloom.small, bloom.medium) * 0.52 : 1;
+      const tuningScale = spec.compositionTuning?.roleScale?.[batch.role] ?? 1;
+      const spikeScale = primitive === 'SpikeFlower' ? spec.compositionTuning?.spikeScale ?? 1 : 1;
       const primitiveGroup = factory({
         seed: `${spec.seed}:bouquet-primitive:${primitive}:${batch.typeId}:${i}`,
         position: p,
-        scale: roleScale * batch.scale * compositionScaleForPrimitive(primitive) * localRng.range(0.82, 1.22) * specialScale,
+        scale: roleScale * batch.scale * compositionScaleForPrimitive(primitive) * localRng.range(0.82, 1.22) * specialScale * tuningScale * spikeScale,
         colorPalette: primitivePalette(spec, primitive, localRng, batch),
         openness: ['OrchidButterflyFlower', 'TrumpetThroatFlower', 'DaturaTrumpetFlower', 'CallaCurledBract'].includes(primitive) ? 0.94 : localRng.range(0.62, 0.86),
         density: ['UmbelMiniCluster', 'FullHydrangeaCloud', 'FruitPodCluster'].includes(primitive) ? 1.08 : localRng.range(0.86, 1.02),
@@ -775,6 +806,7 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
       primitiveGroup.name = `${primitive}:${batch.cn}`;
       orientPrimitiveGroup(primitiveGroup, primitive, p, theta, localRng, batch.placement);
       group.add(primitiveGroup);
+      if (primitive === 'SpikeFlower') group.add(buildSpikeStemConnector(spec, primitiveGroup, localRng));
     }
   });
 
@@ -836,6 +868,10 @@ function placementPoint(
   const [radiusMin, radiusMax] = radiusRanges[placement];
   const [heightMin, heightMax] = heightRanges[placement];
   const p = bouquetPoint(spec, rng.range(radiusMin, radiusMax), rng.range(heightMin, heightMax), theta, rng.range(phiMin, phiMax));
+  const radialSpread = spec.compositionTuning?.radialSpread ?? 1;
+  const placementSpread = placement === 'center' ? spec.compositionTuning?.centerSpread ?? 1 : 1;
+  p.x *= radialSpread * placementSpread;
+  p.z *= radialSpread * placementSpread;
   const liftRanges: Record<FlowerPlanItem['placement'], [number, number]> = {
     center: [-0.18, 0.24],
     outer: [-0.24, 0.34],

@@ -139,6 +139,14 @@ export interface DailyBouquetSpec {
   asymmetry: number;
   haloLift: number;
   flowerPlan: FlowerPlan;
+  compositionTuning?: {
+    radialSpread?: number;
+    centerSpread?: number;
+    spikeScale?: number;
+    spikeAnchorLift?: number;
+    roleShare?: Partial<Record<FlowerPlanRole, number>>;
+    roleScale?: Partial<Record<FlowerPlanRole, number>>;
+  };
   special?: SpecialBouquetReference;
 }
 

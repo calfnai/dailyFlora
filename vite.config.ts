@@ -53,6 +53,8 @@ export default defineConfig({
         flowerPlanSamples: resolve(__dirname, 'docs/dailyflora-flower-plan-samples.html'),
         aestheticReviewDashboard: resolve(__dirname, 'docs/aesthetic-review-dashboard.html'),
         primitiveLab: resolve(__dirname, 'docs/primitive-lab.html'),
+        realisticFlowerLab: resolve(__dirname, 'docs/realistic-flower-lab.html'),
+        scifiFlowerLab: resolve(__dirname, 'docs/scifi-flower-lab.html'),
         avatarLab: resolve(__dirname, 'docs/avatar-lab.html')
       }
     }

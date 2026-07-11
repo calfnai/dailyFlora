@@ -1,5 +1,62 @@
 # DailyFlora Changelog
 
+## 0.14.9 - 2026-07-12
+
+Reworked the rejected July 7 and July 11 daily bouquets and made daily generation visible in the UI.
+
+- Replaced repeated theme-only headings with deterministic daily Chinese/English bouquet names carrying a visible date stamp; names remain distinct in sparse and low-power modes.
+- Rebalanced the default `2026-07-07` bouquet away from a dense central ball by reducing center/cluster weight and scale, increasing small-flower, fruit, line, branch, sparkle, and radial-air roles.
+- Rebuilt spike placement around one shared bouquet tie point: each spike direction now follows its physical path from the vase, with a visible curved stem connecting the tie point to the spike base.
+- Shortened, lowered, and reduced the repeated line-flower share for the default `2026-07-11` bouquet so spike lengths and angles no longer read as uniform floating AI artifacts.
+- Kept both corrections inside the default date-seed mechanism instead of creating or borrowing fixed bouquet URLs; owner acceptance remains pending.
+
+## 0.14.8 - 2026-07-12
+
+Separated science-fiction morphology from science-fiction color styling.
+
+- Reclassified `OrbitalPulseFlower` as a user-liked realistic-skeleton color control rather than a genuinely science-fiction morphology.
+- Added a separate Sci-Fi Flower Lab with four structural hypotheses: Möbius inversion, recursive bifurcation, phase-folded ribbons, and singularity-driven inward growth.
+- Added global one-click palette presets, random palettes, and five user-editable color roles while keeping every flower's geometry fixed.
+- Kept the experiment outside the main generator until the owner confirms that the palette UI and morphology tests are worth adopting.
+
+## 0.14.7 - 2026-07-12
+
+Started a third, science-fiction flower-form vocabulary.
+
+- Added `OrbitalPulseFlower / 星环脉冲花型` as a pending candidate with an emissive energy core, exaggerated radial petals, two connected orbital rings, pulse stamens, and a rear biological connection.
+- Kept every orbital ring physically connected to the flower core through solid spokes so the form reads as a living flower rather than floating decoration.
+- Expanded Primitive Lab from 33 to 34 displayed forms while retaining one shared WebGL canvas.
+- Kept the sci-fi form separate from the accepted 16 abstract classes and 16 concrete flower extensions until owner review.
+
+## 0.14.6 - 2026-07-12
+
+Expanded Primitive Lab with approved concrete single-flower forms.
+
+- Promoted 16 face, layered, and sculptural forms from the realistic lab into Primitive Lab as concrete vocabulary extensions.
+- Kept the five spike forms and four cluster forms shown in the user's screenshot out of Primitive Lab pending a separate revision discussion.
+- Expanded the shared Primitive Lab canvas from 17 to 33 displayed forms without adding another WebGL rendering context.
+- Preserved the original 16 abstract target shapes and the pending narcissus candidate as distinct statuses instead of replacing the compatibility vocabulary.
+
+## 0.14.5 - 2026-07-11
+
+Added a separate realistic flower-form lab and print-aware structural vocabulary.
+
+- Added 25 concrete flower forms in one shared 3D canvas, each with adjacent Chinese/English naming, identification notes, and physical-connection notes.
+- Explicitly removed lisianthus from the list and recorded it as a user-rejected default reference for future flower forms and bouquets.
+- Kept the new page separate from Primitive Lab so the accepted 16 abstract target shapes remain a stable compatibility vocabulary.
+- Built petals into receptacles, heads into stems, and clustered florets onto solid branches to avoid floating parts and prepare the forms for later 3D-print engineering.
+- Documented that sellable print files still require boolean union, minimum-wall, watertight/manifold, support, and print-orientation validation.
+
+## 0.14.4 - 2026-07-11
+
+Primitive Lab target-vocabulary redesign.
+
+- Rebuilt Primitive Lab as one large 3D flower-library canvas containing all 16 accepted shapes plus one pending candidate, with adjacent Chinese/English labels and short identification notes.
+- Kept a single WebGL renderer for the whole library instead of creating one rendering context per flower; future shapes can be added without repeating the per-card context limit problem.
+- Added `FrilledNarcissusFlower / 褶边副冠水仙型` as a pending candidate derived from the July 5 trumpet-throat v1/v3 direction: six reflexed tepals, a deep frilled corona, visible stamens, and a green rear connection.
+- Preserved lab inspection controls across the shared canvas: front/side/top views, silhouette mode, reference grid, auto-rotation, per-flower drag rotation, and aggregate geometry stats.
+- Added natural English names to the shared dashboard vocabulary data so Primitive Lab and the aesthetic dashboard read from the same bilingual source.
+
 ## 0.14.3 - 2026-07-08
 
 Fixed bouquet sample library 3D preview restoration.
