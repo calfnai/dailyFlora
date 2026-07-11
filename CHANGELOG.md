@@ -10,6 +10,7 @@ Reworked the rejected July 7 and July 11 daily bouquets and made daily generatio
 - Shortened, lowered, and reduced the repeated line-flower share for the default `2026-07-11` bouquet so spike lengths and angles no longer read as uniform floating AI artifacts.
 - Kept both corrections inside the default date-seed mechanism instead of creating or borrowing fixed bouquet URLs; owner acceptance remains pending.
 - Promoted the owner's feedback into three permanent reusable aesthetic gates: colorful rhythm must retain air, natural direction must follow a continuous physical growth path, and every daily bouquet must have a user-visible identity rather than only a changed internal seed.
+- Added the new Sites build helper, hosting config, worker, and science-fiction lab files to the GitHub source deploy manifest, and snapshotted deploy file contents before blob upload to avoid long-upload `dist` races.
 
 ## 0.14.8 - 2026-07-12
 

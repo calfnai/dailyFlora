@@ -300,8 +300,13 @@ function resolveMainFiles() {
 }
 
 function treeEntries(gh, repo, files, stripPrefix = '') {
-  return files.map((file) => {
+  const snapshots = files.map((file) => {
     const repoPath = stripPrefix ? file.slice(stripPrefix.length).replace(/^\//, '') : file;
+    const content = dryRun ? '' : fs.readFileSync(path.join(repoRoot, file)).toString('base64');
+    return { repoPath, content };
+  });
+
+  return snapshots.map(({ repoPath, content }) => {
     if (dryRun) {
       return {
         path: repoPath,
@@ -310,7 +315,6 @@ function treeEntries(gh, repo, files, stripPrefix = '') {
         content: ''
       };
     }
-    const content = fs.readFileSync(path.join(repoRoot, file)).toString('base64');
     const blob = ghApiJson(gh, ['-X', 'POST', `repos/${repo}/git/blobs`, '--input', '-'], {
       content,
       encoding: 'base64'

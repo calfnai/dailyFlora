@@ -55,6 +55,7 @@ export default defineConfig({
         primitiveLab: resolve(__dirname, 'docs/primitive-lab.html'),
         realisticFlowerLab: resolve(__dirname, 'docs/realistic-flower-lab.html'),
         scifiFlowerLab: resolve(__dirname, 'docs/scifi-flower-lab.html'),
+        scifiBouquetLab: resolve(__dirname, 'docs/scifi-bouquet-lab.html'),
         avatarLab: resolve(__dirname, 'docs/avatar-lab.html')
       }
     }
