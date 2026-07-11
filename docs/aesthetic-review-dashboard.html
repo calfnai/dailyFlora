@@ -775,6 +775,9 @@
               <article class="panel">
                 <h3>${escapeHtml(role.name)}</h3>
                 <p>${escapeHtml(role.brief)}</p>
+                <p><strong>状态：</strong>${escapeHtml(role.status || '按需启用')}</p>
+                <p><strong>启用频率：</strong>${escapeHtml(role.cadence || '任务需要时')}</p>
+                <p><strong>本次审计：</strong>${escapeHtml(role.audit || '保留观察')}</p>
               </article>
             `
           )

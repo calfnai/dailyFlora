@@ -1,15 +1,27 @@
 # DailyFlora Changelog
 
+> 自 `0.14.10` 起，新增版本记录使用中英文双语。 / Starting with `0.14.10`, all new release notes are written in both Chinese and English.
+
+## 0.14.10 - 2026-07-12
+
+修复花型 LAB 的模型可读性，审计项目角色，并检查本地与 GitHub 同步风险。 / Restored model legibility in the flower labs, audited project roles, and checked local/GitHub synchronization risks.
+
+- 偏写实花型 LAB 从最多四列改为最多三列，科幻花型 LAB 固定最多两列，为每朵花保留更大的模型观察区。 / Reduced the realistic lab from four to at most three columns and the sci-fi lab to at most two columns, giving every flower a larger inspection area.
+- 桌面端改为“模型左、说明右”，移动端改为“模型上、说明下”；Three.js viewport 会真实扣除文字区，不再在文字背后渲染模型。 / Split desktop cells into model-left and copy-right regions and mobile cells into model-above and copy-below regions; Three.js viewports now exclude the text area instead of rendering behind it.
+- 审查角色改为带启用频率的职责表：项目主任降为里程碑门禁，其余角色按视觉、结构或花库变动触发。 / Converted review roles into cadence-based responsibilities: the project director is now a milestone-only gate while the other roles activate for visual, structural, or library changes.
+- 记录本地旧功能分支与远端 main 已明显分叉，普通 `git push` 当前不安全；发布继续使用内容快照流程，直到工作区整理完成。 / Recorded that the old local feature branch has materially diverged from remote main and is unsafe for a normal `git push`; publishing continues through content snapshots until the workspace is reconciled.
+- 为 GitHub blob 上传增加 429/502/503/504 瞬时错误重试，避免单次网关超时中断完整发布。 / Added retries for transient 429/502/503/504 GitHub blob-upload failures so a single gateway timeout no longer aborts the full deployment.
+
 ## 0.14.9 - 2026-07-12
 
-Reworked the rejected July 7 and July 11 daily bouquets and made daily generation visible in the UI.
+重做被否定的 7 月 7 日与 7 月 11 日花束，并让每日生成在界面上可辨认。 / Reworked the rejected July 7 and July 11 daily bouquets and made daily generation visible in the UI.
 
-- Replaced repeated theme-only headings with deterministic daily Chinese/English bouquet names carrying a visible date stamp; names remain distinct in sparse and low-power modes.
-- Rebalanced the default `2026-07-07` bouquet away from a dense central ball by reducing center/cluster weight and scale, increasing small-flower, fruit, line, branch, sparkle, and radial-air roles.
-- Rebuilt spike placement around one shared bouquet tie point: each spike direction now follows its physical path from the vase, with a visible curved stem connecting the tie point to the spike base.
-- Shortened, lowered, and reduced the repeated line-flower share for the default `2026-07-11` bouquet so spike lengths and angles no longer read as uniform floating AI artifacts.
-- Kept both corrections inside the default date-seed mechanism instead of creating or borrowing fixed bouquet URLs; owner acceptance remains pending.
-- Promoted the owner's feedback into three permanent reusable aesthetic gates: colorful rhythm must retain air, natural direction must follow a continuous physical growth path, and every daily bouquet must have a user-visible identity rather than only a changed internal seed.
+- 用带日期印记的确定性中英文每日花名替代重复主题标题；“疏/省”模式下仍能区分日期。 / Replaced repeated theme-only headings with deterministic daily Chinese/English bouquet names carrying a visible date stamp; names remain distinct in sparse and low-power modes.
+- 降低 `2026-07-07` 中心与簇花权重、尺寸，增加小花、果点、枝线、闪点和径向空气，消除中心密球。 / Rebalanced the default `2026-07-07` bouquet away from a dense central ball by reducing center/cluster weight and scale while increasing small-flower, fruit, line, branch, sparkle, and radial-air roles.
+- 围绕共同扎口重建穗花放置，每一枝都沿花瓶物理路径生长，并以可见曲线花茎连接花穗底部。 / Rebuilt spike placement around one shared bouquet tie point, with each spike following its physical path from the vase and a visible curved stem connecting to its base.
+- 缩短、下沉并减少 `2026-07-11` 的重复线花，避免统一悬浮的 AI 痕迹。 / Shortened, lowered, and reduced repeated line flowers in `2026-07-11` so their lengths and angles no longer read as uniform floating AI artifacts.
+- 两组修正继续使用默认日期 seed，不借用固定花束地址；等待用户复验。 / Kept both corrections inside the default date-seed mechanism without borrowing fixed bouquet URLs; owner acceptance remains pending.
+- 将反馈提升为三条长期审美门禁：缤纷必须保留空气，自然方向必须服从连续生长路径，每日花束必须有用户可见身份。 / Promoted the feedback into three permanent gates: colorful rhythm must retain air, natural direction must follow a continuous growth path, and every daily bouquet must have a user-visible identity.
 - Added the new Sites build helper, hosting config, worker, and science-fiction lab files to the GitHub source deploy manifest, and snapshotted deploy file contents before blob upload to avoid long-upload `dist` races.
 
 ## 0.14.8 - 2026-07-12

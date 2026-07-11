@@ -193,8 +193,21 @@ function ghApi(gh, apiArgs, input) {
 }
 
 function ghApiJson(gh, apiArgs, input) {
-  const out = ghApi(gh, apiArgs, input).trim();
-  return out ? JSON.parse(out) : null;
+  const endpoint = apiArgs.find((arg) => arg.startsWith('repos/')) || '';
+  const retryableBlobUpload = endpoint.endsWith('/git/blobs');
+  for (let attempt = 1; attempt <= 4; attempt += 1) {
+    try {
+      const out = ghApi(gh, apiArgs, input).trim();
+      return out ? JSON.parse(out) : null;
+    } catch (error) {
+      const detail = `${error?.stderr || ''}\n${error?.message || ''}`;
+      const transient = /HTTP (429|502|503|504)\b/.test(detail);
+      if (!retryableBlobUpload || !transient || attempt === 4) throw error;
+      log(`GitHub blob upload retry ${attempt}/3 after a transient API error.`);
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, attempt * 1500);
+    }
+  }
+  return null;
 }
 
 function tryGhApiJson(gh, apiArgs, input) {

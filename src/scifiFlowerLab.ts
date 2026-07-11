@@ -79,7 +79,7 @@ function setView(preview: Preview, view: ViewName) {
   if (view === 'side') preview.camera.position.set(distance,0.12,0);
   else if (view === 'top') preview.camera.position.set(0,distance,0.01);
   else preview.camera.position.set(0,0.12,distance);
-  preview.camera.lookAt(-0.67,0,0);
+  preview.camera.lookAt(0,0,0);
 }
 
 function countGeometry(model: THREE.Group) {
@@ -111,7 +111,7 @@ function buildModel(preview: Preview, index: number) {
   }
   const model = createSciFiFlower(preview.definition, palette, `scifi-lab:${preview.definition.id}:${palette.join('-')}`);
   model.scale.setScalar(preview.definition.id === 'fractal-rift' ? 0.72 : 0.76);
-  model.position.x = -0.7;
+  model.position.x = 0;
   model.rotation.x = preview.definition.id === 'fractal-rift' ? -0.22 : -0.46;
   model.rotation.y = preview.yaw || index * 0.08;
   preview.model = model;
@@ -126,7 +126,7 @@ function initScenes() {
     const key = new THREE.DirectionalLight('#ffffff',2.5); key.position.set(2.4,3.2,4.8); scene.add(key);
     const rim = new THREE.DirectionalLight('#7cf9ff',1.1); rim.position.set(-3,0.6,2); scene.add(rim);
     const camera = new THREE.PerspectiveCamera(37,1,0.1,30);
-    const grid = new THREE.GridHelper(3.2,8,'#526153','#26312c'); grid.position.set(-0.7,-1.1,0); grid.material.transparent=true; grid.material.opacity=.32; scene.add(grid);
+    const grid = new THREE.GridHelper(3.2,8,'#526153','#26312c'); grid.position.set(0,-1.1,0); grid.material.transparent=true; grid.material.opacity=.32; scene.add(grid);
     const preview: Preview = {definition,cell:cells[index],scene,camera,model:new THREE.Group(),grid,yaw:index*.08};
     buildModel(preview,index);
     setView(preview,activeView);
@@ -154,12 +154,35 @@ function randomColor() {
 }
 
 function updateLayout() {
-  columns = stage.clientWidth >= 1080 ? 3 : stage.clientWidth >= 700 ? 2 : 1;
-  rowHeight = columns === 1 ? 320 : 350;
+  columns = stage.clientWidth >= 760 ? 2 : 1;
+  rowHeight = columns === 1 ? 580 : 380;
   stage.style.height = `${Math.ceil(previews.length/columns)*rowHeight}px`;
   labels.style.gridTemplateColumns = `repeat(${columns},minmax(0,1fr))`;
   labels.style.gridAutoRows = `${rowHeight}px`;
   renderer.setSize(Math.max(1,stage.clientWidth),Math.max(1,stage.clientHeight),false);
+}
+
+function previewViewport(preview: Preview, stageHeight: number) {
+  const cellWidth = preview.cell.clientWidth;
+  const cellHeight = preview.cell.clientHeight;
+  const cellBottom = stageHeight - preview.cell.offsetTop - cellHeight;
+  if (columns === 1) {
+    const infoHeight = 230;
+    return {
+      left: preview.cell.offsetLeft,
+      bottom: cellBottom + infoHeight,
+      width: cellWidth,
+      height: cellHeight - infoHeight
+    };
+  }
+
+  const infoWidth = Math.min(240, Math.round(cellWidth * 0.44));
+  return {
+    left: preview.cell.offsetLeft,
+    bottom: cellBottom,
+    width: cellWidth - infoWidth - 24,
+    height: cellHeight
+  };
 }
 
 presetButtons.forEach((button) => button.addEventListener('click',() => {
@@ -187,7 +210,7 @@ function animate(time:number) {
   renderer.setScissorTest(false);renderer.clear();renderer.setScissorTest(true);
   previews.forEach((preview)=>{
     const visible=preview.cell.getBoundingClientRect();if(visible.bottom<0||visible.top>window.innerHeight)return;
-    const left=preview.cell.offsetLeft;const bottom=stageHeight-preview.cell.offsetTop-preview.cell.clientHeight;const width=preview.cell.clientWidth;const height=preview.cell.clientHeight;
+    const {left,bottom,width,height}=previewViewport(preview,stageHeight);
     renderer.setViewport(left,bottom,width,height);renderer.setScissor(left,bottom,width,height);preview.camera.aspect=width/Math.max(1,height);preview.camera.updateProjectionMatrix();
     if(autoRotate&&dragging!==preview)preview.yaw+=delta*.14;preview.model.rotation.y=preview.yaw;renderer.render(preview.scene,preview.camera);
   });
