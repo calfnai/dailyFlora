@@ -137,6 +137,90 @@ function flaredTrumpetGeometry(length = 1.1, throatRadius = 0.12, rimRadius = 0.
   return geometry;
 }
 
+function reflexedTepalGeometry(length = 1.28, width = 0.31, reflex = 0.2) {
+  const positions: number[] = [];
+  const rows = 12;
+  const cols = 6;
+  const point = (row: number, col: number) => {
+    const v = row / rows;
+    const u = col / cols * 2 - 1;
+    const widthProfile = Math.sin(v * Math.PI) ** 0.82 * width * (1 - v * 0.1);
+    const edgeWave = Math.sin(v * Math.PI * 3.2 + Math.abs(u) * 1.8) * 0.012 * Math.abs(u) * v;
+    const centerVein = (1 - Math.abs(u)) * Math.sin(v * Math.PI) * 0.026;
+    return new THREE.Vector3(
+      u * widthProfile,
+      0.13 + v * length,
+      centerVein + edgeWave - reflex * v * v
+    );
+  };
+
+  for (let row = 0; row < rows; row += 1) {
+    for (let col = 0; col < cols; col += 1) {
+      const a = point(row, col);
+      const b = point(row, col + 1);
+      const c = point(row + 1, col);
+      const d = point(row + 1, col + 1);
+      positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+      positions.push(b.x, b.y, b.z, d.x, d.y, d.z, c.x, c.y, c.z);
+    }
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function frilledCoronaGeometry(length = 0.72, baseRadius = 0.2, rimRadius = 0.43, frill = 0.075) {
+  const positions: number[] = [];
+  const rows = 12;
+  const segments = 48;
+  const point = (row: number, segment: number) => {
+    const v = row / rows;
+    const angle = segment / segments * Math.PI * 2;
+    const flare = Math.sin(v * Math.PI * 0.5) ** 1.15;
+    const base = baseRadius + (rimRadius - baseRadius) * flare;
+    const ripple = (
+      Math.sin(angle * 6 + 0.35) * frill +
+      Math.sin(angle * 11 - 0.6) * frill * 0.28
+    ) * v ** 3;
+    const radius = base + ripple;
+    const ellipse = 0.82 + v * 0.04;
+    return new THREE.Vector3(
+      Math.cos(angle) * radius,
+      Math.sin(angle) * radius * ellipse,
+      0.015 + v * length + Math.sin(angle * 6) * frill * 0.08 * v
+    );
+  };
+
+  for (let row = 0; row < rows; row += 1) {
+    for (let segment = 0; segment < segments; segment += 1) {
+      const a = point(row, segment);
+      const b = point(row, segment + 1);
+      const c = point(row + 1, segment);
+      const d = point(row + 1, segment + 1);
+      positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+      positions.push(b.x, b.y, b.z, d.x, d.y, d.z, c.x, c.y, c.z);
+    }
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function cylinderBetween(start: THREE.Vector3, end: THREE.Vector3, radius: number, color: THREE.Color) {
+  const direction = end.clone().sub(start);
+  const cylinder = new THREE.Mesh(
+    new THREE.CylinderGeometry(radius, radius * 0.86, direction.length(), 8),
+    material(color, 0.76)
+  );
+  cylinder.position.copy(start).add(end).multiplyScalar(0.5);
+  cylinder.quaternion.setFromUnitVectors(up, direction.normalize());
+  return cylinder;
+}
+
 function callaSpatheGeometry(length = 1.08, baseRadius = 0.12, rimRadius = 0.48) {
   const positions: number[] = [];
   const rows = 10;
@@ -522,6 +606,105 @@ export function createTrumpetThroatFlower(options: FloraPrimitiveOptions) {
   const rim = new THREE.Mesh(new THREE.TorusGeometry(0.21, 0.014, 6, 28), material(colorAt(options.colorPalette, 3), 0.86));
   rim.position.z = 0.4;
   group.add(petals, throat, rim);
+  return applyRoot(group, options);
+}
+
+export function createFrilledNarcissusFlower(options: FloraPrimitiveOptions) {
+  const rng = createRng(`${options.seed}:frilled-narcissus`);
+  const group = new THREE.Group();
+  const petalCount = 6;
+  const petals = new THREE.InstancedMesh(
+    reflexedTepalGeometry(1.26, 0.31, 0.2 + options.curvature * 0.045),
+    material(colorAt(options.colorPalette, 0), 0.88),
+    petalCount
+  );
+
+  for (let i = 0; i < petalCount; i += 1) {
+    const angle = (i / petalCount) * Math.PI * 2 + (i % 2 === 0 ? -0.035 : 0.045);
+    const innerWhorl = i % 2 === 1;
+    setInstance(
+      petals,
+      i,
+      new THREE.Vector3(Math.cos(angle) * 0.12, Math.sin(angle) * 0.12, innerWhorl ? 0.018 : -0.018),
+      new THREE.Vector3(
+        rng.range(innerWhorl ? 0.94 : 1.0, innerWhorl ? 1.02 : 1.08),
+        rng.range(innerWhorl ? 0.94 : 1.0, innerWhorl ? 1.02 : 1.08),
+        1
+      ),
+      colorAt(options.colorPalette, innerWhorl ? 1 : 0).clone().lerp(new THREE.Color('#ffffff'), rng.range(0.05, 0.16)),
+      angle - Math.PI / 2
+    );
+  }
+
+  const coronaColor = colorAt(options.colorPalette, 2);
+  const corona = new THREE.Mesh(
+    frilledCoronaGeometry(0.72, 0.2, 0.43, 0.075 + options.openness * 0.018),
+    material(coronaColor, 0.78)
+  );
+
+  const rimPoints: THREE.Vector3[] = [];
+  const rimSegments = 64;
+  for (let i = 0; i < rimSegments; i += 1) {
+    const angle = i / rimSegments * Math.PI * 2;
+    const ripple = Math.sin(angle * 6 + 0.35) * 0.084 + Math.sin(angle * 11 - 0.6) * 0.022;
+    const radius = 0.43 + ripple;
+    rimPoints.push(new THREE.Vector3(
+      Math.cos(angle) * radius,
+      Math.sin(angle) * radius * 0.86,
+      0.735 + Math.sin(angle * 6) * 0.008
+    ));
+  }
+  const rimCurve = new THREE.CatmullRomCurve3(rimPoints, true, 'centripetal', 0.5);
+  const rim = new THREE.Mesh(
+    new THREE.TubeGeometry(rimCurve, 96, 0.018, 6, true),
+    material(colorAt(options.colorPalette, 3), 0.72)
+  );
+
+  const throat = new THREE.Mesh(
+    new THREE.CircleGeometry(0.19, 36),
+    material(new THREE.Color('#66713d'), 0.96)
+  );
+  throat.position.z = 0.035;
+
+  const innerGlow = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.16, 0.21, 0.18, 32, 1, true),
+    material(coronaColor.clone().lerp(new THREE.Color('#d7822f'), 0.34), 0.8)
+  );
+  innerGlow.rotation.x = Math.PI / 2;
+  innerGlow.position.z = 0.11;
+
+  const stamens = new THREE.Group();
+  const stamenColor = new THREE.Color('#a86f2d');
+  for (let i = 0; i < 6; i += 1) {
+    const angle = -0.78 + i * (1.56 / 5) + rng.range(-0.035, 0.035);
+    const start = new THREE.Vector3(Math.sin(angle) * 0.035, Math.cos(angle) * 0.025, 0.22);
+    const end = new THREE.Vector3(Math.sin(angle) * 0.14, Math.cos(angle) * 0.085, 0.61 + rng.range(-0.025, 0.025));
+    const filament = cylinderBetween(start, end, 0.009, stamenColor);
+    const anther = new THREE.Mesh(
+      new THREE.SphereGeometry(0.035, 10, 7),
+      material(colorAt(options.colorPalette, 3).clone().lerp(new THREE.Color('#b85f24'), 0.42), 0.7)
+    );
+    anther.position.copy(end);
+    anther.scale.set(0.72, 1.35, 0.62);
+    anther.rotation.z = -angle * 0.45;
+    stamens.add(filament, anther);
+  }
+
+  const ovary = new THREE.Mesh(
+    new THREE.SphereGeometry(0.2, 18, 12),
+    material(colorAt(options.colorPalette, 4), 0.9)
+  );
+  ovary.position.z = -0.1;
+  ovary.scale.set(1, 0.86, 0.62);
+
+  const neck = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.09, 0.13, 0.28, 14),
+    material(colorAt(options.colorPalette, 4).clone().lerp(new THREE.Color('#355d38'), 0.24), 0.92)
+  );
+  neck.rotation.x = Math.PI / 2;
+  neck.position.z = -0.24;
+
+  group.add(petals, throat, innerGlow, corona, rim, stamens, ovary, neck);
   return applyRoot(group, options);
 }
 
@@ -994,6 +1177,7 @@ export const floraPrimitiveFactories = {
   StarPinwheelFlower: createStarPinwheelFlower,
   TulipCupFlower: createTulipCupFlower,
   TrumpetThroatFlower: createTrumpetThroatFlower,
+  FrilledNarcissusFlower: createFrilledNarcissusFlower,
   DaturaTrumpetFlower: createDaturaTrumpetFlower,
   OrchidButterflyFlower: createOrchidButterflyFlower,
   CallaCurledBract: createCallaCurledBract,

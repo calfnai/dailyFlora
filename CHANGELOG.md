@@ -1,5 +1,25 @@
 # DailyFlora Changelog
 
+## 0.14.5 - 2026-07-11
+
+Added a separate realistic flower-form lab and print-aware structural vocabulary.
+
+- Added 25 concrete flower forms in one shared 3D canvas, each with adjacent Chinese/English naming, identification notes, and physical-connection notes.
+- Explicitly removed lisianthus from the list and recorded it as a user-rejected default reference for future flower forms and bouquets.
+- Kept the new page separate from Primitive Lab so the accepted 16 abstract target shapes remain a stable compatibility vocabulary.
+- Built petals into receptacles, heads into stems, and clustered florets onto solid branches to avoid floating parts and prepare the forms for later 3D-print engineering.
+- Documented that sellable print files still require boolean union, minimum-wall, watertight/manifold, support, and print-orientation validation.
+
+## 0.14.4 - 2026-07-11
+
+Primitive Lab target-vocabulary redesign.
+
+- Rebuilt Primitive Lab as one large 3D flower-library canvas containing all 16 accepted shapes plus one pending candidate, with adjacent Chinese/English labels and short identification notes.
+- Kept a single WebGL renderer for the whole library instead of creating one rendering context per flower; future shapes can be added without repeating the per-card context limit problem.
+- Added `FrilledNarcissusFlower / 褶边副冠水仙型` as a pending candidate derived from the July 5 trumpet-throat v1/v3 direction: six reflexed tepals, a deep frilled corona, visible stamens, and a green rear connection.
+- Preserved lab inspection controls across the shared canvas: front/side/top views, silhouette mode, reference grid, auto-rotation, per-flower drag rotation, and aggregate geometry stats.
+- Added natural English names to the shared dashboard vocabulary data so Primitive Lab and the aesthetic dashboard read from the same bilingual source.
+
 ## 0.14.3 - 2026-07-08
 
 Fixed bouquet sample library 3D preview restoration.

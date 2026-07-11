@@ -124,6 +124,10 @@
         color: var(--warn);
       }
 
+      .status.needs-owner-review {
+        color: var(--warn);
+      }
+
       .status.pass {
         color: var(--good);
       }
@@ -216,6 +220,11 @@
         padding: 14px;
       }
 
+      .candidate-panel {
+        border-color: rgb(242 203 98 / 34%);
+        background: rgb(242 203 98 / 6%);
+      }
+
       .library-card {
         display: grid;
         gap: 10px;
@@ -260,6 +269,15 @@
         display: block;
         width: 100%;
         height: 100%;
+      }
+
+      .candidate-preview-link {
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        color: var(--warn);
+        text-align: center;
+        line-height: 1.55;
       }
 
       .panel p,
@@ -458,7 +476,7 @@
           <div>
             <p class="kicker">Review library</p>
             <h2>审美资料入口</h2>
-            <p class="section-copy">这里固定保留四类可检查材料：你给过的参考图片、已经及格的花库模型、可直接打开的花束样例、以及 0.13 审美记忆。</p>
+            <p class="section-copy">这里固定保留参考图片、抽象花型词表、偏写实花型、固定花束样例和项目审美记忆。</p>
           </div>
         </div>
         <div class="library-grid">
@@ -471,6 +489,11 @@
             <em>花库罗列</em>
             <strong>Primitive Lab</strong>
             <span>逐个查看已达到及格线的花材/叶材 primitive，包含隐藏标签、隔离观察和模型状态。</span>
+          </a>
+          <a class="panel library-card" href="./realistic-flower-lab.html">
+            <em>25 种具象花型</em>
+            <strong>偏写实花型 LAB</strong>
+            <span>查看删除洋桔梗后的 25 种具体花材表达，以及面向 3D 打印的花托、花梗和实体分枝连接。</span>
           </a>
           <a class="panel library-card" href="./dailyflora-flower-plan-samples.html">
             <em>花束库</em>
@@ -516,6 +539,18 @@
           </div>
         </div>
         <div class="shape-grid" id="shape-grid"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Candidate shape vocabulary</p>
+            <h2>待验收候选花型</h2>
+            <p class="section-copy">候选只进入实验和复盘，不自动改写正式 16 类。只有用户确认其正面、侧面和 360° 旋转都真正成立，才升级为新的正式花型。</p>
+          </div>
+          <a class="pill" href="./primitive-lab.html#candidate-title">在 Primitive Lab 验收</a>
+        </div>
+        <div class="shape-grid" id="candidate-shape-grid"></div>
       </section>
 
       <section class="section">
@@ -590,6 +625,7 @@
       const statusText = {
         blocked: 'blocked',
         'needs-work': 'needs-work',
+        'needs-owner-review': '待用户验收',
         pass: 'pass'
       };
 
@@ -609,6 +645,7 @@
         StarPinwheelFlower: '星形/风车型',
         TulipCupFlower: '郁金香/杯型',
         TrumpetThroatFlower: '洋水仙管心型',
+        FrilledNarcissusFlower: '褶边副冠水仙型',
         DaturaTrumpetFlower: '大喇叭型',
         OrchidButterflyFlower: '兰花/蝴蝶型',
         CallaCurledBract: '马蹄莲/卷曲苞片型',
@@ -633,6 +670,7 @@
         'star-pinwheel-form': 'StarPinwheelFlower',
         'tulip-cup-form': 'TulipCupFlower',
         'trumpet-throat-form': 'TrumpetThroatFlower',
+        'frilled-narcissus-corona': 'FrilledNarcissusFlower',
         'datura-trumpet-form': 'DaturaTrumpetFlower',
         'orchid-butterfly-form': 'OrchidButterflyFlower',
         'calla-curled-bract': 'CallaCurledBract',
@@ -652,6 +690,7 @@
         StarPinwheelFlower: ['#ff8b32', '#ffd15a', '#e9565d', '#7aa65a'],
         TulipCupFlower: ['#ffbf5a', '#fff0c2', '#f58aa2', '#5d8a55'],
         TrumpetThroatFlower: ['#fff9e8', '#ffffff', '#ffc847', '#f08b36'],
+        FrilledNarcissusFlower: ['#fff4c8', '#ffe8a7', '#f3b13e', '#ffd86a', '#78a66a'],
         DaturaTrumpetFlower: ['#ffffff', '#f2e3ff', '#8a5ab8', '#58783f'],
         OrchidButterflyFlower: ['#f8c8eb', '#fff6fb', '#e078b8', '#cc8b4f'],
         CallaCurledBract: ['#fff7df', '#f6e8b5', '#f2b84c', '#6c8b57'],
@@ -785,6 +824,7 @@
                   <canvas data-shape-preview="${escapeHtml(primitive)}" aria-label="${escapeHtml(shape.name)} model preview"></canvas>
                 </div>
                 <h3>${escapeHtml(shape.name)}</h3>
+                <p class="en">${escapeHtml(shape.englishName || shape.id)}</p>
                 <p class="en">${escapeHtml(shape.id)}</p>
                 <p><strong>对应模型：</strong>${escapeHtml(primitiveNames[primitive] || primitive || '未映射')}</p>
                 <p><strong>例子：</strong>${escapeHtml(shape.examples)}</p>
@@ -792,6 +832,30 @@
               </article>
             `;
             }
+          )
+          .join('');
+      }
+
+      function renderCandidateShapes(data) {
+        const shapes = data.candidateShapeVocabulary || [];
+        document.querySelector('#candidate-shape-grid').innerHTML = shapes
+          .map(
+            (shape) => `
+              <article class="panel candidate-panel">
+                <div>${statusBadge(shape.status)}</div>
+                <div class="shape-preview candidate-preview-link">
+                  <a class="pill" href="./primitive-lab.html#candidate-title">打开独立 3D 候选验收窗口</a>
+                </div>
+                <h3>${escapeHtml(shape.name)}</h3>
+                <p class="en">${escapeHtml(shape.englishName)}</p>
+                <p class="en">${escapeHtml(shape.primitive)} · ${escapeHtml(shape.id)}</p>
+                <p><strong>来源：</strong>${escapeHtml(shape.source)}</p>
+                <p><strong>例子：</strong>${escapeHtml(shape.examples)}</p>
+                <p><strong>为什么需要：</strong>${escapeHtml(shape.whyNeeded)}</p>
+                <p><strong>验收口径：</strong>${escapeHtml(shape.acceptance)}</p>
+                <p><strong>登记规则：</strong>${escapeHtml(shape.ownerNote)}</p>
+              </article>
+            `
           )
           .join('');
       }
@@ -821,14 +885,14 @@
           const model = factory({
             seed: `dashboard-target-shape:${primitive}`,
             position: new THREE.Vector3(0, 0, 0),
-            scale: primitive === 'FoliageGrassBranch' ? 0.92 : primitive === 'SpikeFlower' ? 0.84 : 1.02,
+            scale: primitive === 'FoliageGrassBranch' ? 0.92 : primitive === 'SpikeFlower' ? 0.84 : primitive === 'FrilledNarcissusFlower' ? 0.9 : 1.02,
             colorPalette: previewPalettes[primitive] || ['#ffffff', '#f7d78a', '#80ad65', '#cc8b4f'],
-            openness: ['OrchidButterflyFlower', 'TrumpetThroatFlower', 'DaturaTrumpetFlower', 'CallaCurledBract'].includes(primitive) ? 0.95 : 0.7,
+            openness: ['OrchidButterflyFlower', 'TrumpetThroatFlower', 'FrilledNarcissusFlower', 'DaturaTrumpetFlower', 'CallaCurledBract'].includes(primitive) ? 0.95 : 0.7,
             density: ['UmbelMiniCluster', 'FullHydrangeaCloud', 'FruitPodCluster', 'FoliageGrassBranch'].includes(primitive) ? 1.08 : 0.92,
             curvature: ['SpikeFlower', 'FoliageGrassBranch', 'CallaCurledBract'].includes(primitive) ? 0.86 : 0.42,
             role: ['SpikeFlower', 'FoliageGrassBranch'].includes(primitive) ? 'line' : 'secondary'
           });
-          model.rotation.x = ['DiskFlower', 'CosmosOpenFlower', 'LayeredDahliaFlower', 'RuffledRoseFlower', 'StarPinwheelFlower', 'TrumpetThroatFlower'].includes(primitive) ? -0.7 : primitive === 'FoliageGrassBranch' ? -0.34 : -0.1;
+          model.rotation.x = ['DiskFlower', 'CosmosOpenFlower', 'LayeredDahliaFlower', 'RuffledRoseFlower', 'StarPinwheelFlower', 'TrumpetThroatFlower', 'FrilledNarcissusFlower'].includes(primitive) ? -0.7 : primitive === 'FoliageGrassBranch' ? -0.34 : -0.1;
           if (primitive === 'FoliageGrassBranch') model.rotation.z = -0.38;
           scene.add(model);
           previewScenes.push({ renderer, scene, camera, model, canvas, primitive });
@@ -967,6 +1031,7 @@
         renderRoles(data);
         renderReusableRules(data);
         renderTargetShapes(data);
+        renderCandidateShapes(data);
         initTargetShapePreviews();
         animateTargetShapePreviews();
         renderPrimitiveGate(data);
