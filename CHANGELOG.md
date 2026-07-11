@@ -9,6 +9,7 @@ Reworked the rejected July 7 and July 11 daily bouquets and made daily generatio
 - Rebuilt spike placement around one shared bouquet tie point: each spike direction now follows its physical path from the vase, with a visible curved stem connecting the tie point to the spike base.
 - Shortened, lowered, and reduced the repeated line-flower share for the default `2026-07-11` bouquet so spike lengths and angles no longer read as uniform floating AI artifacts.
 - Kept both corrections inside the default date-seed mechanism instead of creating or borrowing fixed bouquet URLs; owner acceptance remains pending.
+- Promoted the owner's feedback into three permanent reusable aesthetic gates: colorful rhythm must retain air, natural direction must follow a continuous physical growth path, and every daily bouquet must have a user-visible identity rather than only a changed internal seed.
 
 ## 0.14.8 - 2026-07-12
 
