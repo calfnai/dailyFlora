@@ -17,7 +17,7 @@ const presets: Record<string, string[]> = {
   '深空冷光': ['#65f4ff', '#8174ff', '#ff5ed2', '#dcff6b', '#365b58'],
   '酸性温室': ['#c6ff37', '#29e69b', '#ff7b38', '#fff06a', '#315a3d'],
   '量子珊瑚': ['#ff746c', '#ffb36b', '#e76bff', '#fff0c2', '#4e6574'],
-  '黑金信号': ['#d6b85f', '#806b34', '#f4df91', '#b6a061', '#20292a']
+  '黑金信号': ['#050504', '#17130c', '#d7b95f', '#7a6634', '#0d1311']
 };
 
 function required<T extends Element>(selector: string) {

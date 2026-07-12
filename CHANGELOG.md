@@ -2,6 +2,12 @@
 
 > 自 `0.14.10` 起，新增版本记录使用中英文双语。 / Starting with `0.14.10`, all new release notes are written in both Chinese and English.
 
+## 0.14.11 - 2026-07-12
+
+调整科幻 LAB 的黑金配色方向。 / Adjusted the sci-fi lab black-gold palette direction.
+
+- 将“黑金信号”从金色主导改为黑色主导：主色、辅色和基座使用近黑色，亮金只保留为能量高光，暗金用于节点。 / Rebalanced `Black Gold Signal` from gold-led to black-led: main, secondary, and base colors are near-black, bright gold is kept as the energy highlight, and muted gold is used for nodes.
+
 ## 0.14.10 - 2026-07-12
 
 修复花型 LAB 的模型可读性，审计项目角色，并检查本地与 GitHub 同步风险。 / Restored model legibility in the flower labs, audited project roles, and checked local/GitHub synchronization risks.
