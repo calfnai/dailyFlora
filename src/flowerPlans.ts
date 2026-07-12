@@ -72,6 +72,27 @@ const plans: FlowerPlan[] = [
     ])
   },
   {
+    id: 'daily-concrete-forest-variety',
+    cnName: '百花莓园空气束',
+    enName: 'Concrete Berry Meadow Air',
+    reference: 'dailyflora-default: 2026-07-13 owner feedback / 花材品种不够丰富',
+    silhouette: '以浆果和热带绿色为底，但让小面花、层叠花、杯形花和雕塑花分层出现；外圈枝线打开，中心不堆成球。',
+    avoid: '避免只剩果点、小雏菊和绣球簇重复；避免为了丰富而填满中心；避免新增具象花只停留在 LAB 而不进入主花束。',
+    items: normalizeShares([
+      { typeId: 'cosmos', cn: '白粉波斯菊', en: 'white pink cosmos', role: 'filler', share: 0.13, scale: 0.78, placement: 'mixed', note: '轻薄小面花矩阵，负责空气和细碎节奏。' },
+      { typeId: 'anemone', cn: '银莲花深心小面花', en: 'dark-centered anemone faces', role: 'secondary', share: 0.1, scale: 0.82, placement: 'outer', note: '用暗心和宽瓣增加可辨识花型，不做普通雏菊重复。' },
+      { typeId: 'dahlia', cn: '迷你大丽花', en: 'mini dahlia blooms', role: 'secondary', share: 0.1, scale: 0.88, placement: 'low', note: '尖瓣层叠花只做低位停顿，不能变成大主花墙。' },
+      { typeId: 'rose', cn: '莓粉玫瑰小团花', en: 'berry rose small blooms', role: 'main', share: 0.09, scale: 0.88, placement: 'center', note: '柔软层次，给今日花束一个局部主花。' },
+      { typeId: 'ranunculus', cn: '橙黄花毛茛', en: 'orange ranunculus cups', role: 'secondary', share: 0.08, scale: 0.82, placement: 'mixed', note: '圆瓣层叠但尺寸小，增加品种而不压扁空气。' },
+      { typeId: 'tulip', cn: '青柠郁金香杯', en: 'lime tulip cups', role: 'main', share: 0.08, scale: 0.9, placement: 'outer', note: '杯形花作为安静停顿，拉开与小面花的差异。' },
+      { typeId: 'narcissus', cn: '浅黄洋水仙', en: 'pale narcissus throats', role: 'main', share: 0.07, scale: 0.82, placement: 'outer', note: '管心和副冠带来明确季节花型。' },
+      { typeId: 'phalaenopsis', cn: '小蝴蝶兰', en: 'small phalaenopsis', role: 'secondary', share: 0.06, scale: 0.82, placement: 'spray', note: '少量雕塑形花瓣出现在外圈，不抢主花。' },
+      { typeId: 'bellFruit', cn: '莓果珍珠点', en: 'berry pearl fruit dots', role: 'fruit', share: 0.14, scale: 0.78, placement: 'mixed', note: '保留 berry-grove 的记忆点，但果点必须归属于枝条。' },
+      { typeId: 'hydrangea', cn: '浅色空气小簇', en: 'pale airy mini clusters', role: 'cluster', share: 0.1, scale: 0.72, placement: 'low', note: '只托住底部体积，不铺满中心。' },
+      { typeId: 'liatris', cn: '嫩绿外开枝线', en: 'fresh open green lines', role: 'line', share: 0.05, scale: 1.0, placement: 'spray', note: '继承山岗小花的外开线条，让丰富花型之间有空气。' }
+    ])
+  },
+  {
     id: 'dewberry-morning-air',
     cnName: '晨露莓园空气束',
     enName: 'Dewberry Morning Air',
@@ -225,7 +246,11 @@ const themePlanIds: Record<string, string[]> = {
   'lychee-garden-rainbow': ['lychee-garden-rainbow']
 };
 
-export function createFlowerPlan(seed: string, theme: BouquetTheme) {
+export function createFlowerPlan(seed: string, theme: BouquetTheme, forcedPlanId?: string) {
+  if (forcedPlanId) {
+    const forced = plans.find((plan) => plan.id === forcedPlanId);
+    if (forced) return forced;
+  }
   const rng = createRng(`flower-plan:${seed}:${theme.id}`);
   const candidates = themePlanIds[theme.id] ?? plans.map((plan) => plan.id);
   const selectedId = candidates[Math.floor(rng.value() * candidates.length)] ?? candidates[0];

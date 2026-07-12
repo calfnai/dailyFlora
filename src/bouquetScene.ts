@@ -561,7 +561,20 @@ function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimit
     liatris: 'SpikeFlower',
     hydrangea: 'FullHydrangeaCloud',
     pompon: 'FullHydrangeaCloud',
-    bellFruit: 'HangingBellFruit'
+    bellFruit: 'HangingBellFruit',
+    daisy: 'DiskFlower',
+    gerbera: 'DiskFlower',
+    sunflower: 'DiskFlower',
+    anemone: 'CosmosOpenFlower',
+    cosmos: 'CosmosOpenFlower',
+    dahlia: 'LayeredDahliaFlower',
+    ranunculus: 'RuffledRoseFlower',
+    camellia: 'LayeredDahliaFlower',
+    peony: 'RuffledRoseFlower',
+    tulip: 'TulipCupFlower',
+    narcissus: 'FrilledNarcissusFlower',
+    phalaenopsis: 'OrchidButterflyFlower',
+    calla: 'CallaCurledBract'
   };
   return primitiveByType[item.typeId];
 }
@@ -691,6 +704,20 @@ function primitivePalette(
     if (item.cn.includes('淡紫')) return ['#d8c4f0', '#f0e8fb', '#b7d6ff', leafColor(2)];
     if (item.cn.includes('蓝色')) return ['#84bdf4', '#b9d8f6', '#f0f6ff', leafColor(2)];
     if (item.cn.includes('满天星')) return ['#fffdf4', '#eff7ff', '#dfe9c9', leafColor(1)];
+  }
+
+  if (spec.flowerPlan.id === 'daily-concrete-forest-variety' && item) {
+    if (item.typeId === 'cosmos') return ['#fff7ec', '#ffd4de', '#f2c94c', leafColor(2)];
+    if (item.typeId === 'anemone') return ['#f8e8ff', '#d9b8ff', '#2b2436', leafColor(1)];
+    if (item.typeId === 'dahlia') return ['#ff9ab8', '#ffcfdf', '#f06f98', leafColor(2)];
+    if (item.typeId === 'rose') return ['#ff8bae', '#ffd7df', '#c94d75', leafColor(2)];
+    if (item.typeId === 'ranunculus') return ['#ffb35a', '#ffe07a', '#fff2bf', leafColor(1)];
+    if (item.typeId === 'tulip') return ['#d9f56d', '#fff07a', '#ffb36a', leafColor(1)];
+    if (item.typeId === 'narcissus') return ['#fff6bd', '#ffe17a', '#ff9e48', leafColor(2)];
+    if (item.typeId === 'phalaenopsis') return ['#ffb7c9', '#fff7e8', '#d9f56d', leafColor(1)];
+    if (item.typeId === 'bellFruit') return ['#ff7a32', '#ffb7c9', '#d9f56d', leafColor(1)];
+    if (item.typeId === 'hydrangea') return ['#fff7df', '#d9f56d', '#a8db5e', leafColor(2)];
+    if (item.typeId === 'liatris') return ['#42d39b', '#a8db5e', '#f8f4d7', leafColor(0)];
   }
 
   if (primitive === 'FoliageGrassBranch') return [leafColor(0), leafColor(1), leafColor(2), spec.theme.stem];
@@ -952,24 +979,170 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   return buildPrimitiveFlowers(spec, quality);
 }
 
+function leafHalfWidth(y: number) {
+  const t = THREE.MathUtils.clamp((y + 0.15) / 0.28, 0, 1);
+  return Math.pow(Math.sin(Math.PI * t), 0.72) * 0.125 * (0.92 + t * 0.08);
+}
+
+function leafSurfaceHeight(x: number, y: number) {
+  const halfWidth = Math.max(leafHalfWidth(y), 0.0001);
+  const across = THREE.MathUtils.clamp(Math.abs(x) / halfWidth, 0, 1);
+  const t = THREE.MathUtils.clamp((y + 0.15) / 0.28, 0, 1);
+  const centerRidge = Math.pow(1 - across, 2.4) * 0.012;
+  const softCup = Math.pow(across, 1.7) * 0.009;
+  const lengthCurl = Math.sin((t - 0.18) * Math.PI) * 0.007;
+  return centerRidge + softCup + lengthCurl;
+}
+
+function buildLeafBladeGeometry(renderName: QualityProfile['renderName']) {
+  const lengthSegments = renderName === 'low' ? 8 : 12;
+  const widthSegments = renderName === 'low' ? 4 : 6;
+  const thickness = renderName === 'low' ? 0.006 : 0.008;
+  const positions: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+  const rowSize = widthSegments + 1;
+
+  for (const side of [1, -1]) {
+    for (let row = 0; row <= lengthSegments; row += 1) {
+      const t = row / lengthSegments;
+      const y = THREE.MathUtils.lerp(-0.15, 0.13, t);
+      const halfWidth = leafHalfWidth(y);
+      for (let column = 0; column <= widthSegments; column += 1) {
+        const across = column / widthSegments;
+        const x = THREE.MathUtils.lerp(-halfWidth, halfWidth, across);
+        const z = leafSurfaceHeight(x, y) + side * thickness * 0.5;
+        positions.push(x, y, z);
+        uvs.push(across, t);
+      }
+    }
+  }
+
+  const surfaceVertexCount = (lengthSegments + 1) * rowSize;
+  for (let sideIndex = 0; sideIndex < 2; sideIndex += 1) {
+    const offset = sideIndex * surfaceVertexCount;
+    for (let row = 0; row < lengthSegments; row += 1) {
+      for (let column = 0; column < widthSegments; column += 1) {
+        const a = offset + row * rowSize + column;
+        const b = a + 1;
+        const c = a + rowSize;
+        const d = c + 1;
+        if (sideIndex === 0) indices.push(a, b, c, b, d, c);
+        else indices.push(a, c, b, b, c, d);
+      }
+    }
+  }
+
+  const addEdge = (column: number) => {
+    for (let row = 0; row < lengthSegments; row += 1) {
+      const frontA = row * rowSize + column;
+      const frontB = (row + 1) * rowSize + column;
+      const backA = frontA + surfaceVertexCount;
+      const backB = frontB + surfaceVertexCount;
+      if (column === 0) indices.push(frontA, frontB, backA, frontB, backB, backA);
+      else indices.push(frontA, backA, frontB, frontB, backA, backB);
+    }
+  };
+  addEdge(0);
+  addEdge(widthSegments);
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+function appendLeafVeinRibbon(
+  positions: number[],
+  indices: number[],
+  points: Array<{ x: number; y: number }>,
+  width: number
+) {
+  const startIndex = positions.length / 3;
+  points.forEach((point, index) => {
+    const previous = points[Math.max(0, index - 1)];
+    const next = points[Math.min(points.length - 1, index + 1)];
+    const dx = next.x - previous.x;
+    const dy = next.y - previous.y;
+    const length = Math.hypot(dx, dy) || 1;
+    const nx = -dy / length;
+    const ny = dx / length;
+    const z = leafSurfaceHeight(point.x, point.y) + 0.0095;
+    positions.push(
+      point.x + nx * width, point.y + ny * width, z,
+      point.x - nx * width, point.y - ny * width, z
+    );
+  });
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const a = startIndex + index * 2;
+    indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+  }
+}
+
+function buildLeafVeinGeometry(renderName: QualityProfile['renderName']) {
+  const positions: number[] = [];
+  const indices: number[] = [];
+  appendLeafVeinRibbon(positions, indices, [
+    { x: 0, y: -0.142 },
+    { x: 0.001, y: -0.07 },
+    { x: -0.001, y: 0.005 },
+    { x: 0, y: 0.074 },
+    { x: 0, y: 0.122 }
+  ], renderName === 'low' ? 0.0032 : 0.0038);
+
+  const branchRows = renderName === 'low' ? [-0.07, 0.005, 0.065] : [-0.09, -0.045, 0, 0.043, 0.078];
+  branchRows.forEach((y, rowIndex) => {
+    const halfWidth = leafHalfWidth(y);
+    for (const direction of [-1, 1]) {
+      const endY = y + 0.027 + rowIndex * 0.002;
+      appendLeafVeinRibbon(positions, indices, [
+        { x: 0, y },
+        { x: direction * halfWidth * 0.34, y: y + 0.012 },
+        { x: direction * leafHalfWidth(endY) * 0.73, y: endY }
+      ], renderName === 'low' ? 0.0025 : 0.003);
+    }
+  });
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
 function buildLeaves(spec: DailyBouquetSpec, quality: QualityProfile) {
   const rng = createRng(`${spec.seed}:leaves`);
-  const shape = new THREE.Shape();
-  shape.moveTo(0, 0.13);
-  shape.bezierCurveTo(0.11, 0.08, 0.13, -0.08, 0, -0.15);
-  shape.bezierCurveTo(-0.13, -0.08, -0.11, 0.08, 0, 0.13);
-  const geometry = new THREE.ShapeGeometry(shape);
-  const material = new THREE.MeshStandardMaterial({
-    roughness: 0.9,
+  const bladeGeometry = buildLeafBladeGeometry(quality.renderName);
+  const veinGeometry = buildLeafVeinGeometry(quality.renderName);
+  const bladeMaterial = new THREE.MeshStandardMaterial({
+    roughness: 0.7,
+    metalness: 0,
+    side: THREE.DoubleSide,
+    emissive: new THREE.Color('#123d28'),
+    emissiveIntensity: 0.028
+  });
+  const veinMaterial = new THREE.MeshStandardMaterial({
+    roughness: 0.86,
     metalness: 0,
     side: THREE.DoubleSide,
     transparent: true,
-    opacity: 0.9,
-    emissive: new THREE.Color('#123d28'),
-    emissiveIntensity: 0.05
+    opacity: quality.renderName === 'low' ? 0.76 : 0.88,
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1
   });
   const count = Math.floor(quality.leafCount * spec.leafDensity * (spec.special ? 0.68 : 1));
-  const mesh = new THREE.InstancedMesh(geometry, material, count);
+  const blades = new THREE.InstancedMesh(bladeGeometry, bladeMaterial, count);
+  const veins = new THREE.InstancedMesh(veinGeometry, veinMaterial, count);
+  const group = new THREE.Group();
+  group.name = 'dimensional-leaves';
+  blades.name = 'leaf-blades';
+  veins.name = 'leaf-veins';
 
   for (let i = 0; i < count; i += 1) {
     const theta = rng.range(0, Math.PI * 2);
@@ -987,11 +1160,17 @@ function buildLeaves(spec: DailyBouquetSpec, quality: QualityProfile) {
       size
     );
     tempObject.updateMatrix();
-    mesh.setMatrixAt(i, tempObject.matrix);
-    mesh.setColorAt(i, tempColor.set(pickColor(spec.theme.leafPalette, rng.value())));
+    blades.setMatrixAt(i, tempObject.matrix);
+    veins.setMatrixAt(i, tempObject.matrix);
+    const bladeColor = tempColor.set(pickColor(spec.theme.leafPalette, rng.value())).clone();
+    blades.setColorAt(i, bladeColor);
+    const veinColor = bladeColor.clone().lerp(new THREE.Color(spec.theme.stem), 0.18).lerp(new THREE.Color('#e4edb8'), 0.36);
+    veins.setColorAt(i, veinColor);
   }
-  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  return mesh;
+  if (blades.instanceColor) blades.instanceColor.needsUpdate = true;
+  if (veins.instanceColor) veins.instanceColor.needsUpdate = true;
+  group.add(blades, veins);
+  return group;
 }
 
 function buildStemBundle(spec: DailyBouquetSpec) {

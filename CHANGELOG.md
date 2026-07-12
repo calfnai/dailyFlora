@@ -2,6 +2,17 @@
 
 > 自 `0.14.10` 起，新增版本记录使用中英文双语。 / Starting with `0.14.10`, all new release notes are written in both Chinese and English.
 
+## Unreleased - 2026-07-13
+
+记录今日默认花束的花材丰富度问题。 / Recorded today's default bouquet variety issue.
+
+- 记录用户反馈：`2026-07-13` 默认花束不好看，主要原因是用到的花的品种不够丰富。 / Recorded owner feedback that the default `2026-07-13` bouquet is not working mainly because the visible flower varieties are not rich enough.
+- 排查确认当天抽到 `tropical-forest` theme 与 `berry-grove` flowerPlan；主花束仍主要使用老 `FlowerTypeId` 与少数 primitive，0.14.6 新增的 16 种具象单花尚未进入每日默认生成器。 / Diagnosed that the date selected the `tropical-forest` theme and `berry-grove` flowerPlan; the main bouquet still relies on the old `FlowerTypeId` set and a small primitive subset, while the 16 concrete forms added in 0.14.6 are not yet part of daily default generation.
+- 将“每日生成必须真正用上扩展花库”记录为新的 dashboard 可复用审美规则，后续需要代码修复后复验。 / Added "daily generation must actually use the expanded flower library" as a reusable dashboard rule; this needs a code fix and owner review.
+- 新增 `daily-concrete-forest-variety / 百花莓园空气束`，并让 `2026-07-13` 默认日期使用它，混合多种具象单花、果点、空气小簇和枝线。 / Added `daily-concrete-forest-variety / Concrete Berry Meadow Air` and routed the default `2026-07-13` date to it, mixing multiple concrete single-flower forms with fruit dots, airy clusters, and branch lines.
+- 修复每日中文名可能重复的问题：默认命名加入日期专属月标记和日标记，允许凭审美起名，但普通日期不能只因抽到相同 mood/plan 就重名。 / Fixed a daily Chinese-name collision bug by adding date-specific month and day name marks; names can remain aesthetic, but ordinary dates no longer collide just because they select the same mood and plan.
+- 将主花束叶片从二维平面升级为有厚度、横向拱起和纵向卷曲的 3D 网格，并增加凸起主脉与成对侧脉；仍使用实例化渲染，低清模式自动减少网格和叶脉细分。 / Upgraded bouquet leaves from flat 2D shapes to thick, laterally arched, longitudinally curled 3D meshes with raised midribs and paired side veins; rendering remains instanced, with reduced mesh and vein detail in low mode.
+
 ## 0.14.11 - 2026-07-12
 
 调整科幻 LAB 的黑金配色方向。 / Adjusted the sci-fi lab black-gold palette direction.

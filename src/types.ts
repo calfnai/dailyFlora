@@ -25,7 +25,20 @@ export type FlowerTypeId =
   | 'liatris'
   | 'hydrangea'
   | 'pompon'
-  | 'bellFruit';
+  | 'bellFruit'
+  | 'daisy'
+  | 'gerbera'
+  | 'sunflower'
+  | 'anemone'
+  | 'cosmos'
+  | 'dahlia'
+  | 'ranunculus'
+  | 'camellia'
+  | 'peony'
+  | 'tulip'
+  | 'narcissus'
+  | 'phalaenopsis'
+  | 'calla';
 
 export type FlowerPlanRole = 'main' | 'secondary' | 'line' | 'cluster' | 'fruit' | 'filler';
 

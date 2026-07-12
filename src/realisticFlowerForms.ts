@@ -127,6 +127,15 @@ function cylinderBetween(start: THREE.Vector3, end: THREE.Vector3, radius: numbe
   return mesh;
 }
 
+function stemAlong(points: THREE.Vector3[], radius: number, color: THREE.Color, segments = 18) {
+  const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
+  const mesh = new THREE.Mesh(
+    new THREE.TubeGeometry(curve, segments, radius, 7, false),
+    flowerMaterial(color, 0.92)
+  );
+  return { curve, mesh };
+}
+
 function addPrintCore(group: THREE.Group, palette: string[], radius = 0.18, stemLength = 0.72) {
   const green = colorAt(palette, palette.length - 1, '#668857');
   const receptacle = new THREE.Mesh(
@@ -350,42 +359,66 @@ function createCalla(options: BuildOptions) {
   return group;
 }
 
-type SpikeKind = 'delphinium' | 'snapdragon' | 'hyacinth' | 'foxtail-lily' | 'liatris';
+type SpikeKind = 'delphinium' | 'snapdragon' | 'hyacinth' | 'foxtail-lily' | 'liatris' | 'babys-breath';
 
 function createSpike(options: BuildOptions, kind: SpikeKind) {
   const rng = createRng(`${options.seed}:${kind}`);
   const group = new THREE.Group();
   const green = colorAt(options.palette, options.palette.length - 1, '#587a4f');
-  const height = kind === 'hyacinth' ? 1.7 : 2.2;
-  group.add(cylinderBetween(new THREE.Vector3(0, -height * 0.55, 0), new THREE.Vector3(0, height * 0.5, 0), 0.055, green));
-  const count = kind === 'liatris' ? 34 : kind === 'foxtail-lily' ? 28 : kind === 'hyacinth' ? 18 : 15;
+  const height = kind === 'hyacinth' ? 1.72 : kind === 'babys-breath' ? 2.05 : 2.2;
+  const sway = kind === 'hyacinth' ? 0.13 : kind === 'liatris' ? 0.2 : kind === 'babys-breath' ? 0.34 : 0.28;
+  const baseY = -height * 0.62;
+  const topY = height * 0.52;
+  const stemPoints = [
+    new THREE.Vector3(0, baseY, 0),
+    new THREE.Vector3(rng.range(-0.06, 0.06), baseY + height * 0.28, rng.range(-0.04, 0.04)),
+    new THREE.Vector3(rng.range(-sway, sway) * 0.48, baseY + height * 0.58, rng.range(-sway, sway) * 0.32),
+    new THREE.Vector3(rng.range(-sway, sway), baseY + height * 0.82, rng.range(-sway, sway) * 0.7),
+    new THREE.Vector3(rng.range(-sway, sway) * 1.18, topY, rng.range(-sway, sway))
+  ];
+  const stemRadius = kind === 'hyacinth' ? 0.036 : kind === 'babys-breath' ? 0.022 : 0.029;
+  const stem = stemAlong(stemPoints, stemRadius, green, 22);
+  group.add(stem.mesh);
+  const count = kind === 'babys-breath' ? 30 : kind === 'liatris' ? 34 : kind === 'foxtail-lily' ? 28 : kind === 'hyacinth' ? 18 : 15;
   const petalsPerFloret = kind === 'snapdragon' ? 3 : kind === 'liatris' ? 4 : 5;
   const totalPetals = count * petalsPerFloret;
-  const petalLength = kind === 'liatris' ? 0.16 : kind === 'foxtail-lily' ? 0.2 : kind === 'hyacinth' ? 0.24 : 0.3;
+  const petalLength = kind === 'babys-breath' ? 0.085 : kind === 'liatris' ? 0.16 : kind === 'foxtail-lily' ? 0.2 : kind === 'hyacinth' ? 0.24 : 0.3;
   const petals = new THREE.InstancedMesh(
     petalGeometry(petalLength, petalLength * 0.34, 0.04, kind === 'snapdragon' ? -0.05 : 0.01, 0.45, 0.006),
     flowerMaterial(colorAt(options.palette, 0), 0.82),
     totalPetals
   );
   const centers = new THREE.InstancedMesh(
-    new THREE.SphereGeometry(kind === 'liatris' ? 0.045 : 0.065, 9, 6),
+    new THREE.SphereGeometry(kind === 'babys-breath' ? 0.032 : kind === 'liatris' ? 0.045 : 0.065, 9, 6),
     flowerMaterial(colorAt(options.palette, 2), 0.88),
     count
   );
   let petalIndex = 0;
   for (let i = 0; i < count; i += 1) {
-    const t = i / Math.max(1, count - 1);
-    const y = -height * 0.18 + t * height * 0.66;
-    const taper = 1 - t * (kind === 'foxtail-lily' ? 0.7 : 0.36);
+    const progress = i / Math.max(1, count - 1);
+    const t = (kind === 'babys-breath' ? 0.3 : 0.34) + progress * (kind === 'babys-breath' ? 0.68 : 0.62);
+    const taper = 1 - progress * (kind === 'foxtail-lily' ? 0.7 : kind === 'babys-breath' ? 0.28 : 0.36);
     const angle = i * 2.39996 + rng.range(-0.08, 0.08);
-    const reach = (kind === 'liatris' ? 0.1 : 0.16 + 0.1 * taper);
-    const centerPos = new THREE.Vector3(Math.cos(angle) * reach, y, Math.sin(angle) * reach);
-    const branchStart = new THREE.Vector3(0, y - 0.03, 0);
-    group.add(cylinderBetween(branchStart, centerPos, kind === 'liatris' ? 0.018 : 0.025, green));
+    const reach = kind === 'babys-breath'
+      ? rng.range(0.18, 0.5) * (0.7 + Math.sin(progress * Math.PI) * 0.45)
+      : kind === 'liatris' ? 0.075 : (0.14 + 0.1 * taper);
+    const axisPoint = stem.curve.getPoint(t);
+    const radial = new THREE.Vector3(Math.cos(angle), kind === 'babys-breath' ? rng.range(-0.12, 0.24) : 0, Math.sin(angle));
+    const centerPos = axisPoint.clone().addScaledVector(radial, reach);
+    const branchStart = stem.curve.getPoint(Math.max(0, t - 0.012));
+    if (kind === 'babys-breath') {
+      const joint = branchStart.clone().lerp(centerPos, 0.56).add(new THREE.Vector3(0, rng.range(0.02, 0.09), 0));
+      group.add(
+        cylinderBetween(branchStart, joint, 0.009, green),
+        cylinderBetween(joint, centerPos, 0.0065, green)
+      );
+    } else {
+      group.add(cylinderBetween(branchStart, centerPos, kind === 'liatris' ? 0.01 : 0.014, green));
+    }
     setInstance(centers, i, centerPos, new THREE.Vector3(taper, taper, taper), colorAt(options.palette, i + 1));
     for (let p = 0; p < petalsPerFloret; p += 1) {
       const pa = p / petalsPerFloret * Math.PI * 2 + angle;
-      const normal = centerPos.clone().normalize().add(new THREE.Vector3(Math.cos(pa) * 0.28, 0.34, Math.sin(pa) * 0.28));
+      const normal = radial.clone().normalize().add(new THREE.Vector3(Math.cos(pa) * 0.2, kind === 'babys-breath' ? 0.62 : 0.34, Math.sin(pa) * 0.2));
       setInstance(
         petals,
         petalIndex,
@@ -402,14 +435,29 @@ function createSpike(options: BuildOptions, kind: SpikeKind) {
   return group;
 }
 
-type ClusterKind = 'lace-flower' | 'hydrangea' | 'babys-breath' | 'rice-flower';
+type ClusterKind = 'lace-flower' | 'hydrangea' | 'rice-flower';
 
 function createCluster(options: BuildOptions, kind: ClusterKind) {
   const rng = createRng(`${options.seed}:${kind}`);
   const group = new THREE.Group();
   const green = colorAt(options.palette, options.palette.length - 1, '#5e7e53');
-  group.add(cylinderBetween(new THREE.Vector3(0, -1, 0), new THREE.Vector3(0, -0.02, 0), 0.06, green));
-  const count = kind === 'hydrangea' ? 34 : kind === 'rice-flower' ? 38 : kind === 'babys-breath' ? 24 : 20;
+  const sprayCount = kind === 'hydrangea' ? 4 : 5;
+  const sprays = Array.from({ length: sprayCount }, (_, index) => {
+    const lane = index - (sprayCount - 1) * 0.5;
+    const base = new THREE.Vector3(lane * 0.075, -1.12 + Math.abs(lane) * 0.025, lane * -0.035);
+    const crownX = lane * (kind === 'hydrangea' ? 0.28 : 0.36) + rng.range(-0.12, 0.12);
+    const crownZ = rng.range(-0.36, 0.36);
+    const points = [
+      base,
+      new THREE.Vector3(base.x + lane * 0.05, -0.68, base.z + rng.range(-0.05, 0.05)),
+      new THREE.Vector3(crownX * 0.48, -0.18 + rng.range(-0.08, 0.1), crownZ * 0.4),
+      new THREE.Vector3(crownX, 0.38 + rng.range(-0.08, 0.22), crownZ)
+    ];
+    const spray = stemAlong(points, kind === 'hydrangea' ? 0.017 : 0.012, green, 14);
+    group.add(spray.mesh);
+    return spray.curve;
+  });
+  const count = kind === 'hydrangea' ? 38 : kind === 'rice-flower' ? 44 : 26;
   const petalsPer = kind === 'hydrangea' ? 4 : 5;
   const petalLength = kind === 'hydrangea' ? 0.2 : kind === 'lace-flower' ? 0.13 : 0.095;
   const petals = new THREE.InstancedMesh(
@@ -424,18 +472,23 @@ function createCluster(options: BuildOptions, kind: ClusterKind) {
   );
   let petalIndex = 0;
   for (let i = 0; i < count; i += 1) {
-    const angle = i * 2.39996;
+    const angle = i * 2.39996 + rng.range(-0.16, 0.16);
     const radial = kind === 'lace-flower'
       ? rng.range(0.5, 0.88)
-      : kind === 'hydrangea' ? rng.range(0.12, 0.86) : rng.range(0.28, 0.82);
+      : kind === 'hydrangea' ? rng.range(0.12, 0.78) : rng.range(0.18, 0.72);
     const vertical = kind === 'lace-flower'
       ? rng.range(0.05, 0.22)
-      : kind === 'hydrangea' ? Math.sqrt(Math.max(0, 0.86 ** 2 - radial ** 2)) * rng.range(0.55, 1) : rng.range(0.1, 0.7);
+      : kind === 'hydrangea' ? Math.sqrt(Math.max(0, 0.82 ** 2 - radial ** 2)) * rng.range(0.45, 0.92) : rng.range(0.08, 0.58);
     const end = new THREE.Vector3(Math.cos(angle) * radial, vertical, Math.sin(angle) * radial);
-    const joint = new THREE.Vector3(Math.cos(angle) * radial * 0.38, -0.04 + vertical * 0.28, Math.sin(angle) * radial * 0.38);
+    const spray = sprays[i % sprays.length];
+    const attachT = rng.range(0.68, 0.98);
+    const branchStart = spray.getPoint(attachT);
+    const crownBias = spray.getPoint(1);
+    end.addScaledVector(crownBias, kind === 'hydrangea' ? 0.34 : 0.48);
+    const joint = branchStart.clone().lerp(end, 0.58).add(new THREE.Vector3(0, rng.range(0.025, 0.11), 0));
     group.add(
-      cylinderBetween(new THREE.Vector3(0, -0.03, 0), joint, kind === 'babys-breath' ? 0.018 : 0.024, green),
-      cylinderBetween(joint, end, kind === 'babys-breath' ? 0.015 : 0.021, green)
+      cylinderBetween(branchStart, joint, kind === 'hydrangea' ? 0.01 : 0.0075, green),
+      cylinderBetween(joint, end, kind === 'hydrangea' ? 0.0075 : 0.0055, green)
     );
     setInstance(centers, i, end, new THREE.Vector3(1, 1, 1), colorAt(options.palette, i + 1));
     if (kind !== 'rice-flower') {
@@ -540,15 +593,15 @@ export const realisticFlowerDefinitions: RealisticFlowerDefinition[] = [
   { id: 'narcissus', cn: '洋水仙', en: 'Narcissus', category: 'sculptural', description: '六片花被、褶边副冠、深喉和可见花蕊。', palette: ['#fff2bc', '#ffe4a0', '#f3b13e', '#ffd46c', '#6f9658'], printStructure: '副冠、花蕊、花被、花托与花梗连续连接。' },
   { id: 'phalaenopsis', cn: '蝴蝶兰', en: 'Phalaenopsis Orchid', category: 'sculptural', description: '左右展开的大瓣、上下萼片和中央唇瓣。', palette: ['#f3c6ea', '#fff1fb', '#d56cad', '#f1b44f', '#64834d'], printStructure: '五片主瓣与中央柱体相交，唇瓣连接柱体。' },
   { id: 'calla', cn: '马蹄莲', en: 'Calla Lily', category: 'sculptural', description: '单片卷曲苞片包围肉穗花序。', palette: ['#fff4d5', '#f5df9e', '#e9b742', '#6a8b57'], printStructure: '苞片基部闭合连接粗花梗，肉穗固定在内部。' },
-  { id: 'delphinium', cn: '飞燕草', en: 'Delphinium', category: 'spike', description: '蓝色开放小花沿高直花轴分层分布。', palette: ['#6f95ed', '#9fb7ff', '#f4e7b9', '#55734e'], printStructure: '每朵小花通过短花梗连接中央花轴。' },
-  { id: 'snapdragon', cn: '金鱼草', en: 'Snapdragon', category: 'spike', description: '密集唇形花沿花轴排列，底密顶疏。', palette: ['#ff8877', '#ffb197', '#f7d07c', '#5b7d4e'], printStructure: '每个唇形花头以加厚短梗连接主轴。' },
-  { id: 'hyacinth', cn: '风信子', en: 'Hyacinth', category: 'spike', description: '短粗花轴上聚集密集星形小花。', palette: ['#9f86df', '#c2adef', '#f0d77b', '#55764e'], printStructure: '所有星形小花由短梗接入粗花轴。' },
-  { id: 'foxtail-lily', cn: '狐尾百合', en: 'Foxtail Lily', category: 'spike', description: '细长锥形花穗，密集小花向上渐疏。', palette: ['#f2a64a', '#f8c46d', '#ffe0a0', '#607d4e'], printStructure: '渐缩花梗和小花共同围绕连续主轴。' },
-  { id: 'liatris', cn: '蛇鞭菊', en: 'Liatris', category: 'spike', description: '紫色细密绒穗紧贴直立花轴。', palette: ['#a36bd1', '#c28ae2', '#e8b5f1', '#55734d'], printStructure: '短花丝簇紧贴加粗花轴，无悬浮花点。' },
-  { id: 'lace-flower', cn: '蕾丝花', en: 'Lace Flower', category: 'cluster', description: '伞形分枝托起一层细小白花。', palette: ['#fffdf0', '#f5eed4', '#e6cf78', '#5e7d52'], printStructure: '每个小花头通过两段实体分枝连接主梗。' },
-  { id: 'hydrangea', cn: '绣球', en: 'Hydrangea', category: 'cluster', description: '四瓣小花组成饱满球形云团。', palette: ['#9dc9ef', '#bddcf6', '#e6d988', '#5d7f54'], printStructure: '小花通过实体分枝汇入中央主梗。' },
-  { id: 'babys-breath', cn: '满天星', en: "Baby's Breath", category: 'cluster', description: '极细分枝托起疏松白色小花点。', palette: ['#fffdf4', '#f3eedf', '#e8d99c', '#617e56'], printStructure: '细枝仍保留最小实体直径，小花固定在枝端。' },
-  { id: 'rice-flower', cn: '米花', en: 'Rice Flower', category: 'cluster', description: '细密米粒状花苞形成紧凑小簇。', palette: ['#fff0dd', '#f2d8bd', '#dfbc83', '#617e54'], printStructure: '米粒花苞直接连接实体分枝，不使用悬空粒子。' }
+  { id: 'delphinium', cn: '飞燕草', en: 'Delphinium', category: 'spike', description: '蓝色开放小花沿自然弯曲的高花轴错落展开。', palette: ['#6f95ed', '#9fb7ff', '#f4e7b9', '#55734e'], printStructure: '纤细连续花轴向下延伸，每朵小花以短花梗接入。' },
+  { id: 'snapdragon', cn: '金鱼草', en: 'Snapdragon', category: 'spike', description: '唇形花沿带侧向摆动的花轴排列，底密顶疏。', palette: ['#ff8877', '#ffb197', '#f7d07c', '#5b7d4e'], printStructure: '弯曲主轴连接花瓶，花头以细短梗逐级接入。' },
+  { id: 'hyacinth', cn: '风信子', en: 'Hyacinth', category: 'spike', description: '星形小花围绕短而柔弯的花轴形成紧凑花穗。', palette: ['#9f86df', '#c2adef', '#f0d77b', '#55764e'], printStructure: '细化主轴并保留短梗，使花穗连续连接至花瓶。' },
+  { id: 'foxtail-lily', cn: '狐尾百合', en: 'Foxtail Lily', category: 'spike', description: '细长锥形花穗带轻微风吹弧度，小花向上渐疏。', palette: ['#f2a64a', '#f8c46d', '#ffe0a0', '#607d4e'], printStructure: '渐缩小花梗围绕纤细曲线主轴，并向下连续连接。' },
+  { id: 'liatris', cn: '蛇鞭菊', en: 'Liatris', category: 'spike', description: '紫色细密绒穗贴着柔韧弯曲的长花轴生长。', palette: ['#a36bd1', '#c28ae2', '#e8b5f1', '#55734d'], printStructure: '花丝簇贴合细曲线花轴，花轴完整延伸至花瓶。' },
+  { id: 'lace-flower', cn: '蕾丝花', en: 'Lace Flower', category: 'cluster', description: '多条独立细枝托起轻盈伞面，像在空气中缓慢舒展。', palette: ['#fffdf0', '#f5eed4', '#e6cf78', '#5e7d52'], printStructure: '小花分散接入多条下行曲枝，不再汇聚单一中心点。' },
+  { id: 'hydrangea', cn: '绣球', en: 'Hydrangea', category: 'cluster', description: '四瓣小花形成留有呼吸间隙的漂浮球形云团。', palette: ['#9dc9ef', '#bddcf6', '#e6d988', '#5d7f54'], printStructure: '多条独立支撑曲枝穿入花团，避免中央放射枢纽。' },
+  { id: 'babys-breath', cn: '满天星', en: "Baby's Breath", category: 'spike', description: '白色小花沿纤细弯曲花轴与二级短枝串状散开。', palette: ['#fffdf4', '#f3eedf', '#e8d99c', '#617e56'], printStructure: '作为轻盈串状花序，细主轴向下连接并逐级分枝。' },
+  { id: 'rice-flower', cn: '米花', en: 'Rice Flower', category: 'cluster', description: '米粒花苞沿多条弧形细枝分散悬浮，形成星云般节奏。', palette: ['#fff0dd', '#f2d8bd', '#dfbc83', '#617e54'], printStructure: '花苞接入多条独立下行曲枝，不使用半截中央主梗。' }
 ];
 
 export function createRealisticFlower(definition: RealisticFlowerDefinition, seed: string) {
@@ -576,9 +629,9 @@ export function createRealisticFlower(definition: RealisticFlowerDefinition, see
       return createPhalaenopsis(options);
     case 'calla':
       return createCalla(options);
-    case 'delphinium': case 'snapdragon': case 'hyacinth': case 'foxtail-lily': case 'liatris':
+    case 'delphinium': case 'snapdragon': case 'hyacinth': case 'foxtail-lily': case 'liatris': case 'babys-breath':
       return createSpike(options, definition.id);
-    case 'lace-flower': case 'hydrangea': case 'babys-breath': case 'rice-flower':
+    case 'lace-flower': case 'hydrangea': case 'rice-flower':
       return createCluster(options, definition.id);
   }
 }

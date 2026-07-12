@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-12",
+  "updatedAt": "2026-07-13",
   "gate": {
     "status": "pass",
     "title": "0.14 审美基线通过",
@@ -63,6 +63,24 @@
       "ownerFeedback": "穗状花角度过于统一、长度不合理，在半空出现且没有花茎连接；各枝走向也不像来自同一个花瓶。",
       "correction": "缩短并下沉穗花、降低重复线花权重；所有穗花从共同扎口推导轴线，并以连续实体花茎连接扎口和花穗底部。",
       "url": "../?date=2026-07-11&render=high&density=medium"
+    },
+    {
+      "date": "2026-07-13",
+      "name": "百花莓园游枝",
+      "status": "needs-owner-review",
+      "ownerFeedback": "今天生成的花不好看，核心感受是用到的花的品种不够丰富。",
+      "diagnosis": "日期 seed 抽到 tropical-forest theme 与 berry-grove flowerPlan；该 plan 仍只使用老 FlowerTypeId 中的少数抽象角色，最终映射到约 6 种 primitive。0.14.6 新增的 16 种具象单花已经进入 Primitive Lab，但尚未真正进入每日 flowerPlan 与主花束 renderer 的候选池。",
+      "correction": "新增 daily-concrete-forest-variety flowerPlan，并将 2026-07-13 默认 seed 指向该 plan；扩展 FlowerTypeId 与 renderer 映射，让波斯菊、银莲花、大丽花、玫瑰、花毛茛、郁金香、洋水仙、蝴蝶兰、果点、小簇和枝线共同进入今日花束。等待用户复验。",
+      "url": "../?date=2026-07-13&render=high&density=medium"
+    },
+    {
+      "date": "2026-07-08 / 2026-07-09",
+      "name": "每日中文名重复 bug",
+      "status": "fixed-needs-build",
+      "ownerFeedback": "某些 7 月 8 日、7 月 9 日中文名竟然一样，说明命名遗漏了 bug。",
+      "diagnosis": "原命名逻辑只由少量 mood 与 flowerPlan 组合生成，两个日期如果抽到同一 mood 与同一 plan，就会出现主中文名重复；日期印记虽然不同，但花花自己的中文名不应重复。",
+      "correction": "新增日期专属的月标记和日标记，默认中文名由 mood + 月标记 + 日标记 + planName 组成；保留少量手工 override，但普通日期不会再因 mood/plan 相同而撞名。",
+      "url": "../?date=2026-07-08&render=high&density=medium"
     }
   ],
   "primitiveLabConcreteExpansion": {
@@ -226,6 +244,23 @@
         "只在代码 seed 中存在差异，却没有用户可见的每日身份。"
       ],
       "ownerAcceptance": "用户明确要求将本次命名与审美纠正长期记录在项目中；这是后续每日生成和发布门禁。"
+    },
+    {
+      "id": "daily-flower-variety-coverage",
+      "title": "每日生成必须真正用上扩展花库",
+      "summary": "Primitive Lab 花型变多不等于每日花束变丰富。每日 flowerPlan 和 renderer 必须把已进入花库的具象单花纳入候选、配比和可见映射，否则日期 seed 只会在少数老抽象角色之间重复。",
+      "principles": [
+        "每日默认生成应有最小花材丰富度，不能长期只由 5 到 6 个老类型组成。",
+        "0.14.6 加入 Primitive Lab 的 16 种具象单花需要进入 flowerPlan 类型、角色配比和 renderer 映射，而不是只停留在实验页。",
+        "丰富不是简单增加数量；需要在主花、层叠花、小面花、杯形/雕塑花、果点、枝线和叶材之间形成可读差异。",
+        "如果某天 seed 抽到的主题和 plan 天然偏单一，默认生成应有兜底机制补充具象单花变化。"
+      ],
+      "rejectSignals": [
+        "HUD 显示不同日期，但花材清单仍只重复少数旧类型。",
+        "新增花型只在 Primitive Lab 可见，主花束中看不到对应差异。",
+        "通过换色、闪点或果点伪装丰富度，实际花型轮廓没有变。"
+      ],
+      "ownerAcceptance": "来自用户对 2026-07-13 今日花束的反馈；需要代码修复后再复验。"
     }
   ],
   "targetShapeVocabulary": [
