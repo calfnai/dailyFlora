@@ -47,6 +47,21 @@
       }
     ]
   },
+  "publicSiteReview": {
+    "updatedAt": "2026-07-13",
+    "status": "pass",
+    "scope": [
+      "/about/",
+      "/signup/"
+    ],
+    "summary": "本轮不修改主花束 composition，而是将已通过的 DailyFlora 审美语言延展到公开网站。About 已形成完整品牌叙事；Signup 已形成围绕收藏、记忆与个人花园的注册 landing page。",
+    "principles": [
+      "真实产品画面优先于另造装饰插画，About 首屏直接嵌入今日花束。",
+      "深绿、暖黄、细边框、衬线大标题与大量留白共同构成公开页面的品牌基线。",
+      "卖点按用户动机组织，不按后台功能模块平铺。",
+      "注册动作、MVP 数据边界、密码处理与 AI 协作署名都需要透明表达。"
+    ]
+  },
   "dailyBouquetCorrections": [
     {
       "date": "2026-07-07",

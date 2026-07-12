@@ -225,6 +225,32 @@
         background: rgb(242 203 98 / 6%);
       }
 
+      .surface-review-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .surface-review-card {
+        display: grid;
+        gap: 13px;
+        min-height: 230px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: linear-gradient(145deg, rgb(255 255 255 / 5%), rgb(255 255 255 / 2%));
+      }
+
+      .surface-review-card h3 {
+        font-size: 24px;
+      }
+
+      .surface-review-card p,
+      .surface-review-card li {
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
       .library-card {
         display: grid;
         gap: 10px;
@@ -398,7 +424,8 @@
         .rules-grid,
         .library-grid,
         .shape-grid,
-        .role-review {
+        .role-review,
+        .surface-review-grid {
           grid-template-columns: 1fr;
         }
 
@@ -457,8 +484,8 @@
         line-height: 1.7;
       }
     </style>
-    <script type="module" crossorigin src="../assets/aestheticReviewDashboard-BSIQKmd2.js"></script>
-    <link rel="modulepreload" crossorigin href="../assets/floraPrimitives-CaIysjBZ.js">
+    <script type="module" crossorigin src="../assets/aestheticReviewDashboard-DLBua9Ul.js"></script>
+    <link rel="modulepreload" crossorigin href="../assets/floraPrimitives-4rXDGYNg.js">
   </head>
   <body>
     <main class="shell">
@@ -529,6 +556,31 @@
           </div>
         </div>
         <div class="role-grid" id="role-grid"></div>
+      </section>
+
+      <section class="section" aria-labelledby="public-surface-review-title">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Public surface review · 2026-07-13</p>
+            <h2 id="public-surface-review-title">品牌网站审美复盘</h2>
+            <p class="section-copy">本轮不改主花束 composition，只把已通过的花束审美语言延展到公开网页：克制的深绿背景、暖黄点光、留白、细边框和偏编辑感的衬线大标题。</p>
+          </div>
+          <div class="link-row"><a class="pill" href="../about/">查看 About</a><a class="pill" href="../signup/">查看 Signup</a></div>
+        </div>
+        <div class="surface-review-grid">
+          <article class="surface-review-card">
+            <div><span class="status pass">pass · implementation</span></div>
+            <h3>About：从开发占位到品牌叙事</h3>
+            <p>品牌介绍、开发初衷、产品原则、人员说明、代码与引用条款、footer 已形成完整阅读路径；首屏实时花束负责证明产品本体，页面装饰不与花竞争。</p>
+            <ul><li>保留空气与纵向节奏，不密铺卡片。</li><li>真实产品画面优先于另造装饰插画。</li><li>AI 协作署名透明，但不抢占品牌主角。</li></ul>
+          </article>
+          <article class="surface-review-card">
+            <div><span class="status pass">pass · implementation</span></div>
+            <h3>Signup：卖点围绕“花会留下来”</h3>
+            <p>首屏将注册价值归结为收藏与记忆，四项卖点按用户动机而非后台模块罗列；注册表单成为页面主动作，同时明确本机 MVP 边界。</p>
+            <ul><li>主 CTA 与内容叙事一致，不再跳到 mockup 才解释。</li><li>功能卡保持疏密变化，避免等宽四格的后台感。</li><li>隐私、密码与真实账号状态用小字如实交代。</li></ul>
+          </article>
+        </div>
       </section>
 
       <section class="section">

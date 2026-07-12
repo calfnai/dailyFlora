@@ -217,6 +217,18 @@
         color: var(--text);
       }
 
+      .update-note {
+        margin-top: 14px;
+        padding: 18px;
+        border: 1px solid rgb(135 212 134 / 32%);
+        border-radius: 8px;
+        background: rgb(135 212 134 / 7%);
+      }
+
+      .update-note p + p {
+        margin-top: 8px;
+      }
+
       @media (max-width: 860px) {
         .grid,
         .grid.two {
@@ -239,6 +251,15 @@
           <code>/docs/</code> 下的实验页、审美页、样例页整理成一个可浏览、可分层、可继续扩展的产品后台和客户页面体系。
         </p>
       </header>
+
+      <section class="section" aria-labelledby="latest-update-title">
+        <p class="eyebrow">2026-07-13 · public website update</p>
+        <h2 id="latest-update-title">本次实现更新</h2>
+        <div class="update-note">
+          <p><strong><code>/about/</code> 已从占位页升级为正式品牌介绍页。</strong>现包含品牌描述、开发初衷、三条产品原则、开发人员与 AI 协作说明、开源代码及引用条款小字，以及完整站点 footer；首屏直接嵌入今日实时花束。</p>
+          <p><strong><code>/signup/</code> 已升级为注册 landing page。</strong>以“别让喜欢的花只开一天”为主叙事，按收藏、生成档案、参考图、未来商业连接四组卖点组织内容，并提供本机 MVP 注册表单；提交后复用现有账户数据格式进入个人花园。</p>
+        </div>
+      </section>
 
       <section class="section">
         <h2>一句话总结</h2>
@@ -297,6 +318,16 @@
                 <td><code>/docs/avatar-lab.html</code></td>
                 <td>用完删除，改成用户页面测试页：资料、头像、密码、生成记录、上传照片和文字、复制再生成、充值、订单、积分、获奖返还。</td>
                 <td><span class="status bad">方向变化大</span> 现页面是头像实验室，需要改成 member/user page 原型，而不是继续做头像单点测试。</td>
+              </tr>
+              <tr>
+                <td><code>/about/</code></td>
+                <td>公开品牌介绍：说明 DailyFlora 是什么、为什么开发、由谁开发，并提供引用与开源条款及完整 footer。</td>
+                <td><span class="status good">已完成</span> 已形成正式品牌页面，不再作为客户侧占位。</td>
+              </tr>
+              <tr>
+                <td><code>/signup/</code></td>
+                <td>以 landing page 方式解释注册价值，并把用户明确引导到可执行的注册动作。</td>
+                <td><span class="status good">MVP 已完成</span> 卖点、注册表单和个人花园跳转已接通；真实账号后端仍为后续事项。</td>
               </tr>
             </tbody>
           </table>
@@ -456,8 +487,8 @@
               </tr>
               <tr>
                 <td><span class="status cool">P2</span></td>
-                <td>补客户公开页面</td>
-                <td>about、Bouquet Shop、downloads 可以先做占位，保持导航完整。</td>
+                <td>继续补齐其余客户公开页面</td>
+                <td>about 与 signup 已升级；Bouquet Shop、downloads 仍可按相同品牌系统继续完善。</td>
               </tr>
             </tbody>
           </table>
