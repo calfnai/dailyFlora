@@ -96,6 +96,7 @@ const palettes: Partial<Record<FloraPrimitiveName, string[]>> = {
   TulipCupFlower: ['#ffbf5a', '#fff0c2', '#f58aa2', '#5d8a55'],
   TrumpetThroatFlower: ['#fff9e8', '#ffffff', '#ffc847', '#f08b36'],
   FrilledNarcissusFlower: ['#fff4c8', '#ffe8a7', '#f3b13e', '#ffd86a', '#78a66a'],
+  OrbitalPulseFlower: ['#6cf4ff', '#8f7bff', '#ff63d8', '#dcff6b', '#375c58'],
   DaturaTrumpetFlower: ['#ffffff', '#f2e3ff', '#8a5ab8', '#58783f'],
   OrchidButterflyFlower: ['#f8c8eb', '#fff6fb', '#e078b8', '#cc8b4f'],
   CallaCurledBract: ['#fff7df', '#f6e8b5', '#f2b84c', '#6c8b57'],
@@ -114,13 +115,15 @@ const faceForwardPrimitives: FloraPrimitiveName[] = [
   'RuffledRoseFlower',
   'StarPinwheelFlower',
   'TrumpetThroatFlower',
-  'FrilledNarcissusFlower'
+  'FrilledNarcissusFlower',
+  'OrbitalPulseFlower'
 ];
 const tallPrimitives: FloraPrimitiveName[] = ['SpikeFlower', 'FoliageGrassBranch'];
 const openPrimitives: FloraPrimitiveName[] = [
   'OrchidButterflyFlower',
   'TrumpetThroatFlower',
   'FrilledNarcissusFlower',
+  'OrbitalPulseFlower',
   'DaturaTrumpetFlower',
   'CallaCurledBract'
 ];
@@ -132,17 +135,30 @@ const densePrimitives: FloraPrimitiveName[] = [
 ];
 
 const shapeEntries = dashboardData.targetShapeVocabulary as ShapeEntry[];
+const acceptedHybridEntries = dashboardData.acceptedHybridVocabulary as CandidateShapeEntry[];
 const candidateEntries = dashboardData.candidateShapeVocabulary as CandidateShapeEntry[];
 const gateEntries = dashboardData.primitiveGate as GateEntry[];
 const promotedRealisticDefinitions = realisticFlowerDefinitions.filter(
   (definition) => definition.category !== 'spike' && definition.category !== 'cluster'
 );
 const displayShapes: DisplayShape[] = [
+  ...acceptedHybridEntries.map((shape, index) => ({
+    id: shape.id,
+    name: shape.name,
+    englishName: shape.englishName,
+    description: `${shape.examples} · ${shape.ownerNote}`,
+    primitive: shape.primitive,
+    realisticDefinition: null,
+    candidate: false,
+    family: 'target' as const,
+    indexLabel: `H${String(index + 1).padStart(2, '0')}`,
+    statusLabel: shape.status
+  })),
   ...candidateEntries.map((shape, index) => ({
     id: shape.id,
     name: shape.name,
     englishName: shape.englishName,
-    description: '六片花被、褶边副冠、深喉、花蕊与绿色连接点；待用户确认后才登记。',
+    description: shape.examples,
     primitive: shape.primitive,
     realisticDefinition: null,
     candidate: true,
@@ -222,6 +238,7 @@ function primitiveModelScale(primitive: FloraPrimitiveName) {
   if (primitive === 'FoliageGrassBranch') return 0.66;
   if (primitive === 'SpikeFlower') return 0.62;
   if (primitive === 'FrilledNarcissusFlower') return 0.68;
+  if (primitive === 'OrbitalPulseFlower') return 0.66;
   if (primitive === 'HangingBellFruit') return 0.72;
   return 0.74;
 }

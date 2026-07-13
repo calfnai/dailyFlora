@@ -1,0 +1,93 @@
+{
+  "date": "2026-06-15",
+  "source": "xiaohongshu",
+  "assistant": "Lobster external AI app running DeepSeek or another model",
+  "goal": "Organize owner-provided Xiaohongshu links for DailyFlora inspiration review without stressing the account session.",
+  "accessMode": "owner-provided-links",
+  "ownerLinksFile": "data/inbox/2026-06-15/owner-links.json",
+  "creators": [
+    {
+      "id": "5cf91ecd0000000016029124",
+      "name": "柏恩花室",
+      "profileUrl": "https://www.xiaohongshu.com/user/profile/5cf91ecd0000000016029124"
+    },
+    {
+      "id": "63690d32000000001f017b63",
+      "name": "早春的树EarlySpring",
+      "profileUrl": "https://www.xiaohongshu.com/user/profile/63690d32000000001f017b63"
+    },
+    {
+      "id": "655c17b70000000004039e98",
+      "name": "Césped",
+      "profileUrl": "https://www.xiaohongshu.com/user/profile/655c17b70000000004039e98"
+    },
+    {
+      "id": "5fb9ef600000000001000de9",
+      "name": "大兜花园DorBeetleGarden",
+      "profileUrl": "https://www.xiaohongshu.com/user/profile/5fb9ef600000000001000de9"
+    },
+    {
+      "id": "65f8141a000000000600f47c",
+      "name": "Dreamseeker寻梦",
+      "profileUrl": "https://www.xiaohongshu.com/user/profile/65f8141a000000000600f47c"
+    }
+  ],
+  "ownerProvidedLinks": [
+    {
+      "sourceUrl": "https://www.xiaohongshu.com/discovery/item/6a2f283900000000060221e3?source=webshare&xhsshare=pc_web&xsec_token=AB0G7c_Eh8stxDAJ7Y7Qtg0OJlA6lLKBtF77KjFsIh0AU=&xsec_source=pc_share",
+      "shareCode": "Z9GNz6u9dwWOSLz",
+      "creatorName": "Mm🔥",
+      "title": "不是惊喜，是“你懂我”的那种安心💐"
+    },
+    {
+      "sourceUrl": "https://www.xiaohongshu.com/discovery/item/6a2e64490000000021015b88?source=webshare&xhsshare=pc_web&xsec_token=ABfop9ihtfGbs1VnCXGbqEMPNYVP6eGo8rM8CM5rAuc_M=&xsec_source=pc_share",
+      "shareCode": "nSXPunB6n4UgUZt",
+      "creatorName": "葡萄枝的花",
+      "title": "蝉鸣铺满河床🍃🌠"
+    }
+  ],
+  "outputFile": "data/inbox/2026-06-15/notes.json",
+  "outputShape": {
+    "notes": [
+      {
+        "creatorId": "string",
+        "creatorName": "string",
+        "sourceUrl": "string",
+        "title": "string",
+        "observedAt": "2026-06-15",
+        "imagePaths": [],
+        "caption": "optional summary from accessible page text",
+        "colorNotes": [
+          "short visual observation"
+        ],
+        "spatialNotes": [
+          "3D bouquet structure observation"
+        ],
+        "materialNotes": [
+          "flower/leaf/filler observation"
+        ],
+        "parameterSuggestions": [
+          "DailyFlora generator suggestion"
+        ]
+      }
+    ],
+    "accessIssues": [
+      {
+        "creatorId": "string",
+        "reason": "login-required | blocked | no-new-posts | other",
+        "detail": "short detail"
+      }
+    ]
+  },
+  "rules": [
+    "Process only links explicitly provided by the owner in this run.",
+    "Do not crawl creator homepages to discover more posts.",
+    "Do not ask the owner to log in repeatedly.",
+    "Open at most one Xiaohongshu URL at a time.",
+    "If Xiaohongshu asks for login, captcha, SMS, QR scan, or account verification, stop browsing immediately.",
+    "Do not copy original images into the web app.",
+    "Do not ask the owner for screenshots unless the owner volunteers them.",
+    "Use only visible/link-accessible information and keep observations compact.",
+    "If access fails, write accessIssues instead of guessing."
+  ]
+}

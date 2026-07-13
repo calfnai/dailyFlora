@@ -85,7 +85,7 @@ function setView(preview: Preview, view: ViewName) {
   if (view === 'side') preview.camera.position.set(distance, 0.15, 0);
   else if (view === 'top') preview.camera.position.set(0, distance, 0.01);
   else preview.camera.position.set(0, 0.15, distance);
-  preview.camera.lookAt(-0.66, 0, 0);
+  preview.camera.lookAt(0, 0, 0);
 }
 
 function countGeometry(group: THREE.Group) {
@@ -124,12 +124,12 @@ function initScenes() {
     const camera = new THREE.PerspectiveCamera(37, 1, 0.1, 30);
     const model = createRealisticFlower(definition, `realistic-lab:${definition.id}`);
     model.scale.setScalar(modelScale(definition));
-    model.position.x = -0.72;
+    model.position.x = 0;
     model.rotation.x = definition.category === 'spike' || definition.category === 'cluster' ? 0 : -0.58;
     scene.add(model);
 
     const grid = new THREE.GridHelper(3.15, 8, '#526153', '#293229');
-    grid.position.set(-0.72, -1.1, 0);
+    grid.position.set(0, -1.1, 0);
     grid.material.transparent = true;
     grid.material.opacity = 0.36;
     scene.add(grid);
@@ -146,13 +146,36 @@ function initScenes() {
 
 function updateLayout() {
   const width = stage.clientWidth;
-  columns = width >= 1180 ? 4 : width >= 850 ? 3 : width >= 620 ? 2 : 1;
-  rowHeight = columns === 1 ? 270 : 300;
+  columns = width >= 1180 ? 3 : width >= 720 ? 2 : 1;
+  rowHeight = columns === 1 ? 560 : 340;
   const rows = Math.ceil(realisticFlowerDefinitions.length / columns);
   stage.style.height = `${rows * rowHeight}px`;
   labels.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
   labels.style.gridAutoRows = `${rowHeight}px`;
   renderer.setSize(Math.max(1, stage.clientWidth), Math.max(1, stage.clientHeight), false);
+}
+
+function previewViewport(preview: Preview, stageHeight: number) {
+  const cellWidth = preview.cell.clientWidth;
+  const cellHeight = preview.cell.clientHeight;
+  const cellBottom = stageHeight - preview.cell.offsetTop - cellHeight;
+  if (columns === 1) {
+    const infoHeight = 220;
+    return {
+      left: preview.cell.offsetLeft,
+      bottom: cellBottom + infoHeight,
+      width: cellWidth,
+      height: cellHeight - infoHeight
+    };
+  }
+
+  const infoWidth = Math.min(210, Math.round(cellWidth * 0.44));
+  return {
+    left: preview.cell.offsetLeft,
+    bottom: cellBottom,
+    width: cellWidth - infoWidth - 20,
+    height: cellHeight
+  };
 }
 
 function previewAt(clientX: number, clientY: number) {
@@ -212,10 +235,7 @@ function animate(time: number) {
   previews.forEach((preview) => {
     const visibleRect = preview.cell.getBoundingClientRect();
     if (visibleRect.bottom < 0 || visibleRect.top > window.innerHeight) return;
-    const left = preview.cell.offsetLeft;
-    const bottom = stageHeight - preview.cell.offsetTop - preview.cell.clientHeight;
-    const width = preview.cell.clientWidth;
-    const height = preview.cell.clientHeight;
+    const { left, bottom, width, height } = previewViewport(preview, stageHeight);
     renderer.setViewport(left, bottom, width, height);
     renderer.setScissor(left, bottom, width, height);
     preview.camera.aspect = width / Math.max(1, height);

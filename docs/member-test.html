@@ -652,7 +652,7 @@
               <div class="chip-list" id="primitive-chips"></div>
               <div class="button-row">
                 <button class="primary" id="generate-button" type="button" disabled>生成并保存记录</button>
-                <a class="button" id="open-live-link" href="../?theme=dewberry-morning&render=high&density=medium" target="_blank" rel="noopener">打开相近花束</a>
+                <a class="button" id="open-live-link" href="../?theme=dewberry-morning&render=high&density=high" target="_blank" rel="noopener">打开相近花束</a>
               </div>
             </section>
 
@@ -840,7 +840,7 @@
         primitiveChips.innerHTML = next.primitives.map((item) => `<span class="chip">${item}</span>`).join('');
         swatches.innerHTML = next.colors.map((color) => `<span class="swatch" style="--swatch:${color}"></span>`).join('');
         renderMockFlower(next.colors);
-        openLiveLink.href = `../?date=2026-07-03&seed=${encodeURIComponent(next.seed)}&theme=${encodeURIComponent(next.theme)}&render=high&density=medium`;
+        openLiveLink.href = `../?date=2026-07-03&seed=${encodeURIComponent(next.seed)}&theme=${encodeURIComponent(next.theme)}&render=high&density=high`;
         generateButton.disabled = false;
       }
 

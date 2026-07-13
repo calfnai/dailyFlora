@@ -25,7 +25,20 @@ export type FlowerTypeId =
   | 'liatris'
   | 'hydrangea'
   | 'pompon'
-  | 'bellFruit';
+  | 'bellFruit'
+  | 'daisy'
+  | 'gerbera'
+  | 'sunflower'
+  | 'anemone'
+  | 'cosmos'
+  | 'dahlia'
+  | 'ranunculus'
+  | 'camellia'
+  | 'peony'
+  | 'tulip'
+  | 'narcissus'
+  | 'phalaenopsis'
+  | 'calla';
 
 export type FlowerPlanRole = 'main' | 'secondary' | 'line' | 'cluster' | 'fruit' | 'filler';
 
@@ -139,6 +152,14 @@ export interface DailyBouquetSpec {
   asymmetry: number;
   haloLift: number;
   flowerPlan: FlowerPlan;
+  compositionTuning?: {
+    radialSpread?: number;
+    centerSpread?: number;
+    spikeScale?: number;
+    spikeAnchorLift?: number;
+    roleShare?: Partial<Record<FlowerPlanRole, number>>;
+    roleScale?: Partial<Record<FlowerPlanRole, number>>;
+  };
   special?: SpecialBouquetReference;
 }
 

@@ -561,7 +561,20 @@ function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimit
     liatris: 'SpikeFlower',
     hydrangea: 'FullHydrangeaCloud',
     pompon: 'FullHydrangeaCloud',
-    bellFruit: 'HangingBellFruit'
+    bellFruit: 'HangingBellFruit',
+    daisy: 'DiskFlower',
+    gerbera: 'DiskFlower',
+    sunflower: 'DiskFlower',
+    anemone: 'CosmosOpenFlower',
+    cosmos: 'CosmosOpenFlower',
+    dahlia: 'LayeredDahliaFlower',
+    ranunculus: 'RuffledRoseFlower',
+    camellia: 'LayeredDahliaFlower',
+    peony: 'RuffledRoseFlower',
+    tulip: 'TulipCupFlower',
+    narcissus: 'FrilledNarcissusFlower',
+    phalaenopsis: 'OrchidButterflyFlower',
+    calla: 'CallaCurledBract'
   };
   return primitiveByType[item.typeId];
 }
@@ -618,6 +631,36 @@ function spikeLeanRange(placement: FlowerPlanItem['placement']): [number, number
   return [0.1, 0.32];
 }
 
+const bouquetTiePoint = new THREE.Vector3(0, -0.98, 0);
+
+function buildSpikeStemConnector(
+  spec: DailyBouquetSpec,
+  spike: THREE.Group,
+  rng: ReturnType<typeof createRng>
+) {
+  spike.updateMatrix();
+  const spikeBase = new THREE.Vector3(0, -0.98, 0).applyMatrix4(spike.matrix);
+  const tie = bouquetTiePoint.clone().add(new THREE.Vector3(rng.range(-0.06, 0.06), 0, rng.range(-0.06, 0.06)));
+  const lower = tie.clone().lerp(spikeBase, 0.38);
+  lower.x *= 0.56;
+  lower.z *= 0.56;
+  const upper = tie.clone().lerp(spikeBase, 0.76);
+  upper.x *= 0.88;
+  upper.z *= 0.88;
+  const curve = new THREE.CatmullRomCurve3([tie, lower, upper, spikeBase]);
+  const geometry = new THREE.TubeGeometry(curve, 10, 0.009, 5, false);
+  const material = new THREE.MeshStandardMaterial({
+    color: spec.theme.stem,
+    roughness: 0.92,
+    metalness: 0,
+    transparent: true,
+    opacity: 0.72
+  });
+  const stem = new THREE.Mesh(geometry, material);
+  stem.name = 'SpikeFlower:connected-stem';
+  return stem;
+}
+
 function primitivePalette(
   spec: DailyBouquetSpec,
   primitive: FloraPrimitiveName,
@@ -663,6 +706,20 @@ function primitivePalette(
     if (item.cn.includes('满天星')) return ['#fffdf4', '#eff7ff', '#dfe9c9', leafColor(1)];
   }
 
+  if (spec.flowerPlan.id === 'daily-concrete-forest-variety' && item) {
+    if (item.typeId === 'cosmos') return ['#fff7ec', '#ffd4de', '#f2c94c', leafColor(2)];
+    if (item.typeId === 'anemone') return ['#f8e8ff', '#d9b8ff', '#2b2436', leafColor(1)];
+    if (item.typeId === 'dahlia') return ['#ff9ab8', '#ffcfdf', '#f06f98', leafColor(2)];
+    if (item.typeId === 'rose') return ['#ff8bae', '#ffd7df', '#c94d75', leafColor(2)];
+    if (item.typeId === 'ranunculus') return ['#ffb35a', '#ffe07a', '#fff2bf', leafColor(1)];
+    if (item.typeId === 'tulip') return ['#d9f56d', '#fff07a', '#ffb36a', leafColor(1)];
+    if (item.typeId === 'narcissus') return ['#fff6bd', '#ffe17a', '#ff9e48', leafColor(2)];
+    if (item.typeId === 'phalaenopsis') return ['#ffb7c9', '#fff7e8', '#d9f56d', leafColor(1)];
+    if (item.typeId === 'bellFruit') return ['#ff7a32', '#ffb7c9', '#d9f56d', leafColor(1)];
+    if (item.typeId === 'hydrangea') return ['#fff7df', '#d9f56d', '#a8db5e', leafColor(2)];
+    if (item.typeId === 'liatris') return ['#42d39b', '#a8db5e', '#f8f4d7', leafColor(0)];
+  }
+
   if (primitive === 'FoliageGrassBranch') return [leafColor(0), leafColor(1), leafColor(2), spec.theme.stem];
   if (primitive === 'FruitPodCluster') return [color(4), color(3), leafColor(1), color(2)];
   if (primitive === 'HangingBellFruit') return [color(0), color(1), leafColor(1), color(2)];
@@ -703,18 +760,10 @@ function orientPrimitiveGroup(
 
   if (primitive === 'SpikeFlower') {
     const [minLean, maxLean] = spikeLeanRange(placement);
-    const lean = rng.range(minLean, maxLean);
-    const radial = new THREE.Vector3(point.x, 0, point.z);
-    if (radial.lengthSq() < 0.0001) radial.set(Math.cos(theta), 0, Math.sin(theta));
-    radial.normalize();
-    const side = new THREE.Vector3(-radial.z, 0, radial.x).multiplyScalar(rng.range(-0.42, 0.42));
-    const openBias = rng.value() < 0.86 ? rng.range(0.82, 1.2) : rng.range(0.28, 0.62);
-    const horizontal = radial.multiplyScalar(openBias).add(side).normalize().multiplyScalar(lean);
-    const target = new THREE.Vector3(
-      horizontal.x,
-      rng.range(0.92, 1.14),
-      horizontal.z
-    ).normalize();
+    const target = point.clone().sub(bouquetTiePoint).normalize();
+    const tangent = new THREE.Vector3(-target.z, 0, target.x).normalize();
+    const leanVariation = rng.range(minLean, maxLean) * rng.range(-0.28, 0.28);
+    target.addScaledVector(tangent, leanVariation).normalize();
     group.quaternion.setFromUnitVectors(up, target);
     group.rotateY(rng.range(-Math.PI, Math.PI));
     return;
@@ -738,13 +787,17 @@ function orientPrimitiveGroup(
 function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   const plannedCount = Math.floor(quality.flowerCount * spec.flowerDensity);
   const specialPrimitiveRatio = spec.flowerPlan.id === 'her-real-bouquet-memory-v4' ? 0.5 : 0.34;
-  const count = Math.max(64, Math.floor(plannedCount * (spec.special ? specialPrimitiveRatio : 0.44)));
+  const count = Math.max(64, Math.floor(plannedCount * (spec.special ? specialPrimitiveRatio : 0.34)));
   const group = new THREE.Group();
   const batches = spec.flowerPlan.items;
+  const roleShares = spec.compositionTuning?.roleShare;
+  const weightedShares = batches.map((batch) => batch.share * (roleShares?.[batch.role] ?? 1));
+  const shareTotal = weightedShares.reduce((sum, share) => sum + share, 0) || 1;
   let used = 0;
 
   batches.forEach((batch, index) => {
-    const batchCount = index === batches.length - 1 ? count - used : Math.max(1, Math.floor(count * batch.share));
+    const adjustedShare = weightedShares[index] / shareTotal;
+    const batchCount = index === batches.length - 1 ? count - used : Math.max(1, Math.floor(count * adjustedShare));
     used += batchCount;
     const primitive = primitiveForPlanItem(batch, spec.flowerPlan.id);
     const factory = floraPrimitiveFactories[primitive];
@@ -752,7 +805,10 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
 
     for (let i = 0; i < batchCount; i += 1) {
       const { p, theta } = placementPoint(spec, localRng, batch.placement);
-      if (primitive === 'SpikeFlower') settleSpikeAnchor(p, batch.placement, localRng);
+      if (primitive === 'SpikeFlower') {
+        settleSpikeAnchor(p, batch.placement, localRng);
+        p.y += spec.compositionTuning?.spikeAnchorLift ?? 0;
+      }
       const roleScale =
         batch.role === 'main' ? 0.26 :
         batch.role === 'line' ? 0.25 :
@@ -762,10 +818,12 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
         0.21;
       const bloom = spec.special?.bloomScale;
       const specialScale = bloom ? localRng.range(bloom.small, bloom.medium) * 0.52 : 1;
+      const tuningScale = spec.compositionTuning?.roleScale?.[batch.role] ?? 1;
+      const spikeScale = primitive === 'SpikeFlower' ? spec.compositionTuning?.spikeScale ?? 1 : 1;
       const primitiveGroup = factory({
         seed: `${spec.seed}:bouquet-primitive:${primitive}:${batch.typeId}:${i}`,
         position: p,
-        scale: roleScale * batch.scale * compositionScaleForPrimitive(primitive) * localRng.range(0.82, 1.22) * specialScale,
+        scale: roleScale * batch.scale * compositionScaleForPrimitive(primitive) * localRng.range(0.82, 1.22) * specialScale * tuningScale * spikeScale,
         colorPalette: primitivePalette(spec, primitive, localRng, batch),
         openness: ['OrchidButterflyFlower', 'TrumpetThroatFlower', 'DaturaTrumpetFlower', 'CallaCurledBract'].includes(primitive) ? 0.94 : localRng.range(0.62, 0.86),
         density: ['UmbelMiniCluster', 'FullHydrangeaCloud', 'FruitPodCluster'].includes(primitive) ? 1.08 : localRng.range(0.86, 1.02),
@@ -775,6 +833,7 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
       primitiveGroup.name = `${primitive}:${batch.cn}`;
       orientPrimitiveGroup(primitiveGroup, primitive, p, theta, localRng, batch.placement);
       group.add(primitiveGroup);
+      if (primitive === 'SpikeFlower') group.add(buildSpikeStemConnector(spec, primitiveGroup, localRng));
     }
   });
 
@@ -836,6 +895,10 @@ function placementPoint(
   const [radiusMin, radiusMax] = radiusRanges[placement];
   const [heightMin, heightMax] = heightRanges[placement];
   const p = bouquetPoint(spec, rng.range(radiusMin, radiusMax), rng.range(heightMin, heightMax), theta, rng.range(phiMin, phiMax));
+  const radialSpread = spec.compositionTuning?.radialSpread ?? 1;
+  const placementSpread = placement === 'center' ? spec.compositionTuning?.centerSpread ?? 1 : 1;
+  p.x *= radialSpread * placementSpread;
+  p.z *= radialSpread * placementSpread;
   const liftRanges: Record<FlowerPlanItem['placement'], [number, number]> = {
     center: [-0.18, 0.24],
     outer: [-0.24, 0.34],
@@ -916,26 +979,177 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   return buildPrimitiveFlowers(spec, quality);
 }
 
+type LeafShapeProfile = {
+  name: string;
+  width: number;
+  length: number;
+  edgePower: number;
+  centerShift: number;
+  edgeWave: number;
+  cup: number;
+  curl: number;
+  veinPairs: number;
+  veinReach: number;
+};
+
+const leafShapeProfiles: readonly LeafShapeProfile[] = [
+  { name: 'soft-ovate', width: 0.124, length: 0.96, edgePower: 0.62, centerShift: 0.018, edgeWave: 0.018, cup: 0.0012, curl: 0.0014, veinPairs: 5, veinReach: 0.72 },
+  { name: 'lanceolate', width: 0.073, length: 1.12, edgePower: 0.86, centerShift: -0.012, edgeWave: 0.012, cup: 0.0008, curl: -0.0016, veinPairs: 4, veinReach: 0.78 },
+  { name: 'elliptic', width: 0.099, length: 1.02, edgePower: 0.48, centerShift: -0.022, edgeWave: 0.024, cup: 0.001, curl: 0.0007, veinPairs: 5, veinReach: 0.68 },
+  { name: 'round-tip', width: 0.116, length: 0.78, edgePower: 0.36, centerShift: 0.026, edgeWave: 0.032, cup: 0.0014, curl: -0.0008, veinPairs: 4, veinReach: 0.66 },
+  { name: 'willow', width: 0.047, length: 1.24, edgePower: 0.98, centerShift: 0.01, edgeWave: 0.014, cup: 0.0006, curl: 0.002, veinPairs: 3, veinReach: 0.8 }
+];
+
+function leafY(profile: LeafShapeProfile, t: number) {
+  return THREE.MathUtils.lerp(-0.15 * profile.length, 0.13 * profile.length, t);
+}
+
+function leafT(profile: LeafShapeProfile, y: number) {
+  return THREE.MathUtils.clamp((y + 0.15 * profile.length) / (0.28 * profile.length), 0, 1);
+}
+
+function leafCenterX(profile: LeafShapeProfile, t: number) {
+  return profile.centerShift * Math.sin(Math.PI * t) * (0.7 + t * 0.3);
+}
+
+function leafHalfWidth(profile: LeafShapeProfile, t: number) {
+  const body = Math.pow(Math.max(0, Math.sin(Math.PI * t)), profile.edgePower);
+  const taperBias = 0.9 + t * 0.1;
+  const edgeVariation = 1 + Math.sin(t * Math.PI * 5.0) * profile.edgeWave;
+  return body * profile.width * taperBias * edgeVariation;
+}
+
+function leafSurfaceHeight(profile: LeafShapeProfile, x: number, y: number) {
+  const t = leafT(profile, y);
+  const center = leafCenterX(profile, t);
+  const halfWidth = Math.max(leafHalfWidth(profile, t), 0.0001);
+  const across = THREE.MathUtils.clamp(Math.abs(x - center) / halfWidth, 0, 1);
+  const softCup = Math.pow(across, 1.8) * profile.cup;
+  const flexibleCurl = Math.sin((t - 0.12) * Math.PI) * profile.curl;
+  return softCup + flexibleCurl;
+}
+
+function pointToSegmentDistance(
+  px: number,
+  py: number,
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number
+) {
+  const abx = bx - ax;
+  const aby = by - ay;
+  const lengthSq = abx * abx + aby * aby || 1;
+  const amount = THREE.MathUtils.clamp(((px - ax) * abx + (py - ay) * aby) / lengthSq, 0, 1);
+  return Math.hypot(px - (ax + abx * amount), py - (ay + aby * amount));
+}
+
+function leafVeinIndentation(
+  profile: LeafShapeProfile,
+  across: number,
+  t: number,
+  renderName: QualityProfile['renderName']
+) {
+  const mainDistance = Math.abs(across - 0.5);
+  const mainInfluence = Math.exp(-Math.pow(mainDistance / 0.022, 2) * 3.2);
+  const pairCount = renderName === 'low' ? Math.min(3, profile.veinPairs) : profile.veinPairs;
+  let sideInfluence = 0;
+  for (let index = 0; index < pairCount; index += 1) {
+    const branchT = 0.23 + (index / Math.max(1, pairCount - 1)) * 0.56;
+    const endT = Math.min(0.94, branchT + 0.1);
+    const midT = THREE.MathUtils.lerp(branchT, endT, 0.5);
+    for (const direction of [-1, 1]) {
+      const midAcross = 0.5 + direction * 0.18;
+      const endAcross = 0.5 + direction * profile.veinReach * 0.5;
+      const firstDistance = pointToSegmentDistance(across, t, 0.5, branchT, midAcross, midT);
+      const secondDistance = pointToSegmentDistance(across, t, midAcross, midT, endAcross, endT);
+      const branchDistance = Math.min(firstDistance, secondDistance);
+      sideInfluence = Math.max(sideInfluence, Math.exp(-Math.pow(branchDistance / 0.018, 2) * 3.4));
+    }
+  }
+  const lengthFade = Math.pow(Math.max(0, Math.sin(Math.PI * t)), 0.32);
+  const depth = renderName === 'low' ? 0.00032 : 0.0005;
+  return (mainInfluence * 0.82 + sideInfluence * 0.48) * lengthFade * depth;
+}
+
+function buildLeafBladeGeometry(profile: LeafShapeProfile, renderName: QualityProfile['renderName']) {
+  const lengthSegments = renderName === 'low' ? 16 : 32;
+  const widthSegments = renderName === 'low' ? 10 : 20;
+  const positions: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+  const rowSize = widthSegments + 1;
+
+  for (let row = 0; row <= lengthSegments; row += 1) {
+    const t = row / lengthSegments;
+    const y = leafY(profile, t);
+    const center = leafCenterX(profile, t);
+    const halfWidth = leafHalfWidth(profile, t);
+    for (let column = 0; column <= widthSegments; column += 1) {
+      const across = column / widthSegments;
+      const x = center + THREE.MathUtils.lerp(-halfWidth, halfWidth, across);
+      const z = leafSurfaceHeight(profile, x, y) - leafVeinIndentation(profile, across, t, renderName);
+      positions.push(x, y, z);
+      uvs.push(across, t);
+    }
+  }
+
+  for (let row = 0; row < lengthSegments; row += 1) {
+    for (let column = 0; column < widthSegments; column += 1) {
+      const a = row * rowSize + column;
+      const b = a + 1;
+      const c = a + rowSize;
+      const d = c + 1;
+      indices.push(a, b, c, b, d, c);
+    }
+  }
+
+  const baseY = leafY(profile, 0);
+  const rootY = baseY - 0.038 * profile.length;
+  const petioleWidth = Math.min(0.0017, profile.width * 0.022);
+  const petioleStart = positions.length / 3;
+  positions.push(
+    -petioleWidth * 0.55, rootY, leafSurfaceHeight(profile, 0, baseY),
+    petioleWidth * 0.55, rootY, leafSurfaceHeight(profile, 0, baseY),
+    -petioleWidth, baseY + 0.006 * profile.length, leafSurfaceHeight(profile, 0, baseY),
+    petioleWidth, baseY + 0.006 * profile.length, leafSurfaceHeight(profile, 0, baseY)
+  );
+  uvs.push(0.48, 0, 0.52, 0, 0.48, 0.03, 0.52, 0.03);
+  indices.push(
+    petioleStart, petioleStart + 1, petioleStart + 2,
+    petioleStart + 1, petioleStart + 3, petioleStart + 2
+  );
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
 function buildLeaves(spec: DailyBouquetSpec, quality: QualityProfile) {
   const rng = createRng(`${spec.seed}:leaves`);
-  const shape = new THREE.Shape();
-  shape.moveTo(0, 0.13);
-  shape.bezierCurveTo(0.11, 0.08, 0.13, -0.08, 0, -0.15);
-  shape.bezierCurveTo(-0.13, -0.08, -0.11, 0.08, 0, 0.13);
-  const geometry = new THREE.ShapeGeometry(shape);
-  const material = new THREE.MeshStandardMaterial({
-    roughness: 0.9,
+  const bladeMaterial = new THREE.MeshStandardMaterial({
+    roughness: 0.78,
     metalness: 0,
     side: THREE.DoubleSide,
-    transparent: true,
-    opacity: 0.9,
     emissive: new THREE.Color('#123d28'),
-    emissiveIntensity: 0.05
+    emissiveIntensity: 0.022
   });
   const count = Math.floor(quality.leafCount * spec.leafDensity * (spec.special ? 0.68 : 1));
-  const mesh = new THREE.InstancedMesh(geometry, material, count);
+  const group = new THREE.Group();
+  group.name = 'varied-thin-leaves';
+  const instances: Array<{
+    variantIndex: number;
+    matrix: THREE.Matrix4;
+    bladeColor: THREE.Color;
+  }> = [];
+  const variantCounts = leafShapeProfiles.map(() => 0);
 
   for (let i = 0; i < count; i += 1) {
+    const variantIndex = Math.floor(rng.value() * leafShapeProfiles.length) % leafShapeProfiles.length;
     const theta = rng.range(0, Math.PI * 2);
     const phi = rng.range(0.38, 1.82);
     const p = bouquetPoint(spec, rng.range(0.44, 1.78), rng.range(0.7, 1.38), theta, phi);
@@ -951,11 +1165,27 @@ function buildLeaves(spec: DailyBouquetSpec, quality: QualityProfile) {
       size
     );
     tempObject.updateMatrix();
-    mesh.setMatrixAt(i, tempObject.matrix);
-    mesh.setColorAt(i, tempColor.set(pickColor(spec.theme.leafPalette, rng.value())));
+    const bladeColor = tempColor.set(pickColor(spec.theme.leafPalette, rng.value())).clone();
+    instances.push({ variantIndex, matrix: tempObject.matrix.clone(), bladeColor });
+    variantCounts[variantIndex] += 1;
   }
-  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  return mesh;
+
+  leafShapeProfiles.forEach((profile, variantIndex) => {
+    const variantCount = variantCounts[variantIndex];
+    if (!variantCount) return;
+    const blades = new THREE.InstancedMesh(buildLeafBladeGeometry(profile, quality.renderName), bladeMaterial, variantCount);
+    blades.name = `leaf-blades:${profile.name}`;
+    let instanceIndex = 0;
+    instances.forEach((instance) => {
+      if (instance.variantIndex !== variantIndex) return;
+      blades.setMatrixAt(instanceIndex, instance.matrix);
+      blades.setColorAt(instanceIndex, instance.bladeColor);
+      instanceIndex += 1;
+    });
+    if (blades.instanceColor) blades.instanceColor.needsUpdate = true;
+    group.add(blades);
+  });
+  return group;
 }
 
 function buildStemBundle(spec: DailyBouquetSpec) {
@@ -1342,11 +1572,17 @@ export class BouquetScene {
     this.clock.start();
     const animate = () => {
       this.animationId = window.requestAnimationFrame(animate);
-      const delta = this.clock.getDelta();
+      const delta = Math.min(this.clock.getDelta(), 0.1);
+      if (this.quality.targetFps >= 58) {
+        this.accumulator = 0;
+        this.tick(delta);
+        return;
+      }
       this.accumulator += delta;
       if (this.accumulator < this.frameInterval) return;
-      this.accumulator = 0;
-      this.tick(delta);
+      const step = this.accumulator;
+      this.accumulator %= this.frameInterval;
+      this.tick(step);
     };
     animate();
   }

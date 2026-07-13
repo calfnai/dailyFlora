@@ -3,263 +3,75 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>加入 DailyFlora</title>
-    <style>
-      :root {
-        color-scheme: dark;
-        --bg: #080a07;
-        --surface: rgb(17 22 15 / 82%);
-        --line: rgb(247 240 227 / 14%);
-        --text: #f7f0e3;
-        --muted: rgb(247 240 227 / 68%);
-        --accent: #f2cb62;
-        --good: #87d486;
-        --cool: #9fc6ff;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        min-width: 320px;
-        min-height: 100vh;
-        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        color: var(--text);
-        background:
-          radial-gradient(circle at 18% 0%, rgb(242 203 98 / 13%), transparent 28%),
-          radial-gradient(circle at 82% 12%, rgb(135 212 134 / 10%), transparent 26%),
-          linear-gradient(180deg, #080a07, #0d110c 58%, #080a07);
-      }
-
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
-      main {
-        width: min(1120px, 100%);
-        margin: 0 auto;
-        padding: 28px 20px 58px;
-      }
-
-      .hero {
-        display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-        gap: 22px;
-        align-items: stretch;
-      }
-
-      .copy,
-      .signup-card,
-      .feature,
-      .mock-card {
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--surface);
-      }
-
-      .copy {
-        display: grid;
-        align-content: center;
-        gap: 18px;
-        min-height: 520px;
-        padding: 32px;
-      }
-
-      h1,
-      h2,
-      h3,
-      p {
-        margin: 0;
-      }
-
-      h1 {
-        max-width: 10ch;
-        font-size: clamp(44px, 8vw, 92px);
-        line-height: 0.94;
-        letter-spacing: 0;
-      }
-
-      h2 {
-        font-size: clamp(24px, 3vw, 36px);
-        line-height: 1.08;
-      }
-
-      p {
-        color: var(--muted);
-        line-height: 1.68;
-      }
-
-      .lead {
-        max-width: 68ch;
-        font-size: 17px;
-      }
-
-      .pill {
-        display: inline-flex;
-        width: fit-content;
-        min-height: 26px;
-        align-items: center;
-        padding: 0 9px;
-        border: 1px solid currentColor;
-        border-radius: 999px;
-        color: var(--accent);
-        font-size: 12px;
-        font-weight: 800;
-      }
-
-      .actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-
-      .button {
-        display: inline-flex;
-        min-height: 42px;
-        align-items: center;
-        justify-content: center;
-        padding: 0 14px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: rgb(255 255 255 / 5%);
-      }
-
-      .button.primary {
-        color: #151307;
-        border-color: transparent;
-        background: var(--accent);
-        font-weight: 850;
-      }
-
-      .signup-card {
-        display: grid;
-        align-content: start;
-        gap: 16px;
-        padding: 22px;
-      }
-
-      .mock-card {
-        display: grid;
-        gap: 12px;
-        min-height: 280px;
-        padding: 18px;
-        background:
-          radial-gradient(circle at 42% 32%, rgb(242 203 98 / 28%), transparent 18%),
-          radial-gradient(circle at 62% 44%, rgb(135 212 134 / 25%), transparent 24%),
-          radial-gradient(circle at 48% 64%, rgb(159 198 255 / 18%), transparent 28%),
-          var(--surface);
-      }
-
-      .flower-chip-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 8px;
-      }
-
-      .flower-chip {
-        min-height: 74px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background:
-          radial-gradient(circle at 46% 36%, var(--a), transparent 24%),
-          radial-gradient(circle at 60% 54%, var(--b), transparent 28%),
-          #071008;
-      }
-
-      .features {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
-        margin-top: 18px;
-      }
-
-      .feature {
-        display: grid;
-        gap: 10px;
-        min-height: 170px;
-        padding: 16px;
-      }
-
-      .feature strong {
-        color: var(--text);
-      }
-
-      .note {
-        margin-top: 18px;
-        color: rgb(247 240 227 / 54%);
-        font-size: 13px;
-      }
-
-      @media (max-width: 880px) {
-        .hero,
-        .features {
-          grid-template-columns: 1fr;
-        }
-
-        .copy {
-          min-height: auto;
-        }
-      }
-    </style>
+    <meta name="description" content="加入 DailyFlora，收藏每日花束，建立属于你的数字花园。" />
+    <title>加入 DailyFlora — 建立你的数字花园</title>
+    <link rel="stylesheet" href="../src/marketing.css" />
   </head>
   <body>
-    <main>
-      <section class="hero">
-        <div class="copy">
-          <span class="pill">DailyFlora ID</span>
-          <h1>把你的花花收进个人花园</h1>
-          <p class="lead">注册后，DailyFlora 不只是每天看一束花。你可以收藏今日花花、上传参考图识别成新花花、保存生成历史，也可以把喜欢的花花重新复制生成一份。</p>
-          <div class="actions">
-            <a class="button primary" href="../member/">进入用户中心 mockup</a>
-            <a class="button" href="../">先继续看今日花花</a>
-          </div>
-        </div>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="../" aria-label="DailyFlora 首页"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA</a>
+        <nav class="site-nav" aria-label="站点导航"><a href="../about/">关于</a><a href="../bouquet-shop/">花束商店</a><a href="../member/">登录</a><a class="nav-cta" href="#register" aria-current="page">免费注册</a></nav>
+      </header>
 
-        <aside class="signup-card">
-          <div>
-            <h2>注册后有什么好玩</h2>
-            <p>当前是 MVP 预览，不接真实支付。先把“收藏、上传、生成、历史、积分”的体验跑通。</p>
-          </div>
-          <div class="mock-card" aria-label="个人花园预览">
-            <span class="pill">个人花园</span>
-            <h3>小花的生成记录</h3>
-            <div class="flower-chip-grid">
-              <span class="flower-chip" style="--a:#fff7df;--b:#bfe878"></span>
-              <span class="flower-chip" style="--a:#ff9fbd;--b:#8ee9d0"></span>
-              <span class="flower-chip" style="--a:#f3d35f;--b:#ef8b73"></span>
+      <main>
+        <section class="signup-hero wrap">
+          <div class="signup-intro">
+            <div class="signup-copy">
+              <p class="eyebrow">Your private digital garden</p>
+              <h1 class="display">别让喜欢的花，只开<em>一天</em>。</h1>
+              <p class="lead">建立 DailyFlora ID，收藏今天遇见的花束，保存每次生成的灵感，并让你的个人花园随着日子慢慢长大。</p>
+              <div class="signup-proof"><span>免费开始</span><span>无需付款信息</span><span>随时回来继续看</span></div>
             </div>
-            <p>上传一张图，DailyFlora 会先识别颜色和氛围，再生成一份可保存的新花花方案。</p>
+
+            <aside class="signup-card" id="register">
+              <span class="card-step">01 · Create your garden</span>
+              <h2>建立你的花园</h2>
+              <p>现在创建的是本机 MVP 体验账户。你的姓名和邮箱仅保存在这台设备中。</p>
+              <form class="signup-form" id="signup-form">
+                <div class="field"><label for="signup-name">怎么称呼你</label><input id="signup-name" name="name" type="text" autocomplete="name" placeholder="例如：小花" required /></div>
+                <div class="field"><label for="signup-email">邮箱</label><input id="signup-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" required /></div>
+                <div class="field"><label for="signup-password">设置密码</label><input id="signup-password" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="至少 8 位（演示中不会保存）" required /></div>
+                <label class="consent"><input type="checkbox" required /><span>我同意以本机演示方式创建账户，并了解正式隐私政策与服务条款将在真实账号系统上线前提供。</span></label>
+                <button class="button primary" type="submit">免费建立我的花园 <span class="arrow" aria-hidden="true">→</span></button>
+                <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+                <p class="form-note">密码不会被存储或发送。正式登录、跨设备同步、支付与订阅尚未启用。</p>
+              </form>
+            </aside>
           </div>
-        </aside>
-      </section>
+        </section>
 
-      <section class="features">
-        <article class="feature">
-          <span class="pill">收藏</span>
-          <strong>保存今天看到的花</strong>
-          <p>把喜欢的每日花花放进个人花园，之后可以找回来继续看。</p>
-        </article>
-        <article class="feature">
-          <span class="pill">上传识别</span>
-          <strong>把照片变成花花方案</strong>
-          <p>上传参考图，先 mock 识别主色、空气感、果点、花材角色。</p>
-        </article>
-        <article class="feature">
-          <span class="pill">生成历史</span>
-          <strong>复制再生成</strong>
-          <p>旧记录不热修改，复制参数会生成一份新的花花。</p>
-        </article>
-        <article class="feature">
-          <span class="pill">积分</span>
-          <strong>为商业化预留</strong>
-          <p>未来订阅、生成消耗和获奖返还都可以走积分流水。</p>
-        </article>
-      </section>
+        <section class="benefits wrap">
+          <div class="benefits-head"><div><p class="eyebrow">A garden that remembers</p><h2 class="section-title">注册之后，花会留下来。</h2></div><p>从每天偶遇一束花，到拥有一座可回看、可延续、可再创作的数字花园。每项能力都围绕“喜欢以后怎么办”来设计。</p></div>
+          <div class="benefit-grid">
+            <article class="benefit-card"><span class="benefit-no">01</span><div class="benefit-icon" aria-hidden="true"></div><div><h3>收藏每日花束</h3><p>一键保存今天的日期、主题、花材方案与生成种子。明天更新后，今天的喜欢仍然找得到。</p></div></article>
+            <article class="benefit-card"><span class="benefit-no">02</span><div class="benefit-icon" aria-hidden="true"></div><div><h3>建立生成档案</h3><p>每次生成都是一份独立记录。旧花不被热修改，想继续探索时复制参数，再长出新的一束。</p></div></article>
+            <article class="benefit-card"><span class="benefit-no">03</span><div class="benefit-icon" aria-hidden="true"></div><div><h3>从参考图出发</h3><p>上传喜欢的颜色与氛围，DailyFlora 会整理成可保存的花束方向，为下一次生成留下线索。</p></div></article>
+            <article class="benefit-card"><span class="benefit-no">04</span><div class="benefit-icon" aria-hidden="true"></div><div><h3>为未来的实体花预留位置</h3><p>数字收藏、积分与花束商店会逐步连接。现在先把喜欢存下来，未来再决定它以何种形式来到身边。</p></div></article>
+          </div>
+        </section>
 
-      <p class="note">正式注册、数据库、支付和订阅方式还没有决定。这个页面只负责解释为什么值得注册，以及引导进入用户中心 mockup。</p>
-    </main>
+        <section class="how wrap">
+          <p class="eyebrow">Three small steps</p><h2 class="section-title">从今天开始养一座花园。</h2>
+          <div class="steps"><article class="step"><span>01</span><h3>创建 DailyFlora ID</h3><p>留下称呼与邮箱，先建立这台设备上的个人花园。</p></article><article class="step"><span>02</span><h3>收藏今天的花</h3><p>回到今日花束，点下收藏，让它成为花园里的第一份记录。</p></article><article class="step"><span>03</span><h3>等待明天生长</h3><p>新的日期会带来新的种子。回来看看明天的花与今天有何不同。</p></article></div>
+        </section>
+
+        <section class="final-cta wrap"><div class="final-cta-inner"><p class="eyebrow">The first flower is waiting</p><h2>你的花园，可以从今天这一束开始。</h2><a class="button primary" href="#register">免费注册 <span class="arrow" aria-hidden="true">↑</span></a></div></section>
+      </main>
+
+      <footer class="site-footer"><div class="footer-main wrap"><p class="footer-statement">DailyFlora<br />每天生成一束数字花。</p><nav class="footer-col" aria-label="探索"><strong>探索</strong><a href="../">今日花束</a><a href="../about/">关于项目</a><a href="../bouquet-shop/">花束商店</a></nav><nav class="footer-col" aria-label="账户"><strong>账户</strong><a href="#register">免费注册</a><a href="../member/">个人花园</a><a href="../downloads/">下载</a></nav></div><div class="footer-bottom wrap"><span>© 2026 DailyFlora.</span><span>MVP account · Device-local only</span></div></footer>
+    </div>
+    <script>
+      const form = document.querySelector('#signup-form');
+      const status = document.querySelector('#form-status');
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = new FormData(form);
+        const account = { name: String(data.get('name')).trim(), email: String(data.get('email')).trim() };
+        localStorage.setItem('dailyflora.account.v1', JSON.stringify(account));
+        status.textContent = '花园已建立，正在带你进去…';
+        window.setTimeout(() => { window.location.href = '../member/'; }, 650);
+      });
+    </script>
   </body>
 </html>

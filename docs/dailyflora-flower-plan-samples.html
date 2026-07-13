@@ -399,7 +399,7 @@
           seed: sample.seed,
           theme: sample.theme,
           render: 'high',
-          density: 'medium'
+          density: 'high'
         }).toString();
 
         if (window.location.protocol !== 'file:') return local.href;
@@ -409,7 +409,6 @@
       function previewHrefFor(sample) {
         const url = new URL(hrefFor(sample));
         url.searchParams.set('preview', '1');
-        url.searchParams.set('render', 'medium');
         return url.href;
       }
 

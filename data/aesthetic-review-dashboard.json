@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-11",
+  "updatedAt": "2026-07-13",
   "gate": {
     "status": "pass",
     "title": "0.14 审美基线通过",
@@ -47,6 +47,57 @@
       }
     ]
   },
+  "publicSiteReview": {
+    "updatedAt": "2026-07-13",
+    "status": "pass",
+    "scope": [
+      "/about/",
+      "/signup/"
+    ],
+    "summary": "本轮不修改主花束 composition，而是将已通过的 DailyFlora 审美语言延展到公开网站。About 已形成完整品牌叙事；Signup 已形成围绕收藏、记忆与个人花园的注册 landing page。",
+    "principles": [
+      "真实产品画面优先于另造装饰插画，About 首屏直接嵌入今日花束。",
+      "深绿、暖黄、细边框、衬线大标题与大量留白共同构成公开页面的品牌基线。",
+      "卖点按用户动机组织，不按后台功能模块平铺。",
+      "注册动作、MVP 数据边界、密码处理与 AI 协作署名都需要透明表达。"
+    ]
+  },
+  "dailyBouquetCorrections": [
+    {
+      "date": "2026-07-07",
+      "name": "星点果汁风车",
+      "status": "needs-owner-review",
+      "ownerFeedback": "中心铺得太满，缺少星星点点和缤纷感，整体像一坨球形花头，脱离中国主流审美。",
+      "correction": "降低总花量、中心主花与低位簇花的权重和尺寸；提高小花、果点、枝线、闪点与径向留白，让轮廓从密球改成有空气的多色节奏。",
+      "url": "../?date=2026-07-07&render=high&density=high"
+    },
+    {
+      "date": "2026-07-11",
+      "name": "紫雾游枝",
+      "status": "needs-owner-review",
+      "ownerFeedback": "穗状花角度过于统一、长度不合理，在半空出现且没有花茎连接；各枝走向也不像来自同一个花瓶。",
+      "correction": "缩短并下沉穗花、降低重复线花权重；所有穗花从共同扎口推导轴线，并以连续实体花茎连接扎口和花穗底部。",
+      "url": "../?date=2026-07-11&render=high&density=high"
+    },
+    {
+      "date": "2026-07-13",
+      "name": "百花莓园游枝",
+      "status": "needs-owner-review",
+      "ownerFeedback": "今天生成的花不好看，核心感受是用到的花的品种不够丰富。",
+      "diagnosis": "日期 seed 抽到 tropical-forest theme 与 berry-grove flowerPlan；该 plan 仍只使用老 FlowerTypeId 中的少数抽象角色，最终映射到约 6 种 primitive。0.14.6 新增的 16 种具象单花已经进入 Primitive Lab，但尚未真正进入每日 flowerPlan 与主花束 renderer 的候选池。",
+      "correction": "新增 daily-concrete-forest-variety flowerPlan，并将 2026-07-13 默认 seed 指向该 plan；扩展 FlowerTypeId 与 renderer 映射，让波斯菊、银莲花、大丽花、玫瑰、花毛茛、郁金香、洋水仙、蝴蝶兰、果点、小簇和枝线共同进入今日花束。等待用户复验。",
+      "url": "../?date=2026-07-13&render=high&density=high"
+    },
+    {
+      "date": "2026-07-08 / 2026-07-09",
+      "name": "每日中文名重复 bug",
+      "status": "fixed-needs-build",
+      "ownerFeedback": "某些 7 月 8 日、7 月 9 日中文名竟然一样，说明命名遗漏了 bug。",
+      "diagnosis": "原命名逻辑只由少量 mood 与 flowerPlan 组合生成，两个日期如果抽到同一 mood 与同一 plan，就会出现主中文名重复；日期印记虽然不同，但花花自己的中文名不应重复。",
+      "correction": "新增日期专属的月标记和日标记，默认中文名由 mood + 月标记 + 日标记 + planName 组成；保留少量手工 override，但普通日期不会再因 mood/plan 相同而撞名。",
+      "url": "../?date=2026-07-08&render=high&density=high"
+    }
+  ],
   "primitiveLabConcreteExpansion": {
     "updatedAt": "2026-07-12",
     "summary": "用户确认偏写实花型是扩充生成花库的有趣方向；将截图之外的 16 种具体单花加入 Primitive Lab，共享同一个 WebGL 画布。",
@@ -85,27 +136,42 @@
     {
       "id": "creative-director",
       "name": "创意总监",
-      "brief": "判断整体方向是否符合 DailyFlora，不允许跑偏到欧美婚礼、粗糙市场束、单一大主花。"
+      "brief": "判断整体方向是否符合 DailyFlora，不允许跑偏到欧美婚礼、粗糙市场束、单一大主花。",
+      "status": "保留 · 按需启用",
+      "cadence": "新主题、新花束方向或用户指出整体跑偏时",
+      "audit": "仍有独立价值，负责方向边界，不参与每个几何细节。"
     },
     {
       "id": "art-director",
       "name": "美术指导",
-      "brief": "拆解色彩、轮廓、花材层级、花叶朝向、空气感、前后关系和叶材合理性。"
+      "brief": "拆解色彩、轮廓、花材层级、花叶朝向、空气感、前后关系、叶材合理性和模型展示可读性。",
+      "status": "保留 · 核心职责",
+      "cadence": "每次视觉、构图、LAB 展示和响应式 UI 修改",
+      "audit": "本次文字遮挡模型说明该职责必须覆盖展示层，而不只审查花束本体。"
     },
     {
       "id": "project-director",
       "name": "项目主任",
-      "brief": "决定当前阶段是否允许进入下一层，比如 primitive 未过就不能进 composition。"
+      "brief": "在关键里程碑检查是否允许进入下一层，比如 primitive 未过就不能进 composition。",
+      "status": "降级 · 里程碑启用",
+      "cadence": "版本阶段切换、用户验收或发布门禁变化时",
+      "audit": "与既有门禁流程重叠，不再参与每张复盘卡；只在阶段决策时启用。"
     },
     {
       "id": "cto",
       "name": "生成架构审查",
-      "brief": "判断 Three.js 生成结构、参数暴露、比例控制、实例化性能和调试数据是否足够支撑审美目标；不替代美术判断。"
+      "brief": "判断 Three.js 生成结构、参数暴露、比例控制、实例化性能和调试数据是否足够支撑审美目标；不替代美术判断。",
+      "status": "保留 · 技术触发",
+      "cadence": "Three.js、性能、构建、部署或生成参数变化时",
+      "audit": "本次 viewport 与文字区域分离属于其职责，但最终可读性仍由美术指导验收。"
     },
     {
       "id": "shape-curator",
       "name": "花材库管理员",
-      "brief": "检查 flowerPlan、renderer、Primitive Lab 和 TARGET SHAPE VOCABULARY 是否一致；代码里用到的花型必须登记，参考图里反复出现的形态不能遗漏。"
+      "brief": "检查 flowerPlan、renderer、Primitive Lab 和 TARGET SHAPE VOCABULARY 是否一致；代码里用到的花型必须登记，参考图里反复出现的形态不能遗漏。",
+      "status": "保留 · 花库触发",
+      "cadence": "新增、删除、重命名或升级花型时",
+      "audit": "仍有明确所有权，避免实验花型、正式词表和生成器之间再次失配。"
     }
   ],
   "reusableAestheticRules": [
@@ -142,6 +208,91 @@
         "用洋桔梗补柔软团花而未获用户明确同意。"
       ],
       "ownerAcceptance": "用户明确排除。"
+    },
+    {
+      "id": "airy-color-rhythm",
+      "title": "缤纷来自点状节奏，不来自填满",
+      "summary": "中国当代花艺语境里的缤纷不是把不同颜色密铺进一个圆球，而是让小花、果点、枝线、局部主花和空气间隔共同形成星星点点的节奏。",
+      "principles": [
+        "中心体积不是越满越好；先看轮廓、留白、前后距离和局部停顿是否成立。",
+        "高饱和颜色应分散给不同花材角色，以小花矩阵、果点和外开线条承载，避免形成连续色块。",
+        "低位簇花只负责托住体积，不能向上吞掉中层空气，更不能把整束压成规则球体。",
+        "空气不是简单减少花材数量，而是由疏密变化、大小差异、遮挡关系和边缘伸展共同产生。"
+      ],
+      "rejectSignals": [
+        "花头在中心连续密铺，远看像一坨或一个完整圆球。",
+        "颜色虽然很多，却因为没有间隔和角色分配而变成厚重色块。",
+        "用增加花量、簇花或主花尺寸代替构图层次。"
+      ],
+      "ownerAcceptance": "来自用户对 2026-07-07 花束的明确否定；这是跨日期 composition 硬规则，不是一次性参数补丁。"
+    },
+    {
+      "id": "physical-growth-coherence",
+      "title": "自然角度必须服从真实生长结构",
+      "summary": "随机角度本身不等于自然。每一枝花材必须先有共同扎口、连续花茎和可解释的受力路径，再在这个物理结构上产生方向差异。",
+      "principles": [
+        "先确定花瓶开口、花泥或扎口，再从该锚点推导每枝花材的轴线和长度。",
+        "花头、花穗、果点和叶材必须有连续可见的茎、枝或花托连接，不能在半空生成。",
+        "方向差异应来自枝条落点、长度、弯曲和空间层级，而不是给一批模型套上相近的随机旋转。",
+        "默认视角与 360 度旋转都要能回看出各枝来自同一束花，而不是各自指向不同的隐形花瓶。"
+      ],
+      "rejectSignals": [
+        "穗状花角度看似不同，但延长轴线后无法回到同一个扎口。",
+        "花穗或花头悬在半空，底部没有连续花茎。",
+        "同类花材长度、倾角和弯曲高度过于一致，呈现明显电脑复制感。"
+      ],
+      "ownerAcceptance": "来自用户对 2026-07-11 花束的明确纠正；物理连贯性是审美可信度的一部分，后续所有生成花束都必须遵守。"
+    },
+    {
+      "id": "daily-aesthetic-legibility",
+      "title": "每日生成必须在审美与命名上可辨认",
+      "summary": "每日 seed 发生变化但用户无法识别，不算完整交付。独立花名、日期印记和可追溯 flowerPlan 是每日花束审美身份的一部分，也是发布可信度的一部分。",
+      "principles": [
+        "HUD 主标题使用日期印记和日期 seed 决定的独立中英文花名，不能只重复有限主题名。",
+        "主题、flowerPlan 和花材清单继续显示，让名称、构图计划和实际画面可以互相核对。",
+        "在疏、低功耗或低细节渲染下，即使几何差异被压缩，名称仍必须明确证明这是不同日期的花。",
+        "每日发布结果应能给出日期地址，方便用户直接抽查对应花束。"
+      ],
+      "rejectSignals": [
+        "连续多天只显示同一个中文主题名，让用户误以为没有生成或上传。",
+        "低细节模式下既看不出视觉差异，也没有独立名称可核对。",
+        "只在代码 seed 中存在差异，却没有用户可见的每日身份。"
+      ],
+      "ownerAcceptance": "用户明确要求将本次命名与审美纠正长期记录在项目中；这是后续每日生成和发布门禁。"
+    },
+    {
+      "id": "daily-flower-variety-coverage",
+      "title": "每日生成必须真正用上扩展花库",
+      "summary": "Primitive Lab 花型变多不等于每日花束变丰富。每日 flowerPlan 和 renderer 必须把已进入花库的具象单花纳入候选、配比和可见映射，否则日期 seed 只会在少数老抽象角色之间重复。",
+      "principles": [
+        "每日默认生成应有最小花材丰富度，不能长期只由 5 到 6 个老类型组成。",
+        "0.14.6 加入 Primitive Lab 的 16 种具象单花需要进入 flowerPlan 类型、角色配比和 renderer 映射，而不是只停留在实验页。",
+        "丰富不是简单增加数量；需要在主花、层叠花、小面花、杯形/雕塑花、果点、枝线和叶材之间形成可读差异。",
+        "如果某天 seed 抽到的主题和 plan 天然偏单一，默认生成应有兜底机制补充具象单花变化。"
+      ],
+      "rejectSignals": [
+        "HUD 显示不同日期，但花材清单仍只重复少数旧类型。",
+        "新增花型只在 Primitive Lab 可见，主花束中看不到对应差异。",
+        "通过换色、闪点或果点伪装丰富度，实际花型轮廓没有变。"
+      ],
+      "ownerAcceptance": "来自用户对 2026-07-13 今日花束的反馈；需要代码修复后再复验。"
+    },
+    {
+      "id": "dashboard-self-review-before-visual-change",
+      "title": "Dashboard 是 Codex 的主动审美门禁",
+      "summary": "审美复盘 Dashboard 不只是给用户验收，也是在 Codex 可能忘记整体花束形态时必须主动回看的项目记忆。不能等用户再次指出一坨、密球、形态单一、物理断裂或轮廓跑偏后才查阅。",
+      "principles": [
+        "任何涉及主花束 composition、整体轮廓、花材比例、叶材关系、花型接入或主视觉的工作，动手前先读 Dashboard 的通过基线、可复用规则、日期回炉记录与反向样本。",
+        "开始修改前明确本轮继承了哪些既有审美规则，并在完成后核对是否出现中心密球、全花无叶、统一角度、半空花材、单一大主花或花材丰富度不足。",
+        "Dashboard 不是一次性交付物；当代码与 Dashboard 记忆不一致时，先停下并查明差异，不能凭当前局部实现覆盖长期审美结论。",
+        "用户仍是最终验收人；主动回看 Dashboard 是减少重复提醒，不是替用户宣布新方向通过。"
+      ],
+      "rejectSignals": [
+        "未看 Dashboard 就直接修改 bouquetScene、flowerPlan、primitive 映射或整束外轮廓。",
+        "只检查单朵模型或技术复杂度，没有检查整束远看轮廓与空气感。",
+        "把用户曾明确否定的形态问题再次实现，再等待用户提醒。"
+      ],
+      "ownerAcceptance": "2026-07-13 用户明确提醒：Dashboard 也供 Codex 主动复习审美使用，不要总等用户提醒花花整体形态问题。"
     }
   ],
   "targetShapeVocabulary": [
@@ -258,6 +409,20 @@
       "whyNeeded": "叶材与绿色部分是空间、层次、春意和饱和度缓冲的关键，不是背景噪声。"
     }
   ],
+  "acceptedHybridVocabulary": [
+    {
+      "id": "orbital-pulse-flower",
+      "name": "星环脉冲花型",
+      "englishName": "Orbital Pulse Flower",
+      "primitive": "OrbitalPulseFlower",
+      "status": "pass",
+      "source": "2026-07-12 realistic-skeleton palette-control experiment",
+      "examples": "中心能量核、双层放射花瓣、两组实体星环、光脉花蕊和背部生命连接点",
+      "whyNeeded": "作为写实花朵骨架叠加非现实配色的正式对照组，帮助区分科幻感究竟来自形态还是来自颜色。",
+      "acceptance": "正面先读成花而不是机械徽章；星环通过实体辐条连接花心，侧面能看出能量核、轨道倾角、花蕊高度和背部连接点；360° 旋转没有漂浮圆环。",
+      "ownerNote": "2026-07-13 用户确认可以验收。正式进入可用花库，但分类仍是“写实骨架 × 非现实配色”的混合花型，不代表真正的结构科幻形态已经通过。"
+    }
+  ],
   "candidateShapeVocabulary": [
     {
       "id": "frilled-narcissus-corona",
@@ -272,7 +437,35 @@
       "ownerNote": "先作为候选花型完善；只有用户确认它真的做得很好，才把正式花库从 16 类扩为 17 类。"
     }
   ],
+  "sciFiFlowerExperiment": {
+    "updatedAt": "2026-07-12",
+    "title": "科幻花型 LAB · 用户配色版",
+    "hypothesis": "真正的科幻花型必须在灰模状态下仍然显得非现实；配色是可由用户独立控制的第二层变量。",
+    "control": "星环脉冲花：用户已验收，正式归类为写实骨架 × 非现实配色对照；不代表结构科幻形态通过。",
+    "morphologyTests": [
+      "莫比乌斯翻面花：连续单面花瓣环。",
+      "递归裂枝花：花瓣在生长途中反复分叉。",
+      "相位折叠花：同一花瓣穿过前后两个相位平面。",
+      "奇点内向花：花瓣围绕中心奇点向内生长。"
+    ],
+    "paletteUi": [
+      "一键配色预设",
+      "随机配色",
+      "主色、辅色、能量色、节点色、生命基座五个用户色选项"
+    ],
+    "ownerAcceptance": "作为重点测试项目；如果 UI 调色效果好，再纳入主体项目。"
+  },
   "primitiveGate": [
+    {
+      "primitive": "OrbitalPulseFlower",
+      "humanName": "星环脉冲花型",
+      "status": "pass",
+      "acceptance": "正面、侧面和 360° 旋转均保持花形、能量核、实体星环、花蕊与背部连接连续，不出现机械徽章或漂浮圆环感。",
+      "ownerStatus": "2026-07-13 已验收",
+      "ownerFeedback": "用户查看线上 Primitive Lab 后确认环脉冲花型可以验收。",
+      "nextTask": "作为正式可用的混合花型和配色对照进入后续花束计划；仍不可替代真正的结构科幻花型研究。",
+      "ownerAcceptance": "用户明确确认通过。"
+    },
     {
       "primitive": "DiskFlower",
       "humanName": "盘状花",

@@ -708,6 +708,134 @@ export function createFrilledNarcissusFlower(options: FloraPrimitiveOptions) {
   return applyRoot(group, options);
 }
 
+export function createOrbitalPulseFlower(options: FloraPrimitiveOptions) {
+  const rng = createRng(`${options.seed}:orbital-pulse`);
+  const group = new THREE.Group();
+  const outerCount = 8;
+  const outerPetals = new THREE.InstancedMesh(
+    curvedPetalGeometry(1.12, 0.18, 0.2, 0.04, 0.56),
+    material(colorAt(options.colorPalette, 0), 0.46),
+    outerCount
+  );
+
+  for (let i = 0; i < outerCount; i += 1) {
+    const angle = i / outerCount * Math.PI * 2;
+    const alternatingLift = i % 2 === 0 ? 0.06 : -0.035;
+    setInstance(
+      outerPetals,
+      i,
+      new THREE.Vector3(Math.cos(angle) * 0.12, Math.sin(angle) * 0.12, alternatingLift),
+      new THREE.Vector3(rng.range(0.93, 1.08), rng.range(0.96, 1.12), 1),
+      colorAt(options.colorPalette, i % 2).clone().lerp(new THREE.Color('#ffffff'), 0.08),
+      angle - Math.PI / 2
+    );
+  }
+
+  const innerCount = 6;
+  const innerFins = new THREE.InstancedMesh(
+    taperedPetalGeometry(0.72, 0.11, 0.24, -0.04),
+    material(colorAt(options.colorPalette, 2), 0.38),
+    innerCount
+  );
+  for (let i = 0; i < innerCount; i += 1) {
+    const angle = i / innerCount * Math.PI * 2 + Math.PI / innerCount;
+    setInstance(
+      innerFins,
+      i,
+      new THREE.Vector3(Math.cos(angle) * 0.09, Math.sin(angle) * 0.09, 0.12),
+      new THREE.Vector3(0.86, rng.range(0.9, 1.08), 1),
+      colorAt(options.colorPalette, i + 2).clone().lerp(new THREE.Color('#ffffff'), 0.12),
+      angle - Math.PI / 2
+    );
+  }
+
+  const coreMaterial = new THREE.MeshStandardMaterial({
+    color: colorAt(options.colorPalette, 1),
+    emissive: colorAt(options.colorPalette, 2),
+    emissiveIntensity: 0.72,
+    roughness: 0.25,
+    metalness: 0.18
+  });
+  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.31, 2), coreMaterial);
+  core.position.z = 0.18;
+  core.scale.set(1, 1, 0.72);
+
+  const pulse = new THREE.Mesh(
+    new THREE.SphereGeometry(0.16, 24, 16),
+    new THREE.MeshStandardMaterial({
+      color: '#f5ffff',
+      emissive: colorAt(options.colorPalette, 0),
+      emissiveIntensity: 1.35,
+      roughness: 0.12,
+      metalness: 0.05
+    })
+  );
+  pulse.position.z = 0.39;
+
+  const buildRing = (radius: number, tube: number, colorIndex: number, tiltX: number, tiltY: number) => {
+    const ringGroup = new THREE.Group();
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(radius, tube, 8, 56),
+      new THREE.MeshStandardMaterial({
+        color: colorAt(options.colorPalette, colorIndex),
+        emissive: colorAt(options.colorPalette, colorIndex),
+        emissiveIntensity: 0.48,
+        roughness: 0.32,
+        metalness: 0.22
+      })
+    );
+    ringGroup.add(ring);
+    for (let i = 0; i < 4; i += 1) {
+      const angle = i / 4 * Math.PI * 2;
+      const start = new THREE.Vector3(Math.cos(angle) * 0.2, Math.sin(angle) * 0.2, 0);
+      const end = new THREE.Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius, 0);
+      ringGroup.add(cylinderBetween(start, end, tube * 0.55, colorAt(options.colorPalette, colorIndex)));
+    }
+    ringGroup.position.z = 0.2;
+    ringGroup.rotation.x = tiltX;
+    ringGroup.rotation.y = tiltY;
+    return ringGroup;
+  };
+
+  const orbitA = buildRing(0.56, 0.022, 0, 0.12, 0.06);
+  const orbitB = buildRing(0.45, 0.018, 2, 0.82, 0.34);
+
+  const antennae = new THREE.Group();
+  for (let i = 0; i < 5; i += 1) {
+    const angle = i / 5 * Math.PI * 2 + 0.24;
+    const start = new THREE.Vector3(Math.cos(angle) * 0.06, Math.sin(angle) * 0.06, 0.24);
+    const end = new THREE.Vector3(Math.cos(angle) * 0.22, Math.sin(angle) * 0.22, 0.72 + (i % 2) * 0.09);
+    antennae.add(cylinderBetween(start, end, 0.011, colorAt(options.colorPalette, 3)));
+    const node = new THREE.Mesh(
+      new THREE.SphereGeometry(0.045, 12, 8),
+      new THREE.MeshStandardMaterial({
+        color: colorAt(options.colorPalette, 3),
+        emissive: colorAt(options.colorPalette, 3),
+        emissiveIntensity: 0.8,
+        roughness: 0.3
+      })
+    );
+    node.position.copy(end);
+    antennae.add(node);
+  }
+
+  const receptacle = new THREE.Mesh(
+    new THREE.SphereGeometry(0.23, 18, 12),
+    material(colorAt(options.colorPalette, 4), 0.82)
+  );
+  receptacle.position.z = -0.14;
+  receptacle.scale.set(1, 1, 0.62);
+  const neck = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.085, 0.12, 0.32, 12),
+    material(colorAt(options.colorPalette, 4).clone().lerp(new THREE.Color('#1b3340'), 0.3), 0.88)
+  );
+  neck.rotation.x = Math.PI / 2;
+  neck.position.z = -0.32;
+
+  group.add(outerPetals, innerFins, core, pulse, orbitA, orbitB, antennae, receptacle, neck);
+  return applyRoot(group, options);
+}
+
 export function createDaturaTrumpetFlower(options: FloraPrimitiveOptions) {
   const rng = createRng(`${options.seed}:datura`);
   const group = new THREE.Group();
@@ -1178,6 +1306,7 @@ export const floraPrimitiveFactories = {
   TulipCupFlower: createTulipCupFlower,
   TrumpetThroatFlower: createTrumpetThroatFlower,
   FrilledNarcissusFlower: createFrilledNarcissusFlower,
+  OrbitalPulseFlower: createOrbitalPulseFlower,
   DaturaTrumpetFlower: createDaturaTrumpetFlower,
   OrchidButterflyFlower: createOrchidButterflyFlower,
   CallaCurledBract: createCallaCurledBract,

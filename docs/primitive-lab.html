@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DailyFlora Primitive Lab · 33 项花型词表</title>
+    <title>DailyFlora Primitive Lab · 34 项花型词表</title>
     <style>
       :root {
         color-scheme: dark;
@@ -283,26 +283,27 @@
       <header class="hero">
         <div>
           <p class="eyebrow">Target shape vocabulary · Primitive Lab</p>
-          <h1>花型词表 · 33 项</h1>
-          <p class="hero-copy">16 类抽象目标形态、1 个 trumpet-throat 候选，加上从偏写实花型中选入的 16 种具体单花，全部放在同一个 3D 花库画布里。每朵花旁边直接显示中英文名称、简短识别说明和当前状态。</p>
+          <h1>花型词表 · 34 项</h1>
+          <p class="hero-copy">16 类抽象目标形态、16 种具体单花、1 个已验收混合花型和 1 个 trumpet-throat 候选，共 34 项放在同一个 3D 花库画布里。真正的结构科幻花型仍移到独立科幻 LAB 测试。</p>
         </div>
         <aside class="hero-side">
           <div>
-            <div class="hero-number">33 <small>one canvas</small></div>
-            <strong>16 抽象类 + 16 具象花型 + 1 候选</strong>
-            <p class="hero-copy">截图中的 9 种穗状和簇状偏写实花型暂不并入，等待后续单独讨论修改。褶边副冠水仙型仍保留候选身份。</p>
+            <div class="hero-number">34 <small>one canvas</small></div>
+            <strong>16 抽象类 + 16 具象花型 + 1 已验收混合花型 + 1 候选</strong>
+            <p class="hero-copy">星环脉冲花已通过用户验收，正式归为“写实骨架 × 非现实配色”混合花型；这不等于真正的结构科幻花型已经通过。截图中的 9 种穗状和簇状偏写实花型仍不并入。</p>
           </div>
           <div class="link-row">
             <a class="pill" href="./aesthetic-review-dashboard.html?debug=1">返回审美 Dashboard</a>
             <a class="pill" href="./dailyflora-reference-gallery.html">查看参考图库</a>
+            <a class="pill" href="./scifi-flower-lab.html">科幻花型与配色测试</a>
           </div>
         </aside>
       </header>
 
-      <section class="lab-section" aria-labelledby="shape-list-title">
+      <section class="lab-section" id="candidate-title" aria-labelledby="shape-list-title">
         <div class="section-head">
           <div>
-            <p class="eyebrow">One canvas · thirty-three flower forms</p>
+            <p class="eyebrow">One canvas · thirty-four flower forms</p>
             <h2 id="shape-list-title">在一个大框里看完整花库</h2>
             <p class="section-copy">拖动某一朵花所在区域可单独旋转。下方工具统一切换观察角度、轮廓、网格和自动旋转。</p>
           </div>
@@ -313,11 +314,11 @@
             <button id="silhouette-button" type="button" aria-pressed="false">轮廓</button>
             <button id="grid-button" type="button" aria-pressed="true">网格</button>
             <button id="rotate-button" type="button" aria-pressed="true">自动旋转</button>
-            <output id="primitive-stats" aria-label="Performance stats">载入 33 个模型…</output>
+            <output id="primitive-stats" aria-label="Performance stats">载入 34 个模型…</output>
           </div>
         </div>
         <div class="gallery-stage" id="gallery-stage">
-          <canvas id="primitive-canvas" aria-label="DailyFlora 16 类抽象花型、16 种具象单花和 1 个候选花型 3D 总览"></canvas>
+          <canvas id="primitive-canvas" aria-label="DailyFlora 16 类抽象花型、16 种具象单花、1 个已验收混合花型和 1 个候选花型 3D 总览"></canvas>
           <div class="shape-labels" id="shape-labels"></div>
           <span class="stage-note">拖动花朵区域旋转 · drag a flower area to rotate</span>
         </div>

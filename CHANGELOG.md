@@ -1,5 +1,72 @@
 # DailyFlora Changelog
 
+> 自 `0.14.10` 起，新增版本记录使用中英文双语。 / Starting with `0.14.10`, all new release notes are written in both Chinese and English.
+
+## Unreleased - 2026-07-13
+
+记录今日默认花束的花材丰富度问题。 / Recorded today's default bouquet variety issue.
+
+- 记录用户反馈：`2026-07-13` 默认花束不好看，主要原因是用到的花的品种不够丰富。 / Recorded owner feedback that the default `2026-07-13` bouquet is not working mainly because the visible flower varieties are not rich enough.
+- 排查确认当天抽到 `tropical-forest` theme 与 `berry-grove` flowerPlan；主花束仍主要使用老 `FlowerTypeId` 与少数 primitive，0.14.6 新增的 16 种具象单花尚未进入每日默认生成器。 / Diagnosed that the date selected the `tropical-forest` theme and `berry-grove` flowerPlan; the main bouquet still relies on the old `FlowerTypeId` set and a small primitive subset, while the 16 concrete forms added in 0.14.6 are not yet part of daily default generation.
+- 将“每日生成必须真正用上扩展花库”记录为新的 dashboard 可复用审美规则，后续需要代码修复后复验。 / Added "daily generation must actually use the expanded flower library" as a reusable dashboard rule; this needs a code fix and owner review.
+- 新增 `daily-concrete-forest-variety / 百花莓园空气束`，并让 `2026-07-13` 默认日期使用它，混合多种具象单花、果点、空气小簇和枝线。 / Added `daily-concrete-forest-variety / Concrete Berry Meadow Air` and routed the default `2026-07-13` date to it, mixing multiple concrete single-flower forms with fruit dots, airy clusters, and branch lines.
+- 修复每日中文名可能重复的问题：默认命名加入日期专属月标记和日标记，允许凭审美起名，但普通日期不能只因抽到相同 mood/plan 就重名。 / Fixed a daily Chinese-name collision bug by adding date-specific month and day name marks; names can remain aesthetic, but ordinary dates no longer collide just because they select the same mood and plan.
+- 将主花束叶片从二维平面升级为有厚度、横向拱起和纵向卷曲的 3D 网格，并增加凸起主脉与成对侧脉；仍使用实例化渲染，低清模式自动减少网格和叶脉细分。 / Upgraded bouquet leaves from flat 2D shapes to thick, laterally arched, longitudinally curled 3D meshes with raised midribs and paired side veins; rendering remains instanced, with reduced mesh and vein detail in low mode.
+- 撤下科幻花束 LAB 中未通过的莫比乌斯、递归裂枝、相位折叠和奇点内向形态，默认改为多黑少金的黑金信号，只保留星环脉冲作为已认可的科幻配色对照。 / Removed the unaccepted Möbius, recursive rift, phase-fold, and singularity morphologies from the sci-fi bouquet lab, defaulted the page to the black-led black-gold signal palette, and kept Orbital Pulse only as the accepted sci-fi color-control form.
+- 将科幻花束 LAB 从“半透明膜包住的小束花”改为开放式星云外轮廓：默认使用缤纷的“星云花火”配色，增加多种支撑花型、果点、空气小簇、草线枝条和发光光轨。 / Changed the sci-fi bouquet lab from small bouquets covered by translucent film into open nebula silhouettes, defaulting to the colorful `Nebula Fireworks` palette with varied support flowers, fruit dots, airy clusters, branch lines, and luminous trails.
+- 将 `/scifi-bouquet-lab` 从“旧花束换科幻配色”改为结构科幻主导：新增星栅天线、双螺旋信标和晶格棱镜三种连续实体花型，每束约六成以上可见花头使用科幻结构，写实花降为少量支撑；此前被否定的四种形态仍不回流。 / Shifted `/scifi-bouquet-lab` from recolored legacy bouquets to structure-led sci-fi bouquets by adding Signal Antenna, Double-Helix Beacon, and Prism Lattice continuous solid forms; sci-fi structures now make up roughly sixty percent or more of visible flower heads, while realistic flowers are reduced to support and the four rejected forms remain excluded.
+- 开发组里的 3D 花束预览默认使用【精】【密】：`preview=1` 与 `debug=1` 在未显式指定时自动选择 high render 和 high density，并同步固定样例、审美复盘、用户测试与开发目录链接；公开首页仍保持原默认。 / Defaulted internal 3D bouquet previews to high render and high density: `preview=1` and `debug=1` now select both when unspecified, with fixed samples, aesthetic review, member tests, and developer-directory links synchronized while public defaults remain unchanged.
+- 将 `/about/` 从占位说明升级为完整品牌介绍页，补齐开发初衷、产品原则、开发人员与 AI 协作说明、代码引用小字和 footer。 / Upgraded `/about/` from a placeholder into a complete brand page with the development intention, product principles, human and AI development credits, code-attribution fine print, and a full footer.
+- 将 `/signup/` 重做为以收藏与个人花园为核心的注册 landing page，补齐四组卖点、本机 MVP 注册表单和账户跳转，并同步开发文档总结与审美复盘 Dashboard。 / Rebuilt `/signup/` as a collection-led registration landing page with four benefit groups, a device-local MVP signup form, and account handoff, then synchronized the development summary and aesthetic review dashboard.
+- 用户确认 `OrbitalPulseFlower / 星环脉冲花型` 可以验收；将其从候选升级为正式可用的“写实骨架 × 非现实配色”混合花型，同时继续与真正的结构科幻形态分开。 / Recorded owner acceptance of `OrbitalPulseFlower`, promoting it from candidate to an approved realistic-skeleton × unreal-palette hybrid while keeping it distinct from true structural science-fiction morphology.
+- 将审美复盘 Dashboard 明确升级为 Codex 的主动修改前门禁：composition、整体轮廓、花材比例、叶材关系与新花型入束前必须回看，不再等用户重复提醒整体形态问题。 / Made the aesthetic review Dashboard an explicit proactive pre-change gate for Codex before composition, silhouette, flower-ratio, foliage, or new-form integration work.
+
+## 0.14.11 - 2026-07-12
+
+调整科幻 LAB 的黑金配色方向。 / Adjusted the sci-fi lab black-gold palette direction.
+
+- 将“黑金信号”从金色主导改为黑色主导：主色、辅色和基座使用近黑色，亮金只保留为能量高光，暗金用于节点。 / Rebalanced `Black Gold Signal` from gold-led to black-led: main, secondary, and base colors are near-black, bright gold is kept as the energy highlight, and muted gold is used for nodes.
+
+## 0.14.10 - 2026-07-12
+
+修复花型 LAB 的模型可读性，审计项目角色，并检查本地与 GitHub 同步风险。 / Restored model legibility in the flower labs, audited project roles, and checked local/GitHub synchronization risks.
+
+- 偏写实花型 LAB 从最多四列改为最多三列，科幻花型 LAB 固定最多两列，为每朵花保留更大的模型观察区。 / Reduced the realistic lab from four to at most three columns and the sci-fi lab to at most two columns, giving every flower a larger inspection area.
+- 桌面端改为“模型左、说明右”，移动端改为“模型上、说明下”；Three.js viewport 会真实扣除文字区，不再在文字背后渲染模型。 / Split desktop cells into model-left and copy-right regions and mobile cells into model-above and copy-below regions; Three.js viewports now exclude the text area instead of rendering behind it.
+- 审查角色改为带启用频率的职责表：项目主任降为里程碑门禁，其余角色按视觉、结构或花库变动触发。 / Converted review roles into cadence-based responsibilities: the project director is now a milestone-only gate while the other roles activate for visual, structural, or library changes.
+- 记录本地旧功能分支与远端 main 已明显分叉，普通 `git push` 当前不安全；发布继续使用内容快照流程，直到工作区整理完成。 / Recorded that the old local feature branch has materially diverged from remote main and is unsafe for a normal `git push`; publishing continues through content snapshots until the workspace is reconciled.
+- 为 GitHub blob 上传增加 429/502/503/504 瞬时错误重试，避免单次网关超时中断完整发布。 / Added retries for transient 429/502/503/504 GitHub blob-upload failures so a single gateway timeout no longer aborts the full deployment.
+
+## 0.14.9 - 2026-07-12
+
+重做被否定的 7 月 7 日与 7 月 11 日花束，并让每日生成在界面上可辨认。 / Reworked the rejected July 7 and July 11 daily bouquets and made daily generation visible in the UI.
+
+- 用带日期印记的确定性中英文每日花名替代重复主题标题；“疏/省”模式下仍能区分日期。 / Replaced repeated theme-only headings with deterministic daily Chinese/English bouquet names carrying a visible date stamp; names remain distinct in sparse and low-power modes.
+- 降低 `2026-07-07` 中心与簇花权重、尺寸，增加小花、果点、枝线、闪点和径向空气，消除中心密球。 / Rebalanced the default `2026-07-07` bouquet away from a dense central ball by reducing center/cluster weight and scale while increasing small-flower, fruit, line, branch, sparkle, and radial-air roles.
+- 围绕共同扎口重建穗花放置，每一枝都沿花瓶物理路径生长，并以可见曲线花茎连接花穗底部。 / Rebuilt spike placement around one shared bouquet tie point, with each spike following its physical path from the vase and a visible curved stem connecting to its base.
+- 缩短、下沉并减少 `2026-07-11` 的重复线花，避免统一悬浮的 AI 痕迹。 / Shortened, lowered, and reduced repeated line flowers in `2026-07-11` so their lengths and angles no longer read as uniform floating AI artifacts.
+- 两组修正继续使用默认日期 seed，不借用固定花束地址；等待用户复验。 / Kept both corrections inside the default date-seed mechanism without borrowing fixed bouquet URLs; owner acceptance remains pending.
+- 将反馈提升为三条长期审美门禁：缤纷必须保留空气，自然方向必须服从连续生长路径，每日花束必须有用户可见身份。 / Promoted the feedback into three permanent gates: colorful rhythm must retain air, natural direction must follow a continuous growth path, and every daily bouquet must have a user-visible identity.
+- Added the new Sites build helper, hosting config, worker, and science-fiction lab files to the GitHub source deploy manifest, and snapshotted deploy file contents before blob upload to avoid long-upload `dist` races.
+
+## 0.14.8 - 2026-07-12
+
+Separated science-fiction morphology from science-fiction color styling.
+
+- Reclassified `OrbitalPulseFlower` as a user-liked realistic-skeleton color control rather than a genuinely science-fiction morphology.
+- Added a separate Sci-Fi Flower Lab with four structural hypotheses: Möbius inversion, recursive bifurcation, phase-folded ribbons, and singularity-driven inward growth.
+- Added global one-click palette presets, random palettes, and five user-editable color roles while keeping every flower's geometry fixed.
+- Kept the experiment outside the main generator until the owner confirms that the palette UI and morphology tests are worth adopting.
+
+## 0.14.7 - 2026-07-12
+
+Started a third, science-fiction flower-form vocabulary.
+
+- Added `OrbitalPulseFlower / 星环脉冲花型` as a pending candidate with an emissive energy core, exaggerated radial petals, two connected orbital rings, pulse stamens, and a rear biological connection.
+- Kept every orbital ring physically connected to the flower core through solid spokes so the form reads as a living flower rather than floating decoration.
+- Expanded Primitive Lab from 33 to 34 displayed forms while retaining one shared WebGL canvas.
+- Kept the sci-fi form separate from the accepted 16 abstract classes and 16 concrete flower extensions until owner review.
+
 ## 0.14.6 - 2026-07-12
 
 Expanded Primitive Lab with approved concrete single-flower forms.

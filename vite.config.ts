@@ -13,6 +13,11 @@ export default defineConfig({
           resolve(__dirname, 'data/aesthetic-review-dashboard.json'),
           resolve(__dirname, 'dist/data/aesthetic-review-dashboard.json')
         );
+        mkdirSync(resolve(__dirname, 'dist/server'), { recursive: true });
+        copyFileSync(
+          resolve(__dirname, 'sites/worker.js'),
+          resolve(__dirname, 'dist/server/index.js')
+        );
         const indexHtml = readFileSync(resolve(__dirname, 'dist/index.html'), 'utf8');
         for (const route of ['special0629', 'special0629-v2', 'special0629-v3', 'special0629-v4']) {
           mkdirSync(resolve(__dirname, `dist/${route}`), { recursive: true });
@@ -43,12 +48,15 @@ export default defineConfig({
         devIndex: resolve(__dirname, 'docs/dev-index.html'),
         developmentDocumentSummary: resolve(__dirname, 'docs/development-document-summary.html'),
         memberTest: resolve(__dirname, 'docs/member-test.html'),
+        memberUiDirection: resolve(__dirname, 'docs/member-ui-direction.html'),
         adminBouquets: resolve(__dirname, 'docs/admin-bouquets.html'),
         adminUsers: resolve(__dirname, 'docs/admin-users.html'),
         flowerPlanSamples: resolve(__dirname, 'docs/dailyflora-flower-plan-samples.html'),
         aestheticReviewDashboard: resolve(__dirname, 'docs/aesthetic-review-dashboard.html'),
         primitiveLab: resolve(__dirname, 'docs/primitive-lab.html'),
         realisticFlowerLab: resolve(__dirname, 'docs/realistic-flower-lab.html'),
+        scifiFlowerLab: resolve(__dirname, 'docs/scifi-flower-lab.html'),
+        scifiBouquetLab: resolve(__dirname, 'docs/scifi-bouquet-lab.html'),
         avatarLab: resolve(__dirname, 'docs/avatar-lab.html')
       }
     }

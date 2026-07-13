@@ -225,6 +225,32 @@
         background: rgb(242 203 98 / 6%);
       }
 
+      .surface-review-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .surface-review-card {
+        display: grid;
+        gap: 13px;
+        min-height: 230px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: linear-gradient(145deg, rgb(255 255 255 / 5%), rgb(255 255 255 / 2%));
+      }
+
+      .surface-review-card h3 {
+        font-size: 24px;
+      }
+
+      .surface-review-card p,
+      .surface-review-card li {
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
       .library-card {
         display: grid;
         gap: 10px;
@@ -398,7 +424,8 @@
         .rules-grid,
         .library-grid,
         .shape-grid,
-        .role-review {
+        .role-review,
+        .surface-review-grid {
           grid-template-columns: 1fr;
         }
 
@@ -488,12 +515,22 @@
           <a class="panel library-card" href="./primitive-lab.html">
             <em>花库罗列</em>
             <strong>Primitive Lab</strong>
-            <span>在一个共享 3D 画布中查看 16 类抽象词表、16 种具象单花和 1 个候选；截图中的 9 种穗状与簇状花暂缓并入。</span>
+            <span>在一个共享 3D 画布中查看 16 类抽象词表、16 种具象单花、已验收的星环脉冲混合花型和 1 个候选；截图中的 9 种穗状与簇状花暂缓并入。</span>
           </a>
           <a class="panel library-card" href="./realistic-flower-lab.html">
             <em>25 种具象花型</em>
             <strong>偏写实花型 LAB</strong>
             <span>查看删除洋桔梗后的 25 种具体花材表达，以及面向 3D 打印的花托、花梗和实体分枝连接。</span>
+          </a>
+          <a class="panel library-card" href="./scifi-flower-lab.html">
+            <em>结构科幻 × 用户配色</em>
+            <strong>科幻花型 LAB</strong>
+            <span>用灰模辨别结构是否真正科幻，再一键切换预设、随机配色或用户自选颜色。</span>
+          </a>
+          <a class="panel library-card" href="./scifi-bouquet-lab.html">
+            <em>新增花型入束</em>
+            <strong>科幻新花束 LAB</strong>
+            <span>用新增科幻花型生成 8 套花束样机，测试它们进入整束 composition 后是否成立。</span>
           </a>
           <a class="panel library-card" href="./dailyflora-flower-plan-samples.html">
             <em>花束库</em>
@@ -519,6 +556,31 @@
         <div class="role-grid" id="role-grid"></div>
       </section>
 
+      <section class="section" aria-labelledby="public-surface-review-title">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Public surface review · 2026-07-13</p>
+            <h2 id="public-surface-review-title">品牌网站审美复盘</h2>
+            <p class="section-copy">本轮不改主花束 composition，只把已通过的花束审美语言延展到公开网页：克制的深绿背景、暖黄点光、留白、细边框和偏编辑感的衬线大标题。</p>
+          </div>
+          <div class="link-row"><a class="pill" href="../about/">查看 About</a><a class="pill" href="../signup/">查看 Signup</a></div>
+        </div>
+        <div class="surface-review-grid">
+          <article class="surface-review-card">
+            <div><span class="status pass">pass · implementation</span></div>
+            <h3>About：从开发占位到品牌叙事</h3>
+            <p>品牌介绍、开发初衷、产品原则、人员说明、代码与引用条款、footer 已形成完整阅读路径；首屏实时花束负责证明产品本体，页面装饰不与花竞争。</p>
+            <ul><li>保留空气与纵向节奏，不密铺卡片。</li><li>真实产品画面优先于另造装饰插画。</li><li>AI 协作署名透明，但不抢占品牌主角。</li></ul>
+          </article>
+          <article class="surface-review-card">
+            <div><span class="status pass">pass · implementation</span></div>
+            <h3>Signup：卖点围绕“花会留下来”</h3>
+            <p>首屏将注册价值归结为收藏与记忆，四项卖点按用户动机而非后台模块罗列；注册表单成为页面主动作，同时明确本机 MVP 边界。</p>
+            <ul><li>主 CTA 与内容叙事一致，不再跳到 mockup 才解释。</li><li>功能卡保持疏密变化，避免等宽四格的后台感。</li><li>隐私、密码与真实账号状态用小字如实交代。</li></ul>
+          </article>
+        </div>
+      </section>
+
       <section class="section">
         <div class="section-head">
           <div>
@@ -533,6 +595,17 @@
       <section class="section">
         <div class="section-head">
           <div>
+            <p class="kicker">Daily bouquet corrections</p>
+            <h2>日期花束回炉记录</h2>
+            <p class="section-copy">这里记录实际运行页面暴露的问题。修正只表示进入复验，不代表用户已经认可。</p>
+          </div>
+        </div>
+        <div class="rules-grid" id="daily-correction-grid"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
             <p class="kicker">Target shape vocabulary</p>
             <h2>16 类目标形态词表</h2>
             <p class="section-copy">这 16 类已经进入 Primitive Lab，并已达到用户确认的花库及格线。CosmosOpenFlower 是从山岗小花/热带丛林经验中补登记的小面花，旧 7 类只保留为历史粗分类和兼容别名。</p>
@@ -541,12 +614,23 @@
         <div class="shape-grid" id="shape-grid"></div>
       </section>
 
+      <section class="section" id="candidate-title" aria-labelledby="accepted-hybrid-title">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Accepted hybrid vocabulary</p>
+            <h2 id="accepted-hybrid-title">已验收混合花型</h2>
+            <p class="section-copy">这里收纳已经通过用户验收、但不应被误归入核心抽象词表或真正结构科幻词表的稳定花型。分类边界和验收状态同样需要保留。</p>
+          </div>
+        </div>
+        <div class="shape-grid" id="accepted-hybrid-grid"></div>
+      </section>
+
       <section class="section">
         <div class="section-head">
           <div>
             <p class="kicker">Candidate shape vocabulary</p>
             <h2>待验收候选花型</h2>
-            <p class="section-copy">候选只进入实验和复盘，不自动改写正式 16 类。只有用户确认其正面、侧面和 360° 旋转都真正成立，才升级为新的正式花型。</p>
+            <p class="section-copy">当前只剩褶边副冠水仙型待验收。候选只进入实验和复盘，不自动改写正式词表；只有用户确认其正面、侧面和 360° 旋转都真正成立，才升级。</p>
           </div>
           <a class="pill" href="./primitive-lab.html#candidate-title">在 Primitive Lab 验收</a>
         </div>
@@ -597,6 +681,7 @@
         },
         "roles": [],
         "primitiveGate": [],
+        "dailyBouquetCorrections": [],
         "reusableAestheticRules": [],
         "targetShapeVocabulary": [],
         "reviewGroups": []
@@ -615,7 +700,7 @@
               <p class="eyebrow">DailyFlora debug gate</p>
               <h1>审美复盘只在 debug 版开放</h1>
               <p>在主页面 URL 加上 <code>?debug=1</code> 后，从右下角的“审美审核”按钮进入。普通观赏模式不显示这页入口。</p>
-              <a class="pill" href="../?debug=1">打开 debug 版</a>
+              <a class="pill" href="../?debug=1&amp;render=high&amp;density=high">打开 debug 版</a>
             </section>
           </main>
         `;
@@ -646,6 +731,7 @@
         TulipCupFlower: '郁金香/杯型',
         TrumpetThroatFlower: '洋水仙管心型',
         FrilledNarcissusFlower: '褶边副冠水仙型',
+        OrbitalPulseFlower: '星环脉冲花型',
         DaturaTrumpetFlower: '大喇叭型',
         OrchidButterflyFlower: '兰花/蝴蝶型',
         CallaCurledBract: '马蹄莲/卷曲苞片型',
@@ -691,6 +777,7 @@
         TulipCupFlower: ['#ffbf5a', '#fff0c2', '#f58aa2', '#5d8a55'],
         TrumpetThroatFlower: ['#fff9e8', '#ffffff', '#ffc847', '#f08b36'],
         FrilledNarcissusFlower: ['#fff4c8', '#ffe8a7', '#f3b13e', '#ffd86a', '#78a66a'],
+        OrbitalPulseFlower: ['#6cf4ff', '#8f7bff', '#ff63d8', '#dcff6b', '#375c58'],
         DaturaTrumpetFlower: ['#ffffff', '#f2e3ff', '#8a5ab8', '#58783f'],
         OrchidButterflyFlower: ['#f8c8eb', '#fff6fb', '#e078b8', '#cc8b4f'],
         CallaCurledBract: ['#fff7df', '#f6e8b5', '#f2b84c', '#6c8b57'],
@@ -753,6 +840,9 @@
               <article class="panel">
                 <h3>${escapeHtml(role.name)}</h3>
                 <p>${escapeHtml(role.brief)}</p>
+                <p><strong>状态：</strong>${escapeHtml(role.status || '按需启用')}</p>
+                <p><strong>启用频率：</strong>${escapeHtml(role.cadence || '任务需要时')}</p>
+                <p><strong>本次审计：</strong>${escapeHtml(role.audit || '保留观察')}</p>
               </article>
             `
           )
@@ -812,6 +902,23 @@
           .join('');
       }
 
+      function renderDailyCorrections(data) {
+        const corrections = data.dailyBouquetCorrections || [];
+        document.querySelector('#daily-correction-grid').innerHTML = corrections
+          .map(
+            (item) => `
+              <article class="panel">
+                <div>${statusBadge(item.status)}</div>
+                <h3>${escapeHtml(item.date)} · ${escapeHtml(item.name)}</h3>
+                <p><strong>用户反馈：</strong>${escapeHtml(item.ownerFeedback)}</p>
+                <p><strong>本轮修正：</strong>${escapeHtml(item.correction)}</p>
+                <a class="pill" href="${escapeHtml(item.url)}">打开日期花束</a>
+              </article>
+            `
+          )
+          .join('');
+      }
+
       function renderTargetShapes(data) {
         const shapes = data.targetShapeVocabulary || [];
         document.querySelector('#shape-grid').innerHTML = shapes
@@ -832,6 +939,28 @@
               </article>
             `;
             }
+          )
+          .join('');
+      }
+
+      function renderAcceptedHybridShapes(data) {
+        const shapes = data.acceptedHybridVocabulary || [];
+        document.querySelector('#accepted-hybrid-grid').innerHTML = shapes
+          .map(
+            (shape) => `
+              <article class="panel">
+                <div>${statusBadge(shape.status)}</div>
+                <div class="shape-preview">
+                  <canvas data-shape-preview="${escapeHtml(shape.primitive)}" aria-label="${escapeHtml(shape.name)} model preview"></canvas>
+                </div>
+                <h3>${escapeHtml(shape.name)}</h3>
+                <p class="en">${escapeHtml(shape.englishName)}</p>
+                <p class="en">${escapeHtml(shape.primitive)} · ${escapeHtml(shape.id)}</p>
+                <p><strong>正式分类：</strong>写实骨架 × 非现实配色</p>
+                <p><strong>验收结论：</strong>${escapeHtml(shape.acceptance)}</p>
+                <p><strong>登记说明：</strong>${escapeHtml(shape.ownerNote)}</p>
+              </article>
+            `
           )
           .join('');
       }
@@ -1030,7 +1159,9 @@
         renderGate(data);
         renderRoles(data);
         renderReusableRules(data);
+        renderDailyCorrections(data);
         renderTargetShapes(data);
+        renderAcceptedHybridShapes(data);
         renderCandidateShapes(data);
         initTargetShapePreviews();
         animateTargetShapePreviews();
