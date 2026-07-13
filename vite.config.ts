@@ -48,6 +48,7 @@ export default defineConfig({
         devIndex: resolve(__dirname, 'docs/dev-index.html'),
         developmentDocumentSummary: resolve(__dirname, 'docs/development-document-summary.html'),
         memberTest: resolve(__dirname, 'docs/member-test.html'),
+        memberUiDirection: resolve(__dirname, 'docs/member-ui-direction.html'),
         adminBouquets: resolve(__dirname, 'docs/admin-bouquets.html'),
         adminUsers: resolve(__dirname, 'docs/admin-users.html'),
         flowerPlanSamples: resolve(__dirname, 'docs/dailyflora-flower-plan-samples.html'),

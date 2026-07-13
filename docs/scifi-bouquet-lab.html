@@ -13,26 +13,26 @@
     <main class="shell">
       <header class="hero">
         <div>
-          <p class="eyebrow">New bouquet tests · sci-fi morphology first</p>
+          <p class="eyebrow">Nebula bouquet silhouettes · rejected morphologies paused</p>
           <h1>科幻新花束 LAB</h1>
-          <p class="copy">把 Primitive Lab 已有花型当作少量支撑材料，主要用星环脉冲、莫比乌斯翻面、递归裂枝、相位折叠、奇点内向这几类新增花型，生成 8 套花束样机。这里先看“入束以后是否有新鲜感”，不作为正式日花版本。</p>
+          <p class="copy">撤下上一版被否定的莫比乌斯翻面、递归裂枝、相位折叠和奇点内向形态；它们暂不进入整束花。当前页面保留用户之前认可的星环脉冲作为科幻主花，但整束外轮廓改为更开、更缤纷、更像真正花束的星云形态。</p>
         </div>
         <aside class="hero-side">
-          <div><div class="count">8<small>new bouquet sketches</small></div></div>
-          <p class="copy">同一批花束可以一键换色或随机配色。结构固定，颜色变化，这样能判断真正成立的是花型、构图，还是单纯颜色刺激。</p>
+          <div><div class="count">8<small>nebula bouquet sketches</small></div></div>
+          <p class="copy">不再使用半透明包裹膜。外部轮廓由多种花型、果点、空气小簇、草线枝条和开放式发光光轨共同形成。</p>
           <div class="links"><a class="pill" href="./primitive-lab.html">Primitive Lab</a><a class="pill" href="./scifi-flower-lab.html">科幻花型 LAB</a></div>
         </aside>
       </header>
 
       <section class="palette-panel" aria-labelledby="palette-title">
-        <div class="palette-head"><div><h2 id="palette-title">整束花一键配色</h2><p>保留同一套花束结构，只替换花型、节点、能量和茎叶色。</p></div><output class="palette-name" id="palette-name">深空冷光</output></div>
-        <div class="presets" aria-label="配色预设"><button type="button" data-preset="深空冷光" aria-pressed="true">深空冷光</button><button type="button" data-preset="酸性温室" aria-pressed="false">酸性温室</button><button type="button" data-preset="量子珊瑚" aria-pressed="false">量子珊瑚</button><button type="button" data-preset="黑金信号" aria-pressed="false">黑金信号</button><button type="button" data-preset="晨雾异种" aria-pressed="false">晨雾异种</button><button id="random-palette" type="button">随机配色</button></div>
-        <div class="color-fields" aria-label="用户自选颜色"><label class="color-field">主色<input type="color" data-color-index="0" value="#65f4ff" /></label><label class="color-field">辅色<input type="color" data-color-index="1" value="#8174ff" /></label><label class="color-field">能量<input type="color" data-color-index="2" value="#ff5ed2" /></label><label class="color-field">节点<input type="color" data-color-index="3" value="#dcff6b" /></label><label class="color-field">茎叶<input type="color" data-color-index="4" value="#365b58" /></label></div>
+        <div class="palette-head"><div><h2 id="palette-title">整束花一键配色</h2><p>默认进入星云花火：颜色缤纷，但外形仍靠真实花束层次和开放光轨成立。</p></div><output class="palette-name" id="palette-name">星云花火</output></div>
+        <div class="presets" aria-label="配色预设"><button type="button" data-preset="星云花火" aria-pressed="true">星云花火</button><button type="button" data-preset="深空冷光" aria-pressed="false">深空冷光</button><button type="button" data-preset="酸性温室" aria-pressed="false">酸性温室</button><button type="button" data-preset="量子珊瑚" aria-pressed="false">量子珊瑚</button><button type="button" data-preset="黑金信号" aria-pressed="false">黑金信号</button><button type="button" data-preset="晨雾异种" aria-pressed="false">晨雾异种</button><button id="random-palette" type="button">随机配色</button></div>
+        <div class="color-fields" aria-label="用户自选颜色"><label class="color-field">主色<input type="color" data-color-index="0" value="#62f6ff" /></label><label class="color-field">辅色<input type="color" data-color-index="1" value="#ff5fc8" /></label><label class="color-field">能量<input type="color" data-color-index="2" value="#f6ff6d" /></label><label class="color-field">节点<input type="color" data-color-index="3" value="#8d74ff" /></label><label class="color-field">茎叶<input type="color" data-color-index="4" value="#2ad49e" /></label></div>
       </section>
 
       <section class="lab" aria-labelledby="lab-title">
-        <div class="section-head"><div><p class="eyebrow">One canvas · eight bouquets</p><h2 id="lab-title">新增花型入束测试</h2><p class="copy">拖动某一格可以单独旋转；切换侧面可以检查花束是不是只是一张正面图。</p></div><div class="tools" aria-label="新花束观察工具"><button type="button" data-view="front" aria-pressed="true">正面</button><button type="button" data-view="side" aria-pressed="false">侧面</button><button type="button" data-view="top" aria-pressed="false">顶视</button><button id="grid-button" type="button" aria-pressed="true">网格</button><button id="rotate-button" type="button" aria-pressed="true">自动旋转</button><output id="bouquet-stats">载入 8 套花束…</output></div></div>
-        <div class="stage" id="bouquet-stage"><canvas id="bouquet-canvas" aria-label="8 套科幻新增花型花束 3D 总览"></canvas><div class="labels" id="bouquet-labels"></div></div>
+        <div class="section-head"><div><p class="eyebrow">One canvas · eight bouquets</p><h2 id="lab-title">星云外轮廓入束测试</h2><p class="copy">拖动某一格可以单独旋转；切换侧面可以检查花束是不是只是一张正面图。当前重点看整体外形是否缤纷、多样、科幻。</p></div><div class="tools" aria-label="新花束观察工具"><button type="button" data-view="front" aria-pressed="true">正面</button><button type="button" data-view="side" aria-pressed="false">侧面</button><button type="button" data-view="top" aria-pressed="false">顶视</button><button id="grid-button" type="button" aria-pressed="true">网格</button><button id="rotate-button" type="button" aria-pressed="true">自动旋转</button><output id="bouquet-stats">载入 8 套花束…</output></div></div>
+        <div class="stage" id="bouquet-stage"><canvas id="bouquet-canvas" aria-label="8 套星云科幻花束 3D 总览"></canvas><div class="labels" id="bouquet-labels"></div></div>
       </section>
     </main>
     <script type="module" src="/src/scifiBouquetLab.ts"></script>

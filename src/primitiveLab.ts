@@ -135,12 +135,25 @@ const densePrimitives: FloraPrimitiveName[] = [
 ];
 
 const shapeEntries = dashboardData.targetShapeVocabulary as ShapeEntry[];
+const acceptedHybridEntries = dashboardData.acceptedHybridVocabulary as CandidateShapeEntry[];
 const candidateEntries = dashboardData.candidateShapeVocabulary as CandidateShapeEntry[];
 const gateEntries = dashboardData.primitiveGate as GateEntry[];
 const promotedRealisticDefinitions = realisticFlowerDefinitions.filter(
   (definition) => definition.category !== 'spike' && definition.category !== 'cluster'
 );
 const displayShapes: DisplayShape[] = [
+  ...acceptedHybridEntries.map((shape, index) => ({
+    id: shape.id,
+    name: shape.name,
+    englishName: shape.englishName,
+    description: `${shape.examples} · ${shape.ownerNote}`,
+    primitive: shape.primitive,
+    realisticDefinition: null,
+    candidate: false,
+    family: 'target' as const,
+    indexLabel: `H${String(index + 1).padStart(2, '0')}`,
+    statusLabel: shape.status
+  })),
   ...candidateEntries.map((shape, index) => ({
     id: shape.id,
     name: shape.name,

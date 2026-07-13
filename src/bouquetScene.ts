@@ -979,72 +979,146 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   return buildPrimitiveFlowers(spec, quality);
 }
 
-function leafHalfWidth(y: number) {
-  const t = THREE.MathUtils.clamp((y + 0.15) / 0.28, 0, 1);
-  return Math.pow(Math.sin(Math.PI * t), 0.72) * 0.125 * (0.92 + t * 0.08);
+type LeafShapeProfile = {
+  name: string;
+  width: number;
+  length: number;
+  edgePower: number;
+  centerShift: number;
+  edgeWave: number;
+  cup: number;
+  curl: number;
+  veinPairs: number;
+  veinReach: number;
+};
+
+const leafShapeProfiles: readonly LeafShapeProfile[] = [
+  { name: 'soft-ovate', width: 0.124, length: 0.96, edgePower: 0.62, centerShift: 0.018, edgeWave: 0.018, cup: 0.0012, curl: 0.0014, veinPairs: 5, veinReach: 0.72 },
+  { name: 'lanceolate', width: 0.073, length: 1.12, edgePower: 0.86, centerShift: -0.012, edgeWave: 0.012, cup: 0.0008, curl: -0.0016, veinPairs: 4, veinReach: 0.78 },
+  { name: 'elliptic', width: 0.099, length: 1.02, edgePower: 0.48, centerShift: -0.022, edgeWave: 0.024, cup: 0.001, curl: 0.0007, veinPairs: 5, veinReach: 0.68 },
+  { name: 'round-tip', width: 0.116, length: 0.78, edgePower: 0.36, centerShift: 0.026, edgeWave: 0.032, cup: 0.0014, curl: -0.0008, veinPairs: 4, veinReach: 0.66 },
+  { name: 'willow', width: 0.047, length: 1.24, edgePower: 0.98, centerShift: 0.01, edgeWave: 0.014, cup: 0.0006, curl: 0.002, veinPairs: 3, veinReach: 0.8 }
+];
+
+function leafY(profile: LeafShapeProfile, t: number) {
+  return THREE.MathUtils.lerp(-0.15 * profile.length, 0.13 * profile.length, t);
 }
 
-function leafSurfaceHeight(x: number, y: number) {
-  const halfWidth = Math.max(leafHalfWidth(y), 0.0001);
-  const across = THREE.MathUtils.clamp(Math.abs(x) / halfWidth, 0, 1);
-  const t = THREE.MathUtils.clamp((y + 0.15) / 0.28, 0, 1);
-  const centerRidge = Math.pow(1 - across, 2.4) * 0.012;
-  const softCup = Math.pow(across, 1.7) * 0.009;
-  const lengthCurl = Math.sin((t - 0.18) * Math.PI) * 0.007;
-  return centerRidge + softCup + lengthCurl;
+function leafT(profile: LeafShapeProfile, y: number) {
+  return THREE.MathUtils.clamp((y + 0.15 * profile.length) / (0.28 * profile.length), 0, 1);
 }
 
-function buildLeafBladeGeometry(renderName: QualityProfile['renderName']) {
-  const lengthSegments = renderName === 'low' ? 8 : 12;
-  const widthSegments = renderName === 'low' ? 4 : 6;
-  const thickness = renderName === 'low' ? 0.006 : 0.008;
+function leafCenterX(profile: LeafShapeProfile, t: number) {
+  return profile.centerShift * Math.sin(Math.PI * t) * (0.7 + t * 0.3);
+}
+
+function leafHalfWidth(profile: LeafShapeProfile, t: number) {
+  const body = Math.pow(Math.max(0, Math.sin(Math.PI * t)), profile.edgePower);
+  const taperBias = 0.9 + t * 0.1;
+  const edgeVariation = 1 + Math.sin(t * Math.PI * 5.0) * profile.edgeWave;
+  return body * profile.width * taperBias * edgeVariation;
+}
+
+function leafSurfaceHeight(profile: LeafShapeProfile, x: number, y: number) {
+  const t = leafT(profile, y);
+  const center = leafCenterX(profile, t);
+  const halfWidth = Math.max(leafHalfWidth(profile, t), 0.0001);
+  const across = THREE.MathUtils.clamp(Math.abs(x - center) / halfWidth, 0, 1);
+  const softCup = Math.pow(across, 1.8) * profile.cup;
+  const flexibleCurl = Math.sin((t - 0.12) * Math.PI) * profile.curl;
+  return softCup + flexibleCurl;
+}
+
+function pointToSegmentDistance(
+  px: number,
+  py: number,
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number
+) {
+  const abx = bx - ax;
+  const aby = by - ay;
+  const lengthSq = abx * abx + aby * aby || 1;
+  const amount = THREE.MathUtils.clamp(((px - ax) * abx + (py - ay) * aby) / lengthSq, 0, 1);
+  return Math.hypot(px - (ax + abx * amount), py - (ay + aby * amount));
+}
+
+function leafVeinIndentation(
+  profile: LeafShapeProfile,
+  across: number,
+  t: number,
+  renderName: QualityProfile['renderName']
+) {
+  const mainDistance = Math.abs(across - 0.5);
+  const mainInfluence = Math.exp(-Math.pow(mainDistance / 0.022, 2) * 3.2);
+  const pairCount = renderName === 'low' ? Math.min(3, profile.veinPairs) : profile.veinPairs;
+  let sideInfluence = 0;
+  for (let index = 0; index < pairCount; index += 1) {
+    const branchT = 0.23 + (index / Math.max(1, pairCount - 1)) * 0.56;
+    const endT = Math.min(0.94, branchT + 0.1);
+    const midT = THREE.MathUtils.lerp(branchT, endT, 0.5);
+    for (const direction of [-1, 1]) {
+      const midAcross = 0.5 + direction * 0.18;
+      const endAcross = 0.5 + direction * profile.veinReach * 0.5;
+      const firstDistance = pointToSegmentDistance(across, t, 0.5, branchT, midAcross, midT);
+      const secondDistance = pointToSegmentDistance(across, t, midAcross, midT, endAcross, endT);
+      const branchDistance = Math.min(firstDistance, secondDistance);
+      sideInfluence = Math.max(sideInfluence, Math.exp(-Math.pow(branchDistance / 0.018, 2) * 3.4));
+    }
+  }
+  const lengthFade = Math.pow(Math.max(0, Math.sin(Math.PI * t)), 0.32);
+  const depth = renderName === 'low' ? 0.00032 : 0.0005;
+  return (mainInfluence * 0.82 + sideInfluence * 0.48) * lengthFade * depth;
+}
+
+function buildLeafBladeGeometry(profile: LeafShapeProfile, renderName: QualityProfile['renderName']) {
+  const lengthSegments = renderName === 'low' ? 16 : 32;
+  const widthSegments = renderName === 'low' ? 10 : 20;
   const positions: number[] = [];
   const uvs: number[] = [];
   const indices: number[] = [];
   const rowSize = widthSegments + 1;
 
-  for (const side of [1, -1]) {
-    for (let row = 0; row <= lengthSegments; row += 1) {
-      const t = row / lengthSegments;
-      const y = THREE.MathUtils.lerp(-0.15, 0.13, t);
-      const halfWidth = leafHalfWidth(y);
-      for (let column = 0; column <= widthSegments; column += 1) {
-        const across = column / widthSegments;
-        const x = THREE.MathUtils.lerp(-halfWidth, halfWidth, across);
-        const z = leafSurfaceHeight(x, y) + side * thickness * 0.5;
-        positions.push(x, y, z);
-        uvs.push(across, t);
-      }
+  for (let row = 0; row <= lengthSegments; row += 1) {
+    const t = row / lengthSegments;
+    const y = leafY(profile, t);
+    const center = leafCenterX(profile, t);
+    const halfWidth = leafHalfWidth(profile, t);
+    for (let column = 0; column <= widthSegments; column += 1) {
+      const across = column / widthSegments;
+      const x = center + THREE.MathUtils.lerp(-halfWidth, halfWidth, across);
+      const z = leafSurfaceHeight(profile, x, y) - leafVeinIndentation(profile, across, t, renderName);
+      positions.push(x, y, z);
+      uvs.push(across, t);
     }
   }
 
-  const surfaceVertexCount = (lengthSegments + 1) * rowSize;
-  for (let sideIndex = 0; sideIndex < 2; sideIndex += 1) {
-    const offset = sideIndex * surfaceVertexCount;
-    for (let row = 0; row < lengthSegments; row += 1) {
-      for (let column = 0; column < widthSegments; column += 1) {
-        const a = offset + row * rowSize + column;
-        const b = a + 1;
-        const c = a + rowSize;
-        const d = c + 1;
-        if (sideIndex === 0) indices.push(a, b, c, b, d, c);
-        else indices.push(a, c, b, b, c, d);
-      }
+  for (let row = 0; row < lengthSegments; row += 1) {
+    for (let column = 0; column < widthSegments; column += 1) {
+      const a = row * rowSize + column;
+      const b = a + 1;
+      const c = a + rowSize;
+      const d = c + 1;
+      indices.push(a, b, c, b, d, c);
     }
   }
 
-  const addEdge = (column: number) => {
-    for (let row = 0; row < lengthSegments; row += 1) {
-      const frontA = row * rowSize + column;
-      const frontB = (row + 1) * rowSize + column;
-      const backA = frontA + surfaceVertexCount;
-      const backB = frontB + surfaceVertexCount;
-      if (column === 0) indices.push(frontA, frontB, backA, frontB, backB, backA);
-      else indices.push(frontA, backA, frontB, frontB, backA, backB);
-    }
-  };
-  addEdge(0);
-  addEdge(widthSegments);
+  const baseY = leafY(profile, 0);
+  const rootY = baseY - 0.038 * profile.length;
+  const petioleWidth = Math.min(0.0017, profile.width * 0.022);
+  const petioleStart = positions.length / 3;
+  positions.push(
+    -petioleWidth * 0.55, rootY, leafSurfaceHeight(profile, 0, baseY),
+    petioleWidth * 0.55, rootY, leafSurfaceHeight(profile, 0, baseY),
+    -petioleWidth, baseY + 0.006 * profile.length, leafSurfaceHeight(profile, 0, baseY),
+    petioleWidth, baseY + 0.006 * profile.length, leafSurfaceHeight(profile, 0, baseY)
+  );
+  uvs.push(0.48, 0, 0.52, 0, 0.48, 0.03, 0.52, 0.03);
+  indices.push(
+    petioleStart, petioleStart + 1, petioleStart + 2,
+    petioleStart + 1, petioleStart + 3, petioleStart + 2
+  );
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
@@ -1055,96 +1129,27 @@ function buildLeafBladeGeometry(renderName: QualityProfile['renderName']) {
   return geometry;
 }
 
-function appendLeafVeinRibbon(
-  positions: number[],
-  indices: number[],
-  points: Array<{ x: number; y: number }>,
-  width: number
-) {
-  const startIndex = positions.length / 3;
-  points.forEach((point, index) => {
-    const previous = points[Math.max(0, index - 1)];
-    const next = points[Math.min(points.length - 1, index + 1)];
-    const dx = next.x - previous.x;
-    const dy = next.y - previous.y;
-    const length = Math.hypot(dx, dy) || 1;
-    const nx = -dy / length;
-    const ny = dx / length;
-    const z = leafSurfaceHeight(point.x, point.y) + 0.0095;
-    positions.push(
-      point.x + nx * width, point.y + ny * width, z,
-      point.x - nx * width, point.y - ny * width, z
-    );
-  });
-  for (let index = 0; index < points.length - 1; index += 1) {
-    const a = startIndex + index * 2;
-    indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
-  }
-}
-
-function buildLeafVeinGeometry(renderName: QualityProfile['renderName']) {
-  const positions: number[] = [];
-  const indices: number[] = [];
-  appendLeafVeinRibbon(positions, indices, [
-    { x: 0, y: -0.142 },
-    { x: 0.001, y: -0.07 },
-    { x: -0.001, y: 0.005 },
-    { x: 0, y: 0.074 },
-    { x: 0, y: 0.122 }
-  ], renderName === 'low' ? 0.0032 : 0.0038);
-
-  const branchRows = renderName === 'low' ? [-0.07, 0.005, 0.065] : [-0.09, -0.045, 0, 0.043, 0.078];
-  branchRows.forEach((y, rowIndex) => {
-    const halfWidth = leafHalfWidth(y);
-    for (const direction of [-1, 1]) {
-      const endY = y + 0.027 + rowIndex * 0.002;
-      appendLeafVeinRibbon(positions, indices, [
-        { x: 0, y },
-        { x: direction * halfWidth * 0.34, y: y + 0.012 },
-        { x: direction * leafHalfWidth(endY) * 0.73, y: endY }
-      ], renderName === 'low' ? 0.0025 : 0.003);
-    }
-  });
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-  geometry.computeBoundingSphere();
-  return geometry;
-}
-
 function buildLeaves(spec: DailyBouquetSpec, quality: QualityProfile) {
   const rng = createRng(`${spec.seed}:leaves`);
-  const bladeGeometry = buildLeafBladeGeometry(quality.renderName);
-  const veinGeometry = buildLeafVeinGeometry(quality.renderName);
   const bladeMaterial = new THREE.MeshStandardMaterial({
-    roughness: 0.7,
+    roughness: 0.78,
     metalness: 0,
     side: THREE.DoubleSide,
     emissive: new THREE.Color('#123d28'),
-    emissiveIntensity: 0.028
-  });
-  const veinMaterial = new THREE.MeshStandardMaterial({
-    roughness: 0.86,
-    metalness: 0,
-    side: THREE.DoubleSide,
-    transparent: true,
-    opacity: quality.renderName === 'low' ? 0.76 : 0.88,
-    depthWrite: false,
-    polygonOffset: true,
-    polygonOffsetFactor: -1,
-    polygonOffsetUnits: -1
+    emissiveIntensity: 0.022
   });
   const count = Math.floor(quality.leafCount * spec.leafDensity * (spec.special ? 0.68 : 1));
-  const blades = new THREE.InstancedMesh(bladeGeometry, bladeMaterial, count);
-  const veins = new THREE.InstancedMesh(veinGeometry, veinMaterial, count);
   const group = new THREE.Group();
-  group.name = 'dimensional-leaves';
-  blades.name = 'leaf-blades';
-  veins.name = 'leaf-veins';
+  group.name = 'varied-thin-leaves';
+  const instances: Array<{
+    variantIndex: number;
+    matrix: THREE.Matrix4;
+    bladeColor: THREE.Color;
+  }> = [];
+  const variantCounts = leafShapeProfiles.map(() => 0);
 
   for (let i = 0; i < count; i += 1) {
+    const variantIndex = Math.floor(rng.value() * leafShapeProfiles.length) % leafShapeProfiles.length;
     const theta = rng.range(0, Math.PI * 2);
     const phi = rng.range(0.38, 1.82);
     const p = bouquetPoint(spec, rng.range(0.44, 1.78), rng.range(0.7, 1.38), theta, phi);
@@ -1160,16 +1165,26 @@ function buildLeaves(spec: DailyBouquetSpec, quality: QualityProfile) {
       size
     );
     tempObject.updateMatrix();
-    blades.setMatrixAt(i, tempObject.matrix);
-    veins.setMatrixAt(i, tempObject.matrix);
     const bladeColor = tempColor.set(pickColor(spec.theme.leafPalette, rng.value())).clone();
-    blades.setColorAt(i, bladeColor);
-    const veinColor = bladeColor.clone().lerp(new THREE.Color(spec.theme.stem), 0.18).lerp(new THREE.Color('#e4edb8'), 0.36);
-    veins.setColorAt(i, veinColor);
+    instances.push({ variantIndex, matrix: tempObject.matrix.clone(), bladeColor });
+    variantCounts[variantIndex] += 1;
   }
-  if (blades.instanceColor) blades.instanceColor.needsUpdate = true;
-  if (veins.instanceColor) veins.instanceColor.needsUpdate = true;
-  group.add(blades, veins);
+
+  leafShapeProfiles.forEach((profile, variantIndex) => {
+    const variantCount = variantCounts[variantIndex];
+    if (!variantCount) return;
+    const blades = new THREE.InstancedMesh(buildLeafBladeGeometry(profile, quality.renderName), bladeMaterial, variantCount);
+    blades.name = `leaf-blades:${profile.name}`;
+    let instanceIndex = 0;
+    instances.forEach((instance) => {
+      if (instance.variantIndex !== variantIndex) return;
+      blades.setMatrixAt(instanceIndex, instance.matrix);
+      blades.setColorAt(instanceIndex, instance.bladeColor);
+      instanceIndex += 1;
+    });
+    if (blades.instanceColor) blades.instanceColor.needsUpdate = true;
+    group.add(blades);
+  });
   return group;
 }
 

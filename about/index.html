@@ -3,35 +3,91 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>About DailyFlora</title>
-    <style>
-      :root { color-scheme: dark; --bg: #080a07; --text: #f7f0e3; --muted: rgb(247 240 227 / 68%); --line: rgb(247 240 227 / 14%); --accent: #f2cb62; }
-      * { box-sizing: border-box; }
-      body { margin: 0; min-height: 100vh; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text); background: radial-gradient(circle at 12% 0%, rgb(242 203 98 / 11%), transparent 28%), linear-gradient(180deg, #080a07, #0d110c); }
-      main { width: min(920px, 100%); margin: 0 auto; padding: 34px 20px 56px; }
-      a { color: var(--accent); }
-      header { display: grid; gap: 14px; padding: 26px; border: 1px solid var(--line); border-radius: 8px; background: rgb(17 22 15 / 78%); }
-      h1, h2, p { margin: 0; }
-      h1 { font-size: clamp(40px, 8vw, 86px); line-height: .96; letter-spacing: 0; }
-      h2 { margin-top: 26px; font-size: 26px; }
-      p { color: var(--muted); line-height: 1.72; }
-      .nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
-      .nav a { padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; text-decoration: none; background: rgb(255 255 255 / 4%); }
-    </style>
+    <meta name="description" content="关于 DailyFlora：一个每天生成一束数字花的独立创作项目。" />
+    <title>关于 DailyFlora — 每日数字花束</title>
+    <link rel="stylesheet" href="../src/marketing.css" />
   </head>
   <body>
-    <main>
-      <header>
-        <p>DailyFlora / about</p>
-        <h1>一束每天生成的数字花</h1>
-        <p>DailyFlora 现在是一个个人开发中的 3D 花束项目：每天用日期、主题、seed 和花材规则生成一束可观看、可收藏、可继续演化的花。</p>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="../" aria-label="DailyFlora 首页"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA</a>
+        <nav class="site-nav" aria-label="站点导航">
+          <a href="./" aria-current="page">关于</a>
+          <a href="../bouquet-shop/">花束商店</a>
+          <a href="../downloads/">下载</a>
+          <a class="nav-cta" href="../signup/">建立我的花园</a>
+        </nav>
       </header>
-      <h2>当前阶段</h2>
-      <p>项目先以低成本 MVP 推进：页面结构、审美系统、花材库和用户流程先跑通；真实账号、数据库、支付和后台权限后续按商业化需要逐步接入。</p>
-      <div class="nav">
-        <a href="../">回到首页</a>
-        <a href="../docs/dev-index.html">开发组目录</a>
-      </div>
-    </main>
+
+      <main>
+        <section class="about-hero wrap">
+          <div class="hero-copy">
+            <p class="eyebrow">A living bouquet, every day</p>
+            <h1 class="display">让一天，长出一束<em>花</em>。</h1>
+            <p class="lead">DailyFlora 是一座每天醒来一次的数字花园。日期成为种子，色彩、花材与空间规则彼此生长，生成一束只属于今天的 3D 花。</p>
+            <div class="button-row">
+              <a class="button primary" href="../"><span>看今天的花</span><span class="arrow" aria-hidden="true">↗</span></a>
+              <a class="button" href="../signup/">收藏每日花束</a>
+            </div>
+          </div>
+          <figure class="live-frame" aria-label="今日 DailyFlora 实时花束">
+            <iframe src="../?preview=1&amp;render=high" title="今日生成花束" loading="eager"></iframe>
+            <figcaption class="frame-caption"><strong>今日生成</strong><span>由日期与花材规则实时生长</span></figcaption>
+          </figure>
+        </section>
+
+        <section class="manifesto wrap">
+          <div class="manifesto-grid">
+            <div><p class="eyebrow">Why we made it</p></div>
+            <div class="prose">
+              <h2>在重复的屏幕里，留下一个会变化的生命迹象。</h2>
+              <p>DailyFlora 的开发初衷很简单：屏幕不应该永远只是工具和通知。它也可以像窗台一样，在你没有操作的时候，安静地放着一束花。</p>
+              <p>我们不复制现实中的某一束花，而是把花艺里的颜色、轮廓、疏密、枝线和空气感写成可演化的规则。每个日期都会得到稳定而独特的结果：今天错过的花，明天不会再以完全相同的方式出现。</p>
+              <p class="pullquote">“数字不是自然的反面。它也可以成为一种照料。”</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="principles wrap">
+          <p class="eyebrow">What guides us</p>
+          <h2 class="section-title">我们在意的，不只是花多不多。</h2>
+          <div class="principle-list">
+            <article class="principle"><span class="principle-index">01</span><h3>每天不同，但始终可认</h3><p>生成带来惊喜，审美规则守住边界。DailyFlora 追求有变化的秩序，而不是不受控制的随机。</p></article>
+            <article class="principle"><span class="principle-index">02</span><h3>让空气成为花材</h3><p>真正的缤纷来自点状节奏、方向差异与留白。叶材托住空间，花朵不被填成沉重的一团。</p></article>
+            <article class="principle"><span class="principle-index">03</span><h3>轻一点，再长久一点</h3><p>项目从浏览器中的低功耗体验开始，让普通设备也能拥有一束持续旋转、随日期更新的数字花。</p></article>
+          </div>
+        </section>
+
+        <section class="team wrap">
+          <div class="team-head">
+            <div><p class="eyebrow">Made by a small studio</p><h2 class="section-title">一人主理，人与 AI 协作。</h2></div>
+            <p>DailyFlora 是仍在成长的独立项目。产品判断、花艺审美与最终取舍始终由人负责；AI 参与原型、代码、测试与文档整理。</p>
+          </div>
+          <div class="team-grid">
+            <article class="person-card"><div><div class="person-monogram" aria-hidden="true">DF</div><h3>产品主理人</h3><p class="person-role">Founder · Creative Direction</p><p>提出 DailyFlora 的产品概念，建立花艺审美边界，决定每日花束、交互与品牌表达的最终方向。</p></div><span class="person-meta">Human authored · Human approved</span></article>
+            <article class="person-card"><div><div class="person-monogram" aria-hidden="true">CX</div><h3>Codex 协作开发</h3><p class="person-role">AI Development Collaborator</p><p>协助把创意转化为可运行的网页、生成规则和开发文档，并在每轮修改后完成结构与构建检查。</p></div><span class="person-meta">AI assisted · Transparently credited</span></article>
+          </div>
+        </section>
+
+        <section class="legal-strip">
+          <div class="legal-grid wrap">
+            <h2>代码与引用说明</h2>
+            <div class="legal-copy">
+              <p>DailyFlora 为独立开发项目。站内原创视觉规则、文案与组合方式除另有说明外归项目创作者所有。项目使用 <code>Three.js</code> 等开源软件；相关代码继续适用其原始开源许可，本项目不主张对第三方开源代码、商标或作品的所有权。</p>
+              <p>开发过程中由 AI 辅助生成或改写的代码均需人工审阅后采用。参考资料仅用于研究花材形态、构图与技术实现；引用内容遵循合理使用与来源许可，若有权利问题请通过项目维护渠道联系处理。</p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-main wrap">
+          <p class="footer-statement">每天一束，不必占有。<br />明天再来，看花如何变化。</p>
+          <nav class="footer-col" aria-label="探索"><strong>探索</strong><a href="../">今日花束</a><a href="../bouquet-shop/">花束商店</a><a href="../downloads/">下载</a></nav>
+          <nav class="footer-col" aria-label="账户"><strong>账户</strong><a href="../signup/">注册</a><a href="../member/">个人花园</a><a href="../docs/dev-index.html">开发记录</a></nav>
+        </div>
+        <div class="footer-bottom wrap"><span>© 2026 DailyFlora. An independent digital garden.</span><span>Made slowly, generated daily.</span></div>
+      </footer>
+    </div>
   </body>
 </html>

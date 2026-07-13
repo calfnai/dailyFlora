@@ -27,6 +27,7 @@ type Preview = {
 };
 
 const presets: Record<string, string[]> = {
+  '星云花火': ['#62f6ff', '#ff5fc8', '#f6ff6d', '#8d74ff', '#2ad49e'],
   '深空冷光': ['#65f4ff', '#8174ff', '#ff5ed2', '#dcff6b', '#365b58'],
   '酸性温室': ['#c6ff37', '#29e69b', '#ff7b38', '#fff06a', '#315a3d'],
   '量子珊瑚': ['#ff746c', '#ffb36b', '#e76bff', '#fff0c2', '#4e6574'],
@@ -35,14 +36,14 @@ const presets: Record<string, string[]> = {
 };
 
 const bouquetDefinitions: BouquetDefinition[] = [
-  { id: 'orbital-collar', cn: '星环领口花束', en: 'Orbital Collar Bouquet', brief: '星环脉冲做主花，环带像领口一样包住中心。', focus: ['orbital-color-control', 'phase-fold'], support: ['CosmosOpenFlower', 'AirFiller'], mood: 'control + pulse rings', density: 0.9, height: 1.0, spread: 0.96 },
-  { id: 'mobius-halo', cn: '莫比乌斯光晕花束', en: 'Möbius Halo Bouquet', brief: '连续单面花瓣绕成上扬光晕，现实支撑花只做底部节奏。', focus: ['mobius-bloom', 'orbital-color-control'], support: ['UmbelMiniCluster', 'FoliageGrassBranch'], mood: 'single-surface halo', density: 0.82, height: 1.08, spread: 1.04 },
-  { id: 'rift-grove', cn: '递归裂枝小森林', en: 'Recursive Rift Grove', brief: '裂枝花型像生长网络，花束边缘会有分叉的触须感。', focus: ['fractal-rift', 'phase-fold'], support: ['SpikeFlower', 'AirFiller'], mood: 'branching alien grove', density: 0.74, height: 1.18, spread: 1.16 },
-  { id: 'phase-fan', cn: '相位折扇花束', en: 'Phase Fan Bouquet', brief: '相位折叠花形成扇形骨架，适合测试正侧面是否都有体积。', focus: ['phase-fold', 'mobius-bloom'], support: ['StarPinwheelFlower', 'FoliageGrassBranch'], mood: 'folded fan volume', density: 0.86, height: 0.96, spread: 1.2 },
-  { id: 'singularity-core', cn: '奇点核心花束', en: 'Singularity Core Bouquet', brief: '中心向内卷，外围用小花与叶线托住暗核。', focus: ['singularity-bloom', 'phase-fold'], support: ['FullHydrangeaCloud', 'CosmosOpenFlower'], mood: 'inward gravity core', density: 0.92, height: 0.94, spread: 0.92 },
-  { id: 'rift-comet', cn: '裂枝彗尾花束', en: 'Rift Comet Bouquet', brief: '递归裂枝集中向一侧拉出尾迹，测试非对称科幻花束。', focus: ['fractal-rift', 'orbital-color-control'], support: ['SpikeFlower', 'HangingBellFruit'], mood: 'asymmetric comet tail', density: 0.78, height: 1.12, spread: 1.28 },
-  { id: 'folded-orchid', cn: '折叠兰形异种', en: 'Folded Orchid Variant', brief: '相位折叠与莫比乌斯带混合，读起来接近异种兰花。', focus: ['phase-fold', 'mobius-bloom', 'singularity-bloom'], support: ['OrchidButterflyFlower', 'AirFiller'], mood: 'alien orchid', density: 0.84, height: 1.02, spread: 1.02 },
-  { id: 'quantum-handful', cn: '量子手捧花', en: 'Quantum Handful Bouquet', brief: '五种新增花型都出现，但主次更像手捧花而不是实验标本。', focus: ['mobius-bloom', 'phase-fold', 'singularity-bloom', 'fractal-rift', 'orbital-color-control'], support: ['CosmosOpenFlower', 'UmbelMiniCluster', 'FoliageGrassBranch'], mood: 'all-new compact mix', density: 1.0, height: 1.0, spread: 1.0 }
+  { id: 'orbital-collar', cn: '星云领口花束', en: 'Nebula Orbital Collar', brief: '星环脉冲做科幻主花，外圈由多种小花和发光信号枝打开，不再像被薄膜罩住的小束花。', focus: ['orbital-color-control'], support: ['CosmosOpenFlower', 'LayeredDahliaFlower', 'AirFiller', 'FruitPodCluster'], mood: 'wide orbital collar', density: 0.9, height: 1.0, spread: 1.22 },
+  { id: 'signal-meadow', cn: '信号草甸花束', en: 'Signal Meadow Bouquet', brief: '用星环脉冲压住中心，外层用面花、伞状小簇和果点制造缤纷草甸感。', focus: ['orbital-color-control'], support: ['CosmosOpenFlower', 'UmbelMiniCluster', 'RuffledRoseFlower', 'BerryCluster'], mood: 'colorful signal meadow', density: 0.92, height: 0.98, spread: 1.3 },
+  { id: 'halo-branch', cn: '光轨枝形花束', en: 'Halo Branch Bouquet', brief: '高低错落的草线枝条和星环主花形成外放轮廓，科幻感来自开放光轨，不来自塑料罩。', focus: ['orbital-color-control'], support: ['FoliageGrassBranch', 'AirFiller', 'TulipCupFlower', 'FruitPodCluster'], mood: 'open halo branches', density: 0.76, height: 1.28, spread: 1.28 },
+  { id: 'orbital-fan', cn: '星环风车花束', en: 'Orbital Pinwheel Bouquet', brief: '用星形/风车型、郁金香杯形和发光花火拉成扇形，整体外轮廓更像一束真正展开的花。', focus: ['orbital-color-control'], support: ['StarPinwheelFlower', 'TulipCupFlower', 'CosmosOpenFlower', 'FoliageGrassBranch'], mood: 'radiant fan silhouette', density: 0.88, height: 1.0, spread: 1.36 },
+  { id: 'dark-core-cloud', cn: '星云云团花束', en: 'Nebula Cloud Bouquet', brief: '云团、小面花和果点托住星环核心，形成饱满但有空气的科幻云团。', focus: ['orbital-color-control'], support: ['FullHydrangeaCloud', 'CosmosOpenFlower', 'LayeredRoundFlower', 'AirFiller'], mood: 'layered nebula cloud', density: 0.96, height: 0.98, spread: 1.08 },
+  { id: 'comet-signal', cn: '彗尾信号花束', en: 'Comet Signal Bouquet', brief: '非对称彗尾由草线、果材和光点拉出，不再使用此前过丑的递归裂枝形态。', focus: ['orbital-color-control'], support: ['FoliageGrassBranch', 'HangingBellFruit', 'AirFiller', 'StarPinwheelFlower'], mood: 'asymmetric comet tail', density: 0.82, height: 1.18, spread: 1.44 },
+  { id: 'orbital-orchid', cn: '星环兰形花束', en: 'Orbital Orchid Bouquet', brief: '蝴蝶兰、马蹄莲和星环脉冲形成异种花感，但外部仍保持花束的丰富层次。', focus: ['orbital-color-control'], support: ['OrchidButterflyFlower', 'CallaCurledBract', 'AirFiller', 'CosmosOpenFlower'], mood: 'alien floral orchid', density: 0.86, height: 1.08, spread: 1.16 },
+  { id: 'approved-handful', cn: '星云手捧花', en: 'Nebula Handful Bouquet', brief: '全部使用已认可或较稳定的花型做入束测试，目标是缤纷、多样、科幻，而不是暗色小包花。', focus: ['orbital-color-control'], support: ['CosmosOpenFlower', 'UmbelMiniCluster', 'LayeredDahliaFlower', 'FoliageGrassBranch', 'BerryCluster'], mood: 'approved colorful mix', density: 1.0, height: 1.02, spread: 1.22 }
 ];
 
 const up = new THREE.Vector3(0, 1, 0);
@@ -67,7 +68,7 @@ const viewButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[da
 const gridButton = required<HTMLButtonElement>('#grid-button');
 const rotateButton = required<HTMLButtonElement>('#rotate-button');
 
-let palette = [...presets['深空冷光']];
+let palette = [...presets['星云花火']];
 let activeView: ViewName = 'front';
 let gridVisible = true;
 let autoRotate = true;
@@ -128,13 +129,29 @@ function varyPalette(base: string[], rng: ReturnType<typeof createRng>) {
   });
 }
 
+function silhouette(definition: BouquetDefinition) {
+  if (definition.id === 'halo-branch') return { low: 0.48, high: 1.2, lift: 0.18, side: 0, fan: 0, tail: 0, cloud: 0.1 };
+  if (definition.id === 'orbital-fan') return { low: 0.34, high: 1.04, lift: 0.08, side: 0, fan: 0.62, tail: 0, cloud: 0 };
+  if (definition.id === 'comet-signal') return { low: 0.42, high: 1.24, lift: 0.1, side: -0.48, fan: 0, tail: 0.72, cloud: 0 };
+  if (definition.id === 'dark-core-cloud') return { low: 0.18, high: 0.9, lift: -0.02, side: 0, fan: 0, tail: 0, cloud: 0.35 };
+  if (definition.id === 'signal-meadow') return { low: 0.38, high: 1.16, lift: 0.03, side: 0, fan: 0.16, tail: 0, cloud: 0.05 };
+  if (definition.id === 'orbital-orchid') return { low: 0.34, high: 1.08, lift: 0.14, side: 0.1, fan: 0.08, tail: 0, cloud: 0 };
+  if (definition.id === 'approved-handful') return { low: 0.26, high: 1.04, lift: 0, side: 0, fan: 0.2, tail: 0, cloud: 0.18 };
+  return { low: 0.28, high: 1.06, lift: 0.08, side: 0, fan: 0.12, tail: 0, cloud: 0 };
+}
+
 function bouquetPoint(definition: BouquetDefinition, rng: ReturnType<typeof createRng>, index: number, count: number) {
-  const angle = (index / count) * Math.PI * 2 + rng.range(-0.34, 0.34);
-  const ring = index % 5 === 0 ? rng.range(0.18, 0.38) : rng.range(0.36, 1);
-  const x = Math.cos(angle) * ring * definition.spread;
-  const z = Math.sin(angle) * ring * (0.52 + definition.spread * 0.22);
-  const dome = Math.max(0, 1 - ring * 0.58);
-  const y = rng.range(-0.1, 0.54) + dome * 0.72 * definition.height;
+  const profile = silhouette(definition);
+  const angleBase = index / count * Math.PI * 2;
+  const fanOffset = Math.sin(index / Math.max(1, count - 1) * Math.PI - Math.PI / 2) * profile.fan;
+  const angle = angleBase + fanOffset + rng.range(-0.42, 0.42);
+  const outer = index % 4 === 0 ? profile.high + rng.range(-0.02, 0.18) : rng.range(profile.low, profile.high);
+  const ring = Math.min(1.42, Math.max(0.12, outer));
+  const x = Math.cos(angle) * ring * definition.spread + profile.side * Math.max(0, ring - 0.36);
+  const z = Math.sin(angle) * ring * (0.48 + definition.spread * 0.26);
+  const dome = Math.max(0, 1 - Math.abs(ring - profile.cloud) * 0.54);
+  const tailLift = definition.id === 'comet-signal' && x < 0 ? Math.abs(x) * profile.tail : 0;
+  const y = rng.range(-0.16, 0.62) + dome * 0.76 * definition.height + profile.lift + tailLift;
   return new THREE.Vector3(x, y, z);
 }
 
@@ -175,26 +192,25 @@ function addSupportFlower(group: THREE.Group, definition: BouquetDefinition, pri
   if (definition.id === 'rift-comet') support.position.x -= rng.range(0.08, 0.24);
 }
 
-function addWrapping(group: THREE.Group, rng: ReturnType<typeof createRng>) {
-  const wrapMaterial = material(colorAt(palette, 1).lerp(colorAt(palette, 4), 0.45), 0.05, 0.18);
-  const edgeMaterial = new THREE.LineBasicMaterial({ color: colorAt(palette, 0), transparent: true, opacity: 0.18 });
-  for (let i = 0; i < 5; i += 1) {
-    const angle = (i / 5) * Math.PI * 2 + rng.range(-0.08, 0.08);
-    const shape = new THREE.Shape();
-    shape.moveTo(-0.16, -1.05);
-    shape.lineTo(0.78, 0.34 + rng.range(-0.08, 0.12));
-    shape.lineTo(-0.64, 0.26 + rng.range(-0.08, 0.12));
-    shape.lineTo(-0.16, -1.05);
-    const panel = new THREE.Mesh(new THREE.ShapeGeometry(shape), wrapMaterial);
-    panel.position.set(Math.cos(angle) * 0.12, -0.12, Math.sin(angle) * 0.12);
-    panel.rotation.set(-0.06, angle - Math.PI / 2, rng.range(-0.1, 0.1));
-    group.add(panel);
-    const edge = new THREE.Line(new THREE.BufferGeometry().setFromPoints(shape.getPoints()), edgeMaterial);
-    edge.position.copy(panel.position);
-    edge.rotation.copy(panel.rotation);
-    group.add(edge);
+function addSignalTrails(group: THREE.Group, definition: BouquetDefinition, rng: ReturnType<typeof createRng>) {
+  const trailCount = definition.id === 'halo-branch' || definition.id === 'comet-signal' ? 9 : 6;
+  for (let i = 0; i < trailCount; i += 1) {
+    const angle = i / trailCount * Math.PI * 2 + rng.range(-0.22, 0.22);
+    const radius = rng.range(0.62, 1.35) * definition.spread;
+    const lean = definition.id === 'comet-signal' && i > trailCount * 0.45 ? -rng.range(0.45, 1.05) : 0;
+    const start = new THREE.Vector3(0, -0.98, 0);
+    const mid = new THREE.Vector3(Math.cos(angle) * radius * 0.56 + lean * 0.45, rng.range(0.18, 0.9) * definition.height, Math.sin(angle) * radius * 0.34);
+    const end = new THREE.Vector3(Math.cos(angle + rng.range(-0.18, 0.18)) * radius + lean, rng.range(0.76, 1.56) * definition.height, Math.sin(angle) * radius * 0.62);
+    const curve = new THREE.CatmullRomCurve3([start, mid, end]);
+    const color = colorAt(palette, i).lerp(colorAt(palette, 2), rng.range(0.18, 0.58));
+    const trail = new THREE.Mesh(new THREE.TubeGeometry(curve, 28, rng.range(0.006, 0.012), 6, false), material(color, 0.46, 0.68));
+    group.add(trail);
+    const node = new THREE.Mesh(new THREE.OctahedronGeometry(rng.range(0.032, 0.058), 0), material(color, 0.72, 0.92));
+    node.position.copy(end);
+    node.rotation.set(rng.range(0, Math.PI), rng.range(0, Math.PI), rng.range(0, Math.PI));
+    group.add(node);
   }
-  const tie = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.014, 8, 38), material(colorAt(palette, 3), 0.35, 0.82));
+  const tie = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.016, 8, 42), material(colorAt(palette, 3), 0.38, 0.86));
   tie.position.y = -0.98;
   tie.rotation.x = Math.PI / 2;
   group.add(tie);
@@ -222,7 +238,7 @@ function addParticles(group: THREE.Group, definition: BouquetDefinition, rng: Re
 function createBouquet(definition: BouquetDefinition) {
   const rng = createRng(`scifi-bouquet:${definition.id}:${palette.join('-')}`);
   const group = new THREE.Group();
-  const flowerCount = Math.floor(13 + definition.density * 8);
+  const flowerCount = Math.floor(8 + definition.density * 5);
   const tie = new THREE.Vector3(0, -1.05, 0);
 
   for (let i = 0; i < flowerCount; i += 1) {
@@ -233,26 +249,26 @@ function createBouquet(definition: BouquetDefinition) {
     const stemEnd = point.clone().lerp(tie, 0.14);
     group.add(cylinderBetween(tie, stemEnd, rng.range(0.008, 0.014), palette[4]));
     const flower = createSciFiFlower(flowerDefinition, varyPalette(palette, rng), `${definition.id}:${flowerId}:${i}`);
-    const baseScale = flowerId === 'fractal-rift' ? 0.18 : flowerId === 'orbital-color-control' ? 0.22 : 0.2;
+    const baseScale = flowerId === 'fractal-rift' ? 0.18 : flowerId === 'orbital-color-control' ? 0.24 : 0.2;
     flower.position.copy(point);
     flower.scale.setScalar(baseScale * rng.range(0.74, 1.12));
     orientFlower(flower, point, rng, definition.id === 'rift-comet' ? -0.28 : 0);
     group.add(flower);
   }
 
-  const supportCount = Math.floor(10 + definition.density * 8);
+  const supportCount = Math.floor(18 + definition.density * 12);
   for (let i = 0; i < supportCount; i += 1) {
     const primitive = definition.support[i % definition.support.length];
     const point = bouquetPoint(definition, rng, i + flowerCount, supportCount + flowerCount);
     point.multiplyScalar(rng.range(0.86, 1.18));
     point.y -= rng.range(0.08, 0.28);
-    addSupportFlower(group, definition, primitive, point, `${definition.id}:support:${primitive}:${i}`, rng.range(0.11, 0.2), rng);
+    addSupportFlower(group, definition, primitive, point, `${definition.id}:support:${primitive}:${i}`, rng.range(0.15, 0.28), rng);
   }
 
   addParticles(group, definition, rng);
-  addWrapping(group, rng);
+  addSignalTrails(group, definition, rng);
   group.rotation.x = -0.08;
-  group.scale.setScalar(1.12);
+  group.scale.setScalar(1.02);
   return group;
 }
 
@@ -363,7 +379,7 @@ function updateLayout() {
 }
 
 presetButtons.forEach((button) => button.addEventListener('click', () => {
-  const name = button.dataset.preset || '深空冷光';
+  const name = button.dataset.preset || '星云花火';
   applyPalette(presets[name] || presets['深空冷光'], name);
 }));
 colorInputs.forEach((input) => input.addEventListener('input', () => applyPalette(colorInputs.map((item) => item.value), '用户自选')));
@@ -435,7 +451,7 @@ function animate(time: number) {
 
 renderLabels();
 initScenes();
-applyPalette(presets['深空冷光'], '深空冷光');
+applyPalette(presets['星云花火'], '星云花火');
 updateLayout();
 window.addEventListener('resize', updateLayout);
 requestAnimationFrame(animate);
