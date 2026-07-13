@@ -61,9 +61,35 @@ function material(color: THREE.Color | string, emissive = 0, opacity = 1) {
   });
 }
 
+function steelMaterial(color: THREE.Color | string, emissive = 0.08, opacity = 1) {
+  const base = color instanceof THREE.Color ? color : new THREE.Color(color);
+  return new THREE.MeshStandardMaterial({
+    color: base,
+    emissive: base,
+    emissiveIntensity: emissive,
+    roughness: 0.24,
+    metalness: 0.72,
+    transparent: opacity < 1,
+    opacity,
+    side: THREE.DoubleSide,
+    depthWrite: opacity >= 0.72
+  });
+}
+
 function cylinderBetween(start: THREE.Vector3, end: THREE.Vector3, radius: number, color: THREE.Color | string, emissive = 0) {
   const direction = end.clone().sub(start);
   const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.82, Math.max(0.001, direction.length()), 7), material(color, emissive));
+  mesh.position.copy(start).add(end).multiplyScalar(0.5);
+  mesh.quaternion.setFromUnitVectors(up, direction.normalize());
+  return mesh;
+}
+
+function steelRodBetween(start: THREE.Vector3, end: THREE.Vector3, radius: number, color: THREE.Color | string, emissive = 0.1) {
+  const direction = end.clone().sub(start);
+  const mesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(radius, radius * 0.92, Math.max(0.001, direction.length()), 8),
+    steelMaterial(color, emissive)
+  );
   mesh.position.copy(start).add(end).multiplyScalar(0.5);
   mesh.quaternion.setFromUnitVectors(up, direction.normalize());
   return mesh;
@@ -92,22 +118,22 @@ function bouquetPoint(definition: SciFiBouquetDefinition, rng: ReturnType<typeof
   const profile = silhouette(definition);
   const angleBase = index / count * Math.PI * 2;
   const fanOffset = Math.sin(index / Math.max(1, count - 1) * Math.PI - Math.PI / 2) * profile.fan;
-  const angle = angleBase + fanOffset + rng.range(-0.42, 0.42);
-  const outer = index % 4 === 0 ? profile.high + rng.range(-0.02, 0.18) : rng.range(profile.low, profile.high);
+  const angle = angleBase + fanOffset + rng.range(-0.28, 0.28);
+  const outer = index % 4 === 0 ? profile.high + rng.range(0.02, 0.22) : rng.range(profile.low, profile.high);
   const ring = Math.min(1.42, Math.max(0.12, outer));
-  const x = Math.cos(angle) * ring * definition.spread + profile.side * Math.max(0, ring - 0.36);
-  const z = Math.sin(angle) * ring * (0.48 + definition.spread * 0.26);
+  const x = Math.cos(angle) * ring * definition.spread * 0.86 + profile.side * Math.max(0, ring - 0.36);
+  const z = Math.sin(angle) * ring * (0.42 + definition.spread * 0.22);
   const dome = Math.max(0, 1 - Math.abs(ring - profile.cloud) * 0.54);
   const tailLift = definition.id === 'comet-signal' && x < 0 ? Math.abs(x) * profile.tail : 0;
-  const y = rng.range(-0.16, 0.62) + dome * 0.76 * definition.height + profile.lift + tailLift;
+  const y = rng.range(-0.06, 0.72) + dome * 0.86 * definition.height + profile.lift + tailLift + ring * 0.1;
   return new THREE.Vector3(x, y, z);
 }
 
 function orientFlower(group: THREE.Group, point: THREE.Vector3, rng: ReturnType<typeof createRng>) {
-  const outward = new THREE.Vector3(point.x * 0.46, point.y * 0.34 + 0.42, point.z + 1.08).normalize();
+  const outward = new THREE.Vector3(point.x * 0.36, point.y * 0.52 + 0.62, point.z + 1.2).normalize();
   group.quaternion.setFromUnitVectors(forward, outward.lengthSq() ? outward : forward);
   group.rotateZ(rng.range(0, Math.PI * 2));
-  group.rotateX(rng.range(-0.16, 0.16));
+  group.rotateX(rng.range(-0.1, 0.18));
 }
 
 function addSupportFlower(group: THREE.Group, definition: SciFiBouquetDefinition, primitive: FloraPrimitiveName, point: THREE.Vector3, seed: string, scale: number, rng: ReturnType<typeof createRng>, palette: string[]) {
@@ -136,26 +162,60 @@ function addSupportFlower(group: THREE.Group, definition: SciFiBouquetDefinition
 }
 
 function addSignalTrails(group: THREE.Group, definition: SciFiBouquetDefinition, rng: ReturnType<typeof createRng>, palette: string[]) {
-  const trailCount = definition.id === 'halo-branch' || definition.id === 'comet-signal' ? 9 : 6;
+  const trailCount = definition.id === 'halo-branch' || definition.id === 'comet-signal' ? 11 : 8;
   for (let i = 0; i < trailCount; i += 1) {
     const angle = i / trailCount * Math.PI * 2 + rng.range(-0.22, 0.22);
-    const radius = rng.range(0.62, 1.35) * definition.spread;
+    const radius = rng.range(0.5, 1.26) * definition.spread;
     const lean = definition.id === 'comet-signal' && i > trailCount * 0.45 ? -rng.range(0.45, 1.05) : 0;
     const start = new THREE.Vector3(0, -0.98, 0);
-    const mid = new THREE.Vector3(Math.cos(angle) * radius * 0.56 + lean * 0.45, rng.range(0.18, 0.9) * definition.height, Math.sin(angle) * radius * 0.34);
-    const end = new THREE.Vector3(Math.cos(angle + rng.range(-0.18, 0.18)) * radius + lean, rng.range(0.76, 1.56) * definition.height, Math.sin(angle) * radius * 0.62);
+    const mid = new THREE.Vector3(Math.cos(angle) * radius * 0.42 + lean * 0.45, rng.range(0.22, 1.0) * definition.height, Math.sin(angle) * radius * 0.26);
+    const end = new THREE.Vector3(Math.cos(angle + rng.range(-0.14, 0.14)) * radius + lean, rng.range(0.9, 1.72) * definition.height, Math.sin(angle) * radius * 0.52);
     const curve = new THREE.CatmullRomCurve3([start, mid, end]);
     const color = colorAt(palette, i).lerp(colorAt(palette, 2), rng.range(0.18, 0.58));
-    group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 28, rng.range(0.006, 0.012), 6, false), material(color, 0.46, 0.68)));
+    group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 30, rng.range(0.007, 0.014), 6, false), steelMaterial(color, 0.34, 0.76)));
     const node = new THREE.Mesh(new THREE.OctahedronGeometry(rng.range(0.032, 0.058), 0), material(color, 0.72, 0.92));
     node.position.copy(end);
     node.rotation.set(rng.range(0, Math.PI), rng.range(0, Math.PI), rng.range(0, Math.PI));
     group.add(node);
   }
-  const tie = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.016, 8, 42), material(colorAt(palette, 3), 0.38, 0.86));
+  const tie = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.024, 8, 42), steelMaterial(colorAt(palette, 3), 0.28, 0.92));
   tie.position.y = -0.98;
   tie.rotation.x = Math.PI / 2;
   group.add(tie);
+}
+
+function addRebarGrowth(group: THREE.Group, definition: SciFiBouquetDefinition, points: THREE.Vector3[], rng: ReturnType<typeof createRng>, palette: string[]) {
+  const tie = new THREE.Vector3(0, -1.08, 0);
+  const steel = colorAt(palette, 1).lerp(new THREE.Color('#030302'), 0.72);
+  const accent = colorAt(palette, 2);
+  const spineTop = new THREE.Vector3(definition.id === 'comet-signal' ? -0.18 : 0.02, 1.28 * definition.height, 0.02);
+  group.add(steelRodBetween(tie, spineTop, 0.032, steel, 0.12));
+  for (let i = 0; i < 5; i += 1) {
+    const angle = i / 5 * Math.PI * 2 + rng.range(-0.12, 0.12);
+    const low = new THREE.Vector3(Math.cos(angle) * 0.08, -0.95 + i * 0.06, Math.sin(angle) * 0.04);
+    const high = new THREE.Vector3(Math.cos(angle) * 0.24, 1.02 + rng.range(-0.04, 0.16), Math.sin(angle) * 0.14);
+    group.add(steelRodBetween(low, high, 0.016, steel, 0.08));
+  }
+
+  const ranked = [...points].sort((a, b) => b.y - a.y);
+  ranked.slice(0, Math.min(14, ranked.length)).forEach((point, index) => {
+    const base = new THREE.Vector3(point.x * 0.18, -0.92 + (index % 3) * 0.08, point.z * 0.14);
+    const joint = point.clone().lerp(spineTop, 0.16);
+    group.add(steelRodBetween(base, joint, rng.range(0.012, 0.02), index % 3 === 0 ? accent : steel, index % 3 === 0 ? 0.22 : 0.1));
+    if (index % 2 === 0) {
+      const collar = new THREE.Mesh(new THREE.TorusGeometry(rng.range(0.07, 0.12), 0.008, 6, 22), steelMaterial(colorAt(palette, index + 3), 0.2, 0.88));
+      collar.position.copy(joint);
+      collar.rotation.set(rng.range(0.4, 1.2), rng.range(0, Math.PI), rng.range(0, Math.PI));
+      group.add(collar);
+    }
+  });
+
+  for (let i = 0; i < ranked.length - 3; i += 3) {
+    const a = ranked[i];
+    const b = ranked[i + 2];
+    if (!a || !b) continue;
+    group.add(steelRodBetween(a.clone().lerp(spineTop, 0.28), b.clone().lerp(spineTop, 0.2), 0.007, colorAt(palette, i + 1), 0.16));
+  }
 }
 
 function addParticles(group: THREE.Group, definition: SciFiBouquetDefinition, rng: ReturnType<typeof createRng>, palette: string[]) {
@@ -181,27 +241,31 @@ export function createSciFiBouquet(definition: SciFiBouquetDefinition, palette: 
   const group = new THREE.Group();
   const flowerCount = Math.floor(15 + definition.density * 5);
   const tie = new THREE.Vector3(0, -1.05, 0);
+  const flowerPoints: THREE.Vector3[] = [];
 
   for (let i = 0; i < flowerCount; i += 1) {
     const flowerId = definition.focus[i % definition.focus.length];
     const point = bouquetPoint(definition, rng, i, flowerCount);
+    flowerPoints.push(point.clone());
     const stemEnd = point.clone().lerp(tie, 0.14);
-    group.add(cylinderBetween(tie, stemEnd, rng.range(0.008, 0.014), palette[4]));
+    group.add(steelRodBetween(tie, stemEnd, rng.range(0.012, 0.022), colorAt(palette, 4).lerp(new THREE.Color('#070907'), 0.5), 0.1));
     const flower = createSciFiFlower(sciFiFlowerById[flowerId], varyPalette(palette, rng), `${definition.id}:${variant}:${flowerId}:${i}`);
-    const baseScale = flowerId === 'orbital-color-control' ? 0.22 : flowerId === 'helix-beacon' ? 0.19 : 0.2;
+    const baseScale = flowerId === 'orbital-color-control' ? 0.2 : flowerId === 'helix-beacon' ? 0.2 : flowerId === 'signal-antenna' ? 0.21 : 0.2;
     flower.position.copy(point);
-    flower.scale.setScalar(baseScale * rng.range(0.74, 1.12));
+    flower.scale.setScalar(baseScale * rng.range(0.84, 1.2));
     orientFlower(flower, point, rng);
     group.add(flower);
   }
 
-  const supportCount = Math.floor(7 + definition.density * 6);
+  addRebarGrowth(group, definition, flowerPoints, rng, palette);
+
+  const supportCount = Math.floor(4 + definition.density * 3);
   for (let i = 0; i < supportCount; i += 1) {
     const primitive = definition.support[i % definition.support.length];
     const point = bouquetPoint(definition, rng, i + flowerCount, supportCount + flowerCount);
-    point.multiplyScalar(rng.range(0.86, 1.18));
-    point.y -= rng.range(0.08, 0.28);
-    addSupportFlower(group, definition, primitive, point, `${definition.id}:${variant}:support:${primitive}:${i}`, rng.range(0.15, 0.28), rng, palette);
+    point.multiplyScalar(rng.range(0.72, 0.98));
+    point.y -= rng.range(0.16, 0.36);
+    addSupportFlower(group, definition, primitive, point, `${definition.id}:${variant}:support:${primitive}:${i}`, rng.range(0.11, 0.2), rng, palette);
   }
 
   addParticles(group, definition, rng, palette);

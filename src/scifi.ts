@@ -53,6 +53,8 @@ let zoom = 4.45;
 let idleTimer = 0;
 let lastTime = performance.now();
 let variant = 0;
+const cameraTarget = new THREE.Vector3(0, 0.2, 0);
+let cameraRadius = 2.2;
 
 const scene = new THREE.Scene();
 scene.add(new THREE.HemisphereLight('#f5fff9', '#101719', 2.25));
@@ -115,6 +117,13 @@ function rebuildModel() {
   model = createSciFiBouquet(definition, activePalette, String(variant));
   model.rotation.set(pitch, yaw, 0);
   scene.add(model);
+  const bounds = new THREE.Box3().setFromObject(model);
+  const sphere = bounds.getBoundingSphere(new THREE.Sphere());
+  cameraTarget.copy(sphere.center);
+  cameraTarget.x = THREE.MathUtils.clamp(cameraTarget.x, -0.18, 0.18);
+  cameraTarget.y = THREE.MathUtils.clamp(cameraTarget.y + 0.04, -0.02, 0.46);
+  cameraTarget.z = THREE.MathUtils.clamp(cameraTarget.z, -0.12, 0.12);
+  cameraRadius = Math.max(1.9, sphere.radius);
   const geometry = countSciFiBouquetGeometry(model);
   canvas.setAttribute('aria-label', `${definition.cn}，${activePaletteName}配色，${geometry.triangles.toLocaleString()} 个三角形`);
   viewer.style.setProperty('--palette-glow', hexToRgbParts(activePalette[1] || activePalette[0]));
@@ -164,9 +173,10 @@ function resize() {
 
 function updateCamera() {
   const mobile = window.innerWidth < 760;
-  const distance = zoom + (mobile ? 1.15 : 0);
-  camera.position.set(mobile ? 0 : 0.18, mobile ? 0.12 : 0.16, distance);
-  camera.lookAt(mobile ? 0 : 0.28, 0.05, 0);
+  const aspectLift = window.innerHeight > window.innerWidth ? 0.1 : 0;
+  const distance = Math.max(zoom, cameraRadius * (mobile ? 3.05 : 2.05)) + (mobile ? 0.9 : 0);
+  camera.position.set(cameraTarget.x, cameraTarget.y + (mobile ? 0.04 : 0.02) + aspectLift, cameraTarget.z + distance);
+  camera.lookAt(cameraTarget);
 }
 
 function animate(time: number) {
