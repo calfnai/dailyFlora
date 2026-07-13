@@ -10,8 +10,6 @@ const entries = [
   ['docs/dailyflora-aesthetic-system-0.13.md', 'docs/dailyflora-aesthetic-system-0.13.md'],
   ['docs/dailyflora-codex-skill.md', 'docs/dailyflora-codex-skill.md'],
   ['docs/reference-flower-identification.md', 'docs/reference-flower-identification.md'],
-  ['docs/释义', 'docs/释义'],
-  ['docs/untitled folder', 'docs/untitled folder'],
   ['data/aesthetic-review-dashboard.json', 'data/aesthetic-review-dashboard.json']
 ];
 
