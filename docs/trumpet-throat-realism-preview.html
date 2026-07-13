@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DailyFlora · Trumpet Throat 写实度旋转预览</title>
+  <style>
+    :root{color-scheme:dark;--bg:#080b0f;--panel:#121923;--panel2:#192332;--line:rgb(247 240 227 / 14%);--text:#f7f0e3;--muted:rgb(247 240 227 / 68%);--accent:#f2cb62;--green:#8dcc82;--warn:#efb960}*{box-sizing:border-box}body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);background:radial-gradient(circle at 12% 0%,rgb(242 203 98 / 12%),transparent 28%),radial-gradient(circle at 88% 10%,rgb(141 204 130 / 10%),transparent 24%),linear-gradient(180deg,#080b0f,#101720 58%,#080b0f)}main{width:min(1220px,100%);margin:0 auto;padding:28px 20px 56px}header,.panel,.card{border:1px solid var(--line);border-radius:10px;background:rgb(18 25 35 / 78%)}header{display:grid;gap:13px;padding:26px;background:linear-gradient(145deg,rgb(18 25 35 / 96%),rgb(24 33 45 / 84%))}h1,h2,h3,p{margin:0}h1{max-width:15ch;font-size:clamp(34px,7vw,70px);line-height:.96}.eyebrow{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.lead{max-width:86ch;color:var(--muted);line-height:1.68;font-size:15px}.layout{display:grid;grid-template-columns:340px 1fr;gap:16px;margin-top:18px}.panel{padding:16px}.control{display:grid;gap:10px;padding:14px;border:1px solid var(--line);border-radius:10px;background:rgb(255 255 255 / 4%)}.topline{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}.value{font-size:34px;font-weight:900;color:var(--accent)}input[type=range]{width:100%;accent-color:var(--accent)}.buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.buttons button{border:1px solid var(--line);border-radius:999px;padding:8px 10px;background:var(--panel2);color:var(--text);cursor:pointer}.buttons button:hover{border-color:rgb(242 203 98 / 48%)}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.metric{padding:10px;border:1px solid var(--line);border-radius:9px;background:rgb(255 255 255 / 3%)}.metric small{display:block;color:var(--muted);font-size:11px}.metric strong{display:block;margin-top:4px;color:var(--accent);font-size:18px}.note{margin-top:14px;padding:13px;border:1px solid var(--line);border-radius:9px;background:rgb(255 255 255 / 3%);color:var(--muted);font-size:13px;line-height:1.7}.stage{position:relative;min-height:620px;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:radial-gradient(circle at 50% 34%,rgb(255 229 150 / 17%),transparent 24%),radial-gradient(circle at 50% 84%,rgb(141 204 130 / 11%),transparent 25%),linear-gradient(180deg,#192331,#0f151d)}canvas{width:100%;height:620px;display:block;touch-action:none;cursor:grab}.dragging canvas{cursor:grabbing}.pill{position:absolute;z-index:2;left:14px;top:14px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgb(0 0 0 / 30%);font-size:12px}.hint{position:absolute;z-index:2;right:14px;top:14px;max-width:260px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:rgb(0 0 0 / 30%);color:var(--muted);font-size:12px;line-height:1.5}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}.card{padding:14px}.card h3{font-size:14px;margin-bottom:8px}.card p{color:var(--muted);font-size:13px;line-height:1.65}.thumbs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}.thumb{padding:8px;border:1px solid var(--line);border-radius:10px;background:rgb(255 255 255 / 3%)}.thumb-title{text-align:center;color:var(--muted);font-size:12px;margin-bottom:6px}.thumb canvas{height:138px;border-radius:8px;background:linear-gradient(180deg,#192331,#10161f);cursor:pointer}.foot{margin-top:12px;color:var(--muted);font-size:12px;line-height:1.7}@media(max-width:960px){.layout{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.thumbs{grid-template-columns:repeat(2,minmax(0,1fr))}.stage{min-height:520px}canvas{height:520px}}
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">DailyFlora reference flower shapes</p>
+      <h1>Trumpet Throat 写实度旋转预览</h1>
+      <p class="lead">这个页面用于验证 `reference-flower-shapes/trumpet-throat-form.md` 的描述能否支撑从抽象 primitive 到更写实 Narcissus / 水仙类管心花型的连续调节。它不导入照片或第三方 3D 模型，只把“六瓣星形背板、cup/corona、波浪 rim、暗喉部、绿色管颈连接”等参考库结论转成可旋转的程序化模型。</p>
+    </header>
+
+    <section class="layout">
+      <aside class="panel">
+        <div class="control">
+          <div class="topline"><div><h2>写实度</h2><p class="lead" style="font-size:13px">0 更符号化；100 更接近水仙类 trumpet-throat。</p></div><div id="value" class="value">58</div></div>
+          <input id="realism" type="range" min="0" max="100" value="58" />
+        </div>
+        <div class="buttons">
+          <button data-v="10">很抽象</button><button data-v="35">轻写实</button><button data-v="65">中写实</button><button data-v="90">更写实</button><button id="resetView">重置视角</button><button id="autoBtn">自动旋转</button>
+        </div>
+        <div class="metrics">
+          <div class="metric"><small>yaw / pitch</small><strong id="m-view">0° / 0°</strong></div>
+          <div class="metric"><small>zoom</small><strong id="m-zoom">1.00</strong></div>
+          <div class="metric"><small>tepalReflex</small><strong id="m-reflex">0.44</strong></div>
+          <div class="metric"><small>rimFrill</small><strong id="m-rim">0.56</strong></div>
+          <div class="metric"><small>throatDepth</small><strong id="m-depth">0.58</strong></div>
+          <div class="metric"><small>stamenVisibility</small><strong id="m-stamen">0.58</strong></div>
+          <div class="metric"><small>headPitch</small><strong id="m-pitch">21°</strong></div>
+          <div class="metric"><small>coronaLengthRatio</small><strong id="m-corona">0.62</strong></div>
+        </div>
+        <div class="note"><strong>操作</strong><br />拖拽主画面旋转花头；滚轮或双指缩放。写实度越高，六瓣更不规则，cup / corona 更有深度，rim 更波浪，喉部花药和绿色连接点更明显。</div>
+      </aside>
+
+      <section class="panel">
+        <div id="stage" class="stage"><div id="label" class="pill">Stage · 中写实</div><div class="hint">拖拽旋转查看侧面：侧面应读成“星形背板 + 中央突出的 cup / trumpet”。</div><canvas id="c"></canvas></div>
+        <div class="cards">
+          <article class="card"><h3>花瓣轮廓</h3><p id="d-petal"></p></article>
+          <article class="card"><h3>花心结构</h3><p id="d-center"></p></article>
+          <article class="card"><h3>花头朝向 / 连接点</h3><p id="d-pose"></p></article>
+          <article class="card"><h3>远看轮廓</h3><p id="d-sil"></p></article>
+        </div>
+        <div class="thumbs" id="thumbs"></div>
+        <p class="foot">验证目标：看参考库描述是否足以支撑“抽象—写实”的滑动。若方向成立，再把参数映射回 `src/floraPrimitives.ts` 的正式 `trumpet-throat-form`。</p>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const $=id=>document.getElementById(id);const lerp=(a,b,t)=>a+(b-a)*t;const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+    const canvas=$('c'),ctx=canvas.getContext('2d');let state={realism:58,yaw:0.15,pitch:-0.08,zoom:1,drag:false,lx:0,ly:0,auto:false};
+    function resize(c=canvas){const r=c.getBoundingClientRect(),d=devicePixelRatio||1;c.width=Math.max(1,Math.round(r.width*d));c.height=Math.max(1,Math.round(r.height*d));}
+    addEventListener('resize',()=>{resize();draw();});
+    function stageName(v){return v<20?'Stage · 很抽象':v<45?'Stage · 轻写实':v<75?'Stage · 中写实':'Stage · 更写实'}
+    function params(v){let t=v/100;return{t,tepalReflex:lerp(.08,.72,t),rimFrill:lerp(.04,.95,t),throatDepth:lerp(.12,.92,t),stamenVisibility:lerp(0,1,t),headPitch:lerp(4,34,t)*Math.PI/180,coronaLengthRatio:lerp(.34,.82,t),petalLen:lerp(1.08,1.56,t),petalW:lerp(.23,.38,t),cupLen:lerp(.34,.82,t),cupR:lerp(.28,.48,t),cupBase:lerp(.13,.2,t),stemBend:lerp(.1,.34,t)}}
+    function rot(p,yaw,pitch,head=0){let x=p.x,y=p.y,z=p.z;let ch=Math.cos(head),sh=Math.sin(head);let y0=y*ch-z*sh,z0=y*sh+z*ch;y=y0;z=z0;let cy=Math.cos(yaw),sy=Math.sin(yaw);let x1=x*cy+z*sy,z1=-x*sy+z*cy;let cp=Math.cos(pitch),sp=Math.sin(pitch);return{x:x1,y:y*cp-z1*sp,z:y*sp+z1*cp}}
+    function makeProject(w,h,zoom,yaw,pitch,head){const s=Math.min(w,h)*.19*zoom,cx=w*.5,cy=h*.48,cam=5;return p=>{let r=rot(p,yaw,pitch,head),k=cam/(cam-r.z*.75);return{x:cx+r.x*s*k,y:cy+r.y*s*k,z:r.z,k}}}
+    function pathPoly(c,pts,fill,stroke,alpha=1){c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.closePath();c.globalAlpha=alpha;c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=1.2;c.stroke()}c.globalAlpha=1}
+    function drawPetal(c,P,a,p){let pts=[];for(let i=0;i<=12;i++){let u=i/12,r=.16+p.petalLen*u,w=Math.sin(u*Math.PI)*p.petalW*(1-u*.12),edge=1;let x=Math.cos(a)*r+Math.cos(a+Math.PI/2)*w*edge,y=Math.sin(a)*r+Math.sin(a+Math.PI/2)*w*edge,z=-p.tepalReflex*u*u*.28+Math.sin(u*Math.PI)*.03*p.t;pts.push(P({x,y,z}))}for(let i=12;i>=0;i--){let u=i/12,r=.16+p.petalLen*u,w=-Math.sin(u*Math.PI)*p.petalW*(1-u*.12),x=Math.cos(a)*r+Math.cos(a+Math.PI/2)*w,y=Math.sin(a)*r+Math.sin(a+Math.PI/2)*w,z=-p.tepalReflex*u*u*.28+Math.sin(u*Math.PI)*.03*p.t;pts.push(P({x,y,z}))}pathPoly(c,pts,'#fff0b8','rgba(245,210,110,.55)',.96);if(p.t>.4){c.beginPath();let p0=P({x:Math.cos(a)*.18,y:Math.sin(a)*.18,z:0}),p1=P({x:Math.cos(a)*(p.petalLen*1.02),y:Math.sin(a)*(p.petalLen*1.02),z:-p.tepalReflex*.25});c.moveTo(p0.x,p0.y);c.lineTo(p1.x,p1.y);c.strokeStyle='rgba(178,142,52,.22)';c.lineWidth=1;c.stroke()}}
+    function drawCup(c,P,p){let seg=24,items=[];for(let i=0;i<seg;i++){let a0=i/seg*TAU,a1=(i+1)/seg*TAU;let f0=1+Math.sin(i*2.1)*p.rimFrill*.09,f1=1+Math.sin((i+1)*2.1)*p.rimFrill*.09;let base0={x:Math.cos(a0)*p.cupBase,y:Math.sin(a0)*p.cupBase,z:.02},base1={x:Math.cos(a1)*p.cupBase,y:Math.sin(a1)*p.cupBase,z:.02},rim1={x:Math.cos(a1)*p.cupR*f1,y:Math.sin(a1)*p.cupR*.72*f1,z:p.cupLen},rim0={x:Math.cos(a0)*p.cupR*f0,y:Math.sin(a0)*p.cupR*.72*f0,z:p.cupLen};let pp=[P(base0),P(base1),P(rim1),P(rim0)];items.push({z:pp.reduce((s,q)=>s+q.z,0)/4,fn:()=>pathPoly(c,pp,'#ffd45a','rgba(242,162,67,.5)',1)})}items.sort((a,b)=>a.z-b.z).forEach(i=>i.fn());let rim=[];for(let i=0;i<seg;i++){let a=i/seg*TAU,f=1+Math.sin(i*2.1)*p.rimFrill*.11;rim.push(P({x:Math.cos(a)*p.cupR*f,y:Math.sin(a)*p.cupR*.72*f,z:p.cupLen+.01}))}pathPoly(c,rim,'rgba(255,226,101,.92)','rgba(255,177,72,.75)',1);let cen=P({x:0,y:0,z:p.cupLen+.025});c.beginPath();c.ellipse(cen.x,cen.y,Math.max(4,36*p.throatDepth*cen.k),Math.max(3,22*p.throatDepth*cen.k),0,0,TAU);c.fillStyle='rgba(92,112,49,.68)';c.fill();if(p.t>.22){let n=Math.max(2,Math.round(6*p.stamenVisibility));for(let i=0;i<n;i++){let a=(i/n*TAU)+.2,tip=P({x:Math.cos(a)*.13,y:Math.sin(a)*.08,z:p.cupLen+.06}),b=P({x:Math.cos(a)*.05,y:Math.sin(a)*.03,z:p.cupLen-.05});c.beginPath();c.moveTo(b.x,b.y);c.lineTo(tip.x,tip.y);c.strokeStyle='rgba(122,84,28,.72)';c.lineWidth=1.2;c.stroke();c.beginPath();c.ellipse(tip.x,tip.y,4*tip.k,7*tip.k,0,0,TAU);c.fillStyle='#d7822f';c.fill()}}}
+    const TAU=Math.PI*2;
+    function drawScene(c,model,w,h,value,yaw,pitch,zoom){c.clearRect(0,0,w,h);let g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,'#182331');g.addColorStop(1,'#0f151d');c.fillStyle=g;c.fillRect(0,0,w,h);c.fillStyle='rgba(0,0,0,.22)';c.beginPath();c.ellipse(w/2,h*.9,w*.18,h*.035,0,0,TAU);c.fill();let p=params(value),P=makeProject(w,h,zoom,yaw,pitch,-p.headPitch);let stem=[P({x:-.04,y:.28,z:-.08}),P({x:.08,y:1.5,z:-.28}),P({x:.02,y:2.35,z:-.36})];c.beginPath();c.moveTo(stem[0].x,stem[0].y);c.quadraticCurveTo(stem[1].x,stem[1].y,stem[2].x,stem[2].y);c.strokeStyle='#82bd74';c.lineWidth=Math.max(3,w*.007);c.lineCap='round';c.stroke();[['left',-1],['right',1]].forEach(([,sg],i)=>{let pts=[P({x:.02,y:1.25,z:-.32}),P({x:sg*.7,y:1.35,z:-.55}),P({x:sg*1.05,y:2.2,z:-.5}),P({x:sg*.14,y:1.95,z:-.35})];pathPoly(c,pts,i?'rgba(123,190,120,.42)':'rgba(116,178,112,.55)',null,1)});let back=P({x:0,y:.08,z:-.04});c.beginPath();c.ellipse(back.x,back.y,28*back.k*zoom,18*back.k*zoom,0,0,TAU);c.fillStyle='rgba(137,194,123,.88)';c.fill();for(let i=0;i<6;i++)drawPetal(c,P,i/6*TAU+(i%2?-.06:.06)*p.t,p);drawCup(c,P,p);}
+    function draw(){resize();let r=canvas.getBoundingClientRect(),d=devicePixelRatio||1;drawScene(ctx,null,canvas.width,canvas.height,state.realism,state.yaw,state.pitch,state.zoom);$('value').textContent=state.realism;$('label').textContent=stageName(state.realism);let p=params(state.realism);$('m-view').textContent=Math.round(state.yaw*180/Math.PI)+'° / '+Math.round(state.pitch*180/Math.PI)+'°';$('m-zoom').textContent=state.zoom.toFixed(2);$('m-reflex').textContent=p.tepalReflex.toFixed(2);$('m-rim').textContent=p.rimFrill.toFixed(2);$('m-depth').textContent=p.throatDepth.toFixed(2);$('m-stamen').textContent=p.stamenVisibility.toFixed(2);$('m-pitch').textContent=Math.round(p.headPitch*180/Math.PI)+'°';$('m-corona').textContent=p.coronaLengthRatio.toFixed(2);describe(p.t)}
+    function describe(t){$('d-petal').textContent=t<.3?'六瓣星形已建立，但仍偏统一、平面，更像 icon。':t<.7?'六瓣背板开始可读，花瓣轻微反卷，边缘不再完全复制。':'六枚 tepals 的厚薄、不规则和反卷感更清楚，开始像水仙类花被片。';$('d-center').textContent=t<.3?'中心 cup 存在，但仍偏几何杯子。':t<.7?'cup / corona 有喉部深度和波浪 rim，开始摆脱塑料圆锥。':'corona 更像真实 trumpet / cup，rim、内壁明暗、花药结构都更完整。';$('d-pose').textContent=t<.3?'花头主要是正视，绿色连接点提示较弱。':t<.7?'头部开始微俯，绿色颈部和基部连接更容易读出来。':'头部轻下俯 + 绿色 tube / ovary + 带状叶的关系更明确。';$('d-sil').textContent=t<.3?'远看仍是“六瓣 + 中心杯”的符号。':t<.7?'远看已能读成“六瓣星形背板 + 突出的中央 trumpet”。':'远看不只认得出花，也更接近 Narcissus / 水仙类 trumpet-throat 家族。'}
+    function bind(){canvas.addEventListener('pointerdown',e=>{state.drag=true;state.lx=e.clientX;state.ly=e.clientY;canvas.setPointerCapture(e.pointerId);$('stage').classList.add('dragging')});canvas.addEventListener('pointermove',e=>{if(!state.drag)return;let dx=e.clientX-state.lx,dy=e.clientY-state.ly;state.lx=e.clientX;state.ly=e.clientY;state.yaw+=dx*.012;state.pitch=clamp(state.pitch+dy*.009,-.95,.95);draw()});canvas.addEventListener('pointerup',e=>{state.drag=false;$('stage').classList.remove('dragging')});canvas.addEventListener('wheel',e=>{e.preventDefault();state.zoom=clamp(state.zoom*(e.deltaY>0?.92:1.08),.62,1.7);draw()},{passive:false});$('realism').addEventListener('input',e=>{state.realism=Number(e.target.value);drawThumbs();draw()});document.querySelectorAll('button[data-v]').forEach(b=>b.onclick=()=>{state.realism=Number(b.dataset.v);$('realism').value=state.realism;drawThumbs();draw()});$('resetView').onclick=()=>{state.yaw=.15;state.pitch=-.08;state.zoom=1;draw()};$('autoBtn').onclick=()=>{state.auto=!state.auto;$('autoBtn').textContent=state.auto?'停止旋转':'自动旋转'}}
+    function drawThumbs(){const box=$('thumbs');box.innerHTML='';[10,35,65,90].forEach(v=>{let div=document.createElement('div');div.className='thumb';div.innerHTML='<div class="thumb-title">'+v+' / 100</div><canvas></canvas>';box.appendChild(div);let cv=div.querySelector('canvas'),cc=cv.getContext('2d');let rr=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=rr.width*d;cv.height=rr.height*d;drawScene(cc,null,cv.width,cv.height,v,.8,-.12,.72);cv.onclick=()=>{state.realism=v;$('realism').value=v;drawThumbs();draw()}})}
+    function tick(){if(state.auto&&!state.drag){state.yaw+=.01;draw()}requestAnimationFrame(tick)}
+    resize();bind();drawThumbs();draw();tick();
+  </script>
+</body>
+</html>

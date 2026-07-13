@@ -1,0 +1,115 @@
+{
+  "shapeId": "trumpet-throat-form",
+  "status": "started",
+  "targetSampleCount": 80,
+  "currentObservedSampleCount": 10,
+  "note": "Reference-only sample log. Do not import third-party images into the renderer. Use links and observations to guide primitive design.",
+  "sampleAllocationTarget": {
+    "frontCloseup": 20,
+    "sideProfile": 15,
+    "threeQuarter": 15,
+    "dissectedAnatomy": 10,
+    "plantHabit": 10,
+    "cultivarVariation": 10
+  },
+  "coreAnchors": [
+    "six-tepal star backing",
+    "independent cup/corona/trumpet projecting forward",
+    "wavy or frilled rim",
+    "dark throat with small stamens/style detail",
+    "green tube/ovary/spathe connection"
+  ],
+  "samples": [
+    {
+      "id": "TT-001",
+      "viewType": "front-closeup",
+      "sourceType": "web image result / anatomy front view",
+      "licenseNote": "link-only; verify before any asset use",
+      "observedFeatures": ["six tepals", "yellow corona", "visible anthers", "central style/stigma"],
+      "primitiveInsight": "A front-facing trumpet-throat cannot be an empty cup; add small internal reproductive marks.",
+      "avoid": "Do not use a pure hole or flat center dot."
+    },
+    {
+      "id": "TT-002",
+      "viewType": "dissected-anatomy",
+      "sourceType": "web image result / longitudinal section",
+      "licenseNote": "link-only; verify before any asset use",
+      "observedFeatures": ["corolla tube", "inferior ovary", "stamens", "style", "tepals attached near tube"],
+      "primitiveInsight": "Add a green back tube/ovary base instead of attaching the cup directly to a stem.",
+      "avoid": "Do not add a rose-like green calyx star."
+    },
+    {
+      "id": "TT-003",
+      "viewType": "front-closeup",
+      "sourceType": "web image result / annotated garden daffodil",
+      "licenseNote": "link-only; verify before any asset use",
+      "observedFeatures": ["orange corona", "yellow tepals", "visible anthers", "strap leaves behind"],
+      "primitiveInsight": "Use rim color contrast as a quick recognition cue.",
+      "avoid": "Do not make the rim a perfect smooth circle."
+    },
+    {
+      "id": "TT-004",
+      "viewType": "front-closeup",
+      "sourceType": "web image result / white-yellow daffodil",
+      "licenseNote": "link-only; verify before any asset use",
+      "observedFeatures": ["white six tepals", "yellow cup", "frilled rim"],
+      "primitiveInsight": "White tepals plus yellow corona is the clearest default Narcissus read.",
+      "avoid": "Do not let the cup cover all six tepals."
+    },
+    {
+      "id": "TT-005",
+      "viewType": "front-macro",
+      "sourceType": "web image result / corona macro",
+      "licenseNote": "link-only; verify before any asset use",
+      "observedFeatures": ["irregular rim", "radial inner wall texture", "throat shadow", "stamens recessed"],
+      "primitiveInsight": "The cup needs inner shading and radial wall direction.",
+      "avoid": "Do not make the corona look like a plastic cone."
+    },
+    {
+      "id": "TT-006",
+      "viewType": "side-profile",
+      "sourceType": "web image result / side corona diagram",
+      "licenseNote": "link-only; verify before any asset use",
+      "observedFeatures": ["long projecting corona", "six star-like tepals behind", "curved stem", "ruffled lip"],
+      "primitiveInsight": "Side view must read as cup-on-star, not a flat flower disk.",
+      "avoid": "Do not make all flowers front-facing."
+    },
+    {
+      "id": "TT-007",
+      "viewType": "dissected-anatomy",
+      "sourceType": "web image result / Narcissus tazetta dissection",
+      "licenseNote": "link-only; verify before any asset use",
+      "observedFeatures": ["short cup", "upper and lower stamens", "style", "stigma", "narrow tube"],
+      "primitiveInsight": "Support a short-cup variant, not only long trumpet variants.",
+      "avoid": "Do not make every Narcissus form one fixed trumpet length."
+    },
+    {
+      "id": "TT-008",
+      "viewType": "front-macro",
+      "sourceType": "web image result / daffodil center macro",
+      "licenseNote": "link-only; verify before any asset use",
+      "observedFeatures": ["orange rim", "yellow inner cup", "greenish throat", "asymmetric rim defects"],
+      "primitiveInsight": "A small amount of rim asymmetry makes the flower less abstract.",
+      "avoid": "Do not over-perfect the rim."
+    },
+    {
+      "id": "TT-009",
+      "viewType": "cultivar-variation",
+      "sourceType": "web/source reference / hoop-petticoat form",
+      "licenseNote": "link-only; verify before any asset use",
+      "observedFeatures": ["oversized corona", "tiny pointed tepals", "petticoat silhouette"],
+      "primitiveInsight": "Allow high corona-to-tepal ratio as an optional variant.",
+      "avoid": "Do not use this extreme ratio as the default DailyFlora form."
+    },
+    {
+      "id": "TT-010",
+      "viewType": "cultivar-variation",
+      "sourceType": "web/source reference / cyclamineus-type form",
+      "licenseNote": "link-only; verify before any asset use",
+      "observedFeatures": ["long narrow corona", "reflexed tepals", "angled or pendent flower head"],
+      "primitiveInsight": "Expose tepalReflex and headPitch parameters.",
+      "avoid": "Do not keep every head upright and flat."
+    }
+  ],
+  "remainingSampleSlots": 70
+}
