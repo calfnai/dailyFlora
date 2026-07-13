@@ -69,7 +69,7 @@
       "status": "needs-owner-review",
       "ownerFeedback": "中心铺得太满，缺少星星点点和缤纷感，整体像一坨球形花头，脱离中国主流审美。",
       "correction": "降低总花量、中心主花与低位簇花的权重和尺寸；提高小花、果点、枝线、闪点与径向留白，让轮廓从密球改成有空气的多色节奏。",
-      "url": "../?date=2026-07-07&render=high&density=medium"
+      "url": "../?date=2026-07-07&render=high&density=high"
     },
     {
       "date": "2026-07-11",
@@ -77,7 +77,7 @@
       "status": "needs-owner-review",
       "ownerFeedback": "穗状花角度过于统一、长度不合理，在半空出现且没有花茎连接；各枝走向也不像来自同一个花瓶。",
       "correction": "缩短并下沉穗花、降低重复线花权重；所有穗花从共同扎口推导轴线，并以连续实体花茎连接扎口和花穗底部。",
-      "url": "../?date=2026-07-11&render=high&density=medium"
+      "url": "../?date=2026-07-11&render=high&density=high"
     },
     {
       "date": "2026-07-13",
@@ -86,7 +86,7 @@
       "ownerFeedback": "今天生成的花不好看，核心感受是用到的花的品种不够丰富。",
       "diagnosis": "日期 seed 抽到 tropical-forest theme 与 berry-grove flowerPlan；该 plan 仍只使用老 FlowerTypeId 中的少数抽象角色，最终映射到约 6 种 primitive。0.14.6 新增的 16 种具象单花已经进入 Primitive Lab，但尚未真正进入每日 flowerPlan 与主花束 renderer 的候选池。",
       "correction": "新增 daily-concrete-forest-variety flowerPlan，并将 2026-07-13 默认 seed 指向该 plan；扩展 FlowerTypeId 与 renderer 映射，让波斯菊、银莲花、大丽花、玫瑰、花毛茛、郁金香、洋水仙、蝴蝶兰、果点、小簇和枝线共同进入今日花束。等待用户复验。",
-      "url": "../?date=2026-07-13&render=high&density=medium"
+      "url": "../?date=2026-07-13&render=high&density=high"
     },
     {
       "date": "2026-07-08 / 2026-07-09",
@@ -95,7 +95,7 @@
       "ownerFeedback": "某些 7 月 8 日、7 月 9 日中文名竟然一样，说明命名遗漏了 bug。",
       "diagnosis": "原命名逻辑只由少量 mood 与 flowerPlan 组合生成，两个日期如果抽到同一 mood 与同一 plan，就会出现主中文名重复；日期印记虽然不同，但花花自己的中文名不应重复。",
       "correction": "新增日期专属的月标记和日标记，默认中文名由 mood + 月标记 + 日标记 + planName 组成；保留少量手工 override，但普通日期不会再因 mood/plan 相同而撞名。",
-      "url": "../?date=2026-07-08&render=high&density=medium"
+      "url": "../?date=2026-07-08&render=high&density=high"
     }
   ],
   "primitiveLabConcreteExpansion": {
