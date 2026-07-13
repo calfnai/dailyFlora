@@ -44,8 +44,5 @@ fs.mkdirSync(clientPath, { recursive: true });
 
 for (const entry of fs.readdirSync(distPath, { withFileTypes: true })) {
   if (entry.name === 'client' || entry.name === 'server' || entry.name === '.openai') continue;
-  fs.cpSync(path.join(distPath, entry.name), path.join(clientPath, entry.name), {
-    recursive: true,
-    verbatimSymlinks: true
-  });
+  fs.renameSync(path.join(distPath, entry.name), path.join(clientPath, entry.name));
 }
