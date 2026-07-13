@@ -44,6 +44,7 @@ export default defineConfig({
         bouquetShop: resolve(__dirname, 'bouquet-shop/index.html'),
         downloads: resolve(__dirname, 'downloads/index.html'),
         member: resolve(__dirname, 'member/index.html'),
+        scifi: resolve(__dirname, 'scifi/index.html'),
         signup: resolve(__dirname, 'signup/index.html'),
         devIndex: resolve(__dirname, 'docs/dev-index.html'),
         developmentDocumentSummary: resolve(__dirname, 'docs/development-document-summary.html'),

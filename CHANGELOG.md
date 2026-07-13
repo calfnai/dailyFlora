@@ -2,7 +2,7 @@
 
 > 自 `0.14.10` 起，新增版本记录使用中英文双语。 / Starting with `0.14.10`, all new release notes are written in both Chinese and English.
 
-## Unreleased - 2026-07-13
+## Unreleased - 2026-07-14
 
 记录今日默认花束的花材丰富度问题。 / Recorded today's default bouquet variety issue.
 
@@ -16,6 +16,7 @@
 - 将科幻花束 LAB 从“半透明膜包住的小束花”改为开放式星云外轮廓：默认使用缤纷的“星云花火”配色，增加多种支撑花型、果点、空气小簇、草线枝条和发光光轨。 / Changed the sci-fi bouquet lab from small bouquets covered by translucent film into open nebula silhouettes, defaulting to the colorful `Nebula Fireworks` palette with varied support flowers, fruit dots, airy clusters, branch lines, and luminous trails.
 - 将 `/scifi-bouquet-lab` 从“旧花束换科幻配色”改为结构科幻主导：新增星栅天线、双螺旋信标和晶格棱镜三种连续实体花型，每束约六成以上可见花头使用科幻结构，写实花降为少量支撑；此前被否定的四种形态仍不回流。 / Shifted `/scifi-bouquet-lab` from recolored legacy bouquets to structure-led sci-fi bouquets by adding Signal Antenna, Double-Helix Beacon, and Prism Lattice continuous solid forms; sci-fi structures now make up roughly sixty percent or more of visible flower heads, while realistic flowers are reduced to support and the four rejected forms remain excluded.
 - 开发组里的 3D 花束预览默认使用【精】【密】：`preview=1` 与 `debug=1` 在未显式指定时自动选择 high render 和 high density，并同步固定样例、审美复盘、用户测试与开发目录链接；公开首页仍保持原默认。 / Defaulted internal 3D bouquet previews to high render and high density: `preview=1` and `debug=1` now select both when unspecified, with fixed samples, aesthetic review, member tests, and developer-directory links synchronized while public defaults remain unchanged.
+- 新增 `/scifi/` 全屏系列入口：一次观看一束结构科幻花，可在 8 束之间切换、拖动旋转、滚轮缩放、随机变体和进入系统全屏；默认使用用户最喜欢的“晨雾异种”，六套预设按明确审美排序排列。科幻 LAB 与全屏入口共用同一生成器，避免形态分叉。 / Added the `/scifi/` fullscreen series viewer for one structural sci-fi bouquet at a time, with eight-bouquet navigation, drag rotation, wheel zoom, randomized variants, and native fullscreen. It defaults to the owner's favorite `Morning Mist Variant`, orders all six presets by stated preference, and shares one generator with the sci-fi lab to prevent visual drift.
 - 将 `/about/` 从占位说明升级为完整品牌介绍页，补齐开发初衷、产品原则、开发人员与 AI 协作说明、代码引用小字和 footer。 / Upgraded `/about/` from a placeholder into a complete brand page with the development intention, product principles, human and AI development credits, code-attribution fine print, and a full footer.
 - 将 `/signup/` 重做为以收藏与个人花园为核心的注册 landing page，补齐四组卖点、本机 MVP 注册表单和账户跳转，并同步开发文档总结与审美复盘 Dashboard。 / Rebuilt `/signup/` as a collection-led registration landing page with four benefit groups, a device-local MVP signup form, and account handoff, then synchronized the development summary and aesthetic review dashboard.
 - 用户确认 `OrbitalPulseFlower / 星环脉冲花型` 可以验收；将其从候选升级为正式可用的“写实骨架 × 非现实配色”混合花型，同时继续与真正的结构科幻形态分开。 / Recorded owner acceptance of `OrbitalPulseFlower`, promoting it from candidate to an approved realistic-skeleton × unreal-palette hybrid while keeping it distinct from true structural science-fiction morphology.
