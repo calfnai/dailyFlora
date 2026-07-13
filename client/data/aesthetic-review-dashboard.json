@@ -276,6 +276,23 @@
         "通过换色、闪点或果点伪装丰富度，实际花型轮廓没有变。"
       ],
       "ownerAcceptance": "来自用户对 2026-07-13 今日花束的反馈；需要代码修复后再复验。"
+    },
+    {
+      "id": "dashboard-self-review-before-visual-change",
+      "title": "Dashboard 是 Codex 的主动审美门禁",
+      "summary": "审美复盘 Dashboard 不只是给用户验收，也是在 Codex 可能忘记整体花束形态时必须主动回看的项目记忆。不能等用户再次指出一坨、密球、形态单一、物理断裂或轮廓跑偏后才查阅。",
+      "principles": [
+        "任何涉及主花束 composition、整体轮廓、花材比例、叶材关系、花型接入或主视觉的工作，动手前先读 Dashboard 的通过基线、可复用规则、日期回炉记录与反向样本。",
+        "开始修改前明确本轮继承了哪些既有审美规则，并在完成后核对是否出现中心密球、全花无叶、统一角度、半空花材、单一大主花或花材丰富度不足。",
+        "Dashboard 不是一次性交付物；当代码与 Dashboard 记忆不一致时，先停下并查明差异，不能凭当前局部实现覆盖长期审美结论。",
+        "用户仍是最终验收人；主动回看 Dashboard 是减少重复提醒，不是替用户宣布新方向通过。"
+      ],
+      "rejectSignals": [
+        "未看 Dashboard 就直接修改 bouquetScene、flowerPlan、primitive 映射或整束外轮廓。",
+        "只检查单朵模型或技术复杂度，没有检查整束远看轮廓与空气感。",
+        "把用户曾明确否定的形态问题再次实现，再等待用户提醒。"
+      ],
+      "ownerAcceptance": "2026-07-13 用户明确提醒：Dashboard 也供 Codex 主动复习审美使用，不要总等用户提醒花花整体形态问题。"
     }
   ],
   "targetShapeVocabulary": [
@@ -392,6 +409,20 @@
       "whyNeeded": "叶材与绿色部分是空间、层次、春意和饱和度缓冲的关键，不是背景噪声。"
     }
   ],
+  "acceptedHybridVocabulary": [
+    {
+      "id": "orbital-pulse-flower",
+      "name": "星环脉冲花型",
+      "englishName": "Orbital Pulse Flower",
+      "primitive": "OrbitalPulseFlower",
+      "status": "pass",
+      "source": "2026-07-12 realistic-skeleton palette-control experiment",
+      "examples": "中心能量核、双层放射花瓣、两组实体星环、光脉花蕊和背部生命连接点",
+      "whyNeeded": "作为写实花朵骨架叠加非现实配色的正式对照组，帮助区分科幻感究竟来自形态还是来自颜色。",
+      "acceptance": "正面先读成花而不是机械徽章；星环通过实体辐条连接花心，侧面能看出能量核、轨道倾角、花蕊高度和背部连接点；360° 旋转没有漂浮圆环。",
+      "ownerNote": "2026-07-13 用户确认可以验收。正式进入可用花库，但分类仍是“写实骨架 × 非现实配色”的混合花型，不代表真正的结构科幻形态已经通过。"
+    }
+  ],
   "candidateShapeVocabulary": [
     {
       "id": "frilled-narcissus-corona",
@@ -404,25 +435,13 @@
       "whyNeeded": "保留 v1/v3 被认可的正面基准，并把 cup/corona 的深度、褶边和花蕊做成真正可旋转的 3D 结构；它必须与简化洋水仙管心型和 Datura 大喇叭型明显不同。",
       "acceptance": "正面应先读成六片花被围绕褶边副冠；侧面能看出副冠突出与深喉，但不能变成单纯喇叭。360° 旋转时花瓣、褶边、花蕊和绿色连接点都应连续成立。",
       "ownerNote": "先作为候选花型完善；只有用户确认它真的做得很好，才把正式花库从 16 类扩为 17 类。"
-    },
-    {
-      "id": "orbital-pulse-flower",
-      "name": "星环脉冲花型",
-      "englishName": "Orbital Pulse Flower",
-      "primitive": "OrbitalPulseFlower",
-      "status": "liked-color-control",
-      "source": "2026-07-12 realistic-skeleton palette-control experiment",
-      "examples": "中心能量核、双层放射花瓣、两组实体星环、光脉花蕊和背部生命连接点",
-      "whyNeeded": "作为写实花朵骨架叠加非现实配色的对照组，帮助区分科幻感究竟来自形态还是来自颜色。",
-      "acceptance": "正面应先读成花而不是机械徽章；星环必须通过实体辐条连接花心，侧面能看出能量核、轨道倾角、花蕊高度和背部连接点。360° 旋转时不能出现漂浮圆环。",
-      "ownerNote": "用户很喜欢这朵花，但明确指出它的结构仍然写实，只是使用了科幻配色；保留为配色对照，不能代表真正的科幻形态。"
     }
   ],
   "sciFiFlowerExperiment": {
     "updatedAt": "2026-07-12",
     "title": "科幻花型 LAB · 用户配色版",
     "hypothesis": "真正的科幻花型必须在灰模状态下仍然显得非现实；配色是可由用户独立控制的第二层变量。",
-    "control": "星环脉冲花：用户喜欢，但归类为写实骨架 × 非现实配色。",
+    "control": "星环脉冲花：用户已验收，正式归类为写实骨架 × 非现实配色对照；不代表结构科幻形态通过。",
     "morphologyTests": [
       "莫比乌斯翻面花：连续单面花瓣环。",
       "递归裂枝花：花瓣在生长途中反复分叉。",
@@ -437,6 +456,16 @@
     "ownerAcceptance": "作为重点测试项目；如果 UI 调色效果好，再纳入主体项目。"
   },
   "primitiveGate": [
+    {
+      "primitive": "OrbitalPulseFlower",
+      "humanName": "星环脉冲花型",
+      "status": "pass",
+      "acceptance": "正面、侧面和 360° 旋转均保持花形、能量核、实体星环、花蕊与背部连接连续，不出现机械徽章或漂浮圆环感。",
+      "ownerStatus": "2026-07-13 已验收",
+      "ownerFeedback": "用户查看线上 Primitive Lab 后确认环脉冲花型可以验收。",
+      "nextTask": "作为正式可用的混合花型和配色对照进入后续花束计划；仍不可替代真正的结构科幻花型研究。",
+      "ownerAcceptance": "用户明确确认通过。"
+    },
     {
       "primitive": "DiskFlower",
       "humanName": "盘状花",
