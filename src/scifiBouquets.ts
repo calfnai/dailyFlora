@@ -95,6 +95,19 @@ function steelRodBetween(start: THREE.Vector3, end: THREE.Vector3, radius: numbe
   return mesh;
 }
 
+function curvedTube(points: THREE.Vector3[], radius: number, color: THREE.Color | string, emissive = 0.1, opacity = 1) {
+  const curve = new THREE.CatmullRomCurve3(points);
+  return new THREE.Mesh(new THREE.TubeGeometry(curve, 30, radius, 7, false), steelMaterial(color, emissive, opacity));
+}
+
+function livingStemBetween(start: THREE.Vector3, end: THREE.Vector3, radius: number, color: THREE.Color | string, rng: ReturnType<typeof createRng>, emissive = 0.04) {
+  const lift = Math.max(0.1, (end.y - start.y) * 0.38);
+  const side = new THREE.Vector3(-end.z, 0, end.x).normalize().multiplyScalar(rng.range(-0.08, 0.08));
+  const lower = start.clone().lerp(end, 0.36).add(side).add(new THREE.Vector3(end.x * -0.08, lift * 0.12, end.z * -0.06));
+  const upper = start.clone().lerp(end, 0.78).add(side.clone().multiplyScalar(-0.55)).add(new THREE.Vector3(end.x * 0.08, lift * 0.08, end.z * 0.04));
+  return curvedTube([start, lower, upper, end], radius, color, emissive, 0.94);
+}
+
 function varyPalette(base: string[], rng: ReturnType<typeof createRng>) {
   return base.map((hex, index) => {
     const color = new THREE.Color(hex);
@@ -162,7 +175,7 @@ function addSupportFlower(group: THREE.Group, definition: SciFiBouquetDefinition
 }
 
 function addSignalTrails(group: THREE.Group, definition: SciFiBouquetDefinition, rng: ReturnType<typeof createRng>, palette: string[]) {
-  const trailCount = definition.id === 'halo-branch' || definition.id === 'comet-signal' ? 11 : 8;
+  const trailCount = definition.id === 'halo-branch' || definition.id === 'comet-signal' ? 9 : 6;
   for (let i = 0; i < trailCount; i += 1) {
     const angle = i / trailCount * Math.PI * 2 + rng.range(-0.22, 0.22);
     const radius = rng.range(0.5, 1.26) * definition.spread;
@@ -172,49 +185,34 @@ function addSignalTrails(group: THREE.Group, definition: SciFiBouquetDefinition,
     const end = new THREE.Vector3(Math.cos(angle + rng.range(-0.14, 0.14)) * radius + lean, rng.range(0.9, 1.72) * definition.height, Math.sin(angle) * radius * 0.52);
     const curve = new THREE.CatmullRomCurve3([start, mid, end]);
     const color = colorAt(palette, i).lerp(colorAt(palette, 2), rng.range(0.18, 0.58));
-    group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 30, rng.range(0.007, 0.014), 6, false), steelMaterial(color, 0.34, 0.76)));
+    group.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 30, rng.range(0.004, 0.008), 6, false), steelMaterial(color, 0.3, 0.62)));
     const node = new THREE.Mesh(new THREE.OctahedronGeometry(rng.range(0.032, 0.058), 0), material(color, 0.72, 0.92));
     node.position.copy(end);
     node.rotation.set(rng.range(0, Math.PI), rng.range(0, Math.PI), rng.range(0, Math.PI));
     group.add(node);
   }
-  const tie = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.024, 8, 42), steelMaterial(colorAt(palette, 3), 0.28, 0.92));
+  const tie = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.014, 8, 42), steelMaterial(colorAt(palette, 3), 0.22, 0.86));
   tie.position.y = -0.98;
   tie.rotation.x = Math.PI / 2;
   group.add(tie);
 }
 
 function addRebarGrowth(group: THREE.Group, definition: SciFiBouquetDefinition, points: THREE.Vector3[], rng: ReturnType<typeof createRng>, palette: string[]) {
-  const tie = new THREE.Vector3(0, -1.08, 0);
-  const steel = colorAt(palette, 1).lerp(new THREE.Color('#030302'), 0.72);
+  const steel = colorAt(palette, 1).lerp(new THREE.Color('#050807'), 0.62);
   const accent = colorAt(palette, 2);
-  const spineTop = new THREE.Vector3(definition.id === 'comet-signal' ? -0.18 : 0.02, 1.28 * definition.height, 0.02);
-  group.add(steelRodBetween(tie, spineTop, 0.032, steel, 0.12));
-  for (let i = 0; i < 5; i += 1) {
-    const angle = i / 5 * Math.PI * 2 + rng.range(-0.12, 0.12);
-    const low = new THREE.Vector3(Math.cos(angle) * 0.08, -0.95 + i * 0.06, Math.sin(angle) * 0.04);
-    const high = new THREE.Vector3(Math.cos(angle) * 0.24, 1.02 + rng.range(-0.04, 0.16), Math.sin(angle) * 0.14);
-    group.add(steelRodBetween(low, high, 0.016, steel, 0.08));
-  }
-
   const ranked = [...points].sort((a, b) => b.y - a.y);
-  ranked.slice(0, Math.min(14, ranked.length)).forEach((point, index) => {
-    const base = new THREE.Vector3(point.x * 0.18, -0.92 + (index % 3) * 0.08, point.z * 0.14);
-    const joint = point.clone().lerp(spineTop, 0.16);
-    group.add(steelRodBetween(base, joint, rng.range(0.012, 0.02), index % 3 === 0 ? accent : steel, index % 3 === 0 ? 0.22 : 0.1));
-    if (index % 2 === 0) {
-      const collar = new THREE.Mesh(new THREE.TorusGeometry(rng.range(0.07, 0.12), 0.008, 6, 22), steelMaterial(colorAt(palette, index + 3), 0.2, 0.88));
-      collar.position.copy(joint);
-      collar.rotation.set(rng.range(0.4, 1.2), rng.range(0, Math.PI), rng.range(0, Math.PI));
-      group.add(collar);
-    }
-  });
-
-  for (let i = 0; i < ranked.length - 3; i += 3) {
+  for (let i = 0; i < ranked.length - 4; i += 4) {
     const a = ranked[i];
-    const b = ranked[i + 2];
+    const b = ranked[i + 3];
     if (!a || !b) continue;
-    group.add(steelRodBetween(a.clone().lerp(spineTop, 0.28), b.clone().lerp(spineTop, 0.2), 0.007, colorAt(palette, i + 1), 0.16));
+    const mid = a.clone().lerp(b, 0.5).add(new THREE.Vector3(rng.range(-0.06, 0.06), rng.range(0.08, 0.2), rng.range(-0.04, 0.04)));
+    group.add(curvedTube(
+      [a.clone().lerp(new THREE.Vector3(0, -1.05, 0), 0.1), mid, b.clone().lerp(new THREE.Vector3(0, -1.05, 0), 0.1)],
+      rng.range(0.004, 0.008),
+      i % 2 === 0 ? accent : steel,
+      i % 2 === 0 ? 0.2 : 0.1,
+      0.72
+    ));
   }
 }
 
@@ -247,14 +245,17 @@ export function createSciFiBouquet(definition: SciFiBouquetDefinition, palette: 
     const flowerId = definition.focus[i % definition.focus.length];
     const point = bouquetPoint(definition, rng, i, flowerCount);
     flowerPoints.push(point.clone());
-    const stemEnd = point.clone().lerp(tie, 0.14);
-    group.add(steelRodBetween(tie, stemEnd, rng.range(0.012, 0.022), colorAt(palette, 4).lerp(new THREE.Color('#070907'), 0.5), 0.1));
+    const stemColor = colorAt(palette, 4).lerp(colorAt(palette, 1), rng.range(0.18, 0.34)).lerp(new THREE.Color('#111713'), 0.24);
+    group.add(livingStemBetween(tie, point, rng.range(0.006, 0.012), stemColor, rng, 0.045));
     const flower = createSciFiFlower(sciFiFlowerById[flowerId], varyPalette(palette, rng), `${definition.id}:${variant}:${flowerId}:${i}`);
     const baseScale = flowerId === 'orbital-color-control' ? 0.2 : flowerId === 'helix-beacon' ? 0.2 : flowerId === 'signal-antenna' ? 0.21 : 0.2;
     flower.position.copy(point);
     flower.scale.setScalar(baseScale * rng.range(0.84, 1.2));
     orientFlower(flower, point, rng);
     group.add(flower);
+    const socket = new THREE.Mesh(new THREE.SphereGeometry(rng.range(0.035, 0.055), 10, 8), steelMaterial(stemColor, 0.08, 0.92));
+    socket.position.copy(point).lerp(tie, 0.035);
+    group.add(socket);
   }
 
   addRebarGrowth(group, definition, flowerPoints, rng, palette);
