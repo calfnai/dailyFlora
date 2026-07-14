@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DailyFlora 写实花型形态调研记录</title>
+    <style>
+      :root{color-scheme:dark;--bg:#080907;--panel:#11150f;--text:#f7f0e3;--muted:rgb(247 240 227 / 68%);--line:rgb(247 240 227 / 15%);--good:#8bd68c;--warn:#f2cb62;--bad:#ef8b73}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 10% 0%,rgb(242 203 98 / 12%),transparent 30%),linear-gradient(180deg,#080907,#11150f 55%,#080907);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.shell{width:min(1180px,100%);margin:0 auto;padding:28px}.hero,.panel{border:1px solid var(--line);border-radius:14px;background:rgb(17 21 15 / 90%)}.hero{padding:28px}.eyebrow{margin:0 0 10px;color:var(--warn);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}h1{max-width:15ch;margin:0 0 14px;font-size:clamp(38px,6vw,72px);line-height:.96;letter-spacing:-.045em}.copy{max-width:88ch;margin:0;color:var(--muted);font-size:15px;line-height:1.75}.status{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px}.status div{padding:14px;border:1px solid var(--line);border-radius:10px;background:rgb(8 10 7 / 54%)}.status strong{display:block;margin-bottom:6px;color:var(--good);font-size:13px}.status span{color:var(--muted);font-size:12px;line-height:1.55}.panel{margin-top:18px;padding:20px}h2{margin:0 0 12px;font-size:28px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;line-height:1.55}th{color:var(--warn);font-size:11px;letter-spacing:.08em;text-transform:uppercase}td:first-child{width:16%;font-weight:800}td:nth-child(2){width:24%;color:var(--bad)}td:nth-child(3){width:30%}td:nth-child(4){width:30%;color:var(--good)}.sources{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.source{padding:13px 14px;border:1px solid var(--line);border-radius:10px;background:rgb(8 10 7 / 48%)}.source strong{display:block;margin-bottom:5px}.source a{color:var(--warn);font-size:12px;word-break:break-all}.source p{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.55}.back{display:inline-flex;margin-top:18px;padding:10px 14px;border:1px solid var(--line);border-radius:999px;color:var(--text);text-decoration:none;background:rgb(16 21 15 / 88%)}@media(max-width:820px){.shell{padding:14px}.status,.sources{grid-template-columns:1fr}.panel{overflow-x:auto}table{min-width:850px}}
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">Morphology audit · 2026-07-13</p>
+        <h1>写实花型形态调研记录</h1>
+        <p class="copy">本记录用于约束程序化建模，不把“看起来像”当作“写实”。本轮核对绣球、满天星、蛇鞭菊、蕾丝花、风信子、狐尾百合、金鱼草、飞燕草的花序类型、单花结构、开放顺序与分枝连接。模型仍属于偏写实表达，不是植物扫描、标本复刻或物种鉴定工具。</p>
+        <div class="status">
+          <div><strong>文字描述已核对</strong><span>中文名、英文名、代表种与关键形态不再混用。</span></div>
+          <div><strong>几何逻辑已拆分</strong><span>八种花不再共用同一个穗状花序花瓣模板。</span></div>
+          <div><strong>写实边界保留</strong><span>为 3D 打印主动加粗细梗，因此比例不是显微级复刻。</span></div>
+        </div>
+      </header>
+
+      <section class="panel">
+        <h2>审计与重建决策</h2>
+        <table>
+          <thead><tr><th>花材</th><th>旧实现问题</th><th>调研约束</th><th>本轮建模改动</th></tr></thead>
+          <tbody>
+            <tr><td>绣球</td><td>近乎完美球壳；104 朵完全相同的四片花；内部花序层级不可见。</td><td>mophead 由放大的装饰花与较小可育花共同组成，花序为不规则半球或近球形。</td><td>增加装饰花/可育花两类单花、多级内部分枝、非均匀半球和对生叶。</td></tr>
+            <tr><td>满天星</td><td>分枝数量少、二段式重复；所有花同尺寸且全部开放。</td><td>圆锥状高度分枝花序，微小五瓣花与花苞并存。</td><td>改为主轴、一级枝、二级枝、末端梗四级网络，并加入尺寸与开放阶段差异。</td></tr>
+            <tr><td>蛇鞭菊</td><td>被画成普通五瓣小花穗，缺少菊科头状花与外伸花柱。</td><td>头状花紧贴花轴，由管状盘花组成，没有舌状花；典型开放方向为由上向下。</td><td>以贴轴花头、管状小花和外伸花柱构成瓶刷质感，编码上开下苞的阶段梯度。</td></tr>
+            <tr><td>蕾丝花</td><td>复伞形概念正确，密度偏低、排布过于规则，物种指代不清。</td><td>本 LAB 固定为大阿米芹 Ammi majus；主伞梗末端再形成小伞形花簇。</td><td>明确两级伞梗、提高小花密度、加入总苞片与轻微拱面。</td></tr>
+            <tr><td>风信子</td><td>六片独立花瓣围绕球心，未形成融合花筒和反卷裂片。</td><td>筒状钟形花冠，末端六裂并展开或反卷；密集圆柱状总状花序。</td><td>拆成短花梗、融合花筒、花喉、六裂片和顶部花苞。</td></tr>
+            <tr><td>狐尾百合</td><td>只有星形轮廓，没有外伸雄蕊、花梗梯度和开放带。</td><td>长总状花序，六被片、六雄蕊；下部花梗通常更长，顶部保留花苞。</td><td>建立残花—开放花—花苞三区，加入六枚外伸雄蕊并使花梗向上缩短。</td></tr>
+            <tr><td>金鱼草</td><td>三片普通花瓣加球形中心，无法表现“金鱼嘴”。</td><td>左右对称的融合花冠，上下两唇明显，下唇膨大并封住花喉。</td><td>以花筒作为结构核心，重做上二裂、下三裂和封闭花喉，顶部保留花苞。</td></tr>
+            <tr><td>飞燕草</td><td>已有花距提示，外萼片与内瓣仍是同一种五瓣模板。</td><td>五枚花瓣状萼片，其中上萼片形成后伸花距；内部另有四枚真花瓣。</td><td>分离五萼片、单花距、四内瓣和中心芯体，并加入总状花序的阶段变化。</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h2>形态参考</h2>
+        <div class="sources">
+          <article class="source"><strong>Liatris spicata</strong><a href="https://plants.ces.ncsu.edu/plants/liatris-spicata/">NC State Extension Plant Toolbox</a><p>核对贴轴头状花、盘花、外伸花柱和由上向下开放。</p></article>
+          <article class="source"><strong>Antirrhinum majus</strong><a href="https://plants.ces.ncsu.edu/plants/antirrhinum-majus/">NC State Extension Plant Toolbox</a><p>核对融合花冠、上下两唇和由下唇封闭花喉。</p></article>
+          <article class="source"><strong>Hydrangea macrophylla</strong><a href="https://plants.ces.ncsu.edu/plants/hydrangea-macrophylla/">NC State Extension Plant Toolbox</a><p>核对 mophead 花序、装饰花与可育花、四至五裂花部。</p></article>
+          <article class="source"><strong>Gypsophila paniculata</strong><a href="https://plants.ces.ncsu.edu/plants/gypsophila-paniculata/">NC State Extension Plant Toolbox</a><p>核对高度分枝花序与四至五瓣微小花。</p></article>
+          <article class="source"><strong>Ammi majus</strong><a href="https://plants.ces.ncsu.edu/plants/ammi-majus/">NC State Extension Plant Toolbox</a><p>核对伞形科复伞形结构和密集白色微花。</p></article>
+          <article class="source"><strong>Hyacinthus orientalis</strong><a href="https://plants.ces.ncsu.edu/plants/hyacinthus-orientalis/">NC State Extension Plant Toolbox</a><p>核对圆柱总状花序、筒状钟形花冠和六裂反卷。</p></article>
+          <article class="source"><strong>Delphinium</strong><a href="https://plants.ces.ncsu.edu/plants/delphinium/">NC State Extension Plant Toolbox</a><p>核对总状花序和后伸单花距；花部数量另与通用植物志描述交叉检查。</p></article>
+          <article class="source"><strong>Eremurus</strong><a href="https://www.rhs.org.uk/plants/eremurus/growing-guide">Royal Horticultural Society growing guide</a><p>核对狐尾百合的高大密集花穗、开放带与栽培形态；花部数量与属级植物志描述交叉检查。</p></article>
+        </div>
+        <a class="back" href="./realistic-flower-lab.html">返回偏写实花型 LAB</a>
+      </section>
+    </main>
+  </body>
+</html>
