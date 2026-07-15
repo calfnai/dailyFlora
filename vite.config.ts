@@ -58,6 +58,8 @@ export default defineConfig({
         realisticFlowerLab: resolve(__dirname, 'docs/realistic-flower-lab.html'),
         scifiFlowerLab: resolve(__dirname, 'docs/scifi-flower-lab.html'),
         scifiBouquetLab: resolve(__dirname, 'docs/scifi-bouquet-lab.html'),
+        leafSilhouetteLab: resolve(__dirname, 'docs/leaf-silhouette-lab.html'),
+        strap3DMiniLab: resolve(__dirname, 'docs/strap-3d-mini-lab.html'),
         avatarLab: resolve(__dirname, 'docs/avatar-lab.html')
       }
     }

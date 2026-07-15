@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { createRng } from './random';
+import type { FoliageProfileId, LeafArrangement, LeafInstanceRecord } from './plantOwnership';
 
 export type FloraPrimitiveRole = 'hero' | 'secondary' | 'line' | 'cluster' | 'fruit' | 'filler';
 
@@ -12,6 +13,11 @@ export interface FloraPrimitiveOptions {
   density: number;
   curvature: number;
   role: FloraPrimitiveRole;
+  leafOwnership?: {
+    stemId: string;
+    foliageProfile: FoliageProfileId;
+    leafArrangement: LeafArrangement;
+  };
 }
 
 const tempObject = new THREE.Object3D();
@@ -1233,6 +1239,13 @@ export function createFoliageGrassBranch(options: FloraPrimitiveOptions) {
   const leafCount = Math.max(12, Math.round(16 * options.density));
   const grassCount = Math.max(10, Math.round(14 * options.density));
   const leaves = new THREE.InstancedMesh(taperedPetalGeometry(0.28, 0.04, 0.024, 0.012), material(colorAt(options.colorPalette, 1), 0.92), leafCount);
+  leaves.name = 'temporary-legacy:foliage-grass-branch:leaves';
+  const ownership = options.leafOwnership ?? {
+    stemId: `temporary-legacy:${options.seed}`,
+    foliageProfile: 'temporary-legacy:foliage-grass-branch' as const,
+    leafArrangement: 'alternate' as const
+  };
+  const leafNodes: THREE.Vector3[] = [];
   const spine = new THREE.CatmullRomCurve3([
     new THREE.Vector3(-0.58, -0.16, rng.range(-0.04, 0.04)),
     new THREE.Vector3(-0.24, rng.range(-0.04, 0.08), rng.range(-0.08, 0.08)),
@@ -1252,6 +1265,7 @@ export function createFoliageGrassBranch(options: FloraPrimitiveOptions) {
     const side = i % 2 === 0 ? 1 : -1;
     const t = (i + 0.55) / (leafCount + 1);
     const base = spine.getPoint(t);
+    leafNodes.push(base.clone());
     const tangent = spine.getTangent(t).normalize();
     const sideVector = new THREE.Vector3(-tangent.y, tangent.x, rng.range(-0.25, 0.25)).normalize();
     const length = rng.range(0.18, 0.34) * (0.78 + Math.sin(t * Math.PI) * 0.18);
@@ -1269,6 +1283,32 @@ export function createFoliageGrassBranch(options: FloraPrimitiveOptions) {
       normal
     );
   }
+
+  const leafRecords: LeafInstanceRecord[] = [];
+  const instanceMatrix = new THREE.Matrix4();
+  const instanceColor = new THREE.Color();
+  for (let i = 0; i < leafCount; i += 1) {
+    leaves.getMatrixAt(i, instanceMatrix);
+    leaves.getColorAt(i, instanceColor);
+    const node = leafNodes[i];
+    leafRecords.push({
+      leafId: `${ownership.stemId}:leaf:${i}`,
+      stemId: ownership.stemId,
+      foliageProfile: ownership.foliageProfile,
+      leafArrangement: ownership.leafArrangement,
+      nodeIndex: i,
+      nodePosition: [node.x, node.y, node.z],
+      growthStage: (i + 1) / leafCount,
+      matrix: instanceMatrix.toArray(),
+      color: `#${instanceColor.getHexString()}`
+    });
+  }
+  leaves.userData.instanceStemIds = leafRecords.map((record) => record.stemId);
+  group.userData.leafRecords = leafRecords;
+  group.userData.localStemCurvePoints = spinePoints.map((point) => point.toArray());
+  group.userData.foliageProfile = ownership.foliageProfile;
+  group.userData.leafArrangement = ownership.leafArrangement;
+  group.userData.stemId = ownership.stemId;
 
   const grassPositions: number[] = [];
   const grassColors: number[] = [];

@@ -245,6 +245,13 @@ let spec = specialReference
   : createDailySpec(params.date, params.seed, selectedTheme);
 let followsToday = !specialReference && !searchParams.has('date') && !searchParams.has('seed');
 let scene = new BouquetScene(ui.canvas, spec, quality);
+(window as Window & {
+  __dailyFloraAudit?: () => ReturnType<BouquetScene['getDebugStats']>;
+}).__dailyFloraAudit = () => scene.getDebugStats();
+const requestedCamera = searchParams.get('camera');
+if (requestedCamera === 'front' || requestedCamera === 'side' || requestedCamera === 'top') {
+  scene.setStaticCameraView(requestedCamera);
+}
 let hideTimer = 0;
 let previewCount = 0;
 let rotationSpeed = THREEClamp(spec.rotationSpeed, minRotationSpeed, maxRotationSpeed);
@@ -636,6 +643,9 @@ function formatCount(value: number) {
 function updateDebugPanel() {
   if (!debugMode || !debugPanel) return;
   const stats = scene.getDebugStats();
+  debugPanel.dataset.flowerAudit = JSON.stringify(stats.flowerAudit);
+  const { flowerRecords: _flowerRecords, ...leafOwnershipCounts } = stats.leafOwnership;
+  debugPanel.dataset.leafOwnershipAudit = JSON.stringify(leafOwnershipCounts);
   const heapText = stats.jsHeapUsedMb === null
     ? 'n/a'
     : `${stats.jsHeapUsedMb}/${stats.jsHeapTotalMb} MB`;
@@ -647,6 +657,12 @@ function updateDebugPanel() {
     <div class="debug-row"><span>Points/Lines</span><strong>${formatCount(stats.points)} / ${formatCount(stats.lines)}</strong></div>
     <div class="debug-row"><span>GPU res</span><strong>${stats.geometries} geo · ${stats.textures} tex</strong></div>
     <div class="debug-row"><span>JS heap</span><strong>${heapText}</strong></div>
+    <div class="debug-row"><span>Realistic leaves</span><strong>${stats.leafOwnership.realisticFlowerLeafCount}</strong></div>
+    <div class="debug-row"><span>Legacy stems</span><strong>${stats.leafOwnership.temporaryLegacyStemCount}</strong></div>
+    <div class="debug-row"><span>Leaves before/after</span><strong>${stats.leafOwnership.beforeTotalLeafCount} → ${stats.leafOwnership.afterTotalLeafCount} (${stats.leafOwnership.totalLeafDelta})</strong></div>
+    <div class="debug-row"><span>Loose leaves removed</span><strong>${stats.leafOwnership.beforeLooseLeafCount}</strong></div>
+    <div class="debug-row"><span>Ownership errors</span><strong>${stats.leafOwnership.orphanLeafCount}/${stats.leafOwnership.mixedProfileStemCount}/${stats.leafOwnership.mixedArrangementStemCount}/${stats.leafOwnership.unresolvedGeneratedLeafCount}/${stats.leafOwnership.detachedLeafNodeCount}</strong></div>
+    <div class="debug-row"><span>Leaf status</span><strong>structural transition</strong></div>
   `;
 }
 

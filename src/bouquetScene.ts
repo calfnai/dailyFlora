@@ -3,15 +3,55 @@ import type { DailyBouquetSpec, FlowerPlanItem, FlowerTypeId, QualityProfile } f
 import { createRng, hashString } from './random';
 import { withBasePath } from './special';
 import { floraPrimitiveFactories, type FloraPrimitiveName, type FloraPrimitiveRole } from './floraPrimitives';
+import {
+  temporaryLegacyFoliageProfile,
+  unresolvedFoliageProfile,
+  validateLeafOwnership,
+  type FlowerAuditRecord,
+  type LeafInstanceRecord,
+  type LeafOwnershipAudit,
+  type PlantStemInstance
+} from './plantOwnership';
 
 const tempObject = new THREE.Object3D();
 const tempColor = new THREE.Color();
 const up = new THREE.Vector3(0, 1, 0);
 const forward = new THREE.Vector3(0, 0, 1);
+const leafBladeAxis = new THREE.Vector3();
+const leafBladeNormal = new THREE.Vector3();
+const leafBladeRight = new THREE.Vector3();
+const leafBasis = new THREE.Matrix4();
+const worldRight = new THREE.Vector3(1, 0, 0);
+const gravityDirection = new THREE.Vector3(0, -1, 0);
+const leafReference = new THREE.Vector3();
+const leafPreferredHemisphere = new THREE.Vector3();
 const minCameraPitch = 0.03;
 const maxCameraPitch = 1.34;
 const minZoomOffset = -1.35;
 const maxZoomOffset = 2.05;
+
+type FlowerBuildResult = {
+  object: THREE.Object3D;
+  flowerRecords: FlowerAuditRecord[];
+  stems: PlantStemInstance[];
+  leaves: LeafInstanceRecord[];
+};
+
+function objectColorSignature(object: THREE.Object3D) {
+  const colors: string[] = [];
+  object.traverse((child) => {
+    if (!(child instanceof THREE.Mesh || child instanceof THREE.Line || child instanceof THREE.Points)) return;
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    materials.forEach((material, materialIndex) => {
+      const color = (material as THREE.Material & { color?: THREE.Color }).color;
+      if (color) colors.push(`${child.name || child.type}:${materialIndex}:${color.getHexString()}`);
+    });
+    if (child instanceof THREE.InstancedMesh && child.instanceColor) {
+      colors.push(`${child.name || child.type}:instances:${Array.from(child.instanceColor.array).join(',')}`);
+    }
+  });
+  return colors;
+}
 
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
 
@@ -633,6 +673,74 @@ function spikeLeanRange(placement: FlowerPlanItem['placement']): [number, number
 
 const bouquetTiePoint = new THREE.Vector3(0, -0.98, 0);
 
+function createUnresolvedFlowerStem(
+  spec: DailyBouquetSpec,
+  stemId: string,
+  plantMemberId: string,
+  terminalPoint: THREE.Vector3
+): PlantStemInstance {
+  const stemRng = createRng(`${spec.seed}:stem-layout:${stemId}`);
+  const tie = bouquetTiePoint.clone().add(new THREE.Vector3(
+    stemRng.range(-0.055, 0.055),
+    0,
+    stemRng.range(-0.055, 0.055)
+  ));
+  const lower = tie.clone().lerp(terminalPoint, 0.36);
+  lower.x *= stemRng.range(0.46, 0.62);
+  lower.z *= stemRng.range(0.46, 0.62);
+  const upper = tie.clone().lerp(terminalPoint, 0.74);
+  upper.x *= stemRng.range(0.82, 0.94);
+  upper.z *= stemRng.range(0.82, 0.94);
+  return {
+    stemId,
+    plantMemberId,
+    source: 'realistic-flower',
+    curvePoints: [tie, lower, upper, terminalPoint.clone()],
+    ...unresolvedFoliageProfile
+  };
+}
+
+function readTemporaryLegacyFoliage(
+  spec: DailyBouquetSpec,
+  foliage: THREE.Group,
+  stemId: string
+): { stem: PlantStemInstance; leaves: LeafInstanceRecord[] } {
+  foliage.updateMatrix();
+  const localCurvePoints = (foliage.userData.localStemCurvePoints ?? []) as Array<[number, number, number]>;
+  const localLeaves = (foliage.userData.leafRecords ?? []) as LeafInstanceRecord[];
+  const curvePoints = localCurvePoints.map((point) => new THREE.Vector3(...point).applyMatrix4(foliage.matrix));
+  const leafMatrix = new THREE.Matrix4();
+  const worldMatrix = new THREE.Matrix4();
+  const leaves = localLeaves.map((leaf) => {
+    leafMatrix.fromArray([...leaf.matrix]);
+    worldMatrix.multiplyMatrices(foliage.matrix, leafMatrix);
+    const node = new THREE.Vector3(...leaf.nodePosition).applyMatrix4(foliage.matrix);
+    return {
+      ...leaf,
+      stemId,
+      leafId: `${stemId}:leaf:${leaf.nodeIndex}`,
+      nodePosition: node.toArray() as [number, number, number],
+      matrix: worldMatrix.toArray()
+    };
+  });
+  foliage.userData.rngNamespaces = {
+    stemMetadata: `${spec.seed}:stem-layout:${stemId}`,
+    foliageMetadata: `${spec.seed}:foliage-layout:${stemId}`,
+    leafNodes: `${spec.seed}:leaf-nodes:${stemId}`,
+    legacyLeaves: `${spec.seed}:legacy-leaves:${stemId}`
+  };
+  return {
+    stem: {
+      stemId,
+      plantMemberId: 'temporary-legacy:foliage-grass-branch',
+      source: 'temporary-legacy',
+      curvePoints,
+      ...temporaryLegacyFoliageProfile
+    },
+    leaves
+  };
+}
+
 function buildSpikeStemConnector(
   spec: DailyBouquetSpec,
   spike: THREE.Group,
@@ -793,6 +901,9 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
   const roleShares = spec.compositionTuning?.roleShare;
   const weightedShares = batches.map((batch) => batch.share * (roleShares?.[batch.role] ?? 1));
   const shareTotal = weightedShares.reduce((sum, share) => sum + share, 0) || 1;
+  const flowerRecords: FlowerAuditRecord[] = [];
+  const stems: PlantStemInstance[] = [];
+  const leaves: LeafInstanceRecord[] = [];
   let used = 0;
 
   batches.forEach((batch, index) => {
@@ -832,6 +943,15 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
       });
       primitiveGroup.name = `${primitive}:${batch.cn}`;
       orientPrimitiveGroup(primitiveGroup, primitive, p, theta, localRng, batch.placement);
+      primitiveGroup.updateMatrix();
+      const flowerId = `${spec.flowerPlan.id}:${batch.typeId}:${primitive}:${i}`;
+      flowerRecords.push({
+        flowerId,
+        placementOrder: flowerRecords.length,
+        matrix: primitiveGroup.matrix.toArray(),
+        colors: objectColorSignature(primitiveGroup)
+      });
+      stems.push(createUnresolvedFlowerStem(spec, `stem:${flowerId}`, batch.typeId, p));
       group.add(primitiveGroup);
       if (primitive === 'SpikeFlower') group.add(buildSpikeStemConnector(spec, primitiveGroup, localRng));
     }
@@ -844,6 +964,7 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
     const { p, theta } = placementPoint(spec, foliageRng, i % 4 === 0 ? 'spray' : i % 2 === 0 ? 'outer' : 'mixed');
     p.y -= foliageRng.range(0.18, 0.42);
     p.multiplyScalar(foliageRng.range(0.9, 1.02));
+    const stemId = `legacy:${spec.seed}:foliage-grass-branch:${i}`;
     const foliage = foliageFactory({
       seed: `${spec.seed}:bouquet-foliage:${i}`,
       position: p,
@@ -852,13 +973,21 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
       openness: 0.74,
       density: 0.92,
       curvature: 0.86,
-      role: 'line'
+      role: 'line',
+      leafOwnership: {
+        stemId,
+        foliageProfile: temporaryLegacyFoliageProfile.foliageProfile,
+        leafArrangement: temporaryLegacyFoliageProfile.leafArrangement
+      }
     });
     orientPrimitiveGroup(foliage, 'FoliageGrassBranch', p, theta, foliageRng);
+    const legacy = readTemporaryLegacyFoliage(spec, foliage, stemId);
+    stems.push(legacy.stem);
+    leaves.push(...legacy.leaves);
     group.add(foliage);
   }
 
-  return group;
+  return { object: group, flowerRecords, stems, leaves } satisfies FlowerBuildResult;
 }
 
 function placementPoint(
@@ -923,6 +1052,9 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
     emissive: new THREE.Color(spec.theme.glow),
     emissiveIntensity: 0.08
   });
+  const flowerRecords: FlowerAuditRecord[] = [];
+  const stems: PlantStemInstance[] = [];
+  const leaves: LeafInstanceRecord[] = [];
 
   const place = (
     mesh: THREE.InstancedMesh,
@@ -951,6 +1083,14 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
       tempObject.updateMatrix();
       mesh.setMatrixAt(i, tempObject.matrix);
       mesh.setColorAt(i, tempColor.set(pickColor(spec.theme.palette, localRng.value())).lerp(new THREE.Color('#ffffff'), localRng.range(0.0, colorLift)));
+      const flowerId = `${quality.renderName}:generic:${i}`;
+      flowerRecords.push({
+        flowerId,
+        placementOrder: flowerRecords.length,
+        matrix: tempObject.matrix.toArray(),
+        colors: [tempColor.toArray().join(',')]
+      });
+      stems.push(createUnresolvedFlowerStem(spec, `stem:${flowerId}`, 'unresolved-render-placeholder', p));
     }
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   };
@@ -960,7 +1100,7 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
     const mesh = new THREE.InstancedMesh(geometry, material, count);
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     place(mesh, rng, count, 0.96, 0.06);
-    return mesh;
+    return { object: mesh, flowerRecords, stems, leaves } satisfies FlowerBuildResult;
   }
 
   if (quality.renderName === 'medium') {
@@ -973,7 +1113,7 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
     const mesh = new THREE.InstancedMesh(geometry, mediumMaterial, count);
     mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     place(mesh, rng, count, 0.96, 0.1);
-    return mesh;
+    return { object: mesh, flowerRecords, stems, leaves } satisfies FlowerBuildResult;
   }
 
   return buildPrimitiveFlowers(spec, quality);
@@ -1129,80 +1269,656 @@ function buildLeafBladeGeometry(profile: LeafShapeProfile, renderName: QualityPr
   return geometry;
 }
 
-function buildLeaves(spec: DailyBouquetSpec, quality: QualityProfile) {
-  const rng = createRng(`${spec.seed}:leaves`);
-  const bladeMaterial = new THREE.MeshStandardMaterial({
+function setLeafPose(
+  object: THREE.Object3D,
+  position: THREE.Vector3,
+  bladeAxis: THREE.Vector3,
+  desiredSurfaceNormal: THREE.Vector3
+) {
+  leafBladeAxis.copy(bladeAxis).normalize();
+  leafBladeNormal.copy(desiredSurfaceNormal).addScaledVector(leafBladeAxis, -desiredSurfaceNormal.dot(leafBladeAxis));
+  if (leafBladeNormal.lengthSq() < 0.0001) {
+    leafBladeNormal.copy(up).addScaledVector(leafBladeAxis, -up.dot(leafBladeAxis));
+  }
+  if (leafBladeNormal.lengthSq() < 0.0001) {
+    leafBladeNormal.copy(forward).addScaledVector(leafBladeAxis, -forward.dot(leafBladeAxis));
+  }
+  leafBladeNormal.normalize();
+  leafBladeRight.crossVectors(leafBladeAxis, leafBladeNormal).normalize();
+  leafBladeNormal.crossVectors(leafBladeRight, leafBladeAxis).normalize();
+  leafBasis.makeBasis(leafBladeRight, leafBladeAxis, leafBladeNormal);
+  object.position.copy(position);
+  object.quaternion.setFromRotationMatrix(leafBasis);
+}
+
+type LeafPoseFrame = {
+  stemTangent: THREE.Vector3;
+  radialOutward: THREE.Vector3;
+  azimuthTangent: THREE.Vector3;
+  petioleDirection: THREE.Vector3;
+  bladeAxis: THREE.Vector3;
+  bladeNormal: THREE.Vector3;
+  bladeRight: THREE.Vector3;
+  pitchDegrees: number;
+  rollDegrees: number;
+};
+
+function makeLeafPoseFrame(
+  stemTangentInput: THREE.Vector3,
+  azimuth: number,
+  pitchDegrees: number,
+  rollDegrees: number,
+  tipDroopDegrees: number,
+  axialWeight: number,
+  sideBias: number,
+  preferredHemisphereWeight: number
+): LeafPoseFrame {
+  const stemTangent = stemTangentInput.clone().normalize();
+  leafReference.copy(Math.abs(stemTangent.dot(up)) > 0.9 ? worldRight : up);
+  const radialBase = new THREE.Vector3().crossVectors(stemTangent, leafReference).normalize();
+  const radialOutward = radialBase.clone().applyAxisAngle(stemTangent, azimuth).normalize();
+  const azimuthTangent = new THREE.Vector3().crossVectors(stemTangent, radialOutward).normalize();
+  const pitch = THREE.MathUtils.degToRad(pitchDegrees);
+  const roll = THREE.MathUtils.degToRad(rollDegrees);
+  const tipDroop = THREE.MathUtils.degToRad(tipDroopDegrees);
+  const petioleDirection = radialOutward
+    .clone()
+    .multiplyScalar(0.86)
+    .addScaledVector(stemTangent, axialWeight)
+    .normalize();
+  const bladeAxis = petioleDirection
+    .clone()
+    .applyAxisAngle(azimuthTangent, pitch)
+    .addScaledVector(azimuthTangent, sideBias)
+    .addScaledVector(gravityDirection, Math.sin(tipDroop) * 0.32)
+    .normalize();
+  const bladeNormal = new THREE.Vector3().crossVectors(azimuthTangent, bladeAxis).normalize();
+  leafPreferredHemisphere
+    .copy(radialOutward)
+    .multiplyScalar(1 - preferredHemisphereWeight)
+    .addScaledVector(stemTangent, preferredHemisphereWeight * 0.42)
+    .normalize();
+  if (bladeNormal.dot(leafPreferredHemisphere) < 0) bladeNormal.negate();
+  bladeNormal.applyAxisAngle(bladeAxis, roll).normalize();
+  const bladeRight = new THREE.Vector3().crossVectors(bladeAxis, bladeNormal).normalize();
+  bladeNormal.crossVectors(bladeRight, bladeAxis).normalize();
+  return { stemTangent, radialOutward, azimuthTangent, petioleDirection, bladeAxis, bladeNormal, bladeRight, pitchDegrees, rollDegrees };
+}
+
+function addDebugLine(
+  group: THREE.Group,
+  start: THREE.Vector3,
+  end: THREE.Vector3,
+  color: string,
+  opacity = 1
+) {
+  const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
+  const material = new THREE.LineBasicMaterial({ color, transparent: opacity < 1, opacity });
+  group.add(new THREE.Line(geometry, material));
+}
+
+type LeafPoseDebugView = 'front' | 'side' | 'top' | 'perspective' | 'orbit';
+type LeafDebugMaterialMode = 'normal' | 'monochrome' | 'silhouette' | 'front' | 'back' | 'wireframe';
+type LeafDebugPrototype = 'strap' | 'lanceolate' | 'ovate' | 'palmate' | 'compound';
+
+type LeafPoseStats = {
+  leafCount: number;
+  stemCount: number;
+  realisticFlowerLeafCount: number;
+  temporaryLegacyStemCount: number;
+  beforeTotalLeafCount: number;
+  afterTotalLeafCount: number;
+  totalLeafDelta: number;
+  stems: Array<{
+    stemId: string;
+    plantMemberId: string;
+    foliageProfile: string;
+    leafMode: 'attached';
+    leafArrangement: 'alternate';
+  }>;
+  pitchRange: [number, number];
+  rollRange: [number, number];
+  meanPitch: number;
+  meanRoll: number;
+  nearHorizontalRatio: number;
+  nearVerticalRatio: number;
+};
+
+function stemPointAt(t: number, xOffset = 0) {
+  return new THREE.Vector3(
+    xOffset + Math.sin(t * Math.PI * 1.18 - 0.35) * 0.13,
+    THREE.MathUtils.lerp(-0.92, 0.92, t),
+    Math.cos(t * Math.PI * 1.04 + 0.5) * 0.08
+  );
+}
+
+function stemTangentAt(t: number, xOffset = 0) {
+  const delta = 0.015;
+  return stemPointAt(Math.min(1, t + delta), xOffset).sub(stemPointAt(Math.max(0, t - delta), xOffset)).normalize();
+}
+
+function makeDebugStem(xOffset = 0) {
+  const curve = new THREE.CatmullRomCurve3(Array.from({ length: 12 }, (_, index) => stemPointAt(index / 11, xOffset)));
+  const geometry = new THREE.TubeGeometry(curve, 42, 0.018, 10, false);
+  const material = new THREE.MeshStandardMaterial({ color: '#375b34', roughness: 0.82 });
+  return new THREE.Mesh(geometry, material);
+}
+
+function makeDebugLeafMaterial(mode: LeafDebugMaterialMode) {
+  if (mode === 'normal') return new THREE.MeshNormalMaterial({ side: THREE.DoubleSide });
+  const color = mode === 'silhouette' ? '#2f7f38' : '#5fa45f';
+  return new THREE.MeshStandardMaterial({
+    color,
     roughness: 0.78,
     metalness: 0,
-    side: THREE.DoubleSide,
-    emissive: new THREE.Color('#123d28'),
-    emissiveIntensity: 0.022
+    side: mode === 'front' ? THREE.FrontSide : mode === 'back' ? THREE.BackSide : THREE.DoubleSide,
+    wireframe: mode === 'wireframe'
   });
-  const count = Math.floor(quality.leafCount * spec.leafDensity * (spec.special ? 0.68 : 1));
-  const group = new THREE.Group();
-  group.name = 'varied-thin-leaves';
-  const instances: Array<{
-    variantIndex: number;
-    matrix: THREE.Matrix4;
-    bladeColor: THREE.Color;
-  }> = [];
-  const variantCounts = leafShapeProfiles.map(() => 0);
+}
 
-  for (let i = 0; i < count; i += 1) {
-    const variantIndex = Math.floor(rng.value() * leafShapeProfiles.length) % leafShapeProfiles.length;
-    const theta = rng.range(0, Math.PI * 2);
-    const phi = rng.range(0.38, 1.82);
-    const p = bouquetPoint(spec, rng.range(0.44, 1.78), rng.range(0.7, 1.38), theta, phi);
-    p.y += spec.haloLift + rng.range(-0.38, 0.24);
-    const size = spec.special ? rng.range(0.32, 0.82) : rng.range(0.55, 1.28);
-    tempObject.position.copy(p);
-    tempObject.quaternion.setFromUnitVectors(up, p.clone().normalize());
-    tempObject.rotateY(theta + rng.range(-0.8, 0.8));
-    tempObject.rotateX(rng.range(-0.8, 0.8));
-    tempObject.scale.set(
-      size * rng.range(0.42, spec.special ? 0.7 : 0.92),
-      size * rng.range(0.72, spec.special ? 1.12 : 1.45),
-      size
-    );
-    tempObject.updateMatrix();
-    const bladeColor = tempColor.set(pickColor(spec.theme.leafPalette, rng.value())).clone();
-    instances.push({ variantIndex, matrix: tempObject.matrix.clone(), bladeColor });
-    variantCounts[variantIndex] += 1;
+function addLocalRib(group: THREE.Group, start: THREE.Vector3, end: THREE.Vector3, radius: number, material: THREE.Material) {
+  const direction = end.clone().sub(start);
+  const length = direction.length();
+  if (length <= 0.0001) return;
+  const rib = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, length, 6), material);
+  rib.position.copy(start).add(end).multiplyScalar(0.5);
+  rib.quaternion.setFromUnitVectors(up, direction.normalize());
+  group.add(rib);
+}
+
+function makeGridLeafGeometry(
+  length: number,
+  widthAt: (t: number) => number,
+  options: {
+    lengthSegments?: number;
+    widthSegments?: number;
+    centerX?: (t: number) => number;
+    surfaceZ?: (signedAcross: number, t: number) => number;
+  } = {}
+) {
+  const lengthSegments = options.lengthSegments ?? 24;
+  const widthSegments = options.widthSegments ?? 14;
+  const positions: number[] = [];
+  const indices: number[] = [];
+  const rowSize = widthSegments + 1;
+  for (let row = 0; row <= lengthSegments; row += 1) {
+    const t = row / lengthSegments;
+    const y = length * t;
+    const halfWidth = Math.max(0.0001, widthAt(t));
+    const centerX = options.centerX?.(t) ?? 0;
+    for (let column = 0; column <= widthSegments; column += 1) {
+      const across = column / widthSegments;
+      const signed = across * 2 - 1;
+      const edgeFade = 1 - Math.abs(signed);
+      const z = (options.surfaceZ?.(signed, t) ?? 0) * Math.max(0.18, edgeFade);
+      positions.push(centerX + signed * halfWidth, y, z);
+    }
   }
+  for (let row = 0; row < lengthSegments; row += 1) {
+    for (let column = 0; column < widthSegments; column += 1) {
+      const a = row * rowSize + column;
+      const b = a + 1;
+      const c = a + rowSize;
+      const d = c + 1;
+      indices.push(a, b, c, b, d, c);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
 
-  leafShapeProfiles.forEach((profile, variantIndex) => {
-    const variantCount = variantCounts[variantIndex];
-    if (!variantCount) return;
-    const blades = new THREE.InstancedMesh(buildLeafBladeGeometry(profile, quality.renderName), bladeMaterial, variantCount);
-    blades.name = `leaf-blades:${profile.name}`;
-    let instanceIndex = 0;
-    instances.forEach((instance) => {
-      if (instance.variantIndex !== variantIndex) return;
-      blades.setMatrixAt(instanceIndex, instance.matrix);
-      blades.setColorAt(instanceIndex, instance.bladeColor);
-      instanceIndex += 1;
-    });
-    if (blades.instanceColor) blades.instanceColor.needsUpdate = true;
-    group.add(blades);
+function makeVeinedBlade(
+  geometry: THREE.BufferGeometry,
+  material: THREE.Material,
+  length: number,
+  sideVeins: Array<[number, number, number, number]> = [],
+  parallelXs: number[] = []
+) {
+  const group = new THREE.Group();
+  group.add(new THREE.Mesh(geometry, material));
+  addLocalRib(group, new THREE.Vector3(0, 0.012, -0.006), new THREE.Vector3(0, length * 0.96, -0.006), 0.0032, material);
+  sideVeins.forEach(([startY, endX, endY, radius]) => {
+    addLocalRib(group, new THREE.Vector3(0, startY, -0.0055), new THREE.Vector3(endX, endY, -0.0055), radius, material);
+    addLocalRib(group, new THREE.Vector3(0, startY, -0.0055), new THREE.Vector3(-endX, endY, -0.0055), radius, material);
+  });
+  parallelXs.forEach((x) => {
+    addLocalRib(group, new THREE.Vector3(x, length * 0.07, -0.0048), new THREE.Vector3(x * 0.55, length * 0.92, -0.0048), 0.0017, material);
   });
   return group;
 }
 
-function buildStemBundle(spec: DailyBouquetSpec) {
-  const rng = createRng(`${spec.seed}:stems`);
+function makeBladeOnly(geometry: THREE.BufferGeometry, material: THREE.Material) {
+  const group = new THREE.Group();
+  group.add(new THREE.Mesh(geometry, material));
+  return group;
+}
+
+function makeStrapLeafGeometry(length: number) {
+  const lengthSegments = 32;
+  const widthSegments = 14;
+  const positions: number[] = [];
+  const indices: number[] = [];
+  const rowSize = widthSegments + 1;
+  for (let row = 0; row <= lengthSegments; row += 1) {
+    const t = row / lengthSegments;
+    let halfWidth = 0;
+    if (t < 0.18) {
+      halfWidth = THREE.MathUtils.lerp(0.028, 0.041, THREE.MathUtils.smoothstep(t, 0, 0.18));
+    } else if (t < 0.7) {
+      const middle = THREE.MathUtils.smoothstep(t, 0.18, 0.7);
+      halfWidth = THREE.MathUtils.lerp(0.041, 0.0375, middle) + Math.sin(t * Math.PI * 2.2) * 0.0009;
+    } else {
+      const tip = THREE.MathUtils.smoothstep(t, 0.7, 1);
+      halfWidth = THREE.MathUtils.lerp(0.0375, 0.0045, tip ** 1.15);
+    }
+    const asymmetry = Math.sin(t * Math.PI * 1.35 + 0.42);
+    const leftHalfWidth = halfWidth * (1 + asymmetry * 0.032);
+    const rightHalfWidth = halfWidth * (1 - asymmetry * 0.024);
+    const tipBias = THREE.MathUtils.smoothstep(t, 0.58, 1);
+    const centerX = Math.sin(t * Math.PI * 0.92) * 0.0045 + tipBias * 0.0085;
+    const tipDroop = -0.012 * THREE.MathUtils.smoothstep(t, 0.72, 1) ** 2;
+    for (let column = 0; column <= widthSegments; column += 1) {
+      const across = column / widthSegments;
+      const signedAcross = across * 2 - 1;
+      const x = centerX + THREE.MathUtils.lerp(-leftHalfWidth, rightHalfWidth, across);
+      const fold = -0.0036 * (1 - Math.abs(signedAcross)) * (0.48 + Math.sin(t * Math.PI) * 0.52);
+      const shallowTwist = signedAcross * Math.sin(t * Math.PI * 0.82) * 0.0016;
+      positions.push(x, length * t, fold + shallowTwist + tipDroop);
+    }
+  }
+  for (let row = 0; row < lengthSegments; row += 1) {
+    for (let column = 0; column < widthSegments; column += 1) {
+      const a = row * rowSize + column;
+      const b = a + 1;
+      const c = a + rowSize;
+      const d = c + 1;
+      indices.push(a, b, c, b, d, c);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+function makeStrapLeaf(material: THREE.Material, showVeins: boolean) {
+  const length = 0.64;
+  const geometry = makeStrapLeafGeometry(length);
+  return showVeins ? makeVeinedBlade(geometry, material, length, [], [-0.018, -0.009, 0.009, 0.018]) : makeBladeOnly(geometry, material);
+}
+
+function makeLanceolateLeaf(material: THREE.Material, showVeins: boolean) {
+  const length = 0.58;
+  const geometry = makeGridLeafGeometry(length, (t) => {
+    const peak = Math.exp(-(((t - 0.42) / 0.27) ** 2));
+    const baseTaper = THREE.MathUtils.smoothstep(t, 0.02, 0.18);
+    const tipTaper = 1 - THREE.MathUtils.smoothstep(t, 0.72, 1);
+    return 0.075 * peak * baseTaper * Math.max(0.02, tipTaper);
+  }, {
+    surfaceZ: (x, t) => -0.005 * Math.abs(x) - 0.012 * Math.max(0, t - 0.68) ** 2
+  });
+  return showVeins ? makeVeinedBlade(geometry, material, length, [
+    [0.15, 0.045, 0.24, 0.0017],
+    [0.24, 0.056, 0.34, 0.0017],
+    [0.34, 0.045, 0.44, 0.0015]
+  ]) : makeBladeOnly(geometry, material);
+}
+
+function makeOvateLeaf(material: THREE.Material, showVeins: boolean) {
+  const length = 0.5;
+  const geometry = makeGridLeafGeometry(length, (t) => {
+    const body = Math.sin(Math.PI * Math.max(0, Math.min(1, t))) ** 0.56;
+    const basalShoulder = 1 + 0.28 * Math.exp(-(((t - 0.28) / 0.16) ** 2));
+    const serration = 1 + 0.055 * Math.sin(t * Math.PI * 18);
+    const baseTaper = THREE.MathUtils.smoothstep(t, 0, 0.1);
+    return 0.11 * body * basalShoulder * serration * Math.max(0.25, baseTaper);
+  }, {
+    centerX: (t) => Math.sin(t * Math.PI) * 0.01,
+    surfaceZ: (x, t) => -0.006 * Math.abs(x) - 0.007 * Math.sin(t * Math.PI)
+  });
+  return showVeins ? makeVeinedBlade(geometry, material, length, [
+    [0.12, 0.062, 0.21, 0.002],
+    [0.19, 0.086, 0.31, 0.002],
+    [0.27, 0.076, 0.4, 0.0018],
+    [0.35, 0.05, 0.455, 0.0015]
+  ]) : makeBladeOnly(geometry, material);
+}
+
+function subdivideLeafSurface(geometry: THREE.BufferGeometry) {
+  const source = geometry.index ? geometry.toNonIndexed() : geometry;
+  const sourcePositions = source.getAttribute('position');
+  const positions: number[] = [];
+  const a = new THREE.Vector3();
+  const b = new THREE.Vector3();
+  const c = new THREE.Vector3();
+  const ab = new THREE.Vector3();
+  const bc = new THREE.Vector3();
+  const ca = new THREE.Vector3();
+  const pushTriangle = (v0: THREE.Vector3, v1: THREE.Vector3, v2: THREE.Vector3) => {
+    positions.push(v0.x, v0.y, v0.z, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z);
+  };
+  for (let index = 0; index < sourcePositions.count; index += 3) {
+    a.fromBufferAttribute(sourcePositions, index);
+    b.fromBufferAttribute(sourcePositions, index + 1);
+    c.fromBufferAttribute(sourcePositions, index + 2);
+    ab.copy(a).add(b).multiplyScalar(0.5);
+    bc.copy(b).add(c).multiplyScalar(0.5);
+    ca.copy(c).add(a).multiplyScalar(0.5);
+    pushTriangle(a, ab, ca);
+    pushTriangle(ab, b, bc);
+    pushTriangle(ca, bc, c);
+    pushTriangle(ab, bc, ca);
+  }
+  if (source !== geometry) source.dispose();
+  geometry.dispose();
+  const subdivided = new THREE.BufferGeometry();
+  subdivided.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  return subdivided;
+}
+
+function makePalmateLeafGeometry() {
+  const outlineControls = [
+    new THREE.Vector3(0.004, 0.014, 0),
+    new THREE.Vector3(0.058, 0.083, 0),
+    new THREE.Vector3(0.128, 0.146, 0),
+    new THREE.Vector3(0.204, 0.21, 0),
+    new THREE.Vector3(0.222, 0.232, 0),
+    new THREE.Vector3(0.204, 0.252, 0),
+    new THREE.Vector3(0.166, 0.268, 0),
+    new THREE.Vector3(0.116, 0.29, 0),
+    new THREE.Vector3(0.132, 0.342, 0),
+    new THREE.Vector3(0.156, 0.386, 0),
+    new THREE.Vector3(0.17, 0.408, 0),
+    new THREE.Vector3(0.15, 0.417, 0),
+    new THREE.Vector3(0.118, 0.4, 0),
+    new THREE.Vector3(0.076, 0.368, 0),
+    new THREE.Vector3(0.066, 0.426, 0),
+    new THREE.Vector3(0.038, 0.505, 0),
+    new THREE.Vector3(0.009, 0.535, 0),
+    new THREE.Vector3(-0.028, 0.508, 0),
+    new THREE.Vector3(-0.06, 0.424, 0),
+    new THREE.Vector3(-0.076, 0.36, 0),
+    new THREE.Vector3(-0.116, 0.394, 0),
+    new THREE.Vector3(-0.148, 0.414, 0),
+    new THREE.Vector3(-0.162, 0.396, 0),
+    new THREE.Vector3(-0.15, 0.376, 0),
+    new THREE.Vector3(-0.13, 0.33, 0),
+    new THREE.Vector3(-0.108, 0.278, 0),
+    new THREE.Vector3(-0.158, 0.262, 0),
+    new THREE.Vector3(-0.198, 0.244, 0),
+    new THREE.Vector3(-0.214, 0.224, 0),
+    new THREE.Vector3(-0.194, 0.202, 0),
+    new THREE.Vector3(-0.128, 0.144, 0),
+    new THREE.Vector3(-0.058, 0.082, 0)
+  ];
+  const outlineCurve = new THREE.CatmullRomCurve3(outlineControls, true, 'centripetal', 0.38);
+  const outlinePoints = outlineCurve.getPoints(72);
+  const outline = new THREE.Shape();
+  outline.moveTo(outlinePoints[0].x, outlinePoints[0].y);
+  outlinePoints.slice(1).forEach((point) => outline.lineTo(point.x, point.y));
+  outline.closePath();
+  const flatGeometry = new THREE.ShapeGeometry(outline, 8);
+  const geometry = subdivideLeafSurface(flatGeometry);
+  const position = geometry.getAttribute('position');
+  for (let index = 0; index < position.count; index += 1) {
+    const x = position.getX(index);
+    const y = position.getY(index);
+    const palmDistance = Math.hypot(x, (y - 0.12) * 0.84);
+    const palmCup = -0.0024 * Math.exp(-((x / 0.16) ** 2 + ((y - 0.19) / 0.2) ** 2));
+    const lobeBend = -0.0055 * THREE.MathUtils.smoothstep(palmDistance, 0.13, 0.43) ** 2;
+    const quietAsymmetry = x * 0.007 * Math.sin(Math.min(1, y / 0.54) * Math.PI);
+    position.setZ(index, palmCup + lobeBend + quietAsymmetry);
+  }
+  position.needsUpdate = true;
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+function makePalmateLeaf(material: THREE.Material, showVeins: boolean) {
+  const geometry = makePalmateLeafGeometry();
+  const group = new THREE.Group();
+  group.add(new THREE.Mesh(geometry, material));
+  if (showVeins) {
+    [
+      new THREE.Vector3(0, 0.51, -0.006),
+      new THREE.Vector3(0.16, 0.42, -0.006),
+      new THREE.Vector3(0.2, 0.25, -0.006),
+      new THREE.Vector3(-0.16, 0.42, -0.006),
+      new THREE.Vector3(-0.2, 0.25, -0.006)
+    ].forEach((tip) => addLocalRib(group, new THREE.Vector3(0, 0.02, -0.006), tip, 0.0025, material));
+  }
+  return group;
+}
+
+function makeCompoundLeaf(material: THREE.Material, showVeins: boolean) {
+  const group = new THREE.Group();
+  const length = 0.62;
+  addLocalRib(group, new THREE.Vector3(0, 0.02, -0.003), new THREE.Vector3(0, length, -0.003), 0.004, material);
+  const leafletGeometry = makeGridLeafGeometry(0.18, (t) => Math.sin(Math.PI * t) ** 0.78 * 0.028, {
+    lengthSegments: 12,
+    widthSegments: 8,
+    surfaceZ: (x, t) => -0.0025 * Math.abs(x) - 0.006 * Math.max(0, t - 0.65) ** 2
+  });
+  const leafletYs = [0.12, 0.22, 0.32, 0.42, 0.51];
+  leafletYs.forEach((y, index) => {
+    const spread = 0.12 + index * 0.01;
+    for (const side of [-1, 1]) {
+      if (index === leafletYs.length - 1 && side === -1) continue;
+      const leaflet = new THREE.Group();
+      const mesh = new THREE.Mesh(leafletGeometry, material);
+      leaflet.add(mesh);
+      if (showVeins) addLocalRib(leaflet, new THREE.Vector3(0, 0.02, -0.004), new THREE.Vector3(0, 0.165, -0.004), 0.0015, material);
+      leaflet.position.set(side * 0.018, y, 0);
+      leaflet.rotation.z = side * -(0.72 - index * 0.08);
+      leaflet.scale.setScalar(index === leafletYs.length - 1 ? 1.12 : 1);
+      group.add(leaflet);
+      addLocalRib(group, new THREE.Vector3(0, y, -0.003), new THREE.Vector3(side * spread * 0.38, y + 0.055, -0.003), 0.0018, material);
+    }
+  });
+  const terminal = new THREE.Group();
+  terminal.add(new THREE.Mesh(leafletGeometry, material));
+  if (showVeins) addLocalRib(terminal, new THREE.Vector3(0, 0.02, -0.004), new THREE.Vector3(0, 0.165, -0.004), 0.0015, material);
+  terminal.position.set(0, 0.53, 0);
+  terminal.scale.setScalar(1.18);
+  group.add(terminal);
+  return group;
+}
+
+function makeDebugLeafPrototype(prototype: LeafDebugPrototype, material: THREE.Material, showVeins: boolean) {
+  if (prototype === 'strap') return makeStrapLeaf(material, showVeins);
+  if (prototype === 'lanceolate') return makeLanceolateLeaf(material, showVeins);
+  if (prototype === 'ovate') return makeOvateLeaf(material, showVeins);
+  if (prototype === 'palmate') return makePalmateLeaf(material, showVeins);
+  return makeCompoundLeaf(material, showVeins);
+}
+
+function roundStat(value: number) {
+  return Math.round(value * 1000) / 1000;
+}
+
+function summarizeLeafPoseStats(
+  poses: LeafPoseFrame[],
+  stems: LeafPoseStats['stems'],
+  beforeTotalLeafCount: number
+): LeafPoseStats {
+  const pitches = poses.map((pose) => pose.pitchDegrees);
+  const rolls = poses.map((pose) => pose.rollDegrees);
+  const normalUps = poses.map((pose) => Math.abs(pose.bladeNormal.dot(up)));
+  return {
+    leafCount: poses.length,
+    stemCount: stems.length,
+    realisticFlowerLeafCount: 0,
+    temporaryLegacyStemCount: stems.length,
+    beforeTotalLeafCount,
+    afterTotalLeafCount: poses.length,
+    totalLeafDelta: poses.length - beforeTotalLeafCount,
+    stems,
+    pitchRange: [roundStat(Math.min(...pitches)), roundStat(Math.max(...pitches))],
+    rollRange: [roundStat(Math.min(...rolls)), roundStat(Math.max(...rolls))],
+    meanPitch: roundStat(pitches.reduce((sum, value) => sum + value, 0) / pitches.length),
+    meanRoll: roundStat(rolls.reduce((sum, value) => sum + value, 0) / rolls.length),
+    nearHorizontalRatio: roundStat(normalUps.filter((value) => value > Math.cos(THREE.MathUtils.degToRad(25))).length / poses.length),
+    nearVerticalRatio: roundStat(normalUps.filter((value) => value < Math.sin(THREE.MathUtils.degToRad(25))).length / poses.length)
+  };
+}
+
+export function createLeafPoseDebugScene(
+  canvas: HTMLCanvasElement,
+  view: LeafPoseDebugView = 'front',
+  materialMode: LeafDebugMaterialMode = 'monochrome',
+  options: { prototype?: LeafDebugPrototype; comparison?: boolean } = {}
+) {
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('#10170f');
+  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  scene.add(new THREE.AmbientLight('#fff7e4', 1.1));
+  const key = new THREE.DirectionalLight('#fff0c8', 1.8);
+  key.position.set(2.4, 4.2, 3.4);
+  scene.add(key);
+
+  const group = new THREE.Group();
+  scene.add(group);
+
+  const leafMaterial = makeDebugLeafMaterial(materialMode);
+  const showLeafVeins = materialMode !== 'silhouette';
+  const axisLength = 0.2;
+  const poses: LeafPoseFrame[] = [];
+  const allPrototypes: LeafDebugPrototype[] = ['strap', 'lanceolate', 'ovate', 'palmate', 'compound'];
+  const selectedPrototype = options.prototype ?? 'ovate';
+  const specimens = options.comparison
+    ? allPrototypes.map((prototype, index) => ({ prototype, xOffset: (index - 2) * 0.72 }))
+    : [{ prototype: selectedPrototype, xOffset: 0 }];
+  const stemMetadata: LeafPoseStats['stems'] = [];
+  const pitchByNode = [-32, 42, -14, 16, 51, -25, 28, 6];
+  const rollByNode = [-24, 18, 72, -32, 12, 29, -18, 44];
+  specimens.forEach(({ prototype, xOffset }, stemIndex) => {
+    const stemId = `debug:temporary-legacy:${stemIndex}`;
+    stemMetadata.push({
+      stemId,
+      plantMemberId: `debug-only:${prototype}`,
+      foliageProfile: `temporary-legacy:${prototype}`,
+      leafMode: 'attached',
+      leafArrangement: 'alternate'
+    });
+    group.add(makeDebugStem(xOffset));
+    const nodeTs = options.comparison ? [0.2, 0.46, 0.72] : [0.08, 0.2, 0.32, 0.44, 0.56, 0.68, 0.8, 0.92];
+    nodeTs.forEach((t, index) => {
+      const node = stemPointAt(t, xOffset);
+      const stemTangent = stemTangentAt(t, xOffset);
+      const azimuth = index * 2.399963 + stemIndex * 0.41;
+      const ageTrend = 1 - t;
+      const pitch = pitchByNode[index];
+      const roll = rollByNode[index];
+      const pose = makeLeafPoseFrame(
+        stemTangent,
+        azimuth,
+        pitch,
+        roll,
+        THREE.MathUtils.lerp(20, 5, t),
+        THREE.MathUtils.lerp(-0.22, 0.24, t) + 0.04,
+        Math.sin(index * 1.3 + stemIndex) * 0.16,
+        THREE.MathUtils.lerp(0.12, 0.34, ageTrend)
+      );
+      poses.push(pose);
+      const base = node.clone().addScaledVector(pose.petioleDirection, 0.22);
+      const leaf = makeDebugLeafPrototype(prototype, leafMaterial, showLeafVeins);
+      leaf.name = `${stemId}:leaf:${index}:${prototype}`;
+      leaf.userData.stemId = stemId;
+      leaf.userData.foliageProfile = `temporary-legacy:${prototype}`;
+      leaf.userData.leafArrangement = 'alternate';
+      setLeafPose(leaf, base, pose.bladeAxis, pose.bladeNormal);
+      leaf.scale.setScalar(options.comparison ? 0.78 : 1.08);
+      group.add(leaf);
+
+      const right = new THREE.Vector3(1, 0, 0).applyQuaternion(leaf.quaternion).normalize();
+      const axis = new THREE.Vector3(0, 1, 0).applyQuaternion(leaf.quaternion).normalize();
+      const normal = new THREE.Vector3(0, 0, 1).applyQuaternion(leaf.quaternion).normalize();
+      addDebugLine(group, node, base, '#f5c542', 0.9);
+      addDebugLine(group, node, node.clone().addScaledVector(pose.stemTangent, axisLength * 0.9), '#ff9a3c', 0.85);
+      addDebugLine(group, base, base.clone().addScaledVector(right, axisLength), '#ff4b4b');
+      addDebugLine(group, base, base.clone().addScaledVector(axis, axisLength * 1.15), '#5cff5c');
+      addDebugLine(group, base, base.clone().addScaledVector(normal, axisLength), '#55a7ff');
+    });
+  });
+
+  const worldUpX = options.comparison ? -2.0 : -0.62;
+  addDebugLine(group, new THREE.Vector3(worldUpX, -0.95, -0.62), new THREE.Vector3(worldUpX, -0.55, -0.62), '#7de8ff');
+  const beforeTotalLeafCount = options.comparison ? allPrototypes.length * 3 : 10;
+  const stats = summarizeLeafPoseStats(poses, stemMetadata, beforeTotalLeafCount);
+  (window as Window & { __leafPoseDebugStats?: LeafPoseStats }).__leafPoseDebugStats = stats;
+
+  const target = new THREE.Vector3(0, -0.04, 0);
+  function setCamera() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height, false);
+    const distanceScale = options.comparison ? 1.55 : 1;
+    if (view === 'top') camera.position.set(0.001, 4.25 * distanceScale, 0.001);
+    else if (view === 'side') camera.position.set(3.2 * distanceScale, 1.05, 0);
+    else if (view === 'perspective' || view === 'orbit') camera.position.set(2.4 * distanceScale, 1.9, 3.2 * distanceScale);
+    else camera.position.set(0, 1.05, 3.35 * distanceScale);
+    camera.lookAt(target);
+  }
+
+  let animationId = 0;
+  const render = () => {
+    animationId = window.requestAnimationFrame(render);
+    if (view === 'orbit') {
+      group.rotation.y += 0.008;
+    }
+    renderer.render(scene, camera);
+  };
+  window.addEventListener('resize', setCamera);
+  setCamera();
+
+  return {
+    stats,
+    start() {
+      render();
+    },
+    stop() {
+      window.cancelAnimationFrame(animationId);
+      window.removeEventListener('resize', setCamera);
+      renderer.dispose();
+    }
+  };
+}
+
+function buildStemBundle(spec: DailyBouquetSpec, stems: readonly PlantStemInstance[]) {
   const positions: number[] = [];
   const colors: number[] = [];
   const stem = new THREE.Color(spec.theme.stem);
-  const count = Math.floor(24 * (spec.special?.shape.stemVisibility ?? 1));
-
-  for (let i = 0; i < count; i += 1) {
-    const theta = rng.range(0, Math.PI * 2);
-    const bottom = new THREE.Vector3(Math.cos(theta) * rng.range(0.04, 0.11), -1.24, Math.sin(theta) * rng.range(0.04, 0.11));
-    const top = new THREE.Vector3(Math.cos(theta) * rng.range(0.14, 0.3), -0.44 + rng.range(-0.1, 0.08), Math.sin(theta) * rng.range(0.14, 0.3));
-    positions.push(bottom.x, bottom.y, bottom.z, top.x, top.y, top.z);
-    const c = stem.clone().lerp(new THREE.Color('#d5d09b'), rng.range(0, 0.24));
-    for (let k = 0; k < 2; k += 1) colors.push(c.r, c.g, c.b);
-  }
+  const flowerStems = stems.filter((plantStem) => plantStem.source === 'realistic-flower');
+  const visibleStemCount = Math.min(
+    flowerStems.length,
+    Math.floor(24 * (spec.special?.shape.stemVisibility ?? 1))
+  );
+  const visibleStems = Array.from({ length: visibleStemCount }, (_, index) => {
+    if (visibleStemCount <= 1) return flowerStems[0];
+    return flowerStems[Math.round(index * (flowerStems.length - 1) / (visibleStemCount - 1))];
+  });
+  visibleStems.forEach((plantStem) => {
+    const tint = (hashString(`${spec.seed}:stem-color:${plantStem.stemId}`) % 2400) / 10000;
+    const color = stem.clone().lerp(new THREE.Color('#d5d09b'), tint);
+    plantStem.curvePoints.forEach((point, pointIndex) => {
+      if (pointIndex === plantStem.curvePoints.length - 1) return;
+      const next = plantStem.curvePoints[pointIndex + 1];
+      positions.push(point.x, point.y, point.z, next.x, next.y, next.z);
+      colors.push(color.r, color.g, color.b, color.r, color.g, color.b);
+    });
+  });
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
@@ -1210,7 +1926,7 @@ function buildStemBundle(spec: DailyBouquetSpec) {
   const material = new THREE.LineBasicMaterial({
     vertexColors: true,
     transparent: true,
-    opacity: 0.24
+    opacity: 0.2
   });
   const lines = new THREE.LineSegments(geometry, material);
 
@@ -1502,6 +2218,22 @@ export class BouquetScene {
   private debugFrameCount = 0;
   private debugFps = 0;
   private debugSampleAt = performance.now();
+  private flowerRecords: FlowerAuditRecord[] = [];
+  private ownershipAudit: LeafOwnershipAudit = {
+    realisticFlowerLeafCount: 0,
+    temporaryLegacyStemCount: 0,
+    beforeLooseLeafCount: 0,
+    beforeTotalLeafCount: 0,
+    afterTotalLeafCount: 0,
+    totalLeafDelta: 0,
+    orphanLeafCount: 0,
+    mixedProfileStemCount: 0,
+    mixedArrangementStemCount: 0,
+    unresolvedGeneratedLeafCount: 0,
+    detachedLeafNodeCount: 0,
+    flowerCount: 0,
+    flowerRecords: []
+  };
 
   constructor(canvas: HTMLCanvasElement, spec: DailyBouquetSpec, quality: QualityProfile) {
     this.canvas = canvas;
@@ -1555,17 +2287,48 @@ export class BouquetScene {
     if (spec.special) {
       this.cosmicLayer.add(buildSpecialCosmicLayer(spec, quality));
     }
+    const flowers = buildFlowers(spec, quality);
+    this.flowerRecords = flowers.flowerRecords;
+    const beforeLooseLeafCount = Math.floor(quality.leafCount * spec.leafDensity * (spec.special ? 0.68 : 1));
+    const validation = validateLeafOwnership(flowers.stems, flowers.leaves);
+    const temporaryLegacyStemCount = flowers.stems.filter((stem) => stem.source === 'temporary-legacy').length;
+    const realisticStemIds = new Set(
+      flowers.stems.filter((stem) => stem.source === 'realistic-flower').map((stem) => stem.stemId)
+    );
+    const realisticFlowerLeafCount = flowers.leaves.filter((leaf) => realisticStemIds.has(leaf.stemId)).length;
+    const beforeTotalLeafCount = beforeLooseLeafCount + flowers.leaves.length;
+    this.ownershipAudit = {
+      realisticFlowerLeafCount,
+      temporaryLegacyStemCount,
+      beforeLooseLeafCount,
+      beforeTotalLeafCount,
+      afterTotalLeafCount: flowers.leaves.length,
+      totalLeafDelta: flowers.leaves.length - beforeTotalLeafCount,
+      ...validation,
+      flowerCount: flowers.flowerRecords.length,
+      flowerRecords: flowers.flowerRecords
+    };
     this.bouquet.add(
       buildSpecialDustRings(spec, quality),
-      buildStemBundle(spec),
+      buildStemBundle(spec, flowers.stems),
       buildSpecialWrapping(spec),
       buildBranches(spec, quality),
       buildOuterLines(spec, quality),
-      buildLeaves(spec, quality),
-      buildFlowers(spec, quality),
+      flowers.object,
       buildParticles(spec, quality),
       ...(spec.special ? [buildSpecialBabyBreath(spec, quality)] : [])
     );
+  }
+
+  setStaticCameraView(view: 'front' | 'side' | 'top') {
+    this.routePausedByDrag = true;
+    this.routeTime = 0;
+    this.cameraYaw = view === 'side' ? Math.PI / 2 : 0;
+    this.targetCameraYaw = this.cameraYaw;
+    this.cameraPitch = view === 'top' ? 1.32 : view === 'side' ? 0.38 : 0.34;
+    this.targetCameraPitch = this.cameraPitch;
+    this.updateCamera(emptyRouteOffsets);
+    this.renderer.render(this.scene, this.camera);
   }
 
   start() {
@@ -1716,7 +2479,12 @@ export class BouquetScene {
       lines: this.renderer.info.render.lines,
       jsHeapUsedMb: heap ? Math.round(heap.usedJSHeapSize / 1024 / 1024) : null,
       jsHeapTotalMb: heap ? Math.round(heap.totalJSHeapSize / 1024 / 1024) : null,
-      jsHeapLimitMb: heap ? Math.round(heap.jsHeapSizeLimit / 1024 / 1024) : null
+      jsHeapLimitMb: heap ? Math.round(heap.jsHeapSizeLimit / 1024 / 1024) : null,
+      leafOwnership: this.ownershipAudit,
+      flowerAudit: {
+        flowerCount: this.flowerRecords.length,
+        records: this.flowerRecords
+      }
     };
   }
 

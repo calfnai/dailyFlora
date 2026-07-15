@@ -4,6 +4,7 @@ import {
   realisticFlowerDefinitions,
   type RealisticFlowerDefinition
 } from './realisticFlowerForms';
+import { realisticFlowerFoliageStatus } from './plantOwnership';
 
 type ViewName = 'front' | 'side' | 'top';
 type Preview = {
@@ -38,6 +39,10 @@ renderer.setClearColor(0x000000, 0);
 renderer.autoClear = false;
 
 const previews: Preview[] = [];
+const calibratedFlowerIds = new Set([
+  'delphinium', 'snapdragon', 'hyacinth', 'foxtail-lily',
+  'liatris', 'lace-flower', 'hydrangea', 'babys-breath'
+]);
 const silhouetteMaterial = new THREE.MeshBasicMaterial({ color: '#f7f0e3', side: THREE.DoubleSide });
 let activeView: ViewName = 'front';
 let silhouetteMode = false;
@@ -59,20 +64,28 @@ function escapeHtml(value: unknown) {
 }
 
 function renderLabels() {
-  labels.innerHTML = realisticFlowerDefinitions.map((definition, index) => `
-    <article class="cell" data-flower="${escapeHtml(definition.id)}">
-      <div class="label">
-        <div class="meta"><span>${String(index + 1).padStart(2, '0')} · ${escapeHtml(definition.category)}</span><span class="connected">connected</span></div>
-        <h3>${escapeHtml(definition.cn)}</h3>
-        <p class="en">${escapeHtml(definition.en)}</p>
-        <p class="desc">${escapeHtml(definition.description)}</p>
-        <p class="print">${escapeHtml(definition.printStructure)}</p>
-      </div>
-    </article>
-  `).join('');
+  labels.innerHTML = realisticFlowerDefinitions.map((definition, index) => {
+    const foliage = realisticFlowerFoliageStatus[definition.id];
+    return `
+      <article class="cell" data-flower="${escapeHtml(definition.id)}" data-foliage-profile="${escapeHtml(foliage.foliageProfile)}" data-leaf-mode="${escapeHtml(foliage.leafMode)}">
+        <div class="label">
+          <div class="meta"><span>${String(index + 1).padStart(2, '0')} · ${escapeHtml(definition.category)}</span><span class="connected">connected</span></div>
+          <h3>${escapeHtml(definition.cn)}</h3>
+          <p class="en">${escapeHtml(definition.en)}</p>
+          ${definition.scientificName ? `<p class="species">${escapeHtml(definition.scientificName)}</p>` : ''}
+          <p class="desc">${escapeHtml(definition.description)}</p>
+          ${definition.calibration ? `<p class="calibration">${escapeHtml(definition.calibration)}</p>` : ''}
+          <p class="print">${escapeHtml(definition.printStructure)}</p>
+          <p class="scope-note">foliageProfile: ${escapeHtml(foliage.foliageProfile)} · leafMode: ${escapeHtml(foliage.leafMode)} · leafArrangement: ${escapeHtml(foliage.leafArrangement)} · 后续需要独立研究</p>
+          ${definition.scopeNote ? `<p class="scope-note">${escapeHtml(definition.scopeNote)}</p>` : ''}
+        </div>
+      </article>
+    `;
+  }).join('');
 }
 
 function modelScale(definition: RealisticFlowerDefinition) {
+  if (calibratedFlowerIds.has(definition.id)) return definition.category === 'spike' ? 0.7 : 0.69;
   if (definition.category === 'spike') return 0.56;
   if (definition.category === 'cluster') return 0.62;
   if (definition.id === 'calla') return 0.68;
@@ -81,7 +94,9 @@ function modelScale(definition: RealisticFlowerDefinition) {
 }
 
 function setView(preview: Preview, view: ViewName) {
-  const distance = preview.definition.category === 'spike' ? 5.4 : 4.7;
+  const distance = calibratedFlowerIds.has(preview.definition.id)
+    ? preview.definition.category === 'spike' ? 4.55 : 4.4
+    : preview.definition.category === 'spike' ? 5.4 : 4.7;
   if (view === 'side') preview.camera.position.set(distance, 0.15, 0);
   else if (view === 'top') preview.camera.position.set(0, distance, 0.01);
   else preview.camera.position.set(0, 0.15, distance);
