@@ -46,7 +46,10 @@ jobs:
       - name: Validate interactions and capture states
         run: |
           mkdir -p validation
-          node .github/scripts/gui-v2-validate.cjs
+          set +e
+          node .github/scripts/gui-v2-validate.cjs 2>&1 | tee validation/validation.log
+          status=${PIPESTATUS[0]}
+          exit "$status"
 
       - name: Upload captures
         if: always()
