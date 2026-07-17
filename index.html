@@ -14,12 +14,16 @@
         const pathname = window.location.pathname.replace(/\/+$/, '');
         const isSpecial = /\/special[^/]*$/i.test(pathname) || params.has('special');
         if (isSpecial) return;
+
         document.documentElement.classList.add('df-gui-v1');
-        let language = 'en';
+        const languageStorageKey = 'dailyflora.gui-language.v2';
+        let language = 'zh';
         try {
-          language = window.localStorage.getItem('dailyflora.gui-language.v1') === 'zh' ? 'zh' : 'en';
+          const storedLanguage = window.localStorage.getItem(languageStorageKey);
+          if (storedLanguage === 'zh' || storedLanguage === 'en') language = storedLanguage;
         } catch {}
         document.documentElement.dataset.language = language;
+        document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
       })();
     </script>
     <link rel="stylesheet" href="/src/gui-v1.css" />
@@ -47,8 +51,8 @@
         <div class="daily-mark">
           <span class="daily-kicker">TODAY'S COMPOSITION</span>
           <div class="language-toggle" role="group" aria-label="花名语言">
-            <button type="button" data-language-choice="en" aria-pressed="true">EN</button>
-            <button type="button" data-language-choice="zh" aria-pressed="false">中</button>
+            <button type="button" data-language-choice="zh" aria-pressed="true">中文</button>
+            <button type="button" data-language-choice="en" aria-pressed="false">EN</button>
           </div>
           <span class="daily-date" id="daily-date"></span>
           <span class="daily-theme" id="daily-theme">
@@ -62,8 +66,7 @@
 
       <nav class="site-menu" id="site-menu" aria-label="DailyFlora site menu">
         <button class="site-menu-toggle" id="site-menu-toggle" type="button" aria-label="Open site index" aria-expanded="false" aria-controls="site-menu-panel" data-tooltip="菜单">
-          <span class="site-menu-mark" aria-hidden="true"></span>
-          <span class="site-menu-label" aria-hidden="true">Index</span>
+          <span class="site-menu-label" aria-hidden="true">INDEX</span>
           <svg class="site-menu-legacy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" /></svg>
         </button>
         <div class="site-menu-panel" id="site-menu-panel" hidden>
@@ -79,8 +82,7 @@
 
       <nav class="controls is-collapsed" id="controls" aria-label="Viewing controls">
         <button class="icon-button controls-toggle" id="controls-toggle" type="button" title="Show viewing controls" aria-label="Show viewing controls" aria-expanded="false" aria-controls="controls-panel" data-tooltip="观看设置">
-          <span class="controls-label" aria-hidden="true">View</span>
-          <span class="controls-glyph" aria-hidden="true"></span>
+          <span class="controls-label" aria-hidden="true">VIEW</span>
           <svg class="controls-legacy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9a3 3 0 0 0 5.83 1H20V6h-1.17A3 3 0 0 0 13 7H4zm0 11h3.17A3 3 0 0 0 13 17h7v-2h-7a3 3 0 0 0-5.83 1H4z" /></svg>
         </button>
         <a class="icon-button review-dashboard-button" id="review-dashboard-link" href="./docs/aesthetic-review-dashboard.html?debug=1" target="_blank" rel="noopener" title="Open aesthetic review dashboard" aria-label="Open aesthetic review dashboard" data-tooltip="审美审核" hidden>
