@@ -2,7 +2,7 @@
   const root = document.documentElement;
   if (!root.classList.contains("df-gui-v1")) return;
 
-  const languageStorageKey = "dailyflora.gui-language.v1";
+  const languageStorageKey = "dailyflora.gui-language.v2";
   const languageButtons = Array.from(
     document.querySelectorAll("[data-language-choice]")
   );
@@ -27,8 +27,9 @@
   };
 
   const applyLanguage = (language, persist = true) => {
-    const nextLanguage = language === "zh" ? "zh" : "en";
+    const nextLanguage = language === "en" ? "en" : "zh";
     root.dataset.language = nextLanguage;
+    root.lang = nextLanguage === "zh" ? "zh-CN" : "en";
     languageButtons.forEach((button) => {
       const active = button.dataset.languageChoice === nextLanguage;
       button.setAttribute("aria-pressed", String(active));
@@ -41,7 +42,7 @@
     }
   };
 
-  applyLanguage(root.dataset.language === "zh" ? "zh" : "en", false);
+  applyLanguage(root.dataset.language === "en" ? "en" : "zh", false);
 
   languageButtons.forEach((button) => {
     button.addEventListener("click", () => {
