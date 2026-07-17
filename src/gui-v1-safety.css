@@ -34,3 +34,9 @@ html.df-gui-v1 .controls {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+@media (max-width: 760px) {
+  html.df-gui-v1 .interface-status {
+    display: none;
+  }
+}
