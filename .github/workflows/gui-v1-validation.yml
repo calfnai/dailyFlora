@@ -24,7 +24,7 @@ permissions:
 jobs:
   build-and-capture:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
 
     steps:
       - name: Check out source
@@ -69,29 +69,112 @@ jobs:
           cat /tmp/dailyflora-preview.log
           exit 1
 
-      - name: Capture desktop, mobile, and Special Edition safeguards
+      - name: Install browser validation dependencies
         shell: bash
         run: |
-          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          test -n "$CHROME"
-          COMMON_FLAGS=(
-            --headless=new
-            --no-sandbox
-            --disable-dev-shm-usage
-            --hide-scrollbars
-            --ignore-gpu-blocklist
-            --enable-webgl
-            --enable-unsafe-swiftshader
-            --use-gl=swiftshader
-            --run-all-compositor-stages-before-draw
-            --virtual-time-budget=2200
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          python3 -m venv /tmp/dailyflora-selenium
+          /tmp/dailyflora-selenium/bin/pip install --quiet 'selenium>=4.20,<5'
+
+      - name: Capture interactive desktop, mobile, and Special Edition states
+        shell: bash
+        run: |
+          /tmp/dailyflora-selenium/bin/python - <<'PY'
+          import json
+          import time
+          from pathlib import Path
+          from selenium import webdriver
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          base = 'http://127.0.0.1:4173/dailyFlora'
+          normal_url = f'{base}/ui-v1/?date=2026-07-17&render=low&density=medium'
+          special_url = f'{base}/ui-v1-special/?special=ngc2787&render=low&density=low'
+
+          options = webdriver.ChromeOptions()
+          for argument in (
+              '--headless=new',
+              '--no-sandbox',
+              '--disable-dev-shm-usage',
+              '--hide-scrollbars',
+              '--ignore-gpu-blocklist',
+              '--enable-webgl',
+              '--enable-unsafe-swiftshader',
+              '--use-gl=swiftshader',
+              '--lang=zh-CN',
+          ):
+              options.add_argument(argument)
+
+          driver = webdriver.Chrome(options=options)
+          wait = WebDriverWait(driver, 20)
+
+          def wait_for_scene(seconds=5):
+              wait.until(lambda current: current.execute_script('return document.readyState') == 'complete')
+              wait.until(lambda current: current.execute_script("return typeof window.__dailyFloraAudit === 'function'"))
+              time.sleep(seconds)
+
+          def reveal_standard_ui():
+              driver.execute_script("""
+                document.querySelector('#hud')?.classList.remove('is-hidden');
+                document.querySelector('#controls')?.classList.remove('is-hidden');
+                document.querySelector('#site-menu')?.classList.remove('is-hidden');
+              """)
+              time.sleep(0.25)
+
+          report = {}
+
+          driver.set_window_size(1440, 1000)
+          driver.get(normal_url)
+          wait_for_scene(5)
+          reveal_standard_ui()
+          report['desktopViewport'] = driver.execute_script('return [window.innerWidth, window.innerHeight]')
+          driver.save_screenshot('gui-v1-desktop.png')
+
+          driver.find_element(By.ID, 'site-menu-toggle').click()
+          wait.until(lambda current: not current.find_element(By.ID, 'site-menu-panel').get_attribute('hidden'))
+          reveal_standard_ui()
+          driver.save_screenshot('gui-v1-menu.png')
+          driver.find_element(By.ID, 'site-menu-toggle').click()
+
+          driver.find_element(By.ID, 'controls-toggle').click()
+          wait.until(lambda current: not current.find_element(By.ID, 'controls-panel').get_attribute('hidden'))
+          reveal_standard_ui()
+          driver.save_screenshot('gui-v1-controls.png')
+
+          driver.set_window_size(390, 844)
+          driver.get(normal_url)
+          wait_for_scene(7)
+          reveal_standard_ui()
+          report['mobileViewport'] = driver.execute_script('return [window.innerWidth, window.innerHeight]')
+          report['mobileStatusDisplay'] = driver.execute_script(
+              "return getComputedStyle(document.querySelector('.interface-status')).display"
           )
-          "$CHROME" "${COMMON_FLAGS[@]}" --window-size=1440,1000 --screenshot=gui-v1-desktop.png "http://127.0.0.1:4173/dailyFlora/ui-v1/?date=2026-07-17&render=low&density=low"
-          "$CHROME" "${COMMON_FLAGS[@]}" --window-size=390,844 --screenshot=gui-v1-mobile.png "http://127.0.0.1:4173/dailyFlora/ui-v1/?date=2026-07-17&render=low&density=low"
-          "$CHROME" "${COMMON_FLAGS[@]}" --window-size=1440,1000 --screenshot=special-edition-safeguard.png "http://127.0.0.1:4173/dailyFlora/ui-v1-special/?special=ngc2787&render=low&density=low"
-          test -s gui-v1-desktop.png
-          test -s gui-v1-mobile.png
-          test -s special-edition-safeguard.png
+          driver.save_screenshot('gui-v1-mobile.png')
+
+          driver.set_window_size(1440, 1000)
+          driver.get(special_url)
+          wait_for_scene(4)
+          special_selectors = (
+              '.brand-lockup',
+              '.interface-frame',
+              '.interface-status',
+              '.daily-kicker',
+              '.site-menu-label',
+              '.controls-label',
+          )
+          report['specialDisplays'] = {
+              selector: driver.execute_script(
+                  'return getComputedStyle(document.querySelector(arguments[0])).display', selector
+              )
+              for selector in special_selectors
+          }
+          assert all(value == 'none' for value in report['specialDisplays'].values()), report['specialDisplays']
+          driver.save_screenshot('special-edition-safeguard.png')
+
+          Path('gui-v1-validation.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
+          driver.quit()
+          PY
 
       - name: Upload validation captures and logs
         if: always()
@@ -101,8 +184,11 @@ jobs:
           path: |
             build.log
             gui-v1-desktop.png
+            gui-v1-menu.png
+            gui-v1-controls.png
             gui-v1-mobile.png
             special-edition-safeguard.png
+            gui-v1-validation.json
             /tmp/dailyflora-preview.log
           if-no-files-found: warn
           retention-days: 7
