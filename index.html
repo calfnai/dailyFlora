@@ -8,13 +8,37 @@
       content="DailyFlora creates a low-power 3D particle bouquet that changes every day."
     />
     <title>DailyFlora</title>
+    <script>
+      (() => {
+        const params = new URLSearchParams(window.location.search);
+        const pathname = window.location.pathname.replace(/\/+$/, '');
+        const isSpecial = /\/special[^/]*$/i.test(pathname) || params.has('special');
+        if (!isSpecial) document.documentElement.classList.add('df-gui-v1');
+      })();
+    </script>
+    <link rel="stylesheet" href="/src/gui-v1.css" />
   </head>
   <body>
     <main class="app-shell" aria-label="DailyFlora 3D bouquet screensaver">
       <canvas id="flora-canvas"></canvas>
 
+      <header class="brand-lockup" aria-label="DailyFlora">
+        <span class="brand-wordmark">DAILYFLORA</span>
+        <span class="brand-meta" aria-hidden="true">
+          <span>GENERATIVE BOTANICAL SYSTEM</span>
+          <span>DF / 014</span>
+        </span>
+      </header>
+      <div class="interface-frame" aria-hidden="true"></div>
+      <div class="interface-status" aria-hidden="true">
+        <span>DATE-SEEDED</span>
+        <span>REALTIME 3D</span>
+        <span>360° VIEW</span>
+      </div>
+
       <section class="hud" id="hud" aria-live="polite">
         <div class="daily-mark">
+          <span class="daily-kicker">TODAY'S COMPOSITION</span>
           <span class="daily-date" id="daily-date"></span>
           <span class="daily-theme" id="daily-theme">
             <span class="daily-theme-cn" id="daily-theme-cn"></span>
@@ -27,6 +51,7 @@
 
       <nav class="site-menu" id="site-menu" aria-label="DailyFlora site menu">
         <button class="site-menu-toggle" id="site-menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu-panel" data-tooltip="菜单">
+          <span class="site-menu-label" aria-hidden="true">INDEX</span>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" /></svg>
         </button>
         <div class="site-menu-panel" id="site-menu-panel" hidden>
@@ -42,6 +67,7 @@
 
       <nav class="controls is-collapsed" id="controls" aria-label="Viewing controls">
         <button class="icon-button controls-toggle" id="controls-toggle" type="button" title="Show viewing controls" aria-label="Show viewing controls" aria-expanded="false" aria-controls="controls-panel" data-tooltip="观看设置">
+          <span class="controls-label" aria-hidden="true">VIEW</span>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9a3 3 0 0 0 5.83 1H20V6h-1.17A3 3 0 0 0 13 7H4zm0 11h3.17A3 3 0 0 0 13 17h7v-2h-7a3 3 0 0 0-5.83 1H4z" /></svg>
         </button>
         <a class="icon-button review-dashboard-button" id="review-dashboard-link" href="./docs/aesthetic-review-dashboard.html?debug=1" target="_blank" rel="noopener" title="Open aesthetic review dashboard" aria-label="Open aesthetic review dashboard" data-tooltip="审美审核" hidden>
