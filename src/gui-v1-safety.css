@@ -1,0 +1,36 @@
+.brand-lockup,
+.interface-frame,
+.interface-status,
+.daily-kicker,
+.site-menu-label,
+.controls-label {
+  display: none;
+}
+
+html.df-gui-v1 .brand-lockup {
+  display: grid;
+}
+
+html.df-gui-v1 .interface-frame,
+html.df-gui-v1 .daily-kicker {
+  display: block;
+}
+
+html.df-gui-v1 .interface-status {
+  display: flex;
+}
+
+html.df-gui-v1 .site-menu-label,
+html.df-gui-v1 .controls-label {
+  display: inline;
+}
+
+html.df-gui-v1 .hud,
+html.df-gui-v1 .controls {
+  animation-fill-mode: backwards;
+}
+
+@keyframes dfGuiControlsIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
