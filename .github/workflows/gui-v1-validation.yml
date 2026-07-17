@@ -1,0 +1,89 @@
+name: GUI v1 validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - index.html
+      - src/gui-v1.css
+      - src/gui-v1-safety.css
+      - .github/workflows/gui-v1-validation.yml
+  push:
+    branches:
+      - agent/gui-dark-editorial-v1
+    paths:
+      - index.html
+      - src/gui-v1.css
+      - src/gui-v1-safety.css
+      - .github/workflows/gui-v1-validation.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Start preview server
+        run: |
+          npm run preview -- --port 4173 > /tmp/dailyflora-preview.log 2>&1 &
+          echo $! > /tmp/dailyflora-preview.pid
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/dailyflora-preview.log
+          exit 1
+
+      - name: Capture desktop, mobile, and Special Edition safeguards
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          test -n "$CHROME"
+          COMMON_FLAGS=(
+            --headless=new
+            --no-sandbox
+            --disable-dev-shm-usage
+            --hide-scrollbars
+            --ignore-gpu-blocklist
+            --enable-webgl
+            --use-gl=swiftshader
+            --virtual-time-budget=2400
+          )
+          "$CHROME" "${COMMON_FLAGS[@]}" --window-size=1440,1000 --screenshot=gui-v1-desktop.png "http://127.0.0.1:4173/?date=2026-07-17&render=low&density=low"
+          "$CHROME" "${COMMON_FLAGS[@]}" --window-size=390,844 --screenshot=gui-v1-mobile.png "http://127.0.0.1:4173/?date=2026-07-17&render=low&density=low"
+          "$CHROME" "${COMMON_FLAGS[@]}" --window-size=1440,1000 --screenshot=special-edition-safeguard.png "http://127.0.0.1:4173/?special=ngc2787&render=low&density=low"
+          test -s gui-v1-desktop.png
+          test -s gui-v1-mobile.png
+          test -s special-edition-safeguard.png
+
+      - name: Upload validation captures
+        uses: actions/upload-artifact@v4
+        with:
+          name: dailyflora-gui-v1-validation
+          path: |
+            gui-v1-desktop.png
+            gui-v1-mobile.png
+            special-edition-safeguard.png
+            /tmp/dailyflora-preview.log
+          if-no-files-found: error
+          retention-days: 7
