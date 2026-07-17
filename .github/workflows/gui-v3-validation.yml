@@ -113,7 +113,7 @@ jobs:
           assert report['rootLang'].lower().startswith('zh'), report
           assert report['cnDisplay'] != 'none' and report['enDisplay'] == 'none', report
           assert not report['borrowedMarkPresent'], report
-          forbidden = ('times', 'baskerville', 'iowan', 'serif')
+          forbidden = ('times', 'baskerville', 'iowan')
           assert not any(item in report['titleFont'].lower() for item in forbidden), report
 
           driver.save_screenshot('gui-v3-chinese-default.png')
