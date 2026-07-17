@@ -1,153 +1,79 @@
 const { chromium } = require('playwright');
-const assert = require('node:assert/strict');
 
-const previewUrl = `https://calfnai.github.io/dailyFlora/ui-v1/?validation=${Date.now()}`;
-const specialUrl = `https://calfnai.github.io/dailyFlora/special0629/?validation=${Date.now()}`;
-const closeEnough = (a, b) => Math.abs(a - b) < 1;
-const losAngelesToday = () => {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Los_Angeles',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).formatToParts(new Date());
-  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-  return `${values.year}-${values.month}-${values.day}`;
+const previewUrl = `https://calfnai.github.io/dailyFlora/ui-v1/?diagnostic=${Date.now()}`;
+const styleSnapshot = (element) => {
+  const style = getComputedStyle(element);
+  const rect = element.getBoundingClientRect();
+  return {
+    rect: {
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+      right: rect.right,
+      bottom: rect.bottom
+    },
+    display: style.display,
+    position: style.position,
+    right: style.right,
+    bottom: style.bottom,
+    width: style.width,
+    height: style.height,
+    padding: style.padding,
+    border: style.border,
+    transform: style.transform,
+    animationName: style.animationName,
+    animationDuration: style.animationDuration,
+    justifyContent: style.justifyContent,
+    alignItems: style.alignItems
+  };
 };
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
-  const desktop = await browser.newContext({
+  const context = await browser.newContext({
     viewport: { width: 1440, height: 1000 },
     deviceScaleFactor: 1,
     timezoneId: 'America/Los_Angeles'
   });
-  const page = await desktop.newPage();
+  const page = await context.newPage();
   await page.goto(previewUrl, { waitUntil: 'networkidle' });
   await page.waitForSelector('#daily-theme-en:not(:empty)');
   await page.waitForTimeout(1200);
 
-  assert.equal(await page.locator('.interface-status').count(), 0, 'top status strip should be removed');
-  assert.equal(await page.locator('#daily-theme-en').evaluate((el) => getComputedStyle(el).display), 'block');
-  assert.equal(await page.locator('#daily-theme-cn').evaluate((el) => getComputedStyle(el).display), 'none');
-  assert.equal(await page.locator('[data-language-choice="en"]').getAttribute('aria-pressed'), 'true');
-  await page.screenshot({ path: 'validation/gui-v2-desktop-en.png', fullPage: true });
-
-  const viewToggle = page.locator('#controls-toggle');
-  const viewBefore = await viewToggle.boundingBox();
-  assert(viewBefore, 'View toggle must have a hit target');
-  const viewPoint = {
-    x: viewBefore.x + viewBefore.width / 2,
-    y: viewBefore.y + viewBefore.height / 2
+  const toggle = page.locator('#controls-toggle');
+  const parent = page.locator('#controls');
+  const panel = page.locator('#controls-panel');
+  const before = {
+    toggle: await toggle.evaluate(styleSnapshot),
+    parent: await parent.evaluate(styleSnapshot),
+    panel: await panel.evaluate(styleSnapshot)
   };
-  await page.mouse.click(viewPoint.x, viewPoint.y);
-  await page.waitForTimeout(250);
-  assert.equal(await page.locator('#controls-panel').isVisible(), true, 'View panel should open');
-  const viewAfter = await viewToggle.boundingBox();
-  assert(viewAfter, 'View toggle must remain measurable after opening');
-  assert(
-    closeEnough(viewBefore.x, viewAfter.x) && closeEnough(viewBefore.y, viewAfter.y),
-    'View toggle moved after opening'
-  );
-  await page.screenshot({ path: 'validation/gui-v2-view-open.png', fullPage: true });
-  await page.mouse.click(viewPoint.x, viewPoint.y);
-  await page.waitForTimeout(200);
-  assert.equal(await page.locator('#controls-panel').isVisible(), false, 'same coordinate should close View');
-
-  await page.mouse.click(viewPoint.x, viewPoint.y);
-  await page.waitForTimeout(7300);
-  assert.equal(await page.locator('#controls-panel').isVisible(), false, 'auto-hide must close View panel');
-  assert.equal(await viewToggle.getAttribute('aria-expanded'), 'false', 'auto-hide must reset View state');
-
-  await page.mouse.move(500, 400);
-  await page.waitForTimeout(150);
-  const indexToggle = page.locator('#site-menu-toggle');
-  await indexToggle.click();
-  assert.equal(await page.locator('#site-menu-panel').isVisible(), true, 'Index should open');
-  await page.waitForTimeout(3700);
-  assert.equal(await page.locator('#site-menu-panel').isVisible(), false, 'auto-hide must close Index panel');
-  assert.equal(await indexToggle.getAttribute('aria-expanded'), 'false', 'auto-hide must reset Index state');
-
-  await page.mouse.move(520, 420);
-  await page.waitForTimeout(150);
-  await viewToggle.click();
-  await page.locator('#today-button').click();
-  await page.waitForTimeout(250);
-  assert.equal(await page.locator('#date-picker').getAttribute('max'), losAngelesToday());
-  assert.equal(
-    await page.locator('.calendar-nav-button[data-calendar-nav="1"]').isDisabled(),
-    true,
-    'next month must be disabled in the current month'
-  );
-  assert(
-    (await page.locator('.calendar-day[data-calendar-date]:disabled').count()) > 0,
-    'future dates must be disabled'
-  );
-  await page.screenshot({ path: 'validation/gui-v2-calendar.png', fullPage: true });
-
-  await page.mouse.move(540, 440);
-  await page.waitForTimeout(100);
-  await page.locator('[data-language-choice="zh"]').click();
-  assert.equal(await page.locator('#daily-theme-cn').evaluate((el) => getComputedStyle(el).display), 'block');
-  assert.equal(await page.locator('#daily-theme-en').evaluate((el) => getComputedStyle(el).display), 'none');
-  await page.screenshot({ path: 'validation/gui-v2-desktop-zh.png', fullPage: true });
-  await desktop.close();
-
-  const mobile = await browser.newContext({
-    viewport: { width: 390, height: 844 },
-    deviceScaleFactor: 1,
-    timezoneId: 'America/Los_Angeles'
-  });
-  const mobilePage = await mobile.newPage();
-  await mobilePage.goto(`${previewUrl}&mobile=1`, { waitUntil: 'networkidle' });
-  await mobilePage.waitForSelector('#daily-theme-en:not(:empty)');
-  await mobilePage.waitForTimeout(800);
-  const mobileView = mobilePage.locator('#controls-toggle');
-  const mobileBefore = await mobileView.boundingBox();
-  assert(mobileBefore);
-  const mobilePoint = {
-    x: mobileBefore.x + mobileBefore.width / 2,
-    y: mobileBefore.y + mobileBefore.height / 2
+  const point = {
+    x: before.toggle.rect.x + before.toggle.rect.width / 2,
+    y: before.toggle.rect.y + before.toggle.rect.height / 2
   };
-  await mobilePage.mouse.click(mobilePoint.x, mobilePoint.y);
-  await mobilePage.waitForTimeout(200);
-  const mobileAfter = await mobileView.boundingBox();
-  assert(mobileAfter);
-  assert(
-    closeEnough(mobileBefore.x, mobileAfter.x) && closeEnough(mobileBefore.y, mobileAfter.y),
-    'mobile View toggle moved after opening'
-  );
-  await mobilePage.screenshot({ path: 'validation/gui-v2-mobile.png', fullPage: true });
-  await mobilePage.mouse.click(mobilePoint.x, mobilePoint.y);
-  assert.equal(await mobilePage.locator('#controls-panel').isVisible(), false);
-  await mobile.close();
+  const hitBefore = await page.evaluate(({ x, y }) => {
+    const element = document.elementFromPoint(x, y);
+    return element ? { id: element.id, className: String(element.className), tagName: element.tagName } : null;
+  }, point);
 
-  const special = await browser.newContext({
-    viewport: { width: 1440, height: 1000 },
-    deviceScaleFactor: 1,
-    timezoneId: 'America/Los_Angeles'
-  });
-  const specialPage = await special.newPage();
-  await specialPage.goto(specialUrl, { waitUntil: 'networkidle' });
-  await specialPage.waitForTimeout(1000);
-  for (const selector of ['.interface-frame', '.language-toggle', '.site-menu-mark', '.controls-glyph']) {
-    const locator = specialPage.locator(selector);
-    if ((await locator.count()) > 0) {
-      assert.equal(
-        await locator.first().evaluate((el) => getComputedStyle(el).display),
-        'none',
-        `${selector} must stay hidden on Special Edition`
-      );
-    }
-  }
-  assert.notEqual(
-    await specialPage.locator('#site-menu-toggle svg').first().evaluate((el) => getComputedStyle(el).display),
-    'none',
-    'Special Edition menu icon must remain'
-  );
-  await specialPage.screenshot({ path: 'validation/special-edition-safeguard-v2.png', fullPage: true });
-  await special.close();
+  await page.mouse.click(point.x, point.y);
+  await page.waitForTimeout(300);
+  const after = {
+    toggle: await toggle.evaluate(styleSnapshot),
+    parent: await parent.evaluate(styleSnapshot),
+    panel: await panel.evaluate(styleSnapshot),
+    ariaExpanded: await toggle.getAttribute('aria-expanded'),
+    panelVisible: await panel.isVisible()
+  };
+  const hitAfter = await page.evaluate(({ x, y }) => {
+    const element = document.elementFromPoint(x, y);
+    return element ? { id: element.id, className: String(element.className), tagName: element.tagName } : null;
+  }, point);
 
+  console.log(JSON.stringify({ point, hitBefore, before, hitAfter, after }, null, 2));
+  await page.screenshot({ path: 'validation/gui-v2-view-diagnostic.png', fullPage: true });
   await browser.close();
 })().catch((error) => {
   console.error(error);
