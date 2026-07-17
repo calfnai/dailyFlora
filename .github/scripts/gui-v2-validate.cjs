@@ -30,17 +30,18 @@ const revealAndSettle = async (page) => {
   const page = await desktop.newPage();
   await page.goto(previewUrl, { waitUntil: 'networkidle' });
   await page.waitForSelector('#daily-theme-en:not(:empty)');
-  await page.waitForTimeout(1200);
+  await page.waitForTimeout(1000);
+  await revealAndSettle(page);
 
   assert.equal(await page.locator('.interface-status').count(), 0, 'top status strip should be removed');
   assert.equal(await page.locator('.interface-corner').count(), 3, 'three animated corner signals should exist');
+  assert.equal(await page.locator('.quality-mark').evaluate((el) => getComputedStyle(el).display), 'none');
   assert.equal(await page.locator('#daily-theme-en').evaluate((el) => getComputedStyle(el).display), 'block');
   assert.equal(await page.locator('#daily-theme-cn').evaluate((el) => getComputedStyle(el).display), 'none');
   assert.equal(await page.locator('[data-language-choice="en"]').getAttribute('aria-pressed'), 'true');
   assert.equal(await page.locator('.site-menu-legacy-icon').evaluate((el) => getComputedStyle(el).display), 'none');
   await page.screenshot({ path: 'validation/gui-v2-desktop-en.png', fullPage: true });
 
-  await revealAndSettle(page);
   const viewToggle = page.locator('#controls-toggle');
   const viewBefore = await viewToggle.boundingBox();
   assert(viewBefore, 'View toggle must have a hit target');
@@ -111,6 +112,10 @@ const revealAndSettle = async (page) => {
   await page.screenshot({ path: 'validation/gui-v2-calendar.png', fullPage: true });
   await page.keyboard.press('Escape');
   await page.waitForTimeout(180);
+  if (await page.locator('#controls-panel').isVisible()) {
+    await viewToggle.click();
+    await page.waitForTimeout(240);
+  }
 
   await page.locator('[data-language-choice="zh"]').click();
   assert.equal(await page.locator('#daily-theme-cn').evaluate((el) => getComputedStyle(el).display), 'block');
@@ -133,6 +138,7 @@ const revealAndSettle = async (page) => {
   await mobilePage.waitForSelector('#daily-theme-en:not(:empty)');
   await mobilePage.waitForTimeout(800);
   await revealAndSettle(mobilePage);
+  await mobilePage.screenshot({ path: 'validation/gui-v2-mobile-default.png', fullPage: true });
   const mobileView = mobilePage.locator('#controls-toggle');
   const mobileBefore = await mobileView.boundingBox();
   assert(mobileBefore);
@@ -141,7 +147,7 @@ const revealAndSettle = async (page) => {
     y: mobileBefore.y + mobileBefore.height / 2
   };
   await mobilePage.mouse.click(mobilePoint.x, mobilePoint.y);
-  await mobilePage.waitForTimeout(360);
+  await mobilePage.waitForTimeout(560);
   const mobileAfter = await mobileView.boundingBox();
   assert(mobileAfter);
   assert(
@@ -153,10 +159,12 @@ const revealAndSettle = async (page) => {
     'controls-toggle',
     'mobile original View coordinate must remain clickable'
   );
-  await mobilePage.screenshot({ path: 'validation/gui-v2-mobile.png', fullPage: true });
+  assert(Number(await mobilePage.locator('#hud').evaluate((el) => getComputedStyle(el).opacity)) < 0.05);
+  await mobilePage.screenshot({ path: 'validation/gui-v2-mobile-view-open.png', fullPage: true });
   await mobilePage.mouse.click(mobilePoint.x, mobilePoint.y);
-  await mobilePage.waitForTimeout(180);
+  await mobilePage.waitForTimeout(560);
   assert.equal(await mobilePage.locator('#controls-panel').isVisible(), false);
+  assert(Number(await mobilePage.locator('#hud').evaluate((el) => getComputedStyle(el).opacity)) > 0.95);
   await mobile.close();
 
   const special = await browser.newContext({
