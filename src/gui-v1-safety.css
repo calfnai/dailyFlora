@@ -3,9 +3,7 @@
 .interface-status,
 .daily-kicker,
 .language-toggle,
-.site-menu-mark,
 .site-menu-label,
-.controls-glyph,
 .controls-label {
   display: none;
 }
@@ -15,9 +13,7 @@ html.df-gui-v1 .brand-lockup {
 }
 
 html.df-gui-v1 .interface-frame,
-html.df-gui-v1 .daily-kicker,
-html.df-gui-v1 .site-menu-mark,
-html.df-gui-v1 .controls-glyph {
+html.df-gui-v1 .daily-kicker {
   display: block;
 }
 
