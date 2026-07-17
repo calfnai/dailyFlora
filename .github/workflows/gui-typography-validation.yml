@@ -1,0 +1,177 @@
+name: GUI typography validation
+
+on:
+  push:
+    branches:
+      - agent/gui-dark-editorial-v1
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Prepare isolated preview
+        shell: bash
+        run: |
+          git fetch --depth=1 origin gh-pages:refs/remotes/origin/gh-pages
+          git worktree add --detach /tmp/dailyflora-gh-pages refs/remotes/origin/gh-pages
+          cp -a /tmp/dailyflora-gh-pages/ui-v1 /tmp/dailyflora-gh-pages/ui-v1-special
+          sed -i 's/class="df-gui-v1" data-language="zh"/data-language="zh"/' /tmp/dailyflora-gh-pages/ui-v1-special/index.html
+          mkdir -p /tmp/dailyflora-site-root
+          ln -s /tmp/dailyflora-gh-pages /tmp/dailyflora-site-root/dailyFlora
+          python3 -m http.server 4173 --directory /tmp/dailyflora-site-root > /tmp/dailyflora-preview.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/dailyFlora/ui-v1/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/dailyflora-preview.log
+          exit 1
+
+      - name: Install browser validation dependencies
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          python3 -m venv /tmp/dailyflora-selenium
+          /tmp/dailyflora-selenium/bin/pip install --quiet 'selenium>=4.20,<5'
+
+      - name: Validate bilingual switch, typography, marks, mobile, and Special Edition
+        shell: bash
+        run: |
+          /tmp/dailyflora-selenium/bin/python - <<'PY'
+          import json
+          import time
+          from pathlib import Path
+          from selenium import webdriver
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          base = 'http://127.0.0.1:4173/dailyFlora'
+          normal_url = f'{base}/ui-v1/?date=2026-07-17&render=low&density=medium'
+          special_url = f'{base}/ui-v1-special/?special=ngc2787&render=low&density=low'
+
+          options = webdriver.ChromeOptions()
+          for argument in (
+              '--headless=new', '--no-sandbox', '--disable-dev-shm-usage',
+              '--hide-scrollbars', '--ignore-gpu-blocklist', '--enable-webgl',
+              '--enable-unsafe-swiftshader', '--use-gl=swiftshader', '--lang=zh-CN'
+          ):
+              options.add_argument(argument)
+
+          driver = webdriver.Chrome(options=options)
+          wait = WebDriverWait(driver, 20)
+          banned = ('times', 'baskerville', 'iowan', 'songti', 'stsong', 'serif')
+          report = {}
+
+          def wait_for_scene(seconds=4):
+              wait.until(lambda current: current.execute_script('return document.readyState') == 'complete')
+              wait.until(lambda current: current.execute_script("return typeof window.__dailyFloraAudit === 'function'"))
+              time.sleep(seconds)
+
+          def reveal_ui():
+              driver.execute_script("""
+                document.querySelector('#hud')?.classList.remove('is-hidden');
+                document.querySelector('#controls')?.classList.remove('is-hidden');
+                document.querySelector('#site-menu')?.classList.remove('is-hidden');
+              """)
+              time.sleep(0.25)
+
+          driver.set_window_size(1440, 1000)
+          driver.get(normal_url)
+          driver.execute_script('localStorage.clear()')
+          driver.refresh()
+          wait_for_scene()
+          reveal_ui()
+
+          report['defaultLanguage'] = driver.execute_script('return document.documentElement.dataset.language')
+          assert report['defaultLanguage'] == 'zh', report
+          report['defaultTitleDisplays'] = {
+              'zh': driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-cn')).display"),
+              'en': driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-en')).display"),
+          }
+          assert report['defaultTitleDisplays'] == {'zh': 'block', 'en': 'none'}, report
+
+          selectors = ('.daily-theme-cn', '.brand-wordmark', '.site-menu-label', '.controls-label')
+          report['fontFamilies'] = {
+              selector: driver.execute_script(
+                  'return getComputedStyle(document.querySelector(arguments[0])).fontFamily', selector
+              )
+              for selector in selectors
+          }
+          for selector, family in report['fontFamilies'].items():
+              lowered = family.lower()
+              assert not any(word in lowered for word in banned), (selector, family)
+
+          report['borrowedMarkPresent'] = driver.execute_script("return document.querySelector('.site-menu-mark') !== null")
+          report['decorativeViewGlyphPresent'] = driver.execute_script("return document.querySelector('.controls-glyph') !== null")
+          assert not report['borrowedMarkPresent'], report
+          assert not report['decorativeViewGlyphPresent'], report
+          driver.save_screenshot('gui-corrected-zh-desktop.png')
+
+          driver.find_element(By.CSS_SELECTOR, '[data-language-choice="en"]').click()
+          time.sleep(0.35)
+          report['englishLanguage'] = driver.execute_script('return document.documentElement.dataset.language')
+          report['englishTitleDisplays'] = {
+              'zh': driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-cn')).display"),
+              'en': driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-en')).display"),
+          }
+          report['storedLanguage'] = driver.execute_script("return localStorage.getItem('dailyflora.gui-language.v2')")
+          assert report['englishLanguage'] == 'en', report
+          assert report['englishTitleDisplays'] == {'zh': 'none', 'en': 'block'}, report
+          assert report['storedLanguage'] == 'en', report
+          reveal_ui()
+          driver.save_screenshot('gui-corrected-en-desktop.png')
+
+          driver.execute_script("localStorage.setItem('dailyflora.gui-language.v2', 'zh')")
+          driver.set_window_size(390, 844)
+          driver.get(normal_url)
+          wait_for_scene(6)
+          reveal_ui()
+          assert driver.execute_script('return document.documentElement.dataset.language') == 'zh'
+          driver.save_screenshot('gui-corrected-mobile.png')
+
+          driver.set_window_size(1440, 1000)
+          driver.get(special_url)
+          wait_for_scene(3)
+          special_selectors = (
+              '.brand-lockup', '.interface-frame', '.daily-kicker', '.language-toggle',
+              '.site-menu-label', '.controls-label'
+          )
+          report['specialDisplays'] = {
+              selector: driver.execute_script(
+                  'return getComputedStyle(document.querySelector(arguments[0])).display', selector
+              )
+              for selector in special_selectors
+          }
+          assert all(value == 'none' for value in report['specialDisplays'].values()), report
+          driver.save_screenshot('special-edition-unchanged.png')
+
+          Path('gui-typography-validation.json').write_text(
+              json.dumps(report, indent=2, ensure_ascii=False), encoding='utf-8'
+          )
+          driver.quit()
+          PY
+
+      - name: Upload validation captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dailyflora-gui-typography-validation
+          path: |
+            gui-corrected-zh-desktop.png
+            gui-corrected-en-desktop.png
+            gui-corrected-mobile.png
+            special-edition-unchanged.png
+            gui-typography-validation.json
+            /tmp/dailyflora-preview.log
+          if-no-files-found: warn
+          retention-days: 7
