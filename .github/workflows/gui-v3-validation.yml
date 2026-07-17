@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - index.html
+      - src/gui-v1-safety.css
+      - src/gui-v2.css
       - src/gui-v2.js
       - src/gui-v3-corrections.css
       - .github/workflows/gui-v3-validation.yml
@@ -14,6 +16,8 @@ on:
       - agent/gui-dark-editorial-v1
     paths:
       - index.html
+      - src/gui-v1-safety.css
+      - src/gui-v2.css
       - src/gui-v2.js
       - src/gui-v3-corrections.css
       - .github/workflows/gui-v3-validation.yml
@@ -37,7 +41,13 @@ jobs:
           git worktree add --detach /tmp/dailyflora-gh-pages refs/remotes/origin/gh-pages
           rm -rf /tmp/dailyflora-gh-pages/ui-v1-special
           cp -a /tmp/dailyflora-gh-pages/ui-v1 /tmp/dailyflora-gh-pages/ui-v1-special
-          sed -i 's/<html lang="zh-CN" class="df-gui-v1" data-language="zh">/<html lang="zh-CN">/' /tmp/dailyflora-gh-pages/ui-v1-special/index.html
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('/tmp/dailyflora-gh-pages/ui-v1-special/index.html')
+          content = path.read_text(encoding='utf-8')
+          content = content.replace(' class="df-gui-v1"', '').replace(' data-language="zh"', '')
+          path.write_text(content, encoding='utf-8')
+          PY
           mkdir -p /tmp/dailyflora-site-root
           ln -s /tmp/dailyflora-gh-pages /tmp/dailyflora-site-root/dailyFlora
 
@@ -61,7 +71,7 @@ jobs:
           python3 -m venv /tmp/dailyflora-selenium
           /tmp/dailyflora-selenium/bin/pip install --quiet 'selenium>=4.20,<5'
 
-      - name: Validate language, typography, icon removal, and Special Edition isolation
+      - name: Validate language, typography, icon removal, mobile, and Special Edition isolation
         shell: bash
         run: |
           /tmp/dailyflora-selenium/bin/python - <<'PY'
@@ -86,58 +96,97 @@ jobs:
 
           driver = webdriver.Chrome(options=options)
           wait = WebDriverWait(driver, 20)
+          report = {}
 
           def wait_for_scene(seconds=5):
               wait.until(lambda current: current.execute_script('return document.readyState') == 'complete')
               wait.until(lambda current: current.execute_script("return typeof window.__dailyFloraAudit === 'function'"))
               time.sleep(seconds)
 
+          def reveal_ui():
+              driver.execute_script("""
+                document.querySelector('#hud')?.classList.remove('is-hidden');
+                document.querySelector('#controls')?.classList.remove('is-hidden');
+                document.querySelector('#site-menu')?.classList.remove('is-hidden');
+              """)
+              time.sleep(.3)
+
           driver.set_window_size(1440, 1000)
           driver.get(normal_url)
+          driver.execute_script('localStorage.clear()')
+          driver.get(normal_url)
           wait_for_scene(5)
-          driver.execute_script("localStorage.clear(); location.reload();")
-          wait_for_scene(5)
-          driver.execute_script("document.querySelector('#hud')?.classList.remove('is-hidden'); document.querySelector('#controls')?.classList.remove('is-hidden');")
-          time.sleep(.3)
+          reveal_ui()
 
-          report = {}
-          report['defaultLanguage'] = driver.execute_script("return document.documentElement.dataset.language")
-          report['rootLang'] = driver.execute_script("return document.documentElement.lang")
-          report['cnDisplay'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-cn')).display")
-          report['enDisplay'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-en')).display")
-          report['titleFont'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-cn')).fontFamily")
-          report['indexFont'] = driver.execute_script("return getComputedStyle(document.querySelector('.site-menu-label')).fontFamily")
-          report['borrowedMarkPresent'] = driver.execute_script("return Boolean(document.querySelector('.site-menu-mark'))")
+          report['defaultLanguage'] = driver.execute_script('return document.documentElement.dataset.language')
+          report['rootLang'] = driver.execute_script('return document.documentElement.lang')
+          report['titleDisplays'] = {
+              'zh': driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-cn')).display"),
+              'en': driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-en')).display"),
+          }
+          selectors = ('.daily-theme-cn', '.brand-wordmark', '.site-menu-label', '.controls-label')
+          report['fontFamilies'] = {
+              selector: driver.execute_script(
+                  'return getComputedStyle(document.querySelector(arguments[0])).fontFamily', selector
+              )
+              for selector in selectors
+          }
+          report['borrowedMarkPresent'] = driver.execute_script("return document.querySelector('.site-menu-mark') !== null")
+          report['decorativeViewGlyphPresent'] = driver.execute_script("return document.querySelector('.controls-glyph') !== null")
+          driver.save_screenshot('gui-v3-chinese-default.png')
 
           assert report['defaultLanguage'] == 'zh', report
           assert report['rootLang'].lower().startswith('zh'), report
-          assert report['cnDisplay'] != 'none' and report['enDisplay'] == 'none', report
+          assert report['titleDisplays'] == {'zh': 'block', 'en': 'none'}, report
           assert not report['borrowedMarkPresent'], report
-          forbidden = ('times', 'baskerville', 'iowan')
-          assert not any(item in report['titleFont'].lower() for item in forbidden), report
-
-          driver.save_screenshot('gui-v3-chinese-default.png')
+          assert not report['decorativeViewGlyphPresent'], report
+          forbidden = ('times', 'baskerville', 'iowan', 'songti', 'stsong')
+          for selector, family in report['fontFamilies'].items():
+              assert not any(item in family.lower() for item in forbidden), (selector, family, report)
 
           driver.find_element(By.CSS_SELECTOR, '[data-language-choice="en"]').click()
-          time.sleep(.3)
-          report['switchedLanguage'] = driver.execute_script("return document.documentElement.dataset.language")
-          report['switchedCnDisplay'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-cn')).display")
-          report['switchedEnDisplay'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-en')).display")
-          assert report['switchedLanguage'] == 'en', report
-          assert report['switchedCnDisplay'] == 'none' and report['switchedEnDisplay'] != 'none', report
+          time.sleep(.35)
+          report['switchedLanguage'] = driver.execute_script('return document.documentElement.dataset.language')
+          report['switchedTitleDisplays'] = {
+              'zh': driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-cn')).display"),
+              'en': driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-en')).display"),
+          }
+          report['storedLanguage'] = driver.execute_script("return localStorage.getItem('dailyflora.gui-language.v2')")
+          reveal_ui()
           driver.save_screenshot('gui-v3-english-toggle.png')
+          assert report['switchedLanguage'] == 'en', report
+          assert report['switchedTitleDisplays'] == {'zh': 'none', 'en': 'block'}, report
+          assert report['storedLanguage'] == 'en', report
 
+          driver.execute_script("localStorage.setItem('dailyflora.gui-language.v2', 'zh')")
+          driver.set_window_size(390, 844)
+          driver.get(normal_url)
+          wait_for_scene(6)
+          reveal_ui()
+          report['mobileLanguage'] = driver.execute_script('return document.documentElement.dataset.language')
+          driver.save_screenshot('gui-v3-mobile.png')
+          assert report['mobileLanguage'] == 'zh', report
+
+          driver.set_window_size(1440, 1000)
           driver.get(special_url)
           wait_for_scene(4)
-          special_selectors = ('.brand-lockup', '.interface-frame', '.daily-kicker', '.language-toggle', '.site-menu-label', '.controls-label')
+          special_selectors = (
+              '.brand-lockup', '.interface-frame', '.daily-kicker', '.language-toggle',
+              '.site-menu-label', '.controls-label'
+          )
           report['specialDisplays'] = {
-              selector: driver.execute_script('return getComputedStyle(document.querySelector(arguments[0])).display', selector)
+              selector: driver.execute_script(
+                  'return getComputedStyle(document.querySelector(arguments[0])).display', selector
+              )
               for selector in special_selectors
           }
-          assert all(value == 'none' for value in report['specialDisplays'].values()), report['specialDisplays']
           driver.save_screenshot('gui-v3-special-unchanged.png')
+          assert all(value == 'none' for value in report['specialDisplays'].values()), report
 
-          Path('gui-v3-validation.json').write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding='utf-8')
+          Path('gui-v3-validation.json').write_text(
+              json.dumps(report, indent=2, ensure_ascii=False), encoding='utf-8'
+          )
+          print(json.dumps(report, indent=2, ensure_ascii=False))
           driver.quit()
           PY
 
@@ -149,6 +198,7 @@ jobs:
           path: |
             gui-v3-chinese-default.png
             gui-v3-english-toggle.png
+            gui-v3-mobile.png
             gui-v3-special-unchanged.png
             gui-v3-validation.json
             /tmp/dailyflora-preview.log
