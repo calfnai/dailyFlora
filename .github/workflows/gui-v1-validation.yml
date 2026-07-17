@@ -40,7 +40,10 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee build.log
 
       - name: Start preview server
         run: |
@@ -76,14 +79,16 @@ jobs:
           test -s gui-v1-mobile.png
           test -s special-edition-safeguard.png
 
-      - name: Upload validation captures
+      - name: Upload validation captures and logs
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dailyflora-gui-v1-validation
           path: |
+            build.log
             gui-v1-desktop.png
             gui-v1-mobile.png
             special-edition-safeguard.png
             /tmp/dailyflora-preview.log
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 7
