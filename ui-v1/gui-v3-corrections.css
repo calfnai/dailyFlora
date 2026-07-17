@@ -1,0 +1,69 @@
+/* GUI correction pass: one coherent sans-serif system, Chinese-first titles,
+   and no decorative mark borrowed from the marketing/About surface. */
+html.df-gui-v1 {
+  --df-sans:
+    "Helvetica Neue", "Arial Nova", "PingFang SC", "Hiragino Sans GB",
+    "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei", Arial,
+    sans-serif;
+  --df-serif: var(--df-sans);
+}
+
+html.df-gui-v1 body,
+html.df-gui-v1 button,
+html.df-gui-v1 input {
+  font-family: var(--df-sans);
+}
+
+html.df-gui-v1 .daily-theme-cn,
+html.df-gui-v1 .daily-theme-en {
+  font-family: var(--df-sans);
+  font-style: normal;
+  font-variation-settings: normal;
+  text-rendering: geometricPrecision;
+}
+
+html.df-gui-v1[data-language="zh"] .daily-theme-cn {
+  font-weight: 380;
+  line-height: 1.02;
+  letter-spacing: 0.035em;
+}
+
+html.df-gui-v1[data-language="en"] .daily-theme-en {
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: 0.005em;
+}
+
+html.df-gui-v1 .site-menu-mark {
+  display: none !important;
+}
+
+html.df-gui-v1 .site-menu-toggle {
+  gap: 0;
+  min-width: 52px;
+}
+
+html.df-gui-v1 .site-menu-label,
+html.df-gui-v1 .controls-label {
+  font-family: var(--df-mono);
+  font-size: 8px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+html.df-gui-v1 .language-toggle button {
+  font-family: var(--df-mono);
+  font-weight: 500;
+}
+
+@media (max-width: 760px) {
+  html.df-gui-v1[data-language="zh"] .daily-theme-cn {
+    letter-spacing: 0.025em;
+  }
+
+  html.df-gui-v1 .site-menu-toggle {
+    min-width: 48px;
+  }
+}
