@@ -1,0 +1,148 @@
+name: GUI v3 correction validation
+
+on:
+  push:
+    branches:
+      - agent/gui-dark-editorial-v1
+    paths:
+      - index.html
+      - src/gui-v2.js
+      - src/gui-v3-corrections.css
+      - .github/workflows/gui-v3-validation.yml
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Prepare isolated GitHub Pages preview
+        shell: bash
+        run: |
+          git fetch --depth=1 origin gh-pages:refs/remotes/origin/gh-pages
+          git worktree add --detach /tmp/dailyflora-gh-pages refs/remotes/origin/gh-pages
+          rm -rf /tmp/dailyflora-gh-pages/ui-v1-special
+          cp -a /tmp/dailyflora-gh-pages/ui-v1 /tmp/dailyflora-gh-pages/ui-v1-special
+          sed -i 's/<html lang="zh-CN" class="df-gui-v1" data-language="zh">/<html lang="zh-CN">/' /tmp/dailyflora-gh-pages/ui-v1-special/index.html
+          mkdir -p /tmp/dailyflora-site-root
+          ln -s /tmp/dailyflora-gh-pages /tmp/dailyflora-site-root/dailyFlora
+
+      - name: Start static preview server
+        run: |
+          python3 -m http.server 4173 --directory /tmp/dailyflora-site-root > /tmp/dailyflora-preview.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/dailyFlora/ui-v1/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/dailyflora-preview.log
+          exit 1
+
+      - name: Install browser validation dependencies
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          python3 -m venv /tmp/dailyflora-selenium
+          /tmp/dailyflora-selenium/bin/pip install --quiet 'selenium>=4.20,<5'
+
+      - name: Validate language, typography, icon removal, and Special Edition isolation
+        shell: bash
+        run: |
+          /tmp/dailyflora-selenium/bin/python - <<'PY'
+          import json
+          import time
+          from pathlib import Path
+          from selenium import webdriver
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          base = 'http://127.0.0.1:4173/dailyFlora'
+          normal_url = f'{base}/ui-v1/?date=2026-07-17&render=low&density=medium'
+          special_url = f'{base}/ui-v1-special/?special=ngc2787&render=low&density=low'
+
+          options = webdriver.ChromeOptions()
+          for argument in (
+              '--headless=new', '--no-sandbox', '--disable-dev-shm-usage',
+              '--hide-scrollbars', '--ignore-gpu-blocklist', '--enable-webgl',
+              '--enable-unsafe-swiftshader', '--use-gl=swiftshader', '--lang=zh-CN',
+          ):
+              options.add_argument(argument)
+
+          driver = webdriver.Chrome(options=options)
+          wait = WebDriverWait(driver, 20)
+
+          def wait_for_scene(seconds=5):
+              wait.until(lambda current: current.execute_script('return document.readyState') == 'complete')
+              wait.until(lambda current: current.execute_script("return typeof window.__dailyFloraAudit === 'function'"))
+              time.sleep(seconds)
+
+          driver.set_window_size(1440, 1000)
+          driver.get(normal_url)
+          wait_for_scene(5)
+          driver.execute_script("localStorage.clear(); location.reload();")
+          wait_for_scene(5)
+          driver.execute_script("document.querySelector('#hud')?.classList.remove('is-hidden'); document.querySelector('#controls')?.classList.remove('is-hidden');")
+          time.sleep(.3)
+
+          report = {}
+          report['defaultLanguage'] = driver.execute_script("return document.documentElement.dataset.language")
+          report['rootLang'] = driver.execute_script("return document.documentElement.lang")
+          report['cnDisplay'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-cn')).display")
+          report['enDisplay'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-en')).display")
+          report['titleFont'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-cn')).fontFamily")
+          report['indexFont'] = driver.execute_script("return getComputedStyle(document.querySelector('.site-menu-label')).fontFamily")
+          report['borrowedMarkPresent'] = driver.execute_script("return Boolean(document.querySelector('.site-menu-mark'))")
+
+          assert report['defaultLanguage'] == 'zh', report
+          assert report['rootLang'].lower().startswith('zh'), report
+          assert report['cnDisplay'] != 'none' and report['enDisplay'] == 'none', report
+          assert not report['borrowedMarkPresent'], report
+          forbidden = ('times', 'baskerville', 'iowan', 'serif')
+          assert not any(item in report['titleFont'].lower() for item in forbidden), report
+
+          driver.save_screenshot('gui-v3-chinese-default.png')
+
+          driver.find_element(By.CSS_SELECTOR, '[data-language-choice="en"]').click()
+          time.sleep(.3)
+          report['switchedLanguage'] = driver.execute_script("return document.documentElement.dataset.language")
+          report['switchedCnDisplay'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-cn')).display")
+          report['switchedEnDisplay'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-en')).display")
+          assert report['switchedLanguage'] == 'en', report
+          assert report['switchedCnDisplay'] == 'none' and report['switchedEnDisplay'] != 'none', report
+          driver.save_screenshot('gui-v3-english-toggle.png')
+
+          driver.get(special_url)
+          wait_for_scene(4)
+          special_selectors = ('.brand-lockup', '.interface-frame', '.daily-kicker', '.language-toggle', '.site-menu-label', '.controls-label')
+          report['specialDisplays'] = {
+              selector: driver.execute_script('return getComputedStyle(document.querySelector(arguments[0])).display', selector)
+              for selector in special_selectors
+          }
+          assert all(value == 'none' for value in report['specialDisplays'].values()), report['specialDisplays']
+          driver.save_screenshot('gui-v3-special-unchanged.png')
+
+          Path('gui-v3-validation.json').write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding='utf-8')
+          driver.quit()
+          PY
+
+      - name: Upload validation captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dailyflora-gui-v3-validation
+          path: |
+            gui-v3-chinese-default.png
+            gui-v3-english-toggle.png
+            gui-v3-special-unchanged.png
+            gui-v3-validation.json
+            /tmp/dailyflora-preview.log
+          if-no-files-found: warn
+          retention-days: 7
