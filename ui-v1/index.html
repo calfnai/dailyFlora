@@ -1,13 +1,23 @@
 <!doctype html>
-<html lang="zh-CN" class="df-gui-v1">
+<html lang="zh-CN" class="df-gui-v1" data-language="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="DailyFlora GUI v1 preview — the existing 3D bouquet with an isolated dark editorial interface layer."
+      content="DailyFlora GUI v2 preview — a refined dark botanical viewer."
     />
-    <title>DailyFlora — GUI v1 Preview</title>
+    <title>DailyFlora — GUI v2 Preview</title>
+    <script>
+      (() => {
+        let language = 'en';
+        try {
+          language = window.localStorage.getItem('dailyflora.gui-language.v1') === 'zh' ? 'zh' : 'en';
+        } catch {}
+        document.documentElement.dataset.language = language;
+      })();
+    </script>
+    <script type="module" src="./gui-v2.js"></script>
     <script type="module" crossorigin src="../assets/main-Cii7_wqV.js"></script>
     <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-B5Qt9EMX.js" />
     <link rel="modulepreload" crossorigin href="../assets/three.module-Cns_0rKS.js" />
@@ -16,6 +26,7 @@
     <link rel="stylesheet" crossorigin href="../assets/main-Bgq3ni-d.css" />
     <link rel="stylesheet" href="./gui-v1.css" />
     <link rel="stylesheet" href="./gui-v1-safety.css" />
+    <link rel="stylesheet" href="./gui-v2.css" />
   </head>
   <body>
     <main class="app-shell" aria-label="DailyFlora 3D bouquet screensaver">
@@ -28,19 +39,22 @@
           <span>DF / 014</span>
         </span>
       </header>
-      <div class="interface-frame" aria-hidden="true"></div>
-      <div class="interface-status" aria-hidden="true">
-        <span>DATE-SEEDED</span>
-        <span>REALTIME 3D</span>
-        <span>360° VIEW</span>
+      <div class="interface-frame" aria-hidden="true">
+        <span class="interface-corner interface-corner-top-left"></span>
+        <span class="interface-corner interface-corner-left-bottom"></span>
+        <span class="interface-corner interface-corner-bottom-right"></span>
       </div>
 
       <section class="hud" id="hud" aria-live="polite">
         <div class="daily-mark">
           <span class="daily-kicker">TODAY'S COMPOSITION</span>
+          <div class="language-toggle" role="group" aria-label="花名语言">
+            <button type="button" data-language-choice="en" aria-pressed="true">EN</button>
+            <button type="button" data-language-choice="zh" aria-pressed="false">中</button>
+          </div>
           <span class="daily-date" id="daily-date"></span>
           <span class="daily-theme" id="daily-theme">
-            <span class="daily-theme-cn" id="daily-theme-cn"></span>
+            <span class="daily-theme-cn" id="daily-theme-cn" lang="zh-CN"></span>
             <span class="daily-theme-en" id="daily-theme-en" lang="en"></span>
           </span>
           <span class="flower-plan-mark" id="flower-plan-mark"></span>
@@ -49,9 +63,10 @@
       </section>
 
       <nav class="site-menu" id="site-menu" aria-label="DailyFlora site menu">
-        <button class="site-menu-toggle" id="site-menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu-panel" data-tooltip="菜单">
-          <span class="site-menu-label" aria-hidden="true">INDEX</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" /></svg>
+        <button class="site-menu-toggle" id="site-menu-toggle" type="button" aria-label="Open site index" aria-expanded="false" aria-controls="site-menu-panel" data-tooltip="菜单">
+          <span class="site-menu-mark" aria-hidden="true"></span>
+          <span class="site-menu-label" aria-hidden="true">Index</span>
+          <svg class="site-menu-legacy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" /></svg>
         </button>
         <div class="site-menu-panel" id="site-menu-panel" hidden>
           <a href="../about/">About</a>
@@ -66,8 +81,9 @@
 
       <nav class="controls is-collapsed" id="controls" aria-label="Viewing controls">
         <button class="icon-button controls-toggle" id="controls-toggle" type="button" title="Show viewing controls" aria-label="Show viewing controls" aria-expanded="false" aria-controls="controls-panel" data-tooltip="观看设置">
-          <span class="controls-label" aria-hidden="true">VIEW</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9a3 3 0 0 0 5.83 1H20V6h-1.17A3 3 0 0 0 13 7H4zm0 11h3.17A3 3 0 0 0 13 17h7v-2h-7a3 3 0 0 0-5.83 1H4z" /></svg>
+          <span class="controls-label" aria-hidden="true">View</span>
+          <span class="controls-glyph" aria-hidden="true"></span>
+          <svg class="controls-legacy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9a3 3 0 0 0 5.83 1H20V6h-1.17A3 3 0 0 0 13 7H4zm0 11h3.17A3 3 0 0 0 13 17h7v-2h-7a3 3 0 0 0-5.83 1H4z" /></svg>
         </button>
         <a class="icon-button review-dashboard-button" id="review-dashboard-link" href="../docs/aesthetic-review-dashboard.html?debug=1" target="_blank" rel="noopener" title="Open aesthetic review dashboard" aria-label="Open aesthetic review dashboard" data-tooltip="审美审核" hidden>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 2v14h14V5z" /><path d="M7 8h10v2H7zM7 12h6v2H7zM15.4 13.6l1.4 1.4-3.6 3.6-2.2-2.2 1.4-1.4.8.8z" /></svg>
