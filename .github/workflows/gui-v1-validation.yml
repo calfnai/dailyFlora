@@ -39,18 +39,29 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      - name: Record current source build status
+        continue-on-error: true
         shell: bash
         run: |
           set -o pipefail
           npm run build 2>&1 | tee build.log
 
-      - name: Start preview server
+      - name: Prepare isolated GitHub Pages preview
+        shell: bash
         run: |
-          npm run preview -- --port 4173 > /tmp/dailyflora-preview.log 2>&1 &
+          git fetch --depth=1 origin gh-pages:refs/remotes/origin/gh-pages
+          git worktree add --detach /tmp/dailyflora-gh-pages refs/remotes/origin/gh-pages
+          cp -a /tmp/dailyflora-gh-pages/ui-v1 /tmp/dailyflora-gh-pages/ui-v1-special
+          sed -i 's/<html lang="zh-CN" class="df-gui-v1">/<html lang="zh-CN">/' /tmp/dailyflora-gh-pages/ui-v1-special/index.html
+          mkdir -p /tmp/dailyflora-site-root
+          ln -s /tmp/dailyflora-gh-pages /tmp/dailyflora-site-root/dailyFlora
+
+      - name: Start static preview server
+        run: |
+          python3 -m http.server 4173 --directory /tmp/dailyflora-site-root > /tmp/dailyflora-preview.log 2>&1 &
           echo $! > /tmp/dailyflora-preview.pid
           for attempt in {1..30}; do
-            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+            if curl --fail --silent http://127.0.0.1:4173/dailyFlora/ui-v1/ > /dev/null; then
               exit 0
             fi
             sleep 1
@@ -59,6 +70,7 @@ jobs:
           exit 1
 
       - name: Capture desktop, mobile, and Special Edition safeguards
+        shell: bash
         run: |
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
           test -n "$CHROME"
@@ -69,12 +81,14 @@ jobs:
             --hide-scrollbars
             --ignore-gpu-blocklist
             --enable-webgl
+            --enable-unsafe-swiftshader
             --use-gl=swiftshader
-            --virtual-time-budget=2400
+            --run-all-compositor-stages-before-draw
+            --virtual-time-budget=2200
           )
-          "$CHROME" "${COMMON_FLAGS[@]}" --window-size=1440,1000 --screenshot=gui-v1-desktop.png "http://127.0.0.1:4173/?date=2026-07-17&render=low&density=low"
-          "$CHROME" "${COMMON_FLAGS[@]}" --window-size=390,844 --screenshot=gui-v1-mobile.png "http://127.0.0.1:4173/?date=2026-07-17&render=low&density=low"
-          "$CHROME" "${COMMON_FLAGS[@]}" --window-size=1440,1000 --screenshot=special-edition-safeguard.png "http://127.0.0.1:4173/?special=ngc2787&render=low&density=low"
+          "$CHROME" "${COMMON_FLAGS[@]}" --window-size=1440,1000 --screenshot=gui-v1-desktop.png "http://127.0.0.1:4173/dailyFlora/ui-v1/?date=2026-07-17&render=low&density=low"
+          "$CHROME" "${COMMON_FLAGS[@]}" --window-size=390,844 --screenshot=gui-v1-mobile.png "http://127.0.0.1:4173/dailyFlora/ui-v1/?date=2026-07-17&render=low&density=low"
+          "$CHROME" "${COMMON_FLAGS[@]}" --window-size=1440,1000 --screenshot=special-edition-safeguard.png "http://127.0.0.1:4173/dailyFlora/ui-v1-special/?special=ngc2787&render=low&density=low"
           test -s gui-v1-desktop.png
           test -s gui-v1-mobile.png
           test -s special-edition-safeguard.png
