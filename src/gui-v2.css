@@ -1,16 +1,25 @@
 html.df-gui-v1 {
-  --df-serif:
-    Iowan Old Style, Baskerville, "Songti SC", STSong, "Noto Serif CJK SC",
-    "Source Han Serif SC", "Times New Roman", serif;
+  --df-interface:
+    "Arial Nova", "Helvetica Neue", Inter, "PingFang SC", "Noto Sans CJK SC",
+    "Microsoft YaHei", Arial, sans-serif;
+  --df-sans: var(--df-interface);
+  --df-mono: var(--df-interface);
+  font-family: var(--df-interface);
+  font-variant-numeric: tabular-nums;
 }
 
-/* The top status strip read like a selectable debug mode. Remove it entirely. */
+html.df-gui-v1 body,
+html.df-gui-v1 button,
+html.df-gui-v1 input,
+html.df-gui-v1 a {
+  font-family: var(--df-interface);
+}
+
+/* Keep the interface quiet: the bouquet remains the only visual object. */
 html.df-gui-v1 .interface-status {
   display: none !important;
 }
 
-/* Animated corner growth: the existing frame remains, while three stronger
-   signals grow from their physical corner points. */
 html.df-gui-v1 .interface-frame::before,
 html.df-gui-v1 .interface-frame::after {
   display: none;
@@ -54,7 +63,7 @@ html.df-gui-v1 .interface-corner-bottom-right {
   animation: dfCornerBottomRightGrow 1060ms 260ms cubic-bezier(0.2, 0.78, 0.2, 1) both;
 }
 
-/* Language is a content preference, not a second visual theme. */
+/* One title at a time. Chinese is the first-visit default; the choice persists. */
 html.df-gui-v1 .daily-mark {
   grid-template-columns: 86px minmax(0, 1fr) auto;
   grid-template-areas:
@@ -66,7 +75,7 @@ html.df-gui-v1 .daily-mark {
 html.df-gui-v1 .language-toggle {
   grid-area: language;
   display: flex;
-  gap: 9px;
+  gap: 12px;
   align-items: center;
   align-self: start;
   justify-self: end;
@@ -75,15 +84,15 @@ html.df-gui-v1 .language-toggle {
 
 html.df-gui-v1 .language-toggle button {
   position: relative;
-  min-width: 18px;
+  min-width: 24px;
   padding: 0 0 5px;
   border: 0;
   color: var(--df-dim);
   background: transparent;
-  font-family: var(--df-mono);
   font-size: 8px;
+  font-weight: 520;
   line-height: 1;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.13em;
   cursor: pointer;
   transition: color 180ms ease;
 }
@@ -91,7 +100,7 @@ html.df-gui-v1 .language-toggle button {
 html.df-gui-v1 .language-toggle button + button::before {
   position: absolute;
   top: 0;
-  left: -5px;
+  left: -7px;
   color: rgb(246 242 232 / 18%);
   content: "/";
   pointer-events: none;
@@ -128,36 +137,43 @@ html.df-gui-v1 .daily-date::before {
   content: "DATE";
 }
 
+html.df-gui-v1 .daily-theme {
+  max-width: min(780px, calc(100vw - 390px));
+}
+
 html.df-gui-v1 .daily-theme-cn,
 html.df-gui-v1 .daily-theme-en {
   display: none;
   overflow: visible;
   color: rgb(246 242 232 / 94%);
-  font-family: var(--df-serif);
+  font-family: var(--df-interface);
   font-size: 1em;
-  font-weight: 400;
-  line-height: 0.96;
+  font-weight: 430;
+  line-height: 0.94;
   text-overflow: clip;
   text-transform: none;
   white-space: normal;
 }
 
-html.df-gui-v1[data-language="en"] .daily-theme-en {
-  display: block;
-  letter-spacing: -0.026em;
-}
-
 html.df-gui-v1[data-language="zh"] .daily-theme-cn {
   display: block;
-  letter-spacing: 0.025em;
+  letter-spacing: 0.018em;
+}
+
+html.df-gui-v1[data-language="en"] .daily-theme-en {
+  display: block;
+  max-width: 24ch;
+  font-size: 0.84em;
+  line-height: 0.98;
+  letter-spacing: 0.018em;
+  text-transform: uppercase;
 }
 
 html.df-gui-v1[data-language="en"] .flower-plan-mark {
   display: none;
 }
 
-/* Index trigger: remove the boxed hamburger/game-control character and use
-   a small botanical mark plus editorial type. The opened menu is preserved. */
+/* Text-only top-level navigation. Do not reuse the About-page flower mark. */
 html.df-gui-v1 .site-menu {
   transition:
     opacity 460ms ease,
@@ -174,11 +190,10 @@ html.df-gui-v1 .site-menu-toggle {
   position: relative;
   display: inline-flex;
   grid-template-columns: none;
-  gap: 9px;
   align-items: center;
   width: auto;
-  min-width: 0;
-  height: 31px;
+  min-width: 52px;
+  height: 30px;
   padding: 0 0 7px;
   border: 0;
   border-bottom: 1px solid var(--df-line);
@@ -193,41 +208,14 @@ html.df-gui-v1 .site-menu-toggle > svg {
   display: none;
 }
 
-html.df-gui-v1 .site-menu-mark {
-  position: relative;
-  display: block;
-  width: 11px;
-  height: 11px;
-  border: 1px solid rgb(245 217 118 / 48%);
-  border-radius: 56% 44% 54% 46%;
-  background:
-    radial-gradient(circle at 53% 46%, rgb(245 217 118 / 88%) 0 13%, transparent 15%),
-    conic-gradient(
-      from 18deg,
-      transparent,
-      rgb(184 210 139 / 68%),
-      transparent 23%,
-      rgb(242 166 160 / 70%),
-      transparent 49%,
-      rgb(245 217 118 / 68%),
-      transparent 73%,
-      rgb(184 210 139 / 62%),
-      transparent
-    );
-  box-shadow: 0 0 20px rgb(245 217 118 / 10%);
-  transform: rotate(16deg);
-  transition:
-    transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 220ms ease;
-}
-
-html.df-gui-v1 .site-menu-label {
-  font-family: var(--df-serif);
-  font-size: 13px;
-  font-weight: 400;
+html.df-gui-v1 .site-menu-label,
+html.df-gui-v1 .controls-label {
+  font-family: var(--df-interface);
+  font-size: 9px;
+  font-weight: 540;
   line-height: 1;
-  letter-spacing: 0.015em;
-  text-transform: none;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
 
 html.df-gui-v1 .site-menu-toggle:hover,
@@ -236,17 +224,18 @@ html.df-gui-v1 .site-menu-toggle[aria-expanded="true"] {
   border-color: var(--df-line-strong);
   color: var(--df-ink);
   background: transparent;
+  outline: none;
 }
 
-html.df-gui-v1 .site-menu-toggle:hover .site-menu-mark,
-html.df-gui-v1 .site-menu-toggle:focus-visible .site-menu-mark,
-html.df-gui-v1 .site-menu-toggle[aria-expanded="true"] .site-menu-mark {
-  border-color: rgb(245 217 118 / 72%);
-  transform: rotate(76deg);
+html.df-gui-v1 .site-menu-panel,
+html.df-gui-v1 .site-menu-panel a,
+html.df-gui-v1 .site-menu-panel::before,
+html.df-gui-v1 .site-menu-panel a::before,
+html.df-gui-v1 .site-menu-panel a::after {
+  font-family: var(--df-interface);
 }
 
-/* Keep the View hit target fixed. The panel opens above the toggle instead of
-   changing the flex box dimensions and moving the control away from the cursor. */
+/* Keep the VIEW hit target fixed. The panel opens above it. */
 html.df-gui-v1 .controls,
 html.df-gui-v1 .controls.is-collapsed,
 html.df-gui-v1 .controls.is-expanded {
@@ -266,11 +255,10 @@ html.df-gui-v1 .controls-toggle {
   z-index: 2;
   display: inline-flex;
   grid-template-columns: none;
-  gap: 9px;
   align-items: center;
   width: auto;
-  min-width: 70px;
-  height: 31px;
+  min-width: 48px;
+  height: 30px;
   padding: 0 0 7px;
   border: 0;
   border-bottom: 1px solid var(--df-line);
@@ -284,56 +272,13 @@ html.df-gui-v1 .controls-toggle > svg {
   display: none;
 }
 
-html.df-gui-v1 .controls-label {
-  font-family: var(--df-serif);
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: 0.015em;
-  text-transform: none;
-}
-
-html.df-gui-v1 .controls-glyph {
-  position: relative;
-  display: block;
-  width: 10px;
-  height: 10px;
-}
-
-html.df-gui-v1 .controls-glyph::before,
-html.df-gui-v1 .controls-glyph::after {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  background: currentColor;
-  content: "";
-  transform: translate(-50%, -50%);
-  transition:
-    opacity 180ms ease,
-    transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-html.df-gui-v1 .controls-glyph::before {
-  width: 10px;
-  height: 1px;
-}
-
-html.df-gui-v1 .controls-glyph::after {
-  width: 1px;
-  height: 10px;
-}
-
-html.df-gui-v1 .controls.is-expanded .controls-glyph::after {
-  opacity: 0;
-  transform: translate(-50%, -50%) scaleY(0.1);
-}
-
 html.df-gui-v1 .controls.is-expanded .controls-toggle,
 html.df-gui-v1 .controls-toggle:hover,
 html.df-gui-v1 .controls-toggle:focus-visible {
   border-color: var(--df-line-strong);
   color: var(--df-ink);
   background: transparent;
+  outline: none;
 }
 
 html.df-gui-v1 .controls-panel {
@@ -351,7 +296,15 @@ html.df-gui-v1 .controls-panel {
   animation: dfGuiPanelLiftIn 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Future flowers do not exist yet. */
+html.df-gui-v1 .controls-panel button,
+html.df-gui-v1 .controls-panel input,
+html.df-gui-v1 .controls-panel label,
+html.df-gui-v1 .date-calendar,
+html.df-gui-v1 .date-calendar button {
+  font-family: var(--df-interface);
+}
+
+/* Future bouquets do not exist yet. */
 html.df-gui-v1 .calendar-day:disabled,
 html.df-gui-v1 .calendar-nav-button:disabled {
   color: rgb(246 242 232 / 16%);
@@ -376,9 +329,7 @@ html.df-gui-v1 .calendar-nav-button:disabled:focus-visible {
     height: 0;
     opacity: 0;
   }
-  18% {
-    opacity: 1;
-  }
+  18% { opacity: 1; }
   to {
     width: 76px;
     height: 76px;
@@ -392,9 +343,7 @@ html.df-gui-v1 .calendar-nav-button:disabled:focus-visible {
     height: 0;
     opacity: 0;
   }
-  16% {
-    opacity: 1;
-  }
+  16% { opacity: 1; }
   to {
     width: 30px;
     height: 118px;
@@ -408,9 +357,7 @@ html.df-gui-v1 .calendar-nav-button:disabled:focus-visible {
     height: 0;
     opacity: 0;
   }
-  18% {
-    opacity: 1;
-  }
+  18% { opacity: 1; }
   to {
     width: 84px;
     height: 84px;
@@ -450,16 +397,24 @@ html.df-gui-v1 .calendar-nav-button:disabled:focus-visible {
   }
 
   html.df-gui-v1 .language-toggle {
-    gap: 8px;
+    gap: 10px;
   }
 
-  html.df-gui-v1 .site-menu-toggle {
-    min-width: 0;
-    height: 29px;
+  html.df-gui-v1 .language-toggle button {
+    font-size: 7px;
   }
 
+  html.df-gui-v1 .daily-theme {
+    max-width: calc(100vw - 112px);
+  }
+
+  html.df-gui-v1[data-language="en"] .daily-theme-en {
+    max-width: 19ch;
+    font-size: 0.72em;
+  }
+
+  html.df-gui-v1 .site-menu-toggle,
   html.df-gui-v1 .controls-toggle {
-    min-width: 66px;
     height: 29px;
   }
 
@@ -486,6 +441,13 @@ html.df-gui-v1 .calendar-nav-button:disabled:focus-visible {
   html.df-gui-v1 .interface-corner-bottom-right {
     width: 58px;
     height: 58px;
+  }
+}
+
+@media (max-width: 420px) {
+  html.df-gui-v1 .site-menu-label,
+  html.df-gui-v1 .controls-label {
+    font-size: 8px;
   }
 }
 
