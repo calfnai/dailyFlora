@@ -1,6 +1,14 @@
 name: GUI v3 correction validation
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - index.html
+      - src/gui-v2.js
+      - src/gui-v3-corrections.css
+      - .github/workflows/gui-v3-validation.yml
   push:
     branches:
       - agent/gui-dark-editorial-v1
