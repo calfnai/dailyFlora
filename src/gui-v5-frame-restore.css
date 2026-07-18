@@ -1,4 +1,5 @@
 @import url("./gui-v7-font-load.css");
+@import url("./gui-v8-visible-frame-space-mono.css");
 
 /* Targeted correction: restore only the framed top-right INDEX and bottom-right VIEW controls.
    The menu CTA remains a single divider line with no surrounding box. */
