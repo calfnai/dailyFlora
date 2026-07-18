@@ -2,7 +2,16 @@
   const root = document.documentElement;
   if (!root.classList.contains("df-gui-v1")) return;
 
-  const languageStorageKey = "dailyflora.gui-language.v3";
+  const languageStorageKey = "dailyflora.gui-language.v4";
+  const supportedLanguages = ["en", "zh", "es", "fr", "it", "ja"];
+  const languageTags = {
+    en: "en",
+    zh: "zh-CN",
+    es: "es",
+    fr: "fr",
+    it: "it",
+    ja: "ja"
+  };
   const languageButtons = Array.from(document.querySelectorAll("[data-language-choice]"));
   const hud = document.querySelector("#hud");
   const siteMenu = document.querySelector("#site-menu");
@@ -29,6 +38,58 @@
   const flowerPlanEn = document.querySelector("#flower-plan-mark-en");
 
   const copy = {
+    en: {
+      brandSystem: "GENERATIVE BOTANICAL SYSTEM",
+      kicker: "TODAY'S COMPOSITION",
+      index: "INDEX",
+      view: "VIEW",
+      menuHeading: "DAILYFLORA / INDEX",
+      about: "About",
+      member: "Member Garden",
+      downloads: "Downloads",
+      shop: "Bouquet Shop",
+      scifi: "SciFi Flora",
+      save: "Save This Bouquet",
+      review: "Aesthetic Review",
+      dateLabel: "DATE",
+      compositionPrefix: "DATE-SEEDED COMPOSITION",
+      uiLanguage: "Interface language",
+      siteNav: "Site index",
+      openIndex: "Open site index",
+      closeIndex: "Close site index",
+      viewingControls: "Viewing controls",
+      showView: "Show viewing controls",
+      hideView: "Hide viewing controls",
+      selectDate: "Choose bouquet date",
+      randomDate: "Random existing date",
+      fullscreen: "Enter fullscreen",
+      zoomControls: "Zoom controls",
+      zoomOut: "Zoom out",
+      zoomIn: "Zoom in",
+      density: "Bouquet density",
+      render: "Render detail",
+      cameraRoute: "Camera route",
+      pause: "Pause rotation",
+      resume: "Resume rotation",
+      reverse: "Reverse camera route",
+      speed: "Camera speed",
+      preset: "Random camera preset",
+      future: "This bouquet has not been generated yet",
+      previousMonth: "Previous month",
+      nextMonth: "Next month",
+      weekdays: ["S", "M", "T", "W", "T", "F", "S"],
+      densityChoices: {
+        low: ["LO", "Low bouquet density"],
+        medium: ["MID", "Medium bouquet density"],
+        high: ["HI", "High bouquet density"]
+      },
+      renderChoices: {
+        auto: ["AUTO", "Automatic render detail"],
+        low: ["ECO", "Low-power render"],
+        medium: ["CLR", "Clear render"],
+        high: ["MAX", "Maximum render detail"]
+      }
+    },
     zh: {
       brandSystem: "生成式植物系统",
       kicker: "今日花束",
@@ -42,6 +103,8 @@
       scifi: "科幻花束",
       save: "收藏这束花",
       review: "审美审核",
+      dateLabel: "日期",
+      compositionPrefix: "日期种子构图",
       uiLanguage: "界面语言",
       siteNav: "站点目录",
       openIndex: "打开站点目录",
@@ -79,59 +142,219 @@
         high: ["精", "精细模式"]
       }
     },
-    en: {
-      brandSystem: "GENERATIVE BOTANICAL SYSTEM",
-      kicker: "TODAY'S COMPOSITION",
-      index: "INDEX",
-      view: "VIEW",
-      menuHeading: "DAILYFLORA / INDEX",
-      about: "About",
-      member: "Member Garden",
-      downloads: "Downloads",
-      shop: "Bouquet Shop",
-      scifi: "SciFi Flora",
-      save: "Save This Bouquet",
-      review: "Aesthetic Review",
-      uiLanguage: "Interface language",
-      siteNav: "Site index",
-      openIndex: "Open site index",
-      closeIndex: "Close site index",
-      viewingControls: "Viewing controls",
-      showView: "Show viewing controls",
-      hideView: "Hide viewing controls",
-      selectDate: "Choose bouquet date",
-      randomDate: "Random existing date",
-      fullscreen: "Enter fullscreen",
-      zoomControls: "Zoom controls",
-      zoomOut: "Zoom out",
-      zoomIn: "Zoom in",
-      density: "Bouquet density",
-      render: "Render detail",
-      cameraRoute: "Camera route",
-      pause: "Pause rotation",
-      resume: "Resume rotation",
-      reverse: "Reverse camera route",
-      speed: "Camera speed",
-      preset: "Random camera preset",
-      future: "This bouquet has not been generated yet",
-      previousMonth: "Previous month",
-      nextMonth: "Next month",
-      weekdays: ["S", "M", "T", "W", "T", "F", "S"],
+    es: {
+      brandSystem: "SISTEMA BOTÁNICO GENERATIVO",
+      kicker: "COMPOSICIÓN DE HOY",
+      index: "ÍNDICE",
+      view: "VISTA",
+      menuHeading: "DAILYFLORA / ÍNDICE",
+      about: "Acerca de",
+      member: "Jardín personal",
+      downloads: "Descargas",
+      shop: "Tienda de ramos",
+      scifi: "Flora Sci-Fi",
+      save: "Guardar este ramo",
+      review: "Revisión estética",
+      dateLabel: "FECHA",
+      compositionPrefix: "COMPOSICIÓN POR FECHA",
+      uiLanguage: "Idioma de la interfaz",
+      siteNav: "Índice del sitio",
+      openIndex: "Abrir índice del sitio",
+      closeIndex: "Cerrar índice del sitio",
+      viewingControls: "Controles de vista",
+      showView: "Mostrar controles de vista",
+      hideView: "Ocultar controles de vista",
+      selectDate: "Elegir fecha del ramo",
+      randomDate: "Fecha existente al azar",
+      fullscreen: "Pantalla completa",
+      zoomControls: "Controles de zoom",
+      zoomOut: "Alejar",
+      zoomIn: "Acercar",
+      density: "Densidad del ramo",
+      render: "Detalle de renderizado",
+      cameraRoute: "Ruta de cámara",
+      pause: "Pausar rotación",
+      resume: "Reanudar rotación",
+      reverse: "Invertir ruta de cámara",
+      speed: "Velocidad de cámara",
+      preset: "Ruta de cámara aleatoria",
+      future: "Este ramo aún no se ha generado",
+      previousMonth: "Mes anterior",
+      nextMonth: "Mes siguiente",
+      weekdays: ["D", "L", "M", "X", "J", "V", "S"],
       densityChoices: {
-        low: ["LO", "Low bouquet density"],
-        medium: ["MID", "Medium bouquet density"],
-        high: ["HI", "High bouquet density"]
+        low: ["BAJ", "Densidad baja"],
+        medium: ["MED", "Densidad media"],
+        high: ["ALT", "Densidad alta"]
       },
       renderChoices: {
-        auto: ["AUTO", "Automatic render detail"],
-        low: ["ECO", "Low-power render"],
-        medium: ["CLR", "Clear render"],
-        high: ["MAX", "Maximum render detail"]
+        auto: ["AUTO", "Detalle automático"],
+        low: ["ECO", "Render de bajo consumo"],
+        medium: ["CLR", "Render claro"],
+        high: ["MAX", "Detalle máximo"]
+      }
+    },
+    fr: {
+      brandSystem: "SYSTÈME BOTANIQUE GÉNÉRATIF",
+      kicker: "COMPOSITION DU JOUR",
+      index: "INDEX",
+      view: "VUE",
+      menuHeading: "DAILYFLORA / INDEX",
+      about: "À propos",
+      member: "Jardin personnel",
+      downloads: "Téléchargements",
+      shop: "Boutique de bouquets",
+      scifi: "Flore Sci-Fi",
+      save: "Enregistrer ce bouquet",
+      review: "Revue esthétique",
+      dateLabel: "DATE",
+      compositionPrefix: "COMPOSITION DATÉE",
+      uiLanguage: "Langue de l’interface",
+      siteNav: "Index du site",
+      openIndex: "Ouvrir l’index du site",
+      closeIndex: "Fermer l’index du site",
+      viewingControls: "Commandes d’affichage",
+      showView: "Afficher les commandes",
+      hideView: "Masquer les commandes",
+      selectDate: "Choisir la date du bouquet",
+      randomDate: "Date existante aléatoire",
+      fullscreen: "Plein écran",
+      zoomControls: "Commandes de zoom",
+      zoomOut: "Éloigner",
+      zoomIn: "Rapprocher",
+      density: "Densité du bouquet",
+      render: "Détail du rendu",
+      cameraRoute: "Trajectoire caméra",
+      pause: "Mettre la rotation en pause",
+      resume: "Reprendre la rotation",
+      reverse: "Inverser la trajectoire",
+      speed: "Vitesse de caméra",
+      preset: "Trajectoire aléatoire",
+      future: "Ce bouquet n’a pas encore été généré",
+      previousMonth: "Mois précédent",
+      nextMonth: "Mois suivant",
+      weekdays: ["D", "L", "Ma", "Me", "J", "V", "S"],
+      densityChoices: {
+        low: ["BAS", "Densité basse"],
+        medium: ["MOY", "Densité moyenne"],
+        high: ["HAU", "Densité haute"]
+      },
+      renderChoices: {
+        auto: ["AUTO", "Détail automatique"],
+        low: ["ÉCO", "Rendu économe"],
+        medium: ["NET", "Rendu net"],
+        high: ["MAX", "Détail maximal"]
+      }
+    },
+    it: {
+      brandSystem: "SISTEMA BOTANICO GENERATIVO",
+      kicker: "COMPOSIZIONE DI OGGI",
+      index: "INDICE",
+      view: "VISTA",
+      menuHeading: "DAILYFLORA / INDICE",
+      about: "Informazioni",
+      member: "Giardino personale",
+      downloads: "Download",
+      shop: "Negozio di bouquet",
+      scifi: "Flora Sci-Fi",
+      save: "Salva questo bouquet",
+      review: "Revisione estetica",
+      dateLabel: "DATA",
+      compositionPrefix: "COMPOSIZIONE BASATA SULLA DATA",
+      uiLanguage: "Lingua dell’interfaccia",
+      siteNav: "Indice del sito",
+      openIndex: "Apri indice del sito",
+      closeIndex: "Chiudi indice del sito",
+      viewingControls: "Controlli di visualizzazione",
+      showView: "Mostra controlli",
+      hideView: "Nascondi controlli",
+      selectDate: "Scegli la data del bouquet",
+      randomDate: "Data esistente casuale",
+      fullscreen: "Schermo intero",
+      zoomControls: "Controlli zoom",
+      zoomOut: "Allontana",
+      zoomIn: "Avvicina",
+      density: "Densità del bouquet",
+      render: "Dettaglio di rendering",
+      cameraRoute: "Percorso camera",
+      pause: "Pausa rotazione",
+      resume: "Riprendi rotazione",
+      reverse: "Inverti percorso camera",
+      speed: "Velocità camera",
+      preset: "Percorso casuale",
+      future: "Questo bouquet non è ancora stato generato",
+      previousMonth: "Mese precedente",
+      nextMonth: "Mese successivo",
+      weekdays: ["D", "L", "M", "M", "G", "V", "S"],
+      densityChoices: {
+        low: ["BAS", "Densità bassa"],
+        medium: ["MED", "Densità media"],
+        high: ["ALT", "Densità alta"]
+      },
+      renderChoices: {
+        auto: ["AUTO", "Dettaglio automatico"],
+        low: ["ECO", "Rendering a basso consumo"],
+        medium: ["NIT", "Rendering nitido"],
+        high: ["MAX", "Dettaglio massimo"]
+      }
+    },
+    ja: {
+      brandSystem: "生成植物システム",
+      kicker: "今日のブーケ",
+      index: "目次",
+      view: "表示",
+      menuHeading: "DAILYFLORA / 目次",
+      about: "概要",
+      member: "マイガーデン",
+      downloads: "ダウンロード",
+      shop: "ブーケショップ",
+      scifi: "SF フローラ",
+      save: "このブーケを保存",
+      review: "美的レビュー",
+      dateLabel: "日付",
+      compositionPrefix: "日付シード構成",
+      uiLanguage: "表示言語",
+      siteNav: "サイト目次",
+      openIndex: "サイト目次を開く",
+      closeIndex: "サイト目次を閉じる",
+      viewingControls: "表示コントロール",
+      showView: "表示コントロールを開く",
+      hideView: "表示コントロールを閉じる",
+      selectDate: "ブーケの日付を選択",
+      randomDate: "既存の日付をランダム選択",
+      fullscreen: "全画面表示",
+      zoomControls: "ズームコントロール",
+      zoomOut: "縮小",
+      zoomIn: "拡大",
+      density: "ブーケ密度",
+      render: "描画精度",
+      cameraRoute: "カメラ軌道",
+      pause: "回転を一時停止",
+      resume: "回転を再開",
+      reverse: "カメラ軌道を反転",
+      speed: "カメラ速度",
+      preset: "ランダム軌道",
+      future: "このブーケはまだ生成されていません",
+      previousMonth: "前の月",
+      nextMonth: "次の月",
+      weekdays: ["日", "月", "火", "水", "木", "金", "土"],
+      densityChoices: {
+        low: ["疎", "低密度"],
+        medium: ["中", "中密度"],
+        high: ["密", "高密度"]
+      },
+      renderChoices: {
+        auto: ["自", "自動描画"],
+        low: ["省", "省電力描画"],
+        medium: ["清", "鮮明描画"],
+        high: ["精", "高精細描画"]
       }
     }
   };
 
   let applyingCopy = false;
+
+  const normalizeLanguage = (language) => supportedLanguages.includes(language) ? language : "en";
 
   const localTodayKey = () => {
     const now = new Date();
@@ -141,7 +364,7 @@
     return `${year}-${month}-${day}`;
   };
 
-  const currentLanguage = () => (root.dataset.language === "en" ? "en" : "zh");
+  const currentLanguage = () => normalizeLanguage(root.dataset.language);
 
   const setTooltip = (element, value) => {
     if (!element) return;
@@ -151,7 +374,7 @@
   };
 
   const visibleBouquetName = () => {
-    const element = currentLanguage() === "en" ? dailyThemeEn : dailyThemeCn;
+    const element = currentLanguage() === "zh" ? dailyThemeCn : dailyThemeEn;
     return element?.textContent?.trim() || "DailyFlora";
   };
 
@@ -161,8 +384,8 @@
     const englishName = dailyThemeEn?.textContent?.trim();
     if (flowerPlanEn) {
       flowerPlanEn.textContent = englishName
-        ? `DATE-SEEDED COMPOSITION / ${englishName.toUpperCase()}`
-        : "DATE-SEEDED COMPOSITION";
+        ? `${text.compositionPrefix} / ${englishName.toUpperCase()}`
+        : text.compositionPrefix;
     }
     const bouquetName = visibleBouquetName();
     document.title = `DailyFlora — ${bouquetName}`;
@@ -197,7 +420,8 @@
     const language = currentLanguage();
     const text = copy[language];
 
-    root.lang = language === "zh" ? "zh-CN" : "en";
+    root.lang = languageTags[language];
+    if (dailyDate) dailyDate.dataset.label = text.dateLabel;
     document.querySelectorAll("[data-ui-key]").forEach((element) => {
       const key = element.dataset.uiKey;
       if (key && typeof text[key] === "string") element.textContent = text[key];
@@ -251,7 +475,7 @@
   };
 
   const applyLanguage = (language, persist = true) => {
-    const nextLanguage = language === "en" ? "en" : "zh";
+    const nextLanguage = normalizeLanguage(language);
     root.dataset.language = nextLanguage;
     languageButtons.forEach((button) => {
       const active = button.dataset.languageChoice === nextLanguage;
