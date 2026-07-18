@@ -1,0 +1,72 @@
+/* Targeted correction: restore only the framed top-right INDEX and bottom-right VIEW controls.
+   The menu CTA remains a single divider line with no surrounding box. */
+html.df-gui-v1 .site-menu-toggle,
+html.df-gui-v1 .controls-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 13px;
+  border: 1px solid var(--df-line);
+  border-radius: 0;
+  color: var(--df-soft);
+  background: rgb(5 6 9 / 58%);
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+html.df-gui-v1 .site-menu-toggle {
+  min-width: 82px;
+}
+
+html.df-gui-v1 .controls-toggle {
+  min-width: 76px;
+}
+
+html.df-gui-v1 .site-menu-toggle:hover,
+html.df-gui-v1 .site-menu-toggle:focus-visible,
+html.df-gui-v1 .site-menu-toggle[aria-expanded="true"],
+html.df-gui-v1 .controls-toggle:hover,
+html.df-gui-v1 .controls-toggle:focus-visible,
+html.df-gui-v1 .controls.is-expanded .controls-toggle {
+  border-color: var(--df-line-strong);
+  color: var(--df-ink);
+  background: rgb(246 242 232 / 7%);
+  outline: none;
+}
+
+/* Keep the global language control clear of the restored INDEX frame. */
+html.df-gui-v1 .global-language-toggle {
+  right: max(124px, calc(env(safe-area-inset-right) + 124px));
+}
+
+/* Explicitly preserve the user's requested unboxed CTA treatment. */
+html.df-gui-v1 .site-menu-panel .site-menu-primary {
+  border: 0 !important;
+  border-top: 1px solid rgb(244 230 129 / 34%) !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 760px) {
+  html.df-gui-v1 .site-menu-toggle,
+  html.df-gui-v1 .controls-toggle {
+    height: 32px;
+    padding-inline: 11px;
+  }
+
+  html.df-gui-v1 .site-menu-toggle {
+    min-width: 74px;
+  }
+
+  html.df-gui-v1 .controls-toggle {
+    min-width: 68px;
+  }
+
+  html.df-gui-v1 .global-language-toggle {
+    right: max(110px, calc(env(safe-area-inset-right) + 110px));
+  }
+}
