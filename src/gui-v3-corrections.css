@@ -1,69 +1,431 @@
-/* GUI correction pass: one coherent sans-serif system, Chinese-first titles,
-   and no decorative mark borrowed from the marketing/About surface. */
+/* GUI correction pass: terminal-led interface, global language switching,
+   no ornamental viewport frame, and an opaque non-overlapping index drawer. */
 html.df-gui-v1 {
-  --df-sans:
-    "Helvetica Neue", "Arial Nova", "PingFang SC", "Hiragino Sans GB",
-    "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei", Arial,
-    sans-serif;
-  --df-serif: var(--df-sans);
+  --df-terminal:
+    "IBM Plex Mono", "Cascadia Mono", "SFMono-Regular", Menlo, Monaco,
+    Consolas, "Liberation Mono", monospace;
+  --df-cjk:
+    "IBM Plex Sans SC", "Sarasa Gothic SC", "Source Han Sans SC",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --df-interface: var(--df-cjk);
+  --df-sans: var(--df-cjk);
+  --df-mono: var(--df-terminal);
+  font-family: var(--df-cjk);
 }
 
 html.df-gui-v1 body,
 html.df-gui-v1 button,
-html.df-gui-v1 input {
-  font-family: var(--df-sans);
+html.df-gui-v1 input,
+html.df-gui-v1 a {
+  font-family: var(--df-cjk);
+}
+
+html.df-gui-v1 .brand-wordmark,
+html.df-gui-v1 .brand-meta,
+html.df-gui-v1 .daily-kicker,
+html.df-gui-v1 .daily-date,
+html.df-gui-v1 .flower-plan-mark,
+html.df-gui-v1 .language-toggle,
+html.df-gui-v1 .site-menu-label,
+html.df-gui-v1 .controls-label,
+html.df-gui-v1 .controls-panel,
+html.df-gui-v1 .date-calendar,
+html.df-gui-v1 .debug-panel {
+  font-family: var(--df-terminal);
+  font-feature-settings: "zero" 1;
+}
+
+/* Keep the good information-line beside the bouquet title. Remove the added
+   viewport rectangle and corner decorations completely. */
+html.df-gui-v1 .interface-frame,
+html.df-gui-v1 .interface-corner {
+  display: none !important;
+}
+
+/* Language is a global interface preference, not title metadata. */
+html.df-gui-v1 .global-language-toggle {
+  position: fixed;
+  top: max(20px, env(safe-area-inset-top));
+  right: max(104px, calc(env(safe-area-inset-right) + 104px));
+  z-index: 31;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 0 7px;
+  border-bottom: 1px solid var(--df-line);
+  color: var(--df-dim);
+  text-shadow: 0 1px 18px rgb(0 0 0 / 72%);
+  transition:
+    opacity 460ms ease,
+    border-color 180ms ease;
+}
+
+html.df-gui-v1 .global-language-toggle button {
+  position: relative;
+  min-width: auto;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font-family: var(--df-terminal);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+
+html.df-gui-v1 .global-language-toggle button + button::before {
+  position: absolute;
+  top: 0;
+  left: -9px;
+  color: rgb(246 242 232 / 24%);
+  content: "/";
+  pointer-events: none;
+}
+
+html.df-gui-v1 .global-language-toggle button::after {
+  position: absolute;
+  right: 0;
+  bottom: -8px;
+  left: 0;
+  height: 1px;
+  background: var(--df-accent);
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.25);
+  transition:
+    opacity 160ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.df-gui-v1 .global-language-toggle button:hover,
+html.df-gui-v1 .global-language-toggle button:focus-visible,
+html.df-gui-v1 .global-language-toggle button[aria-pressed="true"] {
+  color: var(--df-ink);
+  outline: none;
+}
+
+html.df-gui-v1 .global-language-toggle button[aria-pressed="true"]::after {
+  opacity: 0.9;
+  transform: scaleX(1);
+}
+
+html.df-gui-v1 body:has(.hud.is-hidden):not(.is-menu-open) .global-language-toggle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Title block returns to the original clean left rule. */
+html.df-gui-v1 .daily-mark {
+  grid-template-columns: 86px minmax(0, 1fr);
+  grid-template-areas:
+    "kicker kicker"
+    "date theme"
+    "date plan";
+}
+
+html.df-gui-v1 .daily-theme {
+  max-width: min(780px, calc(100vw - 390px));
 }
 
 html.df-gui-v1 .daily-theme-cn,
 html.df-gui-v1 .daily-theme-en {
-  font-family: var(--df-sans);
+  display: none;
+  overflow: visible;
+  color: rgb(246 242 232 / 94%);
   font-style: normal;
-  font-variation-settings: normal;
-  text-rendering: geometricPrecision;
+  text-overflow: clip;
+  text-transform: none;
+  white-space: normal;
 }
 
 html.df-gui-v1[data-language="zh"] .daily-theme-cn {
-  font-weight: 380;
+  display: block;
+  font-family: var(--df-cjk);
+  font-size: 0.95em;
+  font-weight: 300;
   line-height: 1.02;
-  letter-spacing: 0.035em;
+  letter-spacing: 0.025em;
 }
 
 html.df-gui-v1[data-language="en"] .daily-theme-en {
-  font-weight: 400;
-  line-height: 0.98;
-  letter-spacing: 0.005em;
-}
-
-html.df-gui-v1 .site-menu-mark {
-  display: none !important;
-}
-
-html.df-gui-v1 .site-menu-toggle {
-  gap: 0;
-  min-width: 52px;
-}
-
-html.df-gui-v1 .site-menu-label,
-html.df-gui-v1 .controls-label {
-  font-family: var(--df-mono);
-  font-size: 8px;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.18em;
+  display: block;
+  max-width: 25ch;
+  font-family: var(--df-terminal);
+  font-size: 0.76em;
+  font-weight: 300;
+  line-height: 1.04;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
 }
 
-html.df-gui-v1 .language-toggle button {
-  font-family: var(--df-mono);
-  font-weight: 500;
+html.df-gui-v1 .flower-plan-mark-cn,
+html.df-gui-v1 .flower-plan-mark-en {
+  display: none;
+}
+
+html.df-gui-v1[data-language="zh"] .flower-plan-mark-cn,
+html.df-gui-v1[data-language="en"] .flower-plan-mark-en {
+  display: block;
+}
+
+html.df-gui-v1[data-language="zh"] .daily-date::before {
+  content: "日期";
+}
+
+html.df-gui-v1[data-language="en"] .daily-date::before {
+  content: "DATE";
+}
+
+/* Top-level INDEX and VIEW are terminal labels; functional icons remain inside
+   the expanded control panel. */
+html.df-gui-v1 .site-menu-label,
+html.df-gui-v1 .controls-label {
+  font-family: var(--df-terminal);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+html.df-gui-v1 .site-menu-toggle,
+html.df-gui-v1 .controls-toggle {
+  min-width: auto;
+}
+
+html.df-gui-v1 .site-menu-legacy-icon,
+html.df-gui-v1 .controls-legacy-icon,
+html.df-gui-v1 .site-menu-mark,
+html.df-gui-v1 .controls-glyph {
+  display: none !important;
+}
+
+/* The menu is an opaque spatial drawer. Text never competes with bouquet
+   geometry, and the CTA stays within the same rhythm instead of becoming a box. */
+html.df-gui-v1 .site-menu {
+  z-index: 30;
+}
+
+html.df-gui-v1 .site-menu-toggle {
+  position: relative;
+  z-index: 3;
+  height: 30px;
+  padding: 0 0 7px;
+  border: 0;
+  border-bottom: 1px solid var(--df-line);
+  border-radius: 0;
+  color: var(--df-soft);
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+html.df-gui-v1 .site-menu-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: grid;
+  align-content: start;
+  width: min(440px, 100vw);
+  min-width: 0;
+  max-height: none;
+  overflow-y: auto;
+  padding: 92px 40px 34px;
+  border: 0;
+  border-left: 1px solid var(--df-line-strong);
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgb(246 242 232 / 2%), transparent 20%),
+    rgb(5 6 9 / 98%);
+  box-shadow: -30px 0 100px rgb(0 0 0 / 56%);
+  backdrop-filter: blur(24px) saturate(96%);
+  animation: dfIndexDrawerIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html.df-gui-v1 .site-menu-panel::before {
+  display: none;
+}
+
+html.df-gui-v1 .site-menu-heading {
+  display: block;
+  margin: 0 0 28px;
+  color: var(--df-dim);
+  font-family: var(--df-terminal);
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.16em;
+}
+
+html.df-gui-v1 .site-menu-panel a {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 74px;
+  padding: 0;
+  border-top: 1px solid var(--df-line);
+  border-radius: 0;
+  color: rgb(246 242 232 / 76%);
+  background: transparent;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  transition:
+    color 180ms ease,
+    padding-left 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.df-gui-v1[data-language="zh"] .site-menu-panel a {
+  font-family: var(--df-cjk);
+  letter-spacing: 0.01em;
+}
+
+html.df-gui-v1[data-language="en"] .site-menu-panel a {
+  font-family: var(--df-terminal);
+  font-size: 21px;
+  letter-spacing: -0.015em;
+}
+
+html.df-gui-v1 .site-menu-panel a::before {
+  color: var(--df-dim);
+  font-family: var(--df-terminal);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+html.df-gui-v1 .site-menu-panel a::after {
+  display: none;
+}
+
+html.df-gui-v1 .site-menu-panel a:hover,
+html.df-gui-v1 .site-menu-panel a:focus-visible {
+  padding-left: 8px;
+  color: var(--df-ink);
+  background: transparent;
+  outline: none;
+}
+
+html.df-gui-v1 .site-menu-panel .site-menu-primary {
+  margin-top: 0;
+  border: 0;
+  border-top: 1px solid rgb(244 230 129 / 34%);
+  color: var(--df-accent);
+  background: transparent;
+  font-weight: 400;
+  box-shadow: none;
+}
+
+html.df-gui-v1 .site-menu-panel .site-menu-primary::before {
+  color: rgb(244 230 129 / 62%);
+}
+
+html.df-gui-v1 body.is-menu-open #flora-canvas {
+  filter: brightness(0.42) saturate(0.72);
+  transition: filter 380ms ease;
+}
+
+html.df-gui-v1 body.is-menu-open .hud,
+html.df-gui-v1 body.is-menu-open .controls {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+html.df-gui-v1 body.is-menu-open .brand-lockup {
+  opacity: 0.2;
+}
+
+html.df-gui-v1 body.is-menu-open .site-menu,
+html.df-gui-v1 body.is-menu-open .global-language-toggle {
+  opacity: 1 !important;
+  pointer-events: auto;
+}
+
+/* English labels need a little more horizontal room inside the existing
+   control bar. */
+html.df-gui-v1[data-language="en"] .segment-button {
+  min-width: 42px;
+  padding-inline: 7px;
+  font-family: var(--df-terminal);
+  font-size: 8px;
+  letter-spacing: 0.05em;
+}
+
+html.df-gui-v1 .controls-panel button,
+html.df-gui-v1 .controls-panel input,
+html.df-gui-v1 .controls-panel label,
+html.df-gui-v1 .date-calendar,
+html.df-gui-v1 .date-calendar button {
+  font-family: var(--df-terminal);
+}
+
+@keyframes dfIndexDrawerIn {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @media (max-width: 760px) {
-  html.df-gui-v1[data-language="zh"] .daily-theme-cn {
-    letter-spacing: 0.025em;
+  html.df-gui-v1 .global-language-toggle {
+    top: max(12px, env(safe-area-inset-top));
+    right: max(84px, calc(env(safe-area-inset-right) + 84px));
+    min-height: 29px;
   }
 
-  html.df-gui-v1 .site-menu-toggle {
-    min-width: 48px;
+  html.df-gui-v1 .global-language-toggle button {
+    font-size: 9px;
+  }
+
+  html.df-gui-v1 .daily-mark {
+    grid-template-columns: 70px minmax(0, 1fr);
+    grid-template-areas:
+      "kicker kicker"
+      "date theme"
+      "date plan";
+  }
+
+  html.df-gui-v1 .daily-theme {
+    max-width: calc(100vw - 112px);
+  }
+
+  html.df-gui-v1[data-language="en"] .daily-theme-en {
+    max-width: 20ch;
+    font-size: 0.66em;
+  }
+
+  html.df-gui-v1 .site-menu-panel {
+    width: 100vw;
+    padding: 78px 22px 28px;
+    border-left: 0;
+  }
+
+  html.df-gui-v1 .site-menu-heading {
+    margin-bottom: 20px;
+  }
+
+  html.df-gui-v1 .site-menu-panel a {
+    min-height: 64px;
+    font-size: 21px;
+  }
+
+  html.df-gui-v1[data-language="en"] .site-menu-panel a {
+    font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.df-gui-v1 .site-menu-panel {
+    animation: none !important;
   }
 }
