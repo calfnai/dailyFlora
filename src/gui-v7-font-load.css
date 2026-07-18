@@ -1,3 +1,5 @@
+@import url("https://cdn.jsdelivr.net/npm/subsetted-fonts@1.0.4/SarasaUiSC-Regular/SarasaUiSC-Regular.css");
+
 /* Reliable Sarasa Term trial.
    Exact Sarasa Term SC is preferred when installed locally. The web fallback
    uses Iosevka Charon Mono for Latin/European text and Sarasa UI SC for CJK,
@@ -15,7 +17,7 @@
     U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-html.df-gui-v1 {
+html.df-gui-v1:root {
   --df-terminal:
     "Sarasa Term SC", "Iosevka Charon Mono", "SarasaUiSC-Regular",
     "Cascadia Mono", "SFMono-Regular", Menlo, Monaco, Consolas,
@@ -29,29 +31,29 @@ html.df-gui-v1 {
   --df-mono: var(--df-terminal);
 }
 
-html.df-gui-v1 body,
-html.df-gui-v1 button,
-html.df-gui-v1 input,
-html.df-gui-v1 a,
-html.df-gui-v1 .brand-wordmark,
-html.df-gui-v1 .brand-meta,
-html.df-gui-v1 .daily-kicker,
-html.df-gui-v1 .daily-date,
-html.df-gui-v1 .flower-plan-mark,
-html.df-gui-v1 .language-toggle,
-html.df-gui-v1 .site-menu-label,
-html.df-gui-v1 .site-menu-panel,
-html.df-gui-v1 .controls-label,
-html.df-gui-v1 .controls-panel,
-html.df-gui-v1 .date-calendar,
-html.df-gui-v1 .debug-panel {
+html.df-gui-v1:root body,
+html.df-gui-v1:root button,
+html.df-gui-v1:root input,
+html.df-gui-v1:root a,
+html.df-gui-v1:root .brand-wordmark,
+html.df-gui-v1:root .brand-meta,
+html.df-gui-v1:root .daily-kicker,
+html.df-gui-v1:root .daily-date,
+html.df-gui-v1:root .flower-plan-mark,
+html.df-gui-v1:root .language-toggle,
+html.df-gui-v1:root .site-menu-label,
+html.df-gui-v1:root .site-menu-panel,
+html.df-gui-v1:root .controls-label,
+html.df-gui-v1:root .controls-panel,
+html.df-gui-v1:root .date-calendar,
+html.df-gui-v1:root .debug-panel {
   font-family: var(--df-terminal);
   font-feature-settings: "liga" 0, "calt" 0, "zero" 1, "locl" 1;
 }
 
 /* Sarasa Term can read narrow and tall at display size. Use the medium cut and
    a restrained optical correction rather than redesigning the title block. */
-html.df-gui-v1[data-language="zh"] .daily-theme-cn {
+html.df-gui-v1:root[data-language="zh"] .daily-theme-cn {
   font-family: var(--df-cjk);
   font-weight: 500;
   line-height: 0.96;
@@ -60,7 +62,7 @@ html.df-gui-v1[data-language="zh"] .daily-theme-cn {
   transform-origin: left bottom;
 }
 
-html.df-gui-v1:not([data-language="zh"]) .daily-theme-en {
+html.df-gui-v1:root:not([data-language="zh"]) .daily-theme-en {
   max-width: 30ch;
   font-family: var(--df-terminal);
   font-size: 0.7em;
@@ -72,27 +74,27 @@ html.df-gui-v1:not([data-language="zh"]) .daily-theme-en {
   text-transform: uppercase;
 }
 
-html.df-gui-v1 .brand-wordmark,
-html.df-gui-v1 .site-menu-label,
-html.df-gui-v1 .controls-label,
-html.df-gui-v1 .global-language-toggle button,
-html.df-gui-v1 .segment-button {
+html.df-gui-v1:root .brand-wordmark,
+html.df-gui-v1:root .site-menu-label,
+html.df-gui-v1:root .controls-label,
+html.df-gui-v1:root .global-language-toggle button,
+html.df-gui-v1:root .segment-button {
   font-weight: 500;
 }
 
-html.df-gui-v1 .site-menu-panel a {
+html.df-gui-v1:root .site-menu-panel a {
   font-family: var(--df-terminal);
   font-weight: 500;
 }
 
 @media (max-width: 760px) {
-  html.df-gui-v1:not([data-language="zh"]) .daily-theme-en {
+  html.df-gui-v1:root:not([data-language="zh"]) .daily-theme-en {
     max-width: 24ch;
     font-size: 0.64em;
     transform: scale(1.02, 0.96);
   }
 
-  html.df-gui-v1[data-language="zh"] .daily-theme-cn {
+  html.df-gui-v1:root[data-language="zh"] .daily-theme-cn {
     transform: scale(1.015, 0.97);
   }
 }
