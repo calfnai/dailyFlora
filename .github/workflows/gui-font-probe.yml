@@ -1,0 +1,41 @@
+name: GUI font CDN probe
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/gui-font-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe font CSS endpoints
+        shell: bash
+        run: |
+          set +e
+          curl -L --max-time 30 -D zeoseven.headers -o zeoseven.css https://fontsapi.zeoseven.com/159/main/result.css
+          echo $? > zeoseven.exit
+          curl -L --max-time 30 -D jsdelivr.headers -o sarasa-ui.css https://cdn.jsdelivr.net/npm/subsetted-fonts@1.0.4/SarasaUiSC-Regular/SarasaUiSC-Regular.css
+          echo $? > jsdelivr.exit
+          curl -L --max-time 30 -D iosevka.headers -o iosevka.woff2 https://cdn.jsdelivr.net/fontsource/fonts/iosevka-charon-mono@5.2.8/latin-500-normal.woff2
+          echo $? > iosevka.exit
+          { echo '--- ZeoSeven'; cat zeoseven.exit; head -30 zeoseven.headers; head -20 zeoseven.css; echo '--- jsDelivr Sarasa UI'; cat jsdelivr.exit; head -30 jsdelivr.headers; head -40 sarasa-ui.css; echo '--- families'; grep -o "font-family:[^;]*" sarasa-ui.css | head -10; echo '--- Iosevka'; cat iosevka.exit; head -30 iosevka.headers; ls -l iosevka.woff2; } > probe.txt
+          cat probe.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gui-font-cdn-probe
+          path: |
+            probe.txt
+            zeoseven.headers
+            zeoseven.css
+            sarasa-ui.css
+            jsdelivr.headers
+            iosevka.headers
+            iosevka.woff2
+          retention-days: 2
