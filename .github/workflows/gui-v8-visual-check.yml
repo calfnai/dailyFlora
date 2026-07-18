@@ -1,0 +1,116 @@
+name: GUI v8 visual check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/gui-v8-visual-check.yml
+      - src/gui-v5-frame-restore.css
+      - src/gui-v8-visible-frame-space-mono.css
+
+permissions:
+  contents: read
+
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare current Pages preview
+        shell: bash
+        run: |
+          git fetch --depth=1 origin gh-pages:refs/remotes/origin/gh-pages
+          git worktree add --detach /tmp/dailyflora-pages refs/remotes/origin/gh-pages
+          mkdir -p /tmp/site
+          ln -s /tmp/dailyflora-pages /tmp/site/dailyFlora
+          python3 -m http.server 4173 --directory /tmp/site > /tmp/gui-v8-server.log 2>&1 &
+          for attempt in {1..30}; do
+            curl --fail --silent http://127.0.0.1:4173/dailyFlora/ui-v1/ >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/gui-v8-server.log
+          exit 1
+
+      - name: Install browser dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          python3 -m venv /tmp/selenium
+          /tmp/selenium/bin/pip install --quiet 'selenium>=4.20,<5' pillow
+
+      - name: Capture and verify rendered corners and font
+        run: |
+          /tmp/selenium/bin/python - <<'PY'
+          import json, time
+          from pathlib import Path
+          from PIL import Image
+          from selenium import webdriver
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          url='http://127.0.0.1:4173/dailyFlora/ui-v1/?date=2026-07-17&render=low&density=medium'
+          options=webdriver.ChromeOptions()
+          for arg in ('--headless=new','--no-sandbox','--disable-dev-shm-usage','--hide-scrollbars','--enable-webgl','--enable-unsafe-swiftshader','--use-gl=swiftshader'):
+              options.add_argument(arg)
+          driver=webdriver.Chrome(options=options)
+          driver.set_window_size(1440,857)
+          driver.get(url)
+          wait=WebDriverWait(driver,25)
+          wait.until(lambda d:d.execute_script('return document.readyState')=='complete')
+          wait.until(lambda d:d.execute_script("return typeof window.__dailyFloraAudit === 'function'"))
+          driver.execute_async_script("const done=arguments[0];document.fonts.ready.then(()=>done(true)).catch(()=>done(false));")
+          time.sleep(6)
+          driver.execute_script("document.querySelector('#hud')?.classList.remove('is-hidden');document.querySelector('#controls')?.classList.remove('is-hidden');")
+          time.sleep(.3)
+          driver.save_screenshot('gui-v8-space-frame.png')
+
+          report=driver.execute_script('''
+            const f=document.querySelector('.interface-frame');
+            const before=getComputedStyle(f,'::before');
+            const after=getComputedStyle(f,'::after');
+            const title=getComputedStyle(document.querySelector('.daily-theme-en'));
+            return {
+              beforeDisplay:before.display,
+              afterDisplay:after.display,
+              beforeWidth:before.borderTopWidth,
+              afterWidth:after.borderRightWidth,
+              titleFont:title.fontFamily,
+              titleWeight:title.fontWeight,
+              spaceLoaded:document.fonts.check('400 20px "Space Mono"')
+            };
+          ''')
+          driver.quit()
+
+          image=Image.open('gui-v8-space-frame.png').convert('RGB')
+          samples={
+            'topLeftHorizontal': image.getpixel((24,12)),
+            'topLeftVertical': image.getpixel((12,24)),
+            'bottomRightHorizontal': image.getpixel((1404,844)),
+            'bottomRightVertical': image.getpixel((1427,812)),
+            'plainTopBorder': image.getpixel((200,12)),
+          }
+          report['pixels']=samples
+          def luminance(rgb): return sum(rgb)/3
+          assert report['beforeDisplay'] != 'none', report
+          assert report['afterDisplay'] != 'none', report
+          assert report['spaceLoaded'], report
+          assert 'Space Mono' in report['titleFont'], report
+          assert luminance(samples['topLeftHorizontal']) > 120, report
+          assert luminance(samples['topLeftVertical']) > 120, report
+          assert luminance(samples['bottomRightHorizontal']) > 120, report
+          assert luminance(samples['bottomRightVertical']) > 120, report
+          assert luminance(samples['topLeftHorizontal']) > luminance(samples['plainTopBorder']) + 80, report
+          Path('gui-v8-visual.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dailyflora-gui-v8-visual
+          path: |
+            gui-v8-space-frame.png
+            gui-v8-visual.json
+            /tmp/gui-v8-server.log
+          retention-days: 3
+          if-no-files-found: warn
