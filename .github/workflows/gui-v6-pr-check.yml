@@ -9,6 +9,7 @@ on:
       - src/gui-v2.js
       - src/gui-v5-frame-restore.css
       - src/gui-v6-sarasa-i18n-frame.css
+      - src/gui-v7-font-load.css
       - .github/workflows/gui-v6-pr-check.yml
 
 permissions:
@@ -80,8 +81,15 @@ jobs:
 
           report['default'] = driver.execute_script('return document.documentElement.dataset.language')
           report['buttons'] = driver.execute_script("return [...document.querySelectorAll('[data-language-choice]')].map(b=>b.textContent.trim())")
-          report['fontFaces'] = driver.execute_script("return [...document.fonts].map(f=>({family:f.family,status:f.status}))")
+          report['fontFaces'] = driver.execute_script("return [...document.fonts].map(f=>({family:f.family,status:f.status,weight:f.weight}))")
+          report['fontChecks'] = driver.execute_script("""
+            return {
+              latin: document.fonts.check('500 32px "Iosevka Charon Mono"', 'DAILYFLORA É Í Ñ'),
+              cjk: document.fonts.check('400 16px "SarasaUiSC-Regular"', '中文日本語')
+            };
+          """)
           report['titleFont'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-en')).fontFamily")
+          report['titleWeight'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-en')).fontWeight")
           report['frame'] = driver.execute_script("""
             const f=document.querySelector('.interface-frame'),s=getComputedStyle(f),b=getComputedStyle(f,'::before'),a=getComputedStyle(f,'::after');
             return {display:s.display,borders:[s.borderTopWidth,s.borderRightWidth,s.borderBottomWidth,s.borderLeftWidth],before:[b.borderTopWidth,b.borderLeftWidth],after:[a.borderRightWidth,a.borderBottomWidth]};
@@ -90,8 +98,9 @@ jobs:
           assert report['buttons'] == ['EN','中','ES','FR','IT','日'], report
           assert report['frame']['display'] == 'block', report
           assert all(v != '0px' for v in report['frame']['borders'] + report['frame']['before'] + report['frame']['after']), report
-          assert any('Sarasa' in f['family'] and f['status'] == 'loaded' for f in report['fontFaces']), report
-          assert 'Sarasa' in report['titleFont'], report
+          assert report['fontChecks']['latin'] and report['fontChecks']['cjk'], report
+          assert 'Iosevka Charon Mono' in report['titleFont'], report
+          assert report['titleWeight'] == '500', report
           driver.save_screenshot('gui-v6-en-frame.png')
 
           expected={'en':('INDEX','VIEW'),'zh':('目录','观看'),'es':('ÍNDICE','VISTA'),'fr':('INDEX','VUE'),'it':('INDICE','VISTA'),'ja':('目次','表示')}
