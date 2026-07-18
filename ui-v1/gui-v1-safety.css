@@ -3,8 +3,10 @@
 .interface-status,
 .daily-kicker,
 .language-toggle,
+.site-menu-heading,
 .site-menu-label,
-.controls-label {
+.controls-label,
+.flower-plan-mark-en {
   display: none;
 }
 
@@ -12,8 +14,8 @@ html.df-gui-v1 .brand-lockup {
   display: grid;
 }
 
-html.df-gui-v1 .interface-frame,
-html.df-gui-v1 .daily-kicker {
+html.df-gui-v1 .daily-kicker,
+html.df-gui-v1 .site-menu-heading {
   display: block;
 }
 
@@ -21,6 +23,7 @@ html.df-gui-v1 .language-toggle {
   display: flex;
 }
 
+html.df-gui-v1 .interface-frame,
 html.df-gui-v1 .interface-status {
   display: none;
 }
