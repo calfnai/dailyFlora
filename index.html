@@ -16,23 +16,24 @@
         if (isSpecial) return;
 
         document.documentElement.classList.add('df-gui-v1');
-        const languageStorageKey = 'dailyflora.gui-language.v3';
-        let language = 'zh';
+        const languageStorageKey = 'dailyflora.gui-language.v4';
+        const supportedLanguages = ['en', 'zh', 'es', 'fr', 'it', 'ja'];
+        let language = 'en';
         try {
           const storedLanguage = window.localStorage.getItem(languageStorageKey);
-          if (storedLanguage === 'zh' || storedLanguage === 'en') language = storedLanguage;
+          if (supportedLanguages.includes(storedLanguage)) language = storedLanguage;
         } catch {}
         document.documentElement.dataset.language = language;
-        document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
+        document.documentElement.lang = language === 'zh' ? 'zh-CN' : language;
       })();
     </script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/ibm-plex-mono.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ibm/plex-sans-sc@1.1.0/css/ibm-plex-sans-sc.css" />
+    <link rel="stylesheet" href="https://fontsapi.zeoseven.com/159/main/result.css" />
     <link rel="stylesheet" href="/src/gui-v1.css" />
     <link rel="stylesheet" href="/src/gui-v1-safety.css" />
     <link rel="stylesheet" href="/src/gui-v2.css" />
     <link rel="stylesheet" href="/src/gui-v3-corrections.css" />
     <link rel="stylesheet" href="/src/gui-v5-frame-restore.css" />
+    <link rel="stylesheet" href="/src/gui-v6-sarasa-i18n-frame.css" />
   </head>
   <body>
     <main class="app-shell" aria-label="DailyFlora 3D bouquet screensaver">
@@ -46,9 +47,15 @@
         </span>
       </header>
 
+      <div class="interface-frame" aria-hidden="true"></div>
+
       <div class="language-toggle global-language-toggle" role="group" aria-label="Interface language">
-        <button type="button" data-language-choice="zh" aria-pressed="true">中文</button>
-        <button type="button" data-language-choice="en" aria-pressed="false">EN</button>
+        <button type="button" data-language-choice="en" aria-pressed="true" title="English" aria-label="English">EN</button>
+        <button type="button" data-language-choice="zh" aria-pressed="false" title="中文" aria-label="中文">中</button>
+        <button type="button" data-language-choice="es" aria-pressed="false" title="Español" aria-label="Español">ES</button>
+        <button type="button" data-language-choice="fr" aria-pressed="false" title="Français" aria-label="Français">FR</button>
+        <button type="button" data-language-choice="it" aria-pressed="false" title="Italiano" aria-label="Italiano">IT</button>
+        <button type="button" data-language-choice="ja" aria-pressed="false" title="日本語" aria-label="日本語">日</button>
       </div>
 
       <section class="hud" id="hud" aria-live="polite">
@@ -77,8 +84,8 @@
           <a href="./downloads/" data-ui-key="downloads">Downloads</a>
           <a href="./bouquet-shop/" data-ui-key="shop">Bouquet Shop</a>
           <a href="./scifi/" data-ui-key="scifi">SciFi Flora</a>
-          <a class="site-menu-primary" href="./signup/" data-ui-key="save">收藏这束花</a>
-          <a id="site-menu-debug-link" href="./docs/aesthetic-review-dashboard.html?debug=1" data-ui-key="review" hidden>审美审核</a>
+          <a class="site-menu-primary" href="./signup/" data-ui-key="save">Save This Bouquet</a>
+          <a id="site-menu-debug-link" href="./docs/aesthetic-review-dashboard.html?debug=1" data-ui-key="review" hidden>Aesthetic Review</a>
         </div>
       </nav>
 
@@ -112,15 +119,15 @@
             </button>
           </div>
           <div class="segmented density-control" aria-label="Bouquet density">
-            <button class="segment-button" type="button" data-density-choice="low" aria-pressed="false" title="Sparse bouquet" data-tooltip="花材少一点">疏</button>
-            <button class="segment-button" type="button" data-density-choice="medium" aria-pressed="true" title="Medium bouquet" data-tooltip="花材中等">中</button>
-            <button class="segment-button" type="button" data-density-choice="high" aria-pressed="false" title="Dense bouquet" data-tooltip="花材密一点">密</button>
+            <button class="segment-button" type="button" data-density-choice="low" aria-pressed="false" title="Sparse bouquet" data-tooltip="花材少一点">LO</button>
+            <button class="segment-button" type="button" data-density-choice="medium" aria-pressed="true" title="Medium bouquet" data-tooltip="花材中等">MID</button>
+            <button class="segment-button" type="button" data-density-choice="high" aria-pressed="false" title="Dense bouquet" data-tooltip="花材密一点">HI</button>
           </div>
           <div class="segmented render-control" aria-label="Render precision">
-            <button class="segment-button" type="button" data-render-choice="auto" aria-pressed="true" title="Auto render" data-tooltip="自动选择清晰度">自</button>
-            <button class="segment-button" type="button" data-render-choice="low" aria-pressed="false" title="Low render" data-tooltip="省电模式">省</button>
-            <button class="segment-button" type="button" data-render-choice="medium" aria-pressed="false" title="Medium render" data-tooltip="80%透明光滑球">清</button>
-            <button class="segment-button" type="button" data-render-choice="high" aria-pressed="false" title="High render" data-tooltip="精细模式">精</button>
+            <button class="segment-button" type="button" data-render-choice="auto" aria-pressed="true" title="Auto render" data-tooltip="自动选择清晰度">AUTO</button>
+            <button class="segment-button" type="button" data-render-choice="low" aria-pressed="false" title="Low render" data-tooltip="省电模式">ECO</button>
+            <button class="segment-button" type="button" data-render-choice="medium" aria-pressed="false" title="Medium render" data-tooltip="80%透明光滑球">CLR</button>
+            <button class="segment-button" type="button" data-render-choice="high" aria-pressed="false" title="High render" data-tooltip="精细模式">MAX</button>
           </div>
           <div class="rotation-control" aria-label="Camera route">
             <button class="icon-button compact-button" id="pause-button" type="button" title="Pause rotation" aria-label="Pause rotation" data-tooltip="暂停 / 继续旋转">
