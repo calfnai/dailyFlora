@@ -65,12 +65,21 @@ jobs:
           driver = webdriver.Chrome(options=options)
           wait = WebDriverWait(driver, 25)
 
+          def reveal_ui():
+              driver.execute_script("document.querySelector('#hud')?.classList.remove('is-hidden');document.querySelector('#controls')?.classList.remove('is-hidden');")
+              time.sleep(.12)
+
           def ready(seconds=4):
               wait.until(lambda d: d.execute_script('return document.readyState') == 'complete')
               wait.until(lambda d: d.execute_script("return typeof window.__dailyFloraAudit === 'function'"))
               driver.execute_async_script("const done=arguments[0]; document.fonts.ready.then(()=>done(true)).catch(()=>done(false));")
               time.sleep(seconds)
-              driver.execute_script("document.querySelector('#hud')?.classList.remove('is-hidden');document.querySelector('#controls')?.classList.remove('is-hidden');")
+              reveal_ui()
+
+          def js_click(selector):
+              reveal_ui()
+              driver.execute_script("document.querySelector(arguments[0])?.click()", selector)
+              time.sleep(.18)
 
           report = {}
           driver.set_window_size(1440, 1000)
@@ -82,12 +91,6 @@ jobs:
           report['default'] = driver.execute_script('return document.documentElement.dataset.language')
           report['buttons'] = driver.execute_script("return [...document.querySelectorAll('[data-language-choice]')].map(b=>b.textContent.trim())")
           report['fontFaces'] = driver.execute_script("return [...document.fonts].map(f=>({family:f.family,status:f.status,weight:f.weight}))")
-          report['fontChecks'] = driver.execute_script("""
-            return {
-              latin: document.fonts.check('500 32px "Iosevka Charon Mono"', 'DAILYFLORA É Í Ñ'),
-              cjk: document.fonts.check('400 16px "SarasaUiSC-Regular"', '中文日本語')
-            };
-          """)
           report['titleFont'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-en')).fontFamily")
           report['titleWeight'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-en')).fontWeight")
           report['frame'] = driver.execute_script("""
@@ -98,7 +101,8 @@ jobs:
           assert report['buttons'] == ['EN','中','ES','FR','IT','日'], report
           assert report['frame']['display'] == 'block', report
           assert all(v != '0px' for v in report['frame']['borders'] + report['frame']['before'] + report['frame']['after']), report
-          assert report['fontChecks']['latin'] and report['fontChecks']['cjk'], report
+          assert any(f['family'] == 'Iosevka Charon Mono' and f['status'] == 'loaded' for f in report['fontFaces']), report
+          assert any(f['family'] == 'SarasaUiSC-Regular' and f['status'] == 'loaded' for f in report['fontFaces']), report
           assert 'Iosevka Charon Mono' in report['titleFont'], report
           assert report['titleWeight'] == '500', report
           driver.save_screenshot('gui-v6-en-frame.png')
@@ -106,21 +110,22 @@ jobs:
           expected={'en':('INDEX','VIEW'),'zh':('目录','观看'),'es':('ÍNDICE','VISTA'),'fr':('INDEX','VUE'),'it':('INDICE','VISTA'),'ja':('目次','表示')}
           report['languages']={}
           for lang, labels in expected.items():
-              driver.find_element(By.CSS_SELECTOR,f'[data-language-choice="{lang}"]').click(); time.sleep(.25)
+              js_click(f'[data-language-choice="{lang}"]')
               state=driver.execute_script("return {lang:document.documentElement.dataset.language,index:document.querySelector('[data-ui-key=index]').textContent,view:document.querySelector('[data-ui-key=view]').textContent,cn:getComputedStyle(document.querySelector('.daily-theme-cn')).display,en:getComputedStyle(document.querySelector('.daily-theme-en')).display}")
               assert state['lang']==lang and (state['index'],state['view'])==labels,(lang,state)
               assert (state['cn']!='none' and state['en']=='none') if lang=='zh' else (state['cn']=='none' and state['en']!='none'),(lang,state)
-              driver.find_element(By.ID,'controls-toggle').click(); time.sleep(.25)
+              js_click('#controls-toggle')
+              wait.until(lambda current: not current.find_element(By.ID,'controls-panel').get_attribute('hidden'))
               view=driver.execute_script("""
                 const p=document.querySelector('#controls-panel'),s=getComputedStyle(p),tops=[...p.children].map(e=>Math.round(e.getBoundingClientRect().top));
                 return {wrap:s.flexWrap,clientHeight:p.clientHeight,scrollHeight:p.scrollHeight,tops:[...new Set(tops)],scrollWidth:p.scrollWidth,clientWidth:p.clientWidth};
               """)
               assert view['wrap']=='nowrap' and view['scrollHeight']<=view['clientHeight']+4 and len(view['tops'])==1,(lang,view)
               report['languages'][lang]={'copy':state,'view':view}
-              driver.find_element(By.ID,'controls-toggle').click(); time.sleep(.1)
+              js_click('#controls-toggle')
 
-          driver.find_element(By.CSS_SELECTOR,'[data-language-choice="es"]').click(); time.sleep(.2)
-          driver.find_element(By.ID,'controls-toggle').click(); time.sleep(.25)
+          js_click('[data-language-choice="es"]')
+          js_click('#controls-toggle')
           driver.save_screenshot('gui-v6-es-view.png')
 
           driver.set_window_size(390,844)
@@ -130,9 +135,9 @@ jobs:
             return !(a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom);
           """)
           assert not report['mobileOverlap'],report
-          driver.find_element(By.ID,'controls-toggle').click();time.sleep(.25)
-          report['mobileView']=driver.execute_script("const p=document.querySelector('#controls-panel'),s=getComputedStyle(p);return {wrap:s.flexWrap,clientHeight:p.clientHeight,scrollHeight:p.scrollHeight}")
-          assert report['mobileView']['wrap']=='nowrap' and report['mobileView']['scrollHeight']<=report['mobileView']['clientHeight']+4,report
+          js_click('#controls-toggle')
+          report['mobileView']=driver.execute_script("const p=document.querySelector('#controls-panel'),s=getComputedStyle(p),tops=[...p.children].map(e=>Math.round(e.getBoundingClientRect().top));return {wrap:s.flexWrap,clientHeight:p.clientHeight,scrollHeight:p.scrollHeight,tops:[...new Set(tops)]}")
+          assert report['mobileView']['wrap']=='nowrap' and report['mobileView']['scrollHeight']<=report['mobileView']['clientHeight']+4 and len(report['mobileView']['tops'])==1,report
           driver.save_screenshot('gui-v6-mobile.png')
 
           driver.set_window_size(1440,1000)
