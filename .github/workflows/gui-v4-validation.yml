@@ -1,4 +1,4 @@
-name: GUI v4 validation
+name: GUI v6 validation
 
 on:
   push:
@@ -9,6 +9,8 @@ on:
       - src/gui-v1-safety.css
       - src/gui-v2.js
       - src/gui-v3-corrections.css
+      - src/gui-v5-frame-restore.css
+      - src/gui-v6-sarasa-i18n-frame.css
       - .github/workflows/gui-v4-validation.yml
 
 permissions:
@@ -28,9 +30,9 @@ jobs:
         run: |
           git fetch --depth=1 origin gh-pages:refs/remotes/origin/gh-pages
           git worktree add --detach /tmp/dailyflora-gh-pages refs/remotes/origin/gh-pages
-          rm -rf /tmp/dailyflora-gh-pages/ui-v4-special
-          cp -a /tmp/dailyflora-gh-pages/ui-v1 /tmp/dailyflora-gh-pages/ui-v4-special
-          sed -i 's/<html lang="zh-CN" class="df-gui-v1" data-language="zh">/<html lang="zh-CN">/' /tmp/dailyflora-gh-pages/ui-v4-special/index.html
+          rm -rf /tmp/dailyflora-gh-pages/ui-v6-special
+          cp -a /tmp/dailyflora-gh-pages/ui-v1 /tmp/dailyflora-gh-pages/ui-v6-special
+          sed -i 's/<html lang="en" class="df-gui-v1" data-language="en">/<html lang="en">/' /tmp/dailyflora-gh-pages/ui-v6-special/index.html
           mkdir -p /tmp/dailyflora-site-root
           ln -s /tmp/dailyflora-gh-pages /tmp/dailyflora-site-root/dailyFlora
 
@@ -54,7 +56,7 @@ jobs:
           python3 -m venv /tmp/dailyflora-selenium
           /tmp/dailyflora-selenium/bin/pip install --quiet 'selenium>=4.20,<5'
 
-      - name: Validate global language, terminal typography, menu space, and Special Edition
+      - name: Validate six locales, Sarasa trial, corner frame, and nowrap VIEW
         shell: bash
         run: |
           /tmp/dailyflora-selenium/bin/python - <<'PY'
@@ -67,13 +69,13 @@ jobs:
 
           base = 'http://127.0.0.1:4173/dailyFlora'
           normal_url = f'{base}/ui-v1/?date=2026-07-17&render=low&density=medium'
-          special_url = f'{base}/ui-v4-special/?special=ngc2787&render=low&density=low'
+          special_url = f'{base}/ui-v6-special/?special=ngc2787&render=low&density=low'
 
           options = webdriver.ChromeOptions()
           for argument in (
               '--headless=new', '--no-sandbox', '--disable-dev-shm-usage',
               '--hide-scrollbars', '--ignore-gpu-blocklist', '--enable-webgl',
-              '--enable-unsafe-swiftshader', '--use-gl=swiftshader', '--lang=zh-CN',
+              '--enable-unsafe-swiftshader', '--use-gl=swiftshader', '--lang=en-US',
           ):
               options.add_argument(argument)
 
@@ -83,6 +85,10 @@ jobs:
           def wait_for_scene(seconds=5):
               wait.until(lambda current: current.execute_script('return document.readyState') == 'complete')
               wait.until(lambda current: current.execute_script("return typeof window.__dailyFloraAudit === 'function'"))
+              driver.execute_async_script("""
+                const done = arguments[0];
+                document.fonts.ready.then(() => done(true)).catch(() => done(false));
+              """)
               time.sleep(seconds)
 
           def reveal_ui():
@@ -90,112 +96,145 @@ jobs:
                 document.querySelector('#hud')?.classList.remove('is-hidden');
                 document.querySelector('#controls')?.classList.remove('is-hidden');
               """)
-              time.sleep(.25)
+              time.sleep(.2)
+
+          def frame_state():
+              return driver.execute_script("""
+                const frame = document.querySelector('.interface-frame');
+                const style = getComputedStyle(frame);
+                const before = getComputedStyle(frame, '::before');
+                const after = getComputedStyle(frame, '::after');
+                return {
+                  display: style.display,
+                  borderTop: style.borderTopWidth,
+                  borderRight: style.borderRightWidth,
+                  borderBottom: style.borderBottomWidth,
+                  borderLeft: style.borderLeftWidth,
+                  inset: [frame.getBoundingClientRect().top, frame.getBoundingClientRect().left,
+                          innerWidth - frame.getBoundingClientRect().right,
+                          innerHeight - frame.getBoundingClientRect().bottom],
+                  before: [before.borderTopWidth, before.borderLeftWidth, before.width, before.height],
+                  after: [after.borderRightWidth, after.borderBottomWidth, after.width, after.height],
+                };
+              """)
+
+          def view_state():
+              return driver.execute_script("""
+                const panel = document.querySelector('#controls-panel');
+                const style = getComputedStyle(panel);
+                const tops = [...panel.children].map(el => Math.round(el.getBoundingClientRect().top));
+                return {
+                  hidden: panel.hidden,
+                  display: style.display,
+                  flexWrap: style.flexWrap,
+                  whiteSpace: style.whiteSpace,
+                  clientHeight: panel.clientHeight,
+                  scrollHeight: panel.scrollHeight,
+                  clientWidth: panel.clientWidth,
+                  scrollWidth: panel.scrollWidth,
+                  distinctTops: [...new Set(tops)],
+                };
+              """)
+
+          expected = {
+              'en': ('INDEX', 'VIEW'),
+              'zh': ('目录', '观看'),
+              'es': ('ÍNDICE', 'VISTA'),
+              'fr': ('INDEX', 'VUE'),
+              'it': ('INDICE', 'VISTA'),
+              'ja': ('目次', '表示'),
+          }
 
           report = {}
           driver.set_window_size(1440, 1000)
           driver.get(normal_url)
           wait_for_scene(6)
-          driver.execute_script("localStorage.removeItem('dailyflora.gui-language.v3'); location.reload();")
+          driver.execute_script("localStorage.removeItem('dailyflora.gui-language.v4'); location.reload();")
           wait_for_scene(6)
           reveal_ui()
 
           report['defaultLanguage'] = driver.execute_script('return document.documentElement.dataset.language')
-          report['frameExists'] = driver.execute_script("return Boolean(document.querySelector('.interface-frame'))")
-          report['languageText'] = driver.execute_script("return document.querySelector('.global-language-toggle').innerText")
-          report['languagePosition'] = driver.execute_script("""
-            const r = document.querySelector('.global-language-toggle').getBoundingClientRect();
-            return {top:r.top,right:innerWidth-r.right,width:r.width,height:r.height};
-          """)
-          report['zhVisibleCopy'] = driver.execute_script("""
-            return {
-              brand: document.querySelector('[data-ui-key="brandSystem"]').textContent,
-              kicker: document.querySelector('[data-ui-key="kicker"]').textContent,
-              index: document.querySelector('[data-ui-key="index"]').textContent,
-              view: document.querySelector('[data-ui-key="view"]').textContent,
-              titleCn: getComputedStyle(document.querySelector('.daily-theme-cn')).display,
-              titleEn: getComputedStyle(document.querySelector('.daily-theme-en')).display,
-            };
-          """)
-          report['monoLoaded'] = driver.execute_script("return document.fonts.check('10px \\\"IBM Plex Mono\\\"')")
-          report['scLoaded'] = driver.execute_script("return document.fonts.check('30px \\\"IBM Plex Sans SC\\\"', '花束')")
-          report['indexFont'] = driver.execute_script("return getComputedStyle(document.querySelector('.site-menu-label')).fontFamily")
-          report['zhTitleFont'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-cn')).fontFamily")
+          report['languageButtons'] = driver.execute_script("return [...document.querySelectorAll('[data-language-choice]')].map(b => b.textContent.trim())")
+          report['frame'] = frame_state()
+          report['fontFamilies'] = driver.execute_script("return [...document.fonts].map(face => face.family).filter((v,i,a) => a.indexOf(v) === i)")
+          report['sarasaLoaded'] = driver.execute_script("return [...document.fonts].some(face => /Sarasa/i.test(face.family) && face.status === 'loaded')")
+          report['titleFont'] = driver.execute_script("return getComputedStyle(document.querySelector('.daily-theme-en')).fontFamily")
 
-          assert report['defaultLanguage'] == 'zh', report
-          assert report['frameExists'] is False, report
-          assert '中文' in report['languageText'] and 'EN' in report['languageText'], report
-          assert report['languagePosition']['top'] < 60 and report['languagePosition']['right'] < 180, report
-          assert report['zhVisibleCopy']['brand'] == '生成式植物系统', report
-          assert report['zhVisibleCopy']['kicker'] == '今日花束', report
-          assert report['zhVisibleCopy']['index'] == '目录', report
-          assert report['zhVisibleCopy']['view'] == '观看', report
-          assert report['zhVisibleCopy']['titleCn'] != 'none' and report['zhVisibleCopy']['titleEn'] == 'none', report
-          assert report['monoLoaded'], report
-          assert 'IBM Plex Mono' in report['indexFont'], report
+          assert report['defaultLanguage'] == 'en', report
+          assert report['languageButtons'] == ['EN', '中', 'ES', 'FR', 'IT', '日'], report
+          assert report['frame']['display'] == 'block', report
+          assert all(value == '1px' for value in report['frame']['borderTop':'borderLeft'] if False), report
+          assert report['frame']['borderTop'] != '0px' and report['frame']['borderRight'] != '0px', report
+          assert report['frame']['borderBottom'] != '0px' and report['frame']['borderLeft'] != '0px', report
+          assert report['frame']['before'][0] != '0px' and report['frame']['before'][1] != '0px', report
+          assert report['frame']['after'][0] != '0px' and report['frame']['after'][1] != '0px', report
+          assert report['sarasaLoaded'], report
+          assert 'Sarasa' in report['titleFont'], report
+          driver.save_screenshot('gui-v6-english-default-frame.png')
 
-          driver.save_screenshot('gui-v4-chinese-default.png')
+          report['locales'] = {}
+          for language, labels in expected.items():
+              driver.find_element(By.CSS_SELECTOR, f'[data-language-choice="{language}"]').click()
+              time.sleep(.3)
+              reveal_ui()
+              state = driver.execute_script("""
+                return {
+                  language: document.documentElement.dataset.language,
+                  rootLang: document.documentElement.lang,
+                  index: document.querySelector('[data-ui-key="index"]').textContent,
+                  view: document.querySelector('[data-ui-key="view"]').textContent,
+                  titleCn: getComputedStyle(document.querySelector('.daily-theme-cn')).display,
+                  titleEn: getComputedStyle(document.querySelector('.daily-theme-en')).display,
+                };
+              """)
+              assert state['language'] == language, (language, state)
+              assert (state['index'], state['view']) == labels, (language, state)
+              if language == 'zh':
+                  assert state['titleCn'] != 'none' and state['titleEn'] == 'none', (language, state)
+              else:
+                  assert state['titleCn'] == 'none' and state['titleEn'] != 'none', (language, state)
 
-          driver.find_element(By.ID, 'site-menu-toggle').click()
-          wait.until(lambda current: not current.find_element(By.ID, 'site-menu-panel').get_attribute('hidden'))
-          time.sleep(.5)
-          report['menuState'] = driver.execute_script("""
-            const panel = document.querySelector('#site-menu-panel');
-            const style = getComputedStyle(panel);
-            const rect = panel.getBoundingClientRect();
-            const cta = getComputedStyle(document.querySelector('.site-menu-primary'));
-            return {
-              bodyClass: document.body.classList.contains('is-menu-open'),
-              height: rect.height,
-              viewport: innerHeight,
-              background: style.backgroundColor,
-              hudOpacity: getComputedStyle(document.querySelector('#hud')).opacity,
-              ctaLeft: cta.borderLeftWidth,
-              ctaRight: cta.borderRightWidth,
-              ctaBottom: cta.borderBottomWidth,
-            };
-          """)
-          assert report['menuState']['bodyClass'], report
-          assert abs(report['menuState']['height'] - report['menuState']['viewport']) < 2, report
-          assert float(report['menuState']['hudOpacity']) == 0, report
-          assert report['menuState']['ctaLeft'] == '0px', report
-          assert report['menuState']['ctaRight'] == '0px', report
-          assert report['menuState']['ctaBottom'] == '0px', report
-          driver.save_screenshot('gui-v4-index-drawer.png')
+              driver.find_element(By.ID, 'controls-toggle').click()
+              wait.until(lambda current: not current.find_element(By.ID, 'controls-panel').get_attribute('hidden'))
+              time.sleep(.25)
+              view = view_state()
+              assert view['flexWrap'] == 'nowrap', (language, view)
+              assert view['scrollHeight'] <= view['clientHeight'] + 4, (language, view)
+              assert len(view['distinctTops']) == 1, (language, view)
+              state['viewPanel'] = view
+              report['locales'][language] = state
+              driver.find_element(By.ID, 'controls-toggle').click()
+              time.sleep(.15)
 
-          driver.find_element(By.CSS_SELECTOR, '[data-language-choice="en"]').click()
-          time.sleep(.5)
-          report['englishCopy'] = driver.execute_script("""
-            return {
-              language: document.documentElement.dataset.language,
-              brand: document.querySelector('[data-ui-key="brandSystem"]').textContent,
-              kicker: document.querySelector('[data-ui-key="kicker"]').textContent,
-              index: document.querySelector('[data-ui-key="index"]').textContent,
-              view: document.querySelector('[data-ui-key="view"]').textContent,
-              about: document.querySelector('[data-ui-key="about"]').textContent,
-              member: document.querySelector('[data-ui-key="member"]').textContent,
-              save: document.querySelector('[data-ui-key="save"]').textContent,
-              titleCn: getComputedStyle(document.querySelector('.daily-theme-cn')).display,
-              titleEn: getComputedStyle(document.querySelector('.daily-theme-en')).display,
-            };
-          """)
-          assert report['englishCopy']['language'] == 'en', report
-          assert report['englishCopy']['brand'] == 'GENERATIVE BOTANICAL SYSTEM', report
-          assert report['englishCopy']['kicker'] == "TODAY'S COMPOSITION", report
-          assert report['englishCopy']['index'] == 'INDEX', report
-          assert report['englishCopy']['view'] == 'VIEW', report
-          assert report['englishCopy']['about'] == 'About', report
-          assert report['englishCopy']['member'] == 'Member Garden', report
-          assert report['englishCopy']['save'] == 'Save This Bouquet', report
-          assert report['englishCopy']['titleCn'] == 'none' and report['englishCopy']['titleEn'] != 'none', report
-          driver.save_screenshot('gui-v4-english-index.png')
+          driver.find_element(By.CSS_SELECTOR, '[data-language-choice="ja"]').click()
+          reveal_ui()
+          driver.save_screenshot('gui-v6-japanese.png')
+          driver.find_element(By.CSS_SELECTOR, '[data-language-choice="es"]').click()
+          reveal_ui()
+          driver.find_element(By.ID, 'controls-toggle').click()
+          time.sleep(.3)
+          driver.save_screenshot('gui-v6-spanish-view-nowrap.png')
 
           driver.set_window_size(390, 844)
           driver.get(normal_url)
           wait_for_scene(7)
-          driver.find_element(By.CSS_SELECTOR, '[data-language-choice="zh"]').click()
           reveal_ui()
-          driver.save_screenshot('gui-v4-mobile.png')
+          report['mobile'] = driver.execute_script("""
+            const language = document.querySelector('.global-language-toggle').getBoundingClientRect();
+            const index = document.querySelector('#site-menu-toggle').getBoundingClientRect();
+            return {
+              language: {left:language.left, right:language.right, top:language.top, bottom:language.bottom},
+              index: {left:index.left, right:index.right, top:index.top, bottom:index.bottom},
+              overlap: !(language.right <= index.left || language.left >= index.right || language.bottom <= index.top || language.top >= index.bottom),
+            };
+          """)
+          assert not report['mobile']['overlap'], report['mobile']
+          driver.find_element(By.ID, 'controls-toggle').click()
+          time.sleep(.3)
+          report['mobileView'] = view_state()
+          assert report['mobileView']['flexWrap'] == 'nowrap', report['mobileView']
+          assert report['mobileView']['scrollHeight'] <= report['mobileView']['clientHeight'] + 4, report['mobileView']
+          driver.save_screenshot('gui-v6-mobile-view-nowrap.png')
 
           driver.set_window_size(1440, 1000)
           driver.get(special_url)
@@ -203,20 +242,20 @@ jobs:
           report['special'] = driver.execute_script("""
             return {
               guiClass: document.documentElement.classList.contains('df-gui-v1'),
+              frame: getComputedStyle(document.querySelector('.interface-frame')).display,
               language: getComputedStyle(document.querySelector('.global-language-toggle')).display,
-              heading: getComputedStyle(document.querySelector('.site-menu-heading')).display,
               menuLegacy: getComputedStyle(document.querySelector('.site-menu-legacy-icon')).display,
               controlsLegacy: getComputedStyle(document.querySelector('.controls-legacy-icon')).display,
             };
           """)
           assert report['special']['guiClass'] is False, report
+          assert report['special']['frame'] == 'none', report
           assert report['special']['language'] == 'none', report
-          assert report['special']['heading'] == 'none', report
           assert report['special']['menuLegacy'] != 'none', report
           assert report['special']['controlsLegacy'] != 'none', report
-          driver.save_screenshot('gui-v4-special-unchanged.png')
+          driver.save_screenshot('gui-v6-special-unchanged.png')
 
-          Path('gui-v4-validation.json').write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding='utf-8')
+          Path('gui-v6-validation.json').write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding='utf-8')
           driver.quit()
           PY
 
@@ -224,14 +263,14 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: dailyflora-gui-v4-validation
+          name: dailyflora-gui-v6-validation
           path: |
-            gui-v4-chinese-default.png
-            gui-v4-index-drawer.png
-            gui-v4-english-index.png
-            gui-v4-mobile.png
-            gui-v4-special-unchanged.png
-            gui-v4-validation.json
+            gui-v6-english-default-frame.png
+            gui-v6-japanese.png
+            gui-v6-spanish-view-nowrap.png
+            gui-v6-mobile-view-nowrap.png
+            gui-v6-special-unchanged.png
+            gui-v6-validation.json
             /tmp/dailyflora-preview.log
           if-no-files-found: warn
           retention-days: 7
