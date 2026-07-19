@@ -41,7 +41,7 @@ renderer.autoClear = false;
 const previews: Preview[] = [];
 const calibratedFlowerIds = new Set([
   'delphinium', 'snapdragon', 'hyacinth', 'foxtail-lily',
-  'liatris', 'lace-flower', 'hydrangea', 'babys-breath'
+  'liatris', 'lace-flower', 'babys-breath'
 ]);
 const silhouetteMaterial = new THREE.MeshBasicMaterial({ color: '#f7f0e3', side: THREE.DoubleSide });
 let activeView: ViewName = 'front';
@@ -69,7 +69,7 @@ function renderLabels() {
     return `
       <article class="cell" data-flower="${escapeHtml(definition.id)}" data-foliage-profile="${escapeHtml(foliage.foliageProfile)}" data-leaf-mode="${escapeHtml(foliage.leafMode)}">
         <div class="label">
-          <div class="meta"><span>${String(index + 1).padStart(2, '0')} · ${escapeHtml(definition.category)}</span><span class="connected">connected</span></div>
+          <div class="meta"><span>${String(index + 1).padStart(2, '0')} · ${escapeHtml(definition.category)}</span><span class="connected">${definition.frozen ? 'frozen' : 'connected'}</span></div>
           <h3>${escapeHtml(definition.cn)}</h3>
           <p class="en">${escapeHtml(definition.en)}</p>
           ${definition.scientificName ? `<p class="species">${escapeHtml(definition.scientificName)}</p>` : ''}

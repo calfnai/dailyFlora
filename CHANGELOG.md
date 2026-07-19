@@ -6,6 +6,12 @@
 
 记录今日默认花束的花材丰富度问题。 / Recorded today's default bouquet variety issue.
 
+- 新增空闲时钟模式：默认 5 分钟无操作后以淡入方式显示 24 小时制时间、日期和舒缓英文名言；支持手动开启、自动显示开关与间隔持久化，并以渐隐毛玻璃叠层保留花束持续旋转。 / Added an idle clock mode: after five minutes of inactivity it fades in a 24-hour clock, date, and calming English quote; manual opening, persistent interval settings, and automatic display can be controlled while the bouquet continues behind a fading glass overlay.
+
+- 记录并修复 `2026-07-16` 默认花束中穗状/线形花材的问题：蛇鞭菊、风信子、金鱼草不应以同一个等长等量 `SpikeFlower` 模板大比例出现，茎过粗、飞出屏幕和蛇鞭菊炸开花蕊都会直接破坏整体美感。 / Recorded and fixed the default `2026-07-16` bouquet issue where liatris, hyacinth, and snapdragon were reading as the same repeated `SpikeFlower` template with equal length and bloom count; thick stems, off-screen spikes, and explosive liatris styles directly broke the bouquet.
+- 为 `2026-07-16` 增加日期修正：降低 line role 权重、缩小并下沉穗花、收窄径向外逸，同时把 sparkle/空气点密度提高到 3 倍。 / Added a `2026-07-16` date correction that reduces line-role weight, scales and lowers spikes, tightens radial drift, and triples sparkle/air-dot density.
+- 重做主花束 `SpikeFlower` 的确定性变体：每支穗花现在有不同长度、花序段、含花量、花距和粗细，避免串串花复制粘贴感。 / Reworked the main bouquet `SpikeFlower` deterministic variation so each spike has different length, active flowering span, bloom count, spacing, and thickness instead of reading as copy-pasted stems.
+- 同步修偏写实 LAB 中金鱼草、风信子、蛇鞭菊和满天星：前两者主轴与花梗变细，蛇鞭菊花头贴轴并收短花柱，满天星分枝和终端花数增加。 / Updated the realistic lab forms for snapdragon, hyacinth, liatris, and baby's breath: snapdragon/hyacinth axes and pedicels are thinner, liatris heads cling to the axis with shorter styles, and baby's breath has denser branching and terminal flowers.
 - 记录用户反馈：`2026-07-13` 默认花束不好看，主要原因是用到的花的品种不够丰富。 / Recorded owner feedback that the default `2026-07-13` bouquet is not working mainly because the visible flower varieties are not rich enough.
 - 排查确认当天抽到 `tropical-forest` theme 与 `berry-grove` flowerPlan；主花束仍主要使用老 `FlowerTypeId` 与少数 primitive，0.14.6 新增的 16 种具象单花尚未进入每日默认生成器。 / Diagnosed that the date selected the `tropical-forest` theme and `berry-grove` flowerPlan; the main bouquet still relies on the old `FlowerTypeId` set and a small primitive subset, while the 16 concrete forms added in 0.14.6 are not yet part of daily default generation.
 - 将“每日生成必须真正用上扩展花库”记录为新的 dashboard 可复用审美规则，后续需要代码修复后复验。 / Added "daily generation must actually use the expanded flower library" as a reusable dashboard rule; this needs a code fix and owner review.

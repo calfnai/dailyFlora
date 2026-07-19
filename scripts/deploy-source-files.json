@@ -60,6 +60,7 @@
   "src/extendedTypes.ts",
   "src/flowerPlans.ts",
   "src/floraPrimitives.ts",
+  "src/idleClock.ts",
   "src/main.ts",
   "src/primitiveLab.ts",
   "src/realisticFlowerForms.ts",

@@ -756,7 +756,7 @@ function buildSpikeStemConnector(
   upper.x *= 0.88;
   upper.z *= 0.88;
   const curve = new THREE.CatmullRomCurve3([tie, lower, upper, spikeBase]);
-  const geometry = new THREE.TubeGeometry(curve, 10, 0.009, 5, false);
+  const geometry = new THREE.TubeGeometry(curve, 10, 0.0055, 5, false);
   const material = new THREE.MeshStandardMaterial({
     color: spec.theme.stem,
     roughness: 0.92,
@@ -934,7 +934,7 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
       const primitiveGroup = factory({
         seed: `${spec.seed}:bouquet-primitive:${primitive}:${batch.typeId}:${i}`,
         position: p,
-        scale: roleScale * batch.scale * compositionScaleForPrimitive(primitive) * localRng.range(0.82, 1.22) * specialScale * tuningScale * spikeScale,
+        scale: roleScale * batch.scale * compositionScaleForPrimitive(primitive) * localRng.range(0.72, primitive === 'SpikeFlower' ? 1.02 : 1.22) * specialScale * tuningScale * spikeScale,
         colorPalette: primitivePalette(spec, primitive, localRng, batch),
         openness: ['OrchidButterflyFlower', 'TrumpetThroatFlower', 'DaturaTrumpetFlower', 'CallaCurledBract'].includes(primitive) ? 0.94 : localRng.range(0.62, 0.86),
         density: ['UmbelMiniCluster', 'FullHydrangeaCloud', 'FruitPodCluster'].includes(primitive) ? 1.08 : localRng.range(0.86, 1.02),
@@ -959,7 +959,8 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
 
   const foliageFactory = floraPrimitiveFactories.FoliageGrassBranch;
   const foliageRng = createRng(`${spec.seed}:primitive-foliage-accents`);
-  const foliageCount = Math.max(6, Math.floor(count * 0.08 * spec.theme.wildness));
+  const foliageAccentRatio = spec.dateLabel === '2026-07-16' ? 0.024 : 0.08;
+  const foliageCount = Math.max(spec.dateLabel === '2026-07-16' ? 3 : 6, Math.floor(count * foliageAccentRatio * spec.theme.wildness));
   for (let i = 0; i < foliageCount; i += 1) {
     const { p, theta } = placementPoint(spec, foliageRng, i % 4 === 0 ? 'spray' : i % 2 === 0 ? 'outer' : 'mixed');
     p.y -= foliageRng.range(0.18, 0.42);
@@ -968,7 +969,7 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
     const foliage = foliageFactory({
       seed: `${spec.seed}:bouquet-foliage:${i}`,
       position: p,
-      scale: foliageRng.range(0.2, 0.32),
+      scale: spec.dateLabel === '2026-07-16' ? foliageRng.range(0.12, 0.2) : foliageRng.range(0.2, 0.32),
       colorPalette: primitivePalette(spec, 'FoliageGrassBranch', foliageRng),
       openness: 0.74,
       density: 0.92,
@@ -1903,7 +1904,7 @@ function buildStemBundle(spec: DailyBouquetSpec, stems: readonly PlantStemInstan
   const flowerStems = stems.filter((plantStem) => plantStem.source === 'realistic-flower');
   const visibleStemCount = Math.min(
     flowerStems.length,
-    Math.floor(24 * (spec.special?.shape.stemVisibility ?? 1))
+    Math.floor(18 * (spec.special?.shape.stemVisibility ?? 1))
   );
   const visibleStems = Array.from({ length: visibleStemCount }, (_, index) => {
     if (visibleStemCount <= 1) return flowerStems[0];
@@ -1926,7 +1927,7 @@ function buildStemBundle(spec: DailyBouquetSpec, stems: readonly PlantStemInstan
   const material = new THREE.LineBasicMaterial({
     vertexColors: true,
     transparent: true,
-    opacity: 0.2
+    opacity: spec.dateLabel === '2026-07-16' ? 0.1 : 0.16
   });
   const lines = new THREE.LineSegments(geometry, material);
 
@@ -2210,6 +2211,7 @@ export class BouquetScene {
   private cameraDistance = 5.36;
   private baseCameraDistance = 5.36;
   private targetCameraDistance = 5.36;
+  private presentationTargetX = 0;
   private cameraTargetY = 0.7;
   private baseCameraTargetY = 0.7;
   private targetCameraTargetY = 0.7;
@@ -2399,8 +2401,8 @@ export class BouquetScene {
   }
 
   resize() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const width = Math.max(1, this.canvas.clientWidth || window.innerWidth);
+    const height = Math.max(1, this.canvas.clientHeight || window.innerHeight);
     const ratio = width / height;
     const phone = width < 720;
     const wide = ratio > 1.65;
@@ -2492,7 +2494,7 @@ export class BouquetScene {
     const yaw = this.cameraYaw + routeOffsets.yaw;
     const pitch = THREE.MathUtils.clamp(this.cameraPitch, minCameraPitch, maxCameraPitch);
     const distance = THREE.MathUtils.clamp(this.cameraDistance, 3.2, 8.7);
-    const target = new THREE.Vector3(0, this.cameraTargetY, 0);
+    const target = new THREE.Vector3(this.presentationTargetX, this.cameraTargetY, 0);
     const horizontal = Math.cos(pitch) * distance;
 
     this.camera.position.set(
@@ -2628,6 +2630,11 @@ export class BouquetScene {
     this.zoomOffset = THREE.MathUtils.clamp(offset, minZoomOffset, maxZoomOffset);
     this.targetCameraDistance = this.baseCameraDistance + this.zoomOffset;
     return this.zoomOffset;
+  }
+
+  setClockLayout(active: boolean) {
+    this.presentationTargetX = active ? 1.08 : 0;
+    this.updateCamera(emptyRouteOffsets);
   }
 
   zoomBy(delta: number) {

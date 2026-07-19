@@ -40,6 +40,20 @@ const dailyCorrections: Record<string, {
       roleScale: { main: 0.92, secondary: 0.9, cluster: 0.74, fruit: 0.86 }
     }
   },
+  '2026-07-16': {
+    flowerDensity: 0.92,
+    branchDensity: 1.08,
+    leafDensity: 1.12,
+    sparkleDensity: 3,
+    compositionTuning: {
+      radialSpread: 0.92,
+      centerSpread: 1.08,
+      spikeScale: 0.58,
+      spikeAnchorLift: -0.34,
+      roleShare: { line: 0.42, filler: 1.24, fruit: 1.68, cluster: 0.96, main: 1.06, secondary: 1.02 },
+      roleScale: { line: 0.66, fruit: 0.72, filler: 0.94 }
+    }
+  },
   '2026-07-11': {
     flowerDensity: 0.9,
     branchDensity: 1.08,

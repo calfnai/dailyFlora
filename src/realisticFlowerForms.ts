@@ -42,6 +42,7 @@ export type RealisticFlowerCategory = 'face' | 'layered' | 'sculptural' | 'spike
 
 export interface RealisticFlowerDefinition {
   id: RealisticFlowerId;
+  frozen?: boolean;
   cn: string;
   en: string;
   scientificName?: string;
@@ -521,6 +522,7 @@ function createLegacySpikeTemplate(options: BuildOptions, kind: LegacySpikeKind)
   return group;
 }
 
+// FROZEN: do not modify Hydrangea geometry or parameters without explicit user unfreeze.
 function createHydrangeaBaseline(options: BuildOptions) {
   const rng = createRng(`${options.seed}:hydrangea`);
   const group = new THREE.Group();
@@ -535,7 +537,6 @@ function createHydrangeaBaseline(options: BuildOptions) {
 
   const flowerCount = 104;
   const cloudCenter = new THREE.Vector3(0, 0.4, 0);
-  const softCenter = colorAt(options.palette, 1).clone().lerp(colorAt(options.palette, 0), 0.55);
   const petals = new THREE.InstancedMesh(
     roundedSepalGeometry(0.15, 0.115, 0.014),
     flowerMaterial(colorAt(options.palette, 0), 0.84),
@@ -543,7 +544,7 @@ function createHydrangeaBaseline(options: BuildOptions) {
   );
   const centers = new THREE.InstancedMesh(
     new THREE.SphereGeometry(0.032, 8, 6),
-    flowerMaterial(softCenter, 0.9),
+    flowerMaterial(colorAt(options.palette, 2), 0.9),
     flowerCount
   );
   let petalIndex = 0;
@@ -556,8 +557,8 @@ function createHydrangeaBaseline(options: BuildOptions) {
     const bloom = cloudCenter.clone().addScaledVector(normal, radius);
     const shortPedicel = bloom.clone().addScaledVector(normal, -0.1);
     group.add(cylinderBetween(shortPedicel, bloom, 0.0045, green));
-    const scale = rng.range(0.95, 1.05);
-    setInstance(centers, i, bloom, new THREE.Vector3(scale, scale, scale), softCenter, 0, normal);
+    const scale = rng.range(0.9, 1.08);
+    setInstance(centers, i, bloom, new THREE.Vector3(scale, scale, scale), colorAt(options.palette, i + 1), 0, normal);
     const reference = Math.abs(normal.y) < 0.88 ? up : new THREE.Vector3(1, 0, 0);
     const tangent = new THREE.Vector3().crossVectors(normal, reference).normalize();
     const bitangent = new THREE.Vector3().crossVectors(normal, tangent).normalize();
@@ -572,7 +573,7 @@ function createHydrangeaBaseline(options: BuildOptions) {
         petalIndex,
         bloom,
         new THREE.Vector3(scale, scale, 1),
-        colorAt(options.palette, p % 2).clone().lerp(new THREE.Color('#ffffff'), rng.range(0.02, 0.12)),
+        colorAt(options.palette, p).clone().lerp(new THREE.Color('#ffffff'), rng.range(0.01, 0.14)),
         0,
         petalDirection
       );
@@ -821,7 +822,7 @@ export const realisticFlowerDefinitions: RealisticFlowerDefinition[] = [
   { id: 'foxtail-lily', cn: '狐尾百合', en: 'Foxtail Lily', scientificName: 'Eremurus × isabellinus 园艺型', category: 'spike', description: '挺拔圆柱状总状花序；下部六被片星形花盛开，六枚雄蕊与花药明显外伸，中部半开、顶部花蕾。', calibration: '校准：自下而上开放；花梗由下长上短，主轴只保留轻微自然偏摆。', scopeNote: calibratedScopeNote, palette: ['#f2a64a', '#f8c46d', '#ffe0a0', '#607d4e'], printStructure: '花梗、花被和外伸雄蕊均连接在近直立主轴上。' },
   { id: 'liatris', cn: '蛇鞭菊', en: 'Liatris', scientificName: 'Liatris spicata', category: 'spike', description: '无明显长花梗的头状花序紧贴主轴；每个花头由多枚细管状盘花和外伸花柱组成。', calibration: '校准：无普通五瓣花；顶部先开、下部留蕾，形成细长紧密的绒毛瓶刷轮廓。', scopeNote: calibratedScopeNote, palette: ['#a36bd1', '#c28ae2', '#e8b5f1', '#55734d'], printStructure: '管状小花、分叉花柱与苞片直接贴合连续主轴。' },
   { id: 'lace-flower', cn: '蕾丝花', en: 'Lace Flower', scientificName: 'Ammi majus', category: 'cluster', description: '中心节点放射不等长一级伞梗；每根末端再形成含五瓣微花的小伞形花簇，整体近扁平微拱。', calibration: '校准：复伞形两级结构、非规则密度、总苞片与小总苞片；不做完美烟花圆盘。', scopeNote: calibratedScopeNote, palette: ['#fffdf0', '#f5eed4', '#e6cf78', '#5e7d52'], printStructure: '所有微花经二级伞梗、一级伞梗汇回中心主花梗。' },
-  { id: 'hydrangea', cn: '绣球', en: 'Hydrangea', scientificName: 'Hydrangea macrophylla mophead 园艺型', category: 'cluster', description: '恢复旧版柔和蓝色半球花球；四枚花瓣状萼片的装饰花保持稳定尺度，只混入少量半开花与花蕾。', calibration: '校准：沿用 0b3655c 的 cap 分布与整体参数，收窄随机变化、降低中心对比并隐藏内部短分枝。', scopeNote: calibratedScopeNote, palette: ['#9dc9ef', '#bddcf6', '#e6d988', '#5d7f54'], printStructure: '主茎经隐藏式支撑枝连接短花梗，外层花不悬浮。' },
+  { id: 'hydrangea', frozen: true, cn: '绣球', en: 'Hydrangea', scientificName: 'Hydrangea macrophylla mophead 园艺型', category: 'cluster', description: '大量四萼片装饰花紧密重叠，形成半球至近球形 mophead 花球。', calibration: '冻结：完整恢复 commit 0b3655c 的花球分布、尺度与配色。', scopeNote: calibratedScopeNote, palette: ['#9dc9ef', '#bddcf6', '#e6d988', '#5d7f54'], printStructure: '短花梗藏在花球内部，由单根明确主茎承托整颗花球。' },
   { id: 'babys-breath', cn: '满天星', en: "Baby's Breath", scientificName: 'Gypsophila paniculata', category: 'cluster', description: '主轴发出不等距一级枝，继续分成二级枝与末端短花梗；五瓣小花和圆蕾集中在枝端。', calibration: '校准：不等长、不等角、不等花数的圆锥花序，远看形成空气花雾而非规则星点阵列。', scopeNote: calibratedScopeNote, palette: ['#fffdf4', '#f3eedf', '#e8d99c', '#617e56'], printStructure: '每朵花都通过末端花梗连接二级枝，再汇回主轴。' },
   { id: 'rice-flower', cn: '米花', en: 'Rice Flower', category: 'cluster', description: '米粒大小的椭圆花苞密集组成多个枝端伞房状小簇。', palette: ['#fff0dd', '#f2d8bd', '#dfbc83', '#617e54'], printStructure: '密集小花头由短梗汇入多个枝端簇，再连接单一主茎。' }
 ];
