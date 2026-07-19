@@ -44,6 +44,7 @@ export default defineConfig({
         bouquetShop: resolve(__dirname, 'bouquet-shop/index.html'),
         downloads: resolve(__dirname, 'downloads/index.html'),
         member: resolve(__dirname, 'member/index.html'),
+        scifi: resolve(__dirname, 'scifi/index.html'),
         signup: resolve(__dirname, 'signup/index.html'),
         devIndex: resolve(__dirname, 'docs/dev-index.html'),
         developmentDocumentSummary: resolve(__dirname, 'docs/development-document-summary.html'),
@@ -55,8 +56,13 @@ export default defineConfig({
         aestheticReviewDashboard: resolve(__dirname, 'docs/aesthetic-review-dashboard.html'),
         primitiveLab: resolve(__dirname, 'docs/primitive-lab.html'),
         realisticFlowerLab: resolve(__dirname, 'docs/realistic-flower-lab.html'),
+        foxtailLilyApprovalLab: resolve(__dirname, 'docs/foxtail-lily-approval-lab.html'),
+        ammiMajusApprovalLab: resolve(__dirname, 'docs/ammi-majus-approval-lab.html'),
         scifiFlowerLab: resolve(__dirname, 'docs/scifi-flower-lab.html'),
         scifiBouquetLab: resolve(__dirname, 'docs/scifi-bouquet-lab.html'),
+        leafSilhouetteLab: resolve(__dirname, 'docs/leaf-silhouette-lab.html'),
+        strap3DMiniLab: resolve(__dirname, 'docs/strap-3d-mini-lab.html'),
+        palmate3DMiniLab: resolve(__dirname, 'docs/palmate-3d-mini-lab.html'),
         avatarLab: resolve(__dirname, 'docs/avatar-lab.html')
       }
     }

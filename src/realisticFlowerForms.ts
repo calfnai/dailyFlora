@@ -1,6 +1,15 @@
 import * as THREE from 'three';
 import { createRng } from './random';
 import { createCallaCurledBract, createFrilledNarcissusFlower } from './floraPrimitives';
+import {
+  createBabysBreath as createCalibratedBabysBreath,
+  createDelphinium as createCalibratedDelphinium,
+  createFoxtailLily as createCalibratedFoxtailLily,
+  createHyacinth as createCalibratedHyacinth,
+  createLaceFlower as createCalibratedLaceFlower,
+  createLiatris as createCalibratedLiatris,
+  createSnapdragon as createCalibratedSnapdragon
+} from './realisticBotanicalForms';
 
 export type RealisticFlowerId =
   | 'daisy'
@@ -33,10 +42,14 @@ export type RealisticFlowerCategory = 'face' | 'layered' | 'sculptural' | 'spike
 
 export interface RealisticFlowerDefinition {
   id: RealisticFlowerId;
+  frozen?: boolean;
   cn: string;
   en: string;
+  scientificName?: string;
   category: RealisticFlowerCategory;
   description: string;
+  calibration?: string;
+  scopeNote?: string;
   palette: string[];
   printStructure: string;
 }
@@ -391,9 +404,10 @@ function createCalla(options: BuildOptions) {
   return group;
 }
 
-type SpikeKind = 'delphinium' | 'snapdragon' | 'hyacinth' | 'foxtail-lily' | 'liatris';
+type LegacySpikeKind = 'delphinium' | 'snapdragon' | 'hyacinth' | 'foxtail-lily' | 'liatris';
 
-function createSpike(options: BuildOptions, kind: SpikeKind) {
+// Retained only as an archived comparison for the before/after study; the LAB no longer calls it.
+function createLegacySpikeTemplate(options: BuildOptions, kind: LegacySpikeKind) {
   const rng = createRng(`${options.seed}:${kind}`);
   const group = new THREE.Group();
   const green = colorAt(options.palette, options.palette.length - 1, '#587a4f');
@@ -508,7 +522,8 @@ function createSpike(options: BuildOptions, kind: SpikeKind) {
   return group;
 }
 
-function createHydrangea(options: BuildOptions) {
+// FROZEN: do not modify Hydrangea geometry or parameters without explicit user unfreeze.
+function createHydrangeaBaseline(options: BuildOptions) {
   const rng = createRng(`${options.seed}:hydrangea`);
   const group = new THREE.Group();
   const green = colorAt(options.palette, options.palette.length - 1, '#5d7f54');
@@ -575,7 +590,7 @@ function createHydrangea(options: BuildOptions) {
   return group;
 }
 
-function createLaceFlower(options: BuildOptions) {
+function createLegacyLaceFlower(options: BuildOptions) {
   const rng = createRng(`${options.seed}:lace-flower`);
   const group = new THREE.Group();
   const green = colorAt(options.palette, options.palette.length - 1, '#5e7d52');
@@ -624,7 +639,7 @@ function createLaceFlower(options: BuildOptions) {
   return group;
 }
 
-function createBabysBreath(options: BuildOptions) {
+function createLegacyBabysBreath(options: BuildOptions) {
   const rng = createRng(`${options.seed}:babys-breath`);
   const group = new THREE.Group();
   const green = colorAt(options.palette, options.palette.length - 1, '#617e56');
@@ -782,6 +797,8 @@ const layeredConfigs: Record<'dahlia' | 'rose' | 'ranunculus' | 'camellia' | 'pe
   }
 };
 
+const calibratedScopeNote = '程序化偏写实校准；用于物种识别与形态检查，不是植物学扫描模型。';
+
 export const realisticFlowerDefinitions: RealisticFlowerDefinition[] = [
   { id: 'daisy', cn: '雏菊', en: 'Daisy', category: 'face', description: '白色窄瓣、清楚黄心、轻薄平展。', palette: ['#fffdf0', '#f7f0d8', '#efc83f', '#71945b'], printStructure: '花瓣根部插入花托，黄心覆盖连接区。' },
   { id: 'chamomile', cn: '洋甘菊', en: 'Chamomile', category: 'face', description: '较少且略下垂的白瓣，黄心更高、更圆。', palette: ['#fff8e4', '#f8efd6', '#e6bd2d', '#698a52'], printStructure: '短瓣与拱形花心相交，连接短花梗。' },
@@ -799,14 +816,14 @@ export const realisticFlowerDefinitions: RealisticFlowerDefinition[] = [
   { id: 'narcissus', cn: '洋水仙', en: 'Narcissus', category: 'sculptural', description: '六片花被、褶边副冠、深喉和可见花蕊。', palette: ['#fff2bc', '#ffe4a0', '#f3b13e', '#ffd46c', '#6f9658'], printStructure: '副冠、花蕊、花被、花托与花梗连续连接。' },
   { id: 'phalaenopsis', cn: '蝴蝶兰', en: 'Phalaenopsis Orchid', category: 'sculptural', description: '左右展开的大瓣、上下萼片和中央唇瓣。', palette: ['#f3c6ea', '#fff1fb', '#d56cad', '#f1b44f', '#64834d'], printStructure: '五片主瓣与中央柱体相交，唇瓣连接柱体。' },
   { id: 'calla', cn: '马蹄莲', en: 'Calla Lily', category: 'sculptural', description: '单片卷曲苞片包围肉穗花序。', palette: ['#fff4d5', '#f5df9e', '#e9b742', '#6a8b57'], printStructure: '苞片基部闭合连接粗花梗，肉穗固定在内部。' },
-  { id: 'delphinium', cn: '飞燕草', en: 'Delphinium', category: 'spike', description: '不对称蓝花带后伸花距，沿纤细总状花轴错落开放。', palette: ['#6f95ed', '#9fb7ff', '#f4e7b9', '#55734e'], printStructure: '连续花轴向下延伸，复杂单花以短花梗接入。' },
-  { id: 'snapdragon', cn: '金鱼草', en: 'Snapdragon', category: 'spike', description: '融合成龙头轮廓的上下两唇花，横向排列在总状花序上。', palette: ['#ff8877', '#ffb197', '#f7d07c', '#5b7d4e'], printStructure: '筒状花冠由细短梗接入连续主轴，底密顶疏。' },
-  { id: 'hyacinth', cn: '风信子', en: 'Hyacinth', category: 'spike', description: '筒状钟形花冠末端六裂反卷，密集组成圆柱形总状花序。', palette: ['#9f86df', '#c2adef', '#f0d77b', '#55764e'], printStructure: '短梗围绕较短主轴密集接入，并完整连接花瓶。' },
-  { id: 'foxtail-lily', cn: '狐尾百合', en: 'Foxtail Lily', category: 'spike', description: '六枚星形花被与长花蕊组成密集、挺拔的长圆柱花序。', palette: ['#f2a64a', '#f8c46d', '#ffe0a0', '#607d4e'], printStructure: '短花梗密集环绕近直立主轴，只保留轻微自然偏摆。' },
-  { id: 'liatris', cn: '蛇鞭菊', en: 'Liatris', category: 'spike', description: '无明显花梗的头状花紧贴主轴，伸出花柱形成瓶刷绒穗。', palette: ['#a36bd1', '#c28ae2', '#e8b5f1', '#55734d'], printStructure: '细管状花与花柱簇直接贴合主轴，由上向下开放。' },
-  { id: 'lace-flower', cn: '蕾丝花', en: 'Lace Flower', category: 'cluster', description: '一级伞梗末端再分出小伞形花簇，组成扁平微拱的复伞形花序。', palette: ['#fffdf0', '#f5eed4', '#e6cf78', '#5e7d52'], printStructure: '所有微小花朵经二级伞梗汇入明确中心花梗。' },
-  { id: 'hydrangea', cn: '绣球', en: 'Hydrangea', category: 'cluster', description: '大量四萼片装饰花紧密重叠，形成半球至近球形 mophead 花球。', palette: ['#9dc9ef', '#bddcf6', '#e6d988', '#5d7f54'], printStructure: '短花梗藏在花球内部，由单根明确主茎承托整颗花球。' },
-  { id: 'babys-breath', cn: '满天星', en: "Baby's Breath", category: 'cluster', description: '高度分枝的圆锥花序托起大量五瓣微小花，整体细密如雾。', palette: ['#fffdf4', '#f3eedf', '#e8d99c', '#617e56'], printStructure: '主枝、侧枝与三级短梗连续串接，不使用悬浮花点。' },
+  { id: 'delphinium', cn: '飞燕草', en: 'Delphinium', scientificName: 'Delphinium elatum 园艺型', category: 'spike', description: '五枚花瓣状萼片围出不对称花面，上方萼片连续后伸成花距，内部保留较小真花瓣与深色中心。', calibration: '校准：萼片 / 真花瓣 / 花距分层；纤细总状花序含花蕾、半开与盛开。', scopeNote: calibratedScopeNote, palette: ['#6f95ed', '#9fb7ff', '#f4e7b9', '#55734e'], printStructure: '连续花轴、短花梗与花背花距相交，花距不再是悬浮尖片。' },
+  { id: 'snapdragon', cn: '金鱼草', en: 'Snapdragon', scientificName: 'Antirrhinum majus', category: 'spike', description: '合生花冠筒连接两枚上唇与三枚下唇；下唇中部隆起并封住喉口，基部保留五裂花萼。', calibration: '校准：侧视可见花冠筒、上下两唇、隆起喉部与由大到小的开放梯度。', scopeNote: calibratedScopeNote, palette: ['#ff8877', '#ffb197', '#f7d07c', '#5b7d4e'], printStructure: '每朵由短花梗接入主轴，花萼、花冠筒和唇瓣连续相交。' },
+  { id: 'hyacinth', cn: '风信子', en: 'Hyacinth', scientificName: 'Hyacinthus orientalis', category: 'spike', description: '短粗主轴上密生筒状钟形花；花被基部合生，顶部六裂并向外后反卷。', calibration: '校准：15–40 花的短密圆柱轮廓；短花梗、合生筒、六裂反卷与顶部花蕾。', scopeNote: calibratedScopeNote, palette: ['#9f86df', '#c2adef', '#f0d77b', '#55764e'], printStructure: '短花梗把每个合生花冠筒接回粗主轴，顶部花蕾保持连接。' },
+  { id: 'foxtail-lily', frozen: true, cn: '狐尾百合', en: 'Foxtail Lily', scientificName: 'Eremurus × isabellinus 园艺型', category: 'spike', description: '挺拔圆柱状总状花序；下部六被片星形花盛开，六枚雄蕊与花药明显外伸，中部半开、顶部花蕾。', calibration: '冻结：已通过独立 LAB 复审；自下而上开放、花梗由下长上短，主轴只保留轻微自然偏摆。', scopeNote: calibratedScopeNote, palette: ['#f2a64a', '#f8c46d', '#ffe0a0', '#607d4e'], printStructure: '花梗、花被和外伸雄蕊均连接在近直立主轴上。' },
+  { id: 'liatris', cn: '蛇鞭菊', en: 'Liatris', scientificName: 'Liatris spicata', category: 'spike', description: '无明显长花梗的头状花序紧贴主轴；每个花头由多枚细管状盘花和外伸花柱组成。', calibration: '校准：无普通五瓣花；顶部先开、下部留蕾，形成细长紧密的绒毛瓶刷轮廓。', scopeNote: calibratedScopeNote, palette: ['#a36bd1', '#c28ae2', '#e8b5f1', '#55734d'], printStructure: '管状小花、分叉花柱与苞片直接贴合连续主轴。' },
+  { id: 'lace-flower', cn: '蕾丝花', en: 'Lace Flower', scientificName: 'Ammi majus', category: 'cluster', description: '中心节点放射不等长一级伞梗；每根末端再形成含五瓣微花的小伞形花簇，整体近扁平微拱。', calibration: '校准：复伞形两级结构、非规则密度、总苞片与小总苞片；不做完美烟花圆盘。', scopeNote: calibratedScopeNote, palette: ['#fffdf0', '#f5eed4', '#e6cf78', '#5e7d52'], printStructure: '所有微花经二级伞梗、一级伞梗汇回中心主花梗。' },
+  { id: 'hydrangea', frozen: true, cn: '绣球', en: 'Hydrangea', scientificName: 'Hydrangea macrophylla mophead 园艺型', category: 'cluster', description: '大量四萼片装饰花紧密重叠，形成半球至近球形 mophead 花球。', calibration: '冻结：完整恢复 commit 0b3655c 的花球分布、尺度与配色。', scopeNote: calibratedScopeNote, palette: ['#9dc9ef', '#bddcf6', '#e6d988', '#5d7f54'], printStructure: '短花梗藏在花球内部，由单根明确主茎承托整颗花球。' },
+  { id: 'babys-breath', cn: '满天星', en: "Baby's Breath", scientificName: 'Gypsophila paniculata', category: 'cluster', description: '主轴发出不等距一级枝，继续分成二级枝与末端短花梗；五瓣小花和圆蕾集中在枝端。', calibration: '校准：不等长、不等角、不等花数的圆锥花序，远看形成空气花雾而非规则星点阵列。', scopeNote: calibratedScopeNote, palette: ['#fffdf4', '#f3eedf', '#e8d99c', '#617e56'], printStructure: '每朵花都通过末端花梗连接二级枝，再汇回主轴。' },
   { id: 'rice-flower', cn: '米花', en: 'Rice Flower', category: 'cluster', description: '米粒大小的椭圆花苞密集组成多个枝端伞房状小簇。', palette: ['#fff0dd', '#f2d8bd', '#dfbc83', '#617e54'], printStructure: '密集小花头由短梗汇入多个枝端簇，再连接单一主茎。' }
 ];
 
@@ -835,14 +852,22 @@ export function createRealisticFlower(definition: RealisticFlowerDefinition, see
       return createPhalaenopsis(options);
     case 'calla':
       return createCalla(options);
-    case 'delphinium': case 'snapdragon': case 'hyacinth': case 'foxtail-lily': case 'liatris':
-      return createSpike(options, definition.id);
+    case 'delphinium':
+      return createCalibratedDelphinium(options);
+    case 'snapdragon':
+      return createCalibratedSnapdragon(options);
+    case 'hyacinth':
+      return createCalibratedHyacinth(options);
+    case 'foxtail-lily':
+      return createCalibratedFoxtailLily(options);
+    case 'liatris':
+      return createCalibratedLiatris(options);
     case 'lace-flower':
-      return createLaceFlower(options);
+      return createCalibratedLaceFlower(options);
     case 'hydrangea':
-      return createHydrangea(options);
+      return createHydrangeaBaseline(options);
     case 'babys-breath':
-      return createBabysBreath(options);
+      return createCalibratedBabysBreath(options);
     case 'rice-flower':
       return createRiceFlower(options);
   }

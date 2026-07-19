@@ -34,6 +34,7 @@
           <a href="./member/">Member</a>
           <a href="./downloads/">Downloads</a>
           <a href="./bouquet-shop/">Bouquet Shop</a>
+          <a href="./scifi/">SciFi Flora</a>
           <a class="site-menu-primary" href="./signup/">收藏这束花</a>
           <a id="site-menu-debug-link" href="./docs/aesthetic-review-dashboard.html?debug=1" hidden>审美审核</a>
         </div>
@@ -93,8 +94,32 @@
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l1.4 5.1L18 4.6l-2.4 4.7 5.1 1.4-5.1 1.4 2.4 4.7-4.6-2.5L12 19.4l-1.4-5.1L6 16.8l2.4-4.7-5.1-1.4 5.1-1.4L6 4.6l4.6 2.5z" /></svg>
             </button>
           </div>
+          <div class="clock-control" data-clock-interaction aria-label="Idle clock settings">
+            <button class="icon-button compact-button" id="clock-toggle" type="button" aria-pressed="false" title="Show clock" aria-label="Show clock" data-tooltip="时钟">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 10.4 3.1 1.8-1 1.7-4.1-2.4V6h2Z" /></svg>
+            </button>
+            <label class="clock-interval-label" title="Minutes before the clock appears">
+              <span>钟</span>
+              <input id="clock-interval" type="number" min="1" max="120" step="1" inputmode="numeric" aria-label="Minutes before automatic clock" />
+              <span>分</span>
+            </label>
+            <label class="clock-auto-label">
+              <input id="clock-auto-enabled" type="checkbox" aria-label="Enable automatic clock" />
+              <span>自动</span>
+            </label>
+          </div>
         </div>
       </nav>
+      <aside class="clock-overlay" id="clock-overlay" aria-live="polite" aria-hidden="true">
+        <div class="clock-content">
+          <p class="clock-time" id="clock-time"></p>
+          <p class="clock-date" id="clock-date"></p>
+          <blockquote class="clock-quote">
+            <p id="clock-quote-text"></p>
+            <footer id="clock-quote-author"></footer>
+          </blockquote>
+        </div>
+      </aside>
       <aside class="debug-panel" id="debug-panel" aria-label="Debug rendering stats" hidden></aside>
     </main>
     <script type="module" src="/src/main.ts"></script>

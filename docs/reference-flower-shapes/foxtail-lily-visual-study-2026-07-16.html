@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Foxtail Lily 视觉校准研究</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0a0d0b; --panel:#111612; --line:#28332b; --text:#f4f1e7; --muted:#adb9ad; --bad:#ff806b; --good:#9fd38f; --gold:#f2bd62; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:Inter,"PingFang SC","Microsoft YaHei",sans-serif; }
+    main { width:1600px; min-height:1000px; padding:46px 52px 42px; }
+    h1 { margin:0 0 7px; font-size:34px; letter-spacing:.02em; }
+    .lead { margin:0 0 26px; color:var(--muted); font-size:16px; }
+    .grid { display:grid; grid-template-columns: 0.92fr 1.08fr; gap:28px; }
+    section { border:1px solid var(--line); background:var(--panel); border-radius:18px; overflow:hidden; }
+    .head { display:flex; align-items:baseline; justify-content:space-between; padding:18px 22px 13px; border-bottom:1px solid var(--line); }
+    h2 { margin:0; font-size:22px; }
+    .bad h2 { color:var(--bad); } .good h2 { color:var(--good); }
+    .tag { color:var(--muted); font-size:13px; }
+    .views { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:14px; }
+    figure { margin:0; position:relative; background:#080b09; border:1px solid #202821; border-radius:12px; overflow:hidden; }
+    .views img { width:100%; height:260px; object-fit:cover; object-position:center; display:block; }
+    figcaption { position:absolute; left:10px; bottom:8px; padding:4px 8px; border-radius:999px; background:#050705dd; font-size:12px; }
+    .issues { display:grid; grid-template-columns:repeat(2,1fr); gap:10px 18px; padding:0 22px 20px; color:#e9d7d1; font-size:14px; line-height:1.5; }
+    .issues b { color:var(--bad); }
+    .refs { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; padding:14px; }
+    .refs figure { height:176px; }
+    .refs img { width:100%; height:100%; object-fit:cover; display:block; }
+    .target { display:grid; grid-template-columns:repeat(2,1fr); gap:9px 18px; padding:0 22px 20px; color:#dce9dc; font-size:14px; line-height:1.5; }
+    .target b { color:var(--good); }
+    .bottom { display:grid; grid-template-columns:1.05fr .95fr; gap:28px; margin-top:28px; }
+    .metrics, .schemes { padding:20px 22px 22px; }
+    .metrics h3, .schemes h3 { margin:0 0 14px; font-size:18px; color:var(--gold); }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    th,td { padding:9px 10px; border-top:1px solid var(--line); text-align:left; vertical-align:top; }
+    th { color:var(--muted); font-weight:600; }
+    .scheme { padding:12px 14px; border:1px solid var(--line); border-radius:12px; margin-top:10px; line-height:1.5; font-size:14px; }
+    .scheme strong { color:var(--good); }
+    .recommend { display:inline-block; margin-left:8px; padding:2px 7px; border-radius:999px; background:#214b2d; color:#c9f5ce; font-size:11px; }
+    footer { margin-top:16px; color:#879389; font-size:12px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Foxtail Lily / Eremurus × isabellinus：当前错误 vs 正确目标</h1>
+  <p class="lead">研究冻结页 · 只定义形态方向，不修改代码；Hydrangea、Ammi majus 与其他花型保持不动</p>
+  <div class="grid">
+    <section class="bad">
+      <div class="head"><h2>当前 LAB</h2><span class="tag">正面 / 侧面 / 顶视实机截图</span></div>
+      <div class="views">
+        <figure><img src="../assets/foxtail-lily-research-2026-07-16/current-front.png"><figcaption>正面</figcaption></figure>
+        <figure><img src="../assets/foxtail-lily-research-2026-07-16/current-side.png"><figcaption>侧面</figcaption></figure>
+        <figure><img src="../assets/foxtail-lily-research-2026-07-16/current-top.png"><figcaption>顶视</figcaption></figure>
+      </div>
+      <div class="issues">
+        <div><b>轮廓：</b>中下段堆成橙色厚墙，缺少修长锥柱与空气。</div>
+        <div><b>单花：</b>六片花被被遮挡，缩小后无法读成星形花。</div>
+        <div><b>雄蕊：</b>从顶视读成规则环状针脚；方向没有跟随单花。</div>
+        <div><b>阶段：</b>开放、半开、花蕾区之间没有清楚的纵向梯度。</div>
+      </div>
+    </section>
+    <section class="good">
+      <div class="head"><h2>真实参照</h2><span class="tag">10 张现场 / 植物园照片</span></div>
+      <div class="refs">
+        <figure><img src="../assets/foxtail-lily-research-2026-07-16/references/01-cleopatra.jpg"><figcaption>Cleopatra</figcaption></figure>
+        <figure><img src="../assets/foxtail-lily-research-2026-07-16/references/02-isabellinus-wisley.jpg"><figcaption>Wisley</figcaption></figure>
+        <figure><img src="../assets/foxtail-lily-research-2026-07-16/references/03-robustus-whole.jpg"><figcaption>整穗</figcaption></figure>
+        <figure><img src="../assets/foxtail-lily-research-2026-07-16/references/04-robustus-close.jpg"><figcaption>单花</figcaption></figure>
+        <figure><img src="../assets/foxtail-lily-research-2026-07-16/references/05-robustus-stage.jpg"><figcaption>开放带</figcaption></figure>
+        <figure><img src="../assets/foxtail-lily-research-2026-07-16/references/06-stenophyllus.jpg"><figcaption>黄花型</figcaption></figure>
+        <figure><img src="../assets/foxtail-lily-research-2026-07-16/references/07-stenophyllus-detail.jpg"><figcaption>花被</figcaption></figure>
+        <figure><img src="../assets/foxtail-lily-research-2026-07-16/references/08-tianschanicus.jpg"><figcaption>花梗</figcaption></figure>
+        <figure><img src="../assets/foxtail-lily-research-2026-07-16/references/09-pollination-close.jpg"><figcaption>雄蕊</figcaption></figure>
+        <figure><img src="../assets/foxtail-lily-research-2026-07-16/references/10-foxtail-robustus.jpg"><figcaption>自然轮廓</figcaption></figure>
+      </div>
+      <div class="target">
+        <div><b>整体：</b>高而窄的直立总状花序；视觉目标高宽约 4.5–6:1。</div>
+        <div><b>纵向阶段：</b>下部展开 → 中部杯状半开 → 顶端紧密花蕾。</div>
+        <div><b>单花：</b>六片窄匙形 / 椭圆披针形花被，张开后形成浅杯状星形。</div>
+        <div><b>连接：</b>花梗下长上短，单花朝向略向外上方，仍保留主轴空隙。</div>
+      </div>
+    </section>
+  </div>
+  <div class="bottom">
+    <section class="metrics">
+      <h3>从照片提取的建模约束</h3>
+      <table>
+        <tr><th>观察项</th><th>正确目标</th></tr>
+        <tr><td>开放区</td><td>约占有效花序下部 40–50%；花朵可独立辨认，不封成表皮。</td></tr>
+        <tr><td>过渡区</td><td>中部约 20–30%；花被半开、直径递减，形成明确渐变。</td></tr>
+        <tr><td>花蕾区</td><td>顶部约 20–30%；花梗最短，轮廓逐渐收尖。</td></tr>
+        <tr><td>雄蕊</td><td>六枚，略长于花被或与之接近；沿每朵花的局部法线伸出，不组成水平圆环。</td></tr>
+        <tr><td>空气感</td><td>每圈保留轴向错位与空隙；密度来自连续层级，不来自同高度堆叠。</td></tr>
+      </table>
+    </section>
+    <section class="schemes">
+      <h3>最多两个几何方向</h3>
+      <div class="scheme"><strong>方案 A：清晰器官优先</strong><span class="recommend">建议</span><br>12–18 朵可读开放花 + 6–10 朵半开花 + 顶端花蕾；沿主轴错落旋生。每朵花独立包含六片花被、花心、六枚克制雄蕊、花药与短花梗。先确保侧视和顶视都能读出单花。</div>
+      <div class="scheme"><strong>方案 B：分层密度优先</strong><br>前景 / 外轮廓保留少量完整单花，内层使用更简化的半开花与花蕾补足连续感；仍维持下长上短花梗和三段开放梯度。更接近密穗，但较容易再次形成“橙色墙”。</div>
+      <footer>比例为本项目的视觉目标区间，不是所有 Eremurus 物种的植物学常数。</footer>
+    </section>
+  </div>
+</main>
+</body>
+</html>

@@ -6,6 +6,7 @@ import { resolveQuality } from './quality';
 import { BouquetScene } from './bouquetScene';
 import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
 import { themes } from './themes';
+import { IdleClockController, normalizeClockInterval, type ClockDisplaySource, type IdleClockSettings } from './idleClock';
 
 type RotationDirection = 1 | -1;
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
@@ -182,6 +183,14 @@ const referencePreviewMeta = document.querySelector<HTMLElement>('#reference-pre
 const referenceNoteInput = document.querySelector<HTMLTextAreaElement>('#reference-note-input');
 const referenceGenerateButton = document.querySelector<HTMLButtonElement>('#reference-generate-button');
 const referenceResult = document.querySelector<HTMLElement>('#reference-result');
+const clockToggleButton = document.querySelector<HTMLButtonElement>('#clock-toggle');
+const clockIntervalInput = document.querySelector<HTMLInputElement>('#clock-interval');
+const clockAutoEnabledInput = document.querySelector<HTMLInputElement>('#clock-auto-enabled');
+const clockOverlay = document.querySelector<HTMLElement>('#clock-overlay');
+const clockTime = document.querySelector<HTMLElement>('#clock-time');
+const clockDate = document.querySelector<HTMLElement>('#clock-date');
+const clockQuoteText = document.querySelector<HTMLElement>('#clock-quote-text');
+const clockQuoteAuthor = document.querySelector<HTMLElement>('#clock-quote-author');
 
 if (
   !canvas ||
@@ -245,6 +254,13 @@ let spec = specialReference
   : createDailySpec(params.date, params.seed, selectedTheme);
 let followsToday = !specialReference && !searchParams.has('date') && !searchParams.has('seed');
 let scene = new BouquetScene(ui.canvas, spec, quality);
+(window as Window & {
+  __dailyFloraAudit?: () => ReturnType<BouquetScene['getDebugStats']>;
+}).__dailyFloraAudit = () => scene.getDebugStats();
+const requestedCamera = searchParams.get('camera');
+if (requestedCamera === 'front' || requestedCamera === 'side' || requestedCamera === 'top') {
+  scene.setStaticCameraView(requestedCamera);
+}
 let hideTimer = 0;
 let previewCount = 0;
 let rotationSpeed = THREEClamp(spec.rotationSpeed, minRotationSpeed, maxRotationSpeed);
@@ -264,6 +280,31 @@ let calendarView = parseDateKey(spec.dateLabel);
 let accountState = readAccountState();
 let favoriteBouquets = readFavoriteBouquets();
 let referenceState: ReferenceState | null = null;
+let clockTickTimer = 0;
+let clockDisplaySource: ClockDisplaySource | null = null;
+const clockSettingsStorageKey = 'dailyflora.idle-clock.v1';
+const clockQuotes = [
+  ['Nothing can bring you peace but yourself.', 'Ralph Waldo Emerson'],
+  ['Nature does not hurry, yet everything is accomplished.', 'Lao Tzu'],
+  ['Each day provides its own gifts.', 'Marcus Aurelius'],
+  ['The quieter you become, the more you can hear.', 'Ram Dass'],
+  ['Adopt the pace of nature: her secret is patience.', 'Ralph Waldo Emerson'],
+  ['There is a calmness to a life lived in gratitude.', 'Ralph Blum']
+] as const;
+
+function readClockSettings(): IdleClockSettings {
+  const stored = safeJsonParse<Partial<IdleClockSettings>>(window.localStorage.getItem(clockSettingsStorageKey), {});
+  return {
+    autoEnabled: stored.autoEnabled ?? true,
+    intervalMinutes: normalizeClockInterval(stored.intervalMinutes ?? 5)
+  };
+}
+
+let clockSettings = readClockSettings();
+const idleClock = new IdleClockController(clockSettings, {
+  onShow: (source) => showClock(source),
+  onHide: hideClock
+});
 
 calendarPanel.className = 'date-calendar';
 calendarPanel.id = 'date-calendar';
@@ -316,6 +357,84 @@ function safeJsonParse<T>(value: string | null, fallback: T): T {
   } catch {
     return fallback;
   }
+}
+
+function formatClockDate(now: Date) {
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const weekday = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(now);
+  return `${year}年${month}月${day}日 · ${weekday}`;
+}
+
+function updateClockTime() {
+  const now = new Date();
+  if (clockTime) {
+    clockTime.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  }
+  if (clockDate) clockDate.textContent = formatClockDate(now);
+}
+
+function syncClockControls() {
+  const { autoEnabled, intervalMinutes } = clockSettings;
+  [clockIntervalInput].forEach((input) => {
+    if (input) input.value = String(intervalMinutes);
+  });
+  [clockAutoEnabledInput].forEach((input) => {
+    if (input) input.checked = autoEnabled;
+  });
+  if (clockToggleButton) {
+    const isManual = clockDisplaySource === 'manual';
+    clockToggleButton.classList.toggle('is-active', isManual);
+    clockToggleButton.setAttribute('aria-pressed', String(isManual));
+    clockToggleButton.setAttribute('aria-label', isManual ? 'Hide clock' : 'Show clock');
+    clockToggleButton.title = isManual ? 'Hide clock' : 'Show clock';
+  }
+}
+
+function updateClockSettings(next: Partial<IdleClockSettings>) {
+  clockSettings = {
+    ...clockSettings,
+    ...next,
+    intervalMinutes: normalizeClockInterval(next.intervalMinutes ?? clockSettings.intervalMinutes)
+  };
+  window.localStorage.setItem(clockSettingsStorageKey, JSON.stringify(clockSettings));
+  idleClock.updateSettings(clockSettings);
+  syncClockControls();
+}
+
+function showClock(source: ClockDisplaySource) {
+  clockDisplaySource = source;
+  const quote = clockQuotes[Math.floor(Math.random() * clockQuotes.length)];
+  if (clockQuoteText) clockQuoteText.textContent = quote[0];
+  if (clockQuoteAuthor) clockQuoteAuthor.textContent = quote[1];
+  updateClockTime();
+  window.clearInterval(clockTickTimer);
+  clockTickTimer = window.setInterval(updateClockTime, 1000);
+  document.body.classList.add('is-clock-visible');
+  scene.setClockLayout(true);
+  if (clockOverlay) {
+    clockOverlay.classList.remove('is-auto', 'is-manual', 'is-visible');
+    clockOverlay.setAttribute('aria-hidden', 'false');
+    if (source === 'auto') clockOverlay.classList.add('is-auto');
+    if (source === 'manual') clockOverlay.classList.add('is-manual');
+    requestAnimationFrame(() => clockOverlay.classList.add('is-visible'));
+  }
+  window.setTimeout(() => scene.resize(), 0);
+  syncClockControls();
+}
+
+function hideClock() {
+  clockDisplaySource = null;
+  window.clearInterval(clockTickTimer);
+  if (clockOverlay) {
+    clockOverlay.classList.remove('is-visible', 'is-auto', 'is-manual');
+    clockOverlay.setAttribute('aria-hidden', 'true');
+  }
+  document.body.classList.remove('is-clock-visible');
+  scene.setClockLayout(false);
+  window.setTimeout(() => scene.resize(), 380);
+  syncClockControls();
 }
 
 function readAccountState(): AccountState | null {
@@ -636,6 +755,9 @@ function formatCount(value: number) {
 function updateDebugPanel() {
   if (!debugMode || !debugPanel) return;
   const stats = scene.getDebugStats();
+  debugPanel.dataset.flowerAudit = JSON.stringify(stats.flowerAudit);
+  const { flowerRecords: _flowerRecords, ...leafOwnershipCounts } = stats.leafOwnership;
+  debugPanel.dataset.leafOwnershipAudit = JSON.stringify(leafOwnershipCounts);
   const heapText = stats.jsHeapUsedMb === null
     ? 'n/a'
     : `${stats.jsHeapUsedMb}/${stats.jsHeapTotalMb} MB`;
@@ -647,6 +769,12 @@ function updateDebugPanel() {
     <div class="debug-row"><span>Points/Lines</span><strong>${formatCount(stats.points)} / ${formatCount(stats.lines)}</strong></div>
     <div class="debug-row"><span>GPU res</span><strong>${stats.geometries} geo · ${stats.textures} tex</strong></div>
     <div class="debug-row"><span>JS heap</span><strong>${heapText}</strong></div>
+    <div class="debug-row"><span>Realistic leaves</span><strong>${stats.leafOwnership.realisticFlowerLeafCount}</strong></div>
+    <div class="debug-row"><span>Legacy stems</span><strong>${stats.leafOwnership.temporaryLegacyStemCount}</strong></div>
+    <div class="debug-row"><span>Leaves before/after</span><strong>${stats.leafOwnership.beforeTotalLeafCount} → ${stats.leafOwnership.afterTotalLeafCount} (${stats.leafOwnership.totalLeafDelta})</strong></div>
+    <div class="debug-row"><span>Loose leaves removed</span><strong>${stats.leafOwnership.beforeLooseLeafCount}</strong></div>
+    <div class="debug-row"><span>Ownership errors</span><strong>${stats.leafOwnership.orphanLeafCount}/${stats.leafOwnership.mixedProfileStemCount}/${stats.leafOwnership.mixedArrangementStemCount}/${stats.leafOwnership.unresolvedGeneratedLeafCount}/${stats.leafOwnership.detachedLeafNodeCount}</strong></div>
+    <div class="debug-row"><span>Leaf status</span><strong>structural transition</strong></div>
   `;
 }
 
@@ -1300,6 +1428,24 @@ rotationPresetButton?.addEventListener('click', () => {
   revealUi();
 });
 
+clockToggleButton?.addEventListener('click', () => {
+  idleClock.toggleManual();
+  revealUi();
+});
+
+function updateClockIntervalFrom(input: HTMLInputElement | null) {
+  if (!input) return;
+  updateClockSettings({ intervalMinutes: normalizeClockInterval(Number(input.value)) });
+}
+
+[clockIntervalInput].forEach((input) => {
+  input?.addEventListener('change', () => updateClockIntervalFrom(input));
+});
+
+[clockAutoEnabledInput].forEach((input) => {
+  input?.addEventListener('change', () => updateClockSettings({ autoEnabled: input.checked }));
+});
+
 window.addEventListener('resize', () => {
   const nextQuality = resolveQuality(selectedDensity, selectedRender);
   const qualityChanged = nextQuality.densityName !== quality.densityName || nextQuality.renderName !== quality.renderName;
@@ -1314,12 +1460,21 @@ window.addEventListener('resize', () => {
 });
 
 ['pointermove', 'pointerdown', 'touchstart', 'keydown'].forEach((eventName) => {
-  window.addEventListener(eventName, revealUi, { passive: true });
+  window.addEventListener(eventName, (event) => {
+    revealUi();
+    const target = event.target;
+    if (target instanceof Element && target.closest('[data-clock-interaction]')) return;
+    idleClock.noteActivity();
+  }, { passive: true });
 });
+
+window.addEventListener('focus', () => idleClock.noteActivity());
 
 window.addEventListener('beforeunload', () => scene.stop());
 window.addEventListener('beforeunload', () => window.clearInterval(debugTimer));
 window.addEventListener('beforeunload', () => window.clearTimeout(dateRolloverTimer));
+window.addEventListener('beforeunload', () => window.clearInterval(clockTickTimer));
+window.addEventListener('beforeunload', () => idleClock.stop());
 
 setLabels();
 renderAccountState();
@@ -1336,5 +1491,7 @@ if (specialReference) {
 applyRotationSettings();
 scene.setZoomOffset(manualZoom);
 scheduleDailyRollover();
+syncClockControls();
+idleClock.start();
 revealUi();
 scene.start();

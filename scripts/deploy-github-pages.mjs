@@ -233,8 +233,8 @@ function filesUnder(root) {
   return files.sort();
 }
 
-function copyReferenceGalleryToDist() {
-  const distDocs = path.join(repoRoot, 'dist', 'docs');
+function copyReferenceGalleryToDist(pagesRoot) {
+  const distDocs = path.join(pagesRoot, 'docs');
   const entries = [
     ['docs/aesthetic-rating-board.md', 'aesthetic-rating-board.md'],
     ['docs/codex-aesthetic-handoff.md', 'codex-aesthetic-handoff.md'],
@@ -265,7 +265,7 @@ function copyReferenceGalleryToDist() {
     }
   }
 
-  const distData = path.join(repoRoot, 'dist', 'data');
+  const distData = path.join(pagesRoot, 'data');
   fs.mkdirSync(distData, { recursive: true });
   fs.copyFileSync(
     path.join(repoRoot, 'data', 'aesthetic-review-dashboard.json'),
@@ -418,12 +418,21 @@ function main() {
     run('npm', ['run', 'build'], { stdio: ['ignore', 'inherit', 'inherit'] });
   }
 
-  const distIndex = path.join(repoRoot, 'dist', 'index.html');
-  if (!fs.existsSync(distIndex)) fail('dist/index.html does not exist. Run npm run build first.');
+  const distRoot = path.join(repoRoot, 'dist');
+  const sitesClientRoot = path.join(distRoot, 'client');
+  const pagesRoot = fs.existsSync(path.join(sitesClientRoot, 'index.html')) ? sitesClientRoot : distRoot;
+  const distIndex = path.join(pagesRoot, 'index.html');
+  if (!fs.existsSync(distIndex)) fail('Built index.html does not exist. Run npm run build first.');
 
-  copyReferenceGalleryToDist();
+  copyReferenceGalleryToDist(pagesRoot);
 
-  const pagesEntries = treeEntries(gh, repo, filesUnder(path.join(repoRoot, 'dist')).map((file) => path.relative(repoRoot, file)), 'dist');
+  const pagesPrefix = path.relative(repoRoot, pagesRoot);
+  const pagesEntries = treeEntries(
+    gh,
+    repo,
+    filesUnder(pagesRoot).map((file) => path.relative(repoRoot, file)),
+    pagesPrefix
+  );
   pagesEntries.push({ path: '.nojekyll', mode: '100644', type: 'blob', content: '' });
 
   log(`Repository: ${repo}`);

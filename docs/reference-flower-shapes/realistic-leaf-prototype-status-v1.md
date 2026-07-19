@@ -1,0 +1,217 @@
+# DailyFlora 叶片原型状态记录 v1
+
+日期：2026-07-17
+
+范围：只记录当前叶片调试原型状态；不表示已完成真实植物成员配置。
+
+## Strap prototype
+
+```ts
+prototypeStatus: 'direction-validated-not-production-ready'
+```
+
+### 已验证方向
+
+- D2 已作为稳定的带状叶二维 silhouette baseline。
+- Strap 3D Mini Lab 已验证扇形而非 360° 放射布局。
+- 已建立 5 片叶的初步年龄层级：外层成熟叶与内层幼叶。
+- 已建立共同基部抽生关系的方向，而不是独立叶片插座。
+- 已验证浅沟截面、薄边缘和基础 3D 弯曲方向。
+- 已保留独立 Mini Lab 调试视图，用于 front、side、top、perspective、base detail、section 和 silhouette 检查。
+
+### 冻结原因
+
+当前 strap 继续通过 `rootLift`、`rootDepth`、`rootSlope`、`rootArc` 等参数微调，已经开始出现厚纸片穿插、碎切口和复杂拓扑，继续收益不足。
+
+因此本阶段停止继续迭代 strap：
+
+- 不继续修改 strap silhouette。
+- 不继续增加根部参数。
+- 不继续增加网格密度。
+- 不继续修补底边。
+- 不接回主花束。
+- 不映射到 realistic flower 成员。
+- 不宣称 strap 已完成。
+
+### 尚未解决的问题
+
+1. 基部仍缺少真实叶鞘的连续包合拓扑。
+2. 局部存在薄片穿插和程序化切口。
+3. 外层成熟叶的自然弯曲仍不足。
+4. 目前只能作为几何方向验证，不能作为正式植物叶型。
+5. 未绑定任何具体物种和 realistic flower 成员。
+
+## Palmate prototype
+
+```ts
+prototypeStatus: '3d-mini-lab-surface-corrected-not-system-integrated'
+venation: 'palmate'
+bladeTopology: 'simple'
+bladeOutline: 'palmately-5-lobed'
+recommendedBaseline: 'T1 traced silhouette'
+```
+
+### 概念纠正
+
+`palmate` 描述的是掌状叶脉系统，不是固定轮廓。
+
+当前验证对象不是笼统的 `palmate leaf`，而是：
+
+```ts
+venation: 'palmate'
+bladeTopology: 'simple'
+bladeOutline: 'palmately-5-lobed'
+```
+
+也就是：一片具有掌状一级主脉的五裂单叶。
+
+## Palmate 2D exploration history
+
+二维阶段先后经历以下探索，全部不作为当前 baseline：
+
+### P1 / P2 / P3
+
+- 将 `palmate` 错误地直接翻译成五个掌形凸起。
+- 裂片像手指、花瓣或徽章附件，整体读成青蛙、皇冠、海星或手掌符号。
+- 叶基与叶柄插入区域不成立，底部甚至出现向下的额外裂片。
+
+### Skeleton / E1 / E2
+
+- 尝试以五条一级主脉骨架自动生成裂片轮廓。
+- 实际仍形成“五根手指 + 中央身体”，未建立宽阔连续叶身。
+- 中央、上侧、下侧裂片的宽度和层级错误，叶基仍像圆盘或第六裂片。
+
+### M0 / M1 / M2
+
+- 转向 mother blade retention 法，先生成完整母叶，再从边缘局部切入四个叶窦。
+- 方法概念比五指骨架正确，但初始母叶像圆盾、软菱形或徽章。
+- M1 / M2 只是在错误母叶上挖缺口，仍读成黑色团块、耳朵或卡通图形。
+
+### New M0 / M1 / M2 与 M0b / M1b / M2b
+
+- 重建母叶后减少了青蛙读感，但母叶仍偏盾牌、图标或带尖底的团块。
+- M1b / M2b 没有形成清楚的左右上侧裂片和左右下侧裂片，只形成卵形叶两侧的缺口。
+- 面积保留率、中央叶肉宽度和叶窦深度等硬指标反而阻止了真实五裂结构形成。
+
+因此已撤销以下硬验收规则：
+
+- `M1 retention >= 90%`
+- `M2 retention >= 85%`
+- 下侧叶窦必须极浅。
+- 必须尽量保留原母叶面积。
+- `central body width` 和 `lower sinus depth` 的固定比例门槛。
+
+这些数据只允许作为观察信息，不再主导轮廓几何。Current M2b 仅保留为错误对照。
+
+## Palmate T1 traced baseline
+
+### 真实参考图
+
+T1 改用真实参考图地标描摹，不再由算法自由设计五裂轮廓。
+
+参考图：Wikimedia Commons, `File:Acer platanoides scanned leaf.jpg`
+
+- 植物：Norway maple，`Acer platanoides`。
+- 作者：Andrew Butko。
+- 许可：CC BY-SA 3.0 / Wikimedia Commons metadata。
+- 来源链接：https://commons.wikimedia.org/wiki/File:Acer_platanoides_scanned_leaf.jpg
+- 本地调试缩略图：`docs/assets/leaf-silhouette-lab/reference/acer-platanoides-scanned-leaf-reference-900.jpg`
+
+选择原因：
+
+1. 参考图为正面扫描，叶片基本平展。
+2. 背景简单，轮廓清楚。
+3. 具有明确中央裂片、左右上侧裂片、左右下侧裂片、四个叶窦和叶柄插入区域。
+4. 适合建立简化槭属五裂单叶的二维几何参照。
+
+简化项：
+
+- 不保留锯齿。
+- 不保留真实叶脉颜色或纹理。
+- 不使用照片作为贴图。
+- 不绑定具体 realistic flower 成员。
+- 只抽取主要轮廓地标和五裂结构关系。
+
+### Landmarks 方法
+
+Leaf Silhouette Lab 的 `Reference + Landmarks` 面板显示低透明度参考图、归一化坐标网格、叶缘描摹线，并显式记录：
+
+- 叶柄插入点。
+- 左右叶基肩部。
+- 中央裂片尖端。
+- 左右上侧裂片尖端。
+- 左右下侧裂片尖端。
+- 四个叶窦最低点。
+- apex 中心轴。
+
+地标由代码显式录入，不自动识别，也不再从圆形母叶、卵形母叶、五条放射线或面积保留率推导最终轮廓。
+
+### T1 唯一二维 baseline
+
+T1 是依据同一组真实参考地标生成的纯黑闭合轮廓，并同时具备：
+
+- 1 个中央裂片。
+- 2 个上侧裂片。
+- 2 个下侧裂片。
+- 4 个清楚叶窦。
+- 1 个明确叶柄插入区域。
+
+T1 已成为 Palmate 当前唯一二维 baseline：
+
+- 不加入随机轮廓差异。
+- 不加入锯齿。
+- 不重新自由设计五裂形状。
+- 不再回到 mother blade retention 法。
+- 不再回到五条主脉自动生成轮廓的方法。
+
+## Palmate 3D Mini Lab current status
+
+```ts
+prototypeStatus: '3d-mini-lab-surface-corrected-not-system-integrated'
+baseline: 'T1 traced silhouette'
+```
+
+### 当前完成内容
+
+- 只使用 T1 traced silhouette 作为叶片二维输入，前视叶身轮廓保持冻结。
+- 叶片为单片 simple leaf，保持超薄，叶缘薄于叶身中央区域。
+- 使用轮廓三角化、三级细分和内部点松弛建立连续叶面。
+- 移除由单一中心点主导的放射扇网格，减少分块薄板和长斜线束读感。
+- 掌状一级脉只使用极浅 3D relief，并按中央、上侧、下侧逐级减弱。
+- 不使用颜色画叶脉，不加入细小 secondary veins。
+- 取消整叶统一大杯形，以轻微纵向拱面、叶脉间叶肉下垂和裂片局部姿态形成克制起伏。
+- 中央裂片、左右上侧裂片和左右下侧裂片具有轻微、确定性的不同抬起、外展或下垂。
+- 叶柄不再使用独立圆柱，已改为与叶基同一闭合网格中的扁平渐宽过渡。
+- 叶柄插入区、两侧叶基肩部、上表面与下表面保持连续，不增加第六裂片或厚底座。
+- section 分为 `mid-blade` 与 `basal transition` 两组截面，用于分别检查叶身厚度和叶柄—叶基连接。
+
+### 调试视图
+
+`docs/palmate-3d-mini-lab.html` 提供：
+
+- `front`
+- `back`
+- `side`
+- `top`
+- `perspective`
+- `base-detail`
+- `section`
+
+显示模式：
+
+- `normal`
+- `silhouette`
+- `wireframe`
+
+### 当前边界
+
+- 仍为独立几何原型，不是 production-ready 叶型。
+- 尚未接入主花束系统。
+- 尚未进行植物成员映射。
+- 尚未绑定任何具体真实物种叶型。
+- 尚未完成 realistic flower 成员配置。
+- 不可直接作为主花束正式叶片使用。
+
+### 当前结论
+
+Palmate 已完成基于 T1 traced silhouette 的独立 3D Mini Lab，并完成第一轮叶面连续性及叶柄—叶基过渡修正。当前状态仍为独立几何原型，尚未接入主花束系统，也尚未进行植物成员映射。

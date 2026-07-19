@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { createRng } from './random';
+import type { FoliageProfileId, LeafArrangement, LeafInstanceRecord } from './plantOwnership';
 
 export type FloraPrimitiveRole = 'hero' | 'secondary' | 'line' | 'cluster' | 'fruit' | 'filler';
 
@@ -12,6 +13,11 @@ export interface FloraPrimitiveOptions {
   density: number;
   curvature: number;
   role: FloraPrimitiveRole;
+  leafOwnership?: {
+    stemId: string;
+    foliageProfile: FoliageProfileId;
+    leafArrangement: LeafArrangement;
+  };
 }
 
 const tempObject = new THREE.Object3D();
@@ -868,8 +874,9 @@ export function createDaturaTrumpetFlower(options: FloraPrimitiveOptions) {
 export function createSpikeFlower(options: FloraPrimitiveOptions) {
   const rng = createRng(`${options.seed}:spike`);
   const group = new THREE.Group();
-  const height = 1.76 + options.openness * 0.22;
-  const lean = new THREE.Vector3(rng.range(-0.025, 0.025), 0, rng.range(-0.025, 0.025));
+  const silhouette = rng.value();
+  const height = (silhouette < 0.34 ? rng.range(1.18, 1.42) : silhouette < 0.68 ? rng.range(1.36, 1.62) : rng.range(1.52, 1.78)) + options.openness * 0.08;
+  const lean = new THREE.Vector3(rng.range(-0.035, 0.035), 0, rng.range(-0.035, 0.035));
   const curve = new THREE.CatmullRomCurve3([
     new THREE.Vector3(0, -height * 0.52, 0),
     new THREE.Vector3(lean.x * 0.35, -height * 0.15, lean.z * 0.35),
@@ -877,29 +884,34 @@ export function createSpikeFlower(options: FloraPrimitiveOptions) {
     new THREE.Vector3(lean.x, height * 0.52, lean.z)
   ]);
   const stem = new THREE.Mesh(
-    new THREE.TubeGeometry(curve, 8, 0.018, 6),
+    new THREE.TubeGeometry(curve, 8, 0.0095, 6),
     material(colorAt(options.colorPalette, 2), 0.9)
   );
-  const floretCount = Math.max(30, Math.round(40 * options.density));
+  const floretCount = Math.max(16, Math.round(rng.range(20, 34) * options.density));
   const florets = new THREE.InstancedMesh(petalGeometry(0.16, 0.045, 0.026), material(colorAt(options.colorPalette, 0)), floretCount * 4);
 
   let cursor = 0;
+  const activeStart = rng.range(0.05, 0.18);
+  const activeEnd = rng.range(0.72, 0.98);
+  const radialScale = rng.range(0.56, 0.92);
+  const petalScale = rng.range(0.58, 0.88);
   for (let i = 0; i < floretCount; i += 1) {
-    const t = i / Math.max(1, floretCount - 1);
+    const progress = i / Math.max(1, floretCount - 1);
+    const t = activeStart + progress * (activeEnd - activeStart);
     const base = curve.getPoint(t);
-    const taper = (1.16 - t * 0.66) * (0.78 + Math.sin(t * Math.PI) * 0.18);
-    const angle = (i % 7) * (Math.PI / 3.5) + i * 0.16 + rng.range(-0.14, 0.14);
-    const center = base.add(new THREE.Vector3(Math.cos(angle) * 0.105 * taper, rng.range(-0.012, 0.012), Math.sin(angle) * 0.105 * taper));
+    const taper = (1.08 - progress * rng.range(0.36, 0.58)) * (0.82 + Math.sin(progress * Math.PI) * 0.12);
+    const angle = i * 2.39996 + rng.range(-0.38, 0.38);
+    const center = base.add(new THREE.Vector3(Math.cos(angle) * 0.07 * radialScale * taper, rng.range(-0.018, 0.018), Math.sin(angle) * 0.07 * radialScale * taper));
     for (let petal = 0; petal < 4; petal += 1) {
       const petalAngle = angle + (petal / 4) * Math.PI * 2;
       setInstance(
         florets,
         cursor,
         center.clone().add(new THREE.Vector3(Math.cos(petalAngle) * 0.018 * taper, Math.sin(petalAngle) * 0.012 * taper, Math.sin(petalAngle) * 0.014 * taper)),
-        new THREE.Vector3(taper * rng.range(0.72, 0.98), taper * rng.range(0.72, 1), 1),
+        new THREE.Vector3(taper * petalScale * rng.range(0.72, 0.98), taper * petalScale * rng.range(0.68, 0.96), 1),
         colorAt(options.colorPalette, i + petal).clone().lerp(new THREE.Color('#ffffff'), rng.range(0.03, 0.22)),
         petalAngle - Math.PI / 2,
-        new THREE.Vector3(Math.cos(angle) * 0.22, 0.96, Math.sin(angle) * 0.22)
+        new THREE.Vector3(Math.cos(angle) * 0.16, 0.98, Math.sin(angle) * 0.16)
       );
       cursor += 1;
     }
@@ -1188,7 +1200,7 @@ export function createHangingBellFruit(options: FloraPrimitiveOptions) {
 export function createAirFiller(options: FloraPrimitiveOptions) {
   const rng = createRng(`${options.seed}:air`);
   const group = new THREE.Group();
-  const branchCount = Math.max(11, Math.round(18 * options.density));
+  const branchCount = Math.max(14, Math.round(22 * options.density));
   const pointPositions: number[] = [];
   const pointColors: number[] = [];
   const linePositions: number[] = [];
@@ -1196,12 +1208,12 @@ export function createAirFiller(options: FloraPrimitiveOptions) {
 
   for (let i = 0; i < branchCount; i += 1) {
     const start = new THREE.Vector3(rng.range(-0.16, 0.16), rng.range(-0.34, 0.08), rng.range(-0.14, 0.14));
-    const end = start.clone().add(new THREE.Vector3(rng.range(-0.58, 0.58), rng.range(0.3, 0.78), rng.range(-0.42, 0.42)));
+    const end = start.clone().add(new THREE.Vector3(rng.range(-0.42, 0.42), rng.range(0.24, 0.62), rng.range(-0.32, 0.32)));
     const mid = start.clone().lerp(end, rng.range(0.45, 0.68)).add(new THREE.Vector3(rng.range(-0.1, 0.1), rng.range(-0.02, 0.08), rng.range(-0.08, 0.08)));
     linePositions.push(start.x, start.y, start.z, mid.x, mid.y, mid.z, mid.x, mid.y, mid.z, end.x, end.y, end.z);
     const c = colorAt(options.colorPalette, i + 1);
     lineColors.push(c.r, c.g, c.b, c.r, c.g, c.b, c.r, c.g, c.b, c.r, c.g, c.b);
-    const dots = rng.integer(3, 6);
+    const dots = rng.integer(12, 18);
     for (let dot = 0; dot < dots; dot += 1) {
       const t = rng.range(0.42, 1);
       const p = mid.clone().lerp(end, t).add(new THREE.Vector3(rng.range(-0.035, 0.035), rng.range(-0.025, 0.025), rng.range(-0.035, 0.035)));
@@ -1218,8 +1230,8 @@ export function createAirFiller(options: FloraPrimitiveOptions) {
   lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
   lineGeometry.setAttribute('color', new THREE.Float32BufferAttribute(lineColors, 3));
   group.add(
-    new THREE.LineSegments(lineGeometry, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.42 })),
-    new THREE.Points(pointGeometry, pointMaterial(0.035, 0.82))
+    new THREE.LineSegments(lineGeometry, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.18 })),
+    new THREE.Points(pointGeometry, pointMaterial(0.025, 0.8))
   );
   return applyRoot(group, options);
 }
@@ -1233,6 +1245,13 @@ export function createFoliageGrassBranch(options: FloraPrimitiveOptions) {
   const leafCount = Math.max(12, Math.round(16 * options.density));
   const grassCount = Math.max(10, Math.round(14 * options.density));
   const leaves = new THREE.InstancedMesh(taperedPetalGeometry(0.28, 0.04, 0.024, 0.012), material(colorAt(options.colorPalette, 1), 0.92), leafCount);
+  leaves.name = 'temporary-legacy:foliage-grass-branch:leaves';
+  const ownership = options.leafOwnership ?? {
+    stemId: `temporary-legacy:${options.seed}`,
+    foliageProfile: 'temporary-legacy:foliage-grass-branch' as const,
+    leafArrangement: 'alternate' as const
+  };
+  const leafNodes: THREE.Vector3[] = [];
   const spine = new THREE.CatmullRomCurve3([
     new THREE.Vector3(-0.58, -0.16, rng.range(-0.04, 0.04)),
     new THREE.Vector3(-0.24, rng.range(-0.04, 0.08), rng.range(-0.08, 0.08)),
@@ -1252,6 +1271,7 @@ export function createFoliageGrassBranch(options: FloraPrimitiveOptions) {
     const side = i % 2 === 0 ? 1 : -1;
     const t = (i + 0.55) / (leafCount + 1);
     const base = spine.getPoint(t);
+    leafNodes.push(base.clone());
     const tangent = spine.getTangent(t).normalize();
     const sideVector = new THREE.Vector3(-tangent.y, tangent.x, rng.range(-0.25, 0.25)).normalize();
     const length = rng.range(0.18, 0.34) * (0.78 + Math.sin(t * Math.PI) * 0.18);
@@ -1269,6 +1289,32 @@ export function createFoliageGrassBranch(options: FloraPrimitiveOptions) {
       normal
     );
   }
+
+  const leafRecords: LeafInstanceRecord[] = [];
+  const instanceMatrix = new THREE.Matrix4();
+  const instanceColor = new THREE.Color();
+  for (let i = 0; i < leafCount; i += 1) {
+    leaves.getMatrixAt(i, instanceMatrix);
+    leaves.getColorAt(i, instanceColor);
+    const node = leafNodes[i];
+    leafRecords.push({
+      leafId: `${ownership.stemId}:leaf:${i}`,
+      stemId: ownership.stemId,
+      foliageProfile: ownership.foliageProfile,
+      leafArrangement: ownership.leafArrangement,
+      nodeIndex: i,
+      nodePosition: [node.x, node.y, node.z],
+      growthStage: (i + 1) / leafCount,
+      matrix: instanceMatrix.toArray(),
+      color: `#${instanceColor.getHexString()}`
+    });
+  }
+  leaves.userData.instanceStemIds = leafRecords.map((record) => record.stemId);
+  group.userData.leafRecords = leafRecords;
+  group.userData.localStemCurvePoints = spinePoints.map((point) => point.toArray());
+  group.userData.foliageProfile = ownership.foliageProfile;
+  group.userData.leafArrangement = ownership.leafArrangement;
+  group.userData.stemId = ownership.stemId;
 
   const grassPositions: number[] = [];
   const grassColors: number[] = [];
