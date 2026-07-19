@@ -12,3 +12,5 @@ data/inbox/*/
 *.toe.backup
 *.tox.backup
 CrashAutoSave*.toe
+.vercel
+.env*
