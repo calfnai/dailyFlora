@@ -165,20 +165,10 @@ button {
   content: '— ';
 }
 
-.clock-settings,
 .clock-control {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-
-.clock-settings {
-  margin-top: clamp(42px, 8vh, 92px);
-  padding: 9px 12px;
-  border: 1px solid rgb(255 246 220 / 14%);
-  border-radius: 999px;
-  background: rgb(4 6 8 / 26%);
-  backdrop-filter: blur(16px);
 }
 
 .clock-interval-label,
@@ -1638,10 +1628,6 @@ body.is-preview .daily-theme {
   }
 
   .clock-quote {
-    margin-top: 26px;
-  }
-
-  .clock-settings {
     margin-top: 26px;
   }
 

@@ -191,8 +191,6 @@ const clockTime = document.querySelector<HTMLElement>('#clock-time');
 const clockDate = document.querySelector<HTMLElement>('#clock-date');
 const clockQuoteText = document.querySelector<HTMLElement>('#clock-quote-text');
 const clockQuoteAuthor = document.querySelector<HTMLElement>('#clock-quote-author');
-const clockOverlayIntervalInput = document.querySelector<HTMLInputElement>('#clock-overlay-interval');
-const clockOverlayAutoEnabledInput = document.querySelector<HTMLInputElement>('#clock-overlay-auto-enabled');
 
 if (
   !canvas ||
@@ -379,10 +377,10 @@ function updateClockTime() {
 
 function syncClockControls() {
   const { autoEnabled, intervalMinutes } = clockSettings;
-  [clockIntervalInput, clockOverlayIntervalInput].forEach((input) => {
+  [clockIntervalInput].forEach((input) => {
     if (input) input.value = String(intervalMinutes);
   });
-  [clockAutoEnabledInput, clockOverlayAutoEnabledInput].forEach((input) => {
+  [clockAutoEnabledInput].forEach((input) => {
     if (input) input.checked = autoEnabled;
   });
   if (clockToggleButton) {
@@ -1440,11 +1438,11 @@ function updateClockIntervalFrom(input: HTMLInputElement | null) {
   updateClockSettings({ intervalMinutes: normalizeClockInterval(Number(input.value)) });
 }
 
-[clockIntervalInput, clockOverlayIntervalInput].forEach((input) => {
+[clockIntervalInput].forEach((input) => {
   input?.addEventListener('change', () => updateClockIntervalFrom(input));
 });
 
-[clockAutoEnabledInput, clockOverlayAutoEnabledInput].forEach((input) => {
+[clockAutoEnabledInput].forEach((input) => {
   input?.addEventListener('change', () => updateClockSettings({ autoEnabled: input.checked }));
 });
 
