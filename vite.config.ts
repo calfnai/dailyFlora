@@ -18,6 +18,17 @@ export default defineConfig({
           resolve(__dirname, 'sites/worker.js'),
           resolve(__dirname, 'dist/server/index.js')
         );
+        mkdirSync(resolve(__dirname, 'dist/assets/leaf-silhouette-lab/reference'), { recursive: true });
+        copyFileSync(
+          resolve(
+            __dirname,
+            'docs/assets/leaf-silhouette-lab/reference/acer-platanoides-scanned-leaf-reference-900.jpg'
+          ),
+          resolve(
+            __dirname,
+            'dist/assets/leaf-silhouette-lab/reference/acer-platanoides-scanned-leaf-reference-900.jpg'
+          )
+        );
         const indexHtml = readFileSync(resolve(__dirname, 'dist/index.html'), 'utf8');
         for (const route of ['special0629', 'special0629-v2', 'special0629-v3', 'special0629-v4']) {
           mkdirSync(resolve(__dirname, `dist/${route}`), { recursive: true });
