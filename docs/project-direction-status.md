@@ -5,7 +5,7 @@
 ## 当前继续项
 
 - **GUI**：作为独立方向继续完善，不与其他实验或发布修复混合。
-- **写实植物形态**：以 `bf086a6`（`fix: rebuild foxtail lily and lace flower forms`）为冻结基线。后续仅在新分支上以明确的形态评审任务继续。
+- **写实植物形态**：以 `0b3655c`（`feat: refine realistic flower forms and site labs`）为冻结基线。后续仅在新分支上以明确的形态评审任务继续。
 
 ## 保留思路，不再继续或合并
 
