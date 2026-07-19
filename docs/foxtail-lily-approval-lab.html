@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Foxtail Lily 独立验收 LAB</title>
+    <style>
+      :root{color-scheme:dark;--bg:#070806;--panel:#10140d;--line:rgb(246 235 211 / 15%);--text:#f7eddb;--muted:rgb(247 237 219 / 68%);--gold:#f2bd58;--green:#8fc87f}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(circle at 15% 0%,rgb(242 189 88 / 12%),transparent 28%),linear-gradient(180deg,#070806,#10140d 55%,#070806)}button,a{font:inherit}a{color:inherit}.shell{width:min(1380px,100%);margin:0 auto;padding:22px}.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:end;margin-bottom:18px;padding:22px;border:1px solid var(--line);border-radius:12px;background:rgb(10 13 8 / 80%)}.eyebrow{margin:0 0 8px;color:var(--gold);font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}h1{margin:0 0 10px;font-size:clamp(32px,5vw,64px);line-height:1;letter-spacing:-.04em}.copy{max-width:82ch;margin:0;color:var(--muted);font-size:14px;line-height:1.65}.badge{display:inline-flex;align-items:center;min-height:34px;padding:0 12px;border:1px solid rgb(143 200 127 / 34%);border-radius:999px;color:var(--green);background:rgb(143 200 127 / 8%);font-size:12px;font-weight:700}.stage-wrap{position:relative;height:min(980px,calc(100vh - 190px));min-height:620px;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,rgb(16 20 13 / 90%),rgb(7 8 6 / 90%))}.grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));pointer-events:none}.cell{position:relative;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.cell:nth-child(3),.cell:nth-child(5){border-right:0}.cell:nth-child(n+4){border-bottom:0}.cell.closeup{grid-column:2 / 4}.label{position:absolute;left:12px;top:10px;z-index:2;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:rgb(7 8 6 / 78%);backdrop-filter:blur(12px)}.label strong{display:block;margin-bottom:2px;font-size:13px}.label span{display:block;color:var(--muted);font-size:11px;line-height:1.45}#foxtail-lily-canvas{position:absolute;inset:0;display:block;width:100%;height:100%}.notes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}.note{padding:10px 11px;border:1px solid var(--line);border-radius:8px;background:rgb(7 8 6 / 58%);color:var(--muted);font-size:12px;line-height:1.5}.note strong{display:block;margin-bottom:4px;color:var(--gold)}@media(max-width:900px){.hero{grid-template-columns:1fr}.stage-wrap{height:1180px}.grid{grid-template-columns:1fr;grid-template-rows:repeat(5,1fr)}.cell.closeup{grid-column:auto}.cell{border-right:0}.notes{grid-template-columns:1fr}}
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">DailyFlora foxtail lily approval lab</p>
+          <h1>狐尾百合独立验收 LAB</h1>
+          <p class="copy">只验证方案 A「清晰器官优先」第一版：高宽比约 5:1，直立主轴，花梗由下向上缩短，下部完整开放花、中部简化半开花、顶部紧密花蕾。此页不接回 25 花总览，不修改 Hydrangea、Ammi majus 或其他花型。</p>
+        </div>
+        <div class="badge">standalone · not integrated</div>
+      </header>
+
+      <section class="stage-wrap" aria-label="Foxtail Lily five-view approval canvas">
+        <canvas id="foxtail-lily-canvas"></canvas>
+        <div class="grid" aria-hidden="true">
+          <div class="cell"><div class="label"><strong>正面</strong><span>整体轮廓与下宽上尖</span></div></div>
+          <div class="cell"><div class="label"><strong>侧面</strong><span>雄蕊跟随单花方向</span></div></div>
+          <div class="cell"><div class="label"><strong>顶视</strong><span>不形成水平针脚塔</span></div></div>
+          <div class="cell"><div class="label"><strong>纯轮廓</strong><span>约 5:1，高而窄</span></div></div>
+          <div class="cell closeup"><div class="label"><strong>单朵完整花放大</strong><span>六片花被、花心、六枚雄蕊、花药、花梗</span></div></div>
+        </div>
+      </section>
+
+      <div class="notes">
+        <div class="note"><strong>前景完整开放花</strong>15 朵，集中在下部和中下部，器官完整。</div>
+        <div class="note"><strong>中后层简化花</strong>24 朵，用星形或杯状轮廓建立连续感。</div>
+        <div class="note"><strong>顶部花蕾</strong>24 枚，贴近主轴并向顶端收尖。</div>
+        <div class="note"><strong>冻结边界</strong>本页不改变 Hydrangea、Ammi majus、总览路由或日常花束。</div>
+      </div>
+    </main>
+    <script type="module" src="/src/foxtailLilyApprovalLab.ts"></script>
+  </body>
+</html>
+
