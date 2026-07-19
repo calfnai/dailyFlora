@@ -5,7 +5,11 @@ import { defineConfig } from 'vite';
 
 function readGitValue(args: string[]) {
   try {
-    return execFileSync('git', args, { cwd: __dirname, encoding: 'utf8' }).trim();
+    return execFileSync('git', args, {
+      cwd: __dirname,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
   } catch {
     return '';
   }

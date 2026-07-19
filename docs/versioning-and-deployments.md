@@ -41,3 +41,5 @@ DF-20260720-0135-d16bb89
 ## 多对话协作规则
 
 每个开发对话使用独立 worktree 和分支。开发完成后 PR 目标统一为 `codex/dailyflora-integration`。Vercel Preview 用于查看各分支，正式站只由整合分支更新。
+
+正式部署必须由 `codex/dailyflora-integration` 推送到 GitHub 后自动触发。不要把 CLI 直接部署作为正式版本，因为直接上传可能缺失 Git commit 环境信息。

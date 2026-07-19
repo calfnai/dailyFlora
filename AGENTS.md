@@ -6,6 +6,7 @@
 - Do not edit, reset, stash, or clean another task's worktree.
 - The only integration branch is `codex/dailyflora-integration`.
 - Production deployment is allowed only from the integration branch.
+- Production deployment must be triggered by pushing the integration branch to GitHub. Do not use a direct CLI production deploy, because it may omit Git metadata.
 - Feature tasks open PRs against `codex/dailyflora-integration`; the integration task merges them one at a time after checks pass.
 
 ## Exact version identity
@@ -19,5 +20,6 @@
 ## Build and deployment
 
 - Run `npm run build:vercel` for Vercel-compatible output.
+- Use Vercel CLI for inspection and diagnostics, not as the canonical production release trigger.
 - `npm run build` is the OpenAI Sites packaging path and moves the client into `dist/client`; do not use that output for Vercel.
 - The deployed page exposes `/version.json` and displays the release label in the lower-right corner.
