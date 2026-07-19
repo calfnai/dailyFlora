@@ -4,7 +4,6 @@ type Point = {
 };
 
 type LeafKind = 'strap' | 'palmate';
-type PalmateVariant = 'current-m2b' | 't1-traced';
 
 function clamp01(value: number) {
   return Math.max(0, Math.min(1, value));
@@ -168,99 +167,117 @@ function makeStrapSilhouettePath(variant: StrapVariant) {
   return makeLandmarkStrapPath(variant as Exclude<StrapVariant, 'current-c2'>);
 }
 
-function makeCurrentM2bPoints() {
-  return [
-    { x: 0, y: 114 },
-    { x: 16, y: 122 },
-    { x: 44, y: 130 },
-    { x: 112, y: 76 },
-    { x: 96, y: 48 },
-    { x: 122, y: -18 },
-    { x: 90, y: -66 },
-    { x: 44, y: -138 },
-    { x: 0, y: -162 },
-    { x: -44, y: -138 },
-    { x: -90, y: -66 },
-    { x: -122, y: -18 },
-    { x: -96, y: 48 },
-    { x: -112, y: 76 },
-    { x: -44, y: 130 },
-    { x: -16, y: 122 }
-  ];
-}
+const PALMATE_REFERENCE_URL = '/assets/leaf-silhouette-lab/reference/acer-platanoides-scanned-leaf-reference-500.jpg';
 
-const palmateTraceLandmarks = {
-  petioleInsertion: { x: 0, y: 86 },
-  leftBasalShoulder: { x: -38, y: 74 },
-  rightBasalShoulder: { x: 38, y: 74 },
-  leftLowerLobeTip: { x: -154, y: 34 },
-  rightLowerLobeTip: { x: 154, y: 34 },
-  leftLowerSinus: { x: -108, y: 6 },
-  rightLowerSinus: { x: 108, y: 6 },
-  leftUpperLobeTip: { x: -152, y: -86 },
-  rightUpperLobeTip: { x: 152, y: -86 },
-  leftUpperSinus: { x: -72, y: -86 },
-  rightUpperSinus: { x: 72, y: -86 },
-  centralLobeTip: { x: 0, y: -170 },
-  apexCentreAxis: { x: 0, y: -170 }
-} satisfies Record<string, Point>;
-
-const palmateTraceContourPoints: readonly Point[] = [
-  palmateTraceLandmarks.petioleInsertion,
-  { x: 18, y: 84 },
-  palmateTraceLandmarks.rightBasalShoulder,
-  { x: 82, y: 62 },
-  palmateTraceLandmarks.rightLowerLobeTip,
-  { x: 132, y: 24 },
-  palmateTraceLandmarks.rightLowerSinus,
-  { x: 118, y: -34 },
-  palmateTraceLandmarks.rightUpperLobeTip,
-  { x: 110, y: -82 },
-  palmateTraceLandmarks.rightUpperSinus,
-  { x: 52, y: -122 },
-  palmateTraceLandmarks.centralLobeTip,
-  { x: -52, y: -122 },
-  palmateTraceLandmarks.leftUpperSinus,
-  { x: -110, y: -82 },
-  palmateTraceLandmarks.leftUpperLobeTip,
-  { x: -118, y: -34 },
-  palmateTraceLandmarks.leftLowerSinus,
-  { x: -132, y: 24 },
-  palmateTraceLandmarks.leftLowerLobeTip,
-  { x: -82, y: 62 },
-  palmateTraceLandmarks.leftBasalShoulder,
-  { x: -18, y: 84 }
+// T2 is an explicit clockwise trace in the 500 × 634 reference-image coordinate system.
+// These 60 points were placed along the visible blade edge; no edge detector or mirrored half-outline is used.
+const palmateT2DensePoints: readonly Point[] = [
+  { x: 260, y: 344 },
+  { x: 283, y: 353 },
+  { x: 311, y: 351 },
+  { x: 329, y: 364 },
+  { x: 341, y: 350 },
+  { x: 382, y: 354 },
+  { x: 390, y: 368 },
+  { x: 419, y: 350 },
+  { x: 462, y: 339 },
+  { x: 498, y: 326 },
+  { x: 459, y: 307 },
+  { x: 425, y: 278 },
+  { x: 409, y: 257 },
+  { x: 430, y: 241 },
+  { x: 460, y: 220 },
+  { x: 488, y: 197 },
+  { x: 460, y: 190 },
+  { x: 476, y: 145 },
+  { x: 455, y: 151 },
+  { x: 452, y: 79 },
+  { x: 421, y: 95 },
+  { x: 392, y: 120 },
+  { x: 369, y: 112 },
+  { x: 354, y: 153 },
+  { x: 327, y: 197 },
+  { x: 312, y: 177 },
+  { x: 299, y: 135 },
+  { x: 288, y: 93 },
+  { x: 314, y: 70 },
+  { x: 286, y: 76 },
+  { x: 265, y: 40 },
+  { x: 246, y: 2 },
+  { x: 231, y: 29 },
+  { x: 211, y: 42 },
+  { x: 209, y: 74 },
+  { x: 198, y: 119 },
+  { x: 176, y: 176 },
+  { x: 190, y: 198 },
+  { x: 169, y: 177 },
+  { x: 158, y: 136 },
+  { x: 158, y: 87 },
+  { x: 139, y: 101 },
+  { x: 127, y: 96 },
+  { x: 129, y: 116 },
+  { x: 94, y: 113 },
+  { x: 59, y: 107 },
+  { x: 68, y: 143 },
+  { x: 64, y: 175 },
+  { x: 44, y: 199 },
+  { x: 73, y: 222 },
+  { x: 103, y: 241 },
+  { x: 104, y: 259 },
+  { x: 77, y: 281 },
+  { x: 39, y: 306 },
+  { x: 1, y: 320 },
+  { x: 44, y: 336 },
+  { x: 80, y: 349 },
+  { x: 126, y: 355 },
+  { x: 174, y: 353 },
+  { x: 221, y: 350 }
 ];
 
-function makePalmateContourPoints(variant: PalmateVariant) {
-  if (variant === 'current-m2b') return makeCurrentM2bPoints();
-  return palmateTraceContourPoints;
+const palmateManualReviewZones = [
+  { label: 'central apex', cx: 247, cy: 48, rx: 60, ry: 53 },
+  { label: 'left upper lobe', cx: 112, cy: 126, rx: 72, ry: 56 },
+  { label: 'right upper lobe', cx: 416, cy: 126, rx: 72, ry: 58 },
+  { label: 'left lower lobe', cx: 62, cy: 286, rx: 68, ry: 56 },
+  { label: 'right lower lobe', cx: 446, cy: 286, rx: 68, ry: 57 },
+  { label: 'petiole insertion', cx: 258, cy: 350, rx: 58, ry: 30 }
+] as const;
+
+function pointDistance(a: Point, b: Point) {
+  return Math.hypot(b.x - a.x, b.y - a.y);
 }
 
-function makePalmateSilhouettePath(variant: PalmateVariant) {
-  return catmullRomToBezierPath(makePalmateContourPoints(variant));
+function normalizedDirection(from: Point, to: Point) {
+  const distance = pointDistance(from, to) || 1;
+  return { x: (to.x - from.x) / distance, y: (to.y - from.y) / distance };
 }
 
-function makePalmateTracePath() {
-  return catmullRomToBezierPath(palmateTraceContourPoints);
-}
+function makeT2LocalSmoothPath(points: readonly Point[]) {
+  const commands = [`M ${points[0].x} ${points[0].y}`];
+  const count = points.length;
 
-function makePalmateTraceLabels() {
-  return [
-    ['PI', palmateTraceLandmarks.petioleInsertion],
-    ['LBS', palmateTraceLandmarks.leftBasalShoulder],
-    ['RBS', palmateTraceLandmarks.rightBasalShoulder],
-    ['LLT', palmateTraceLandmarks.leftLowerLobeTip],
-    ['RLT', palmateTraceLandmarks.rightLowerLobeTip],
-    ['LLS', palmateTraceLandmarks.leftLowerSinus],
-    ['RLS', palmateTraceLandmarks.rightLowerSinus],
-    ['LULT', palmateTraceLandmarks.leftUpperLobeTip],
-    ['RULT', palmateTraceLandmarks.rightUpperLobeTip],
-    ['LUS', palmateTraceLandmarks.leftUpperSinus],
-    ['RUS', palmateTraceLandmarks.rightUpperSinus],
-    ['CLT', palmateTraceLandmarks.centralLobeTip],
-    ['AXIS', palmateTraceLandmarks.apexCentreAxis]
-  ] as const;
+  for (let index = 0; index < count; index += 1) {
+    const previous = points[(index - 1 + count) % count];
+    const current = points[index];
+    const next = points[(index + 1) % count];
+    const afterNext = points[(index + 2) % count];
+    const segmentLength = pointDistance(current, next);
+    const currentTangent = normalizedDirection(previous, next);
+    const nextTangent = normalizedDirection(current, afterNext);
+    const handleLength = Math.min(segmentLength * 0.1, 4.5);
+    const c1 = {
+      x: current.x + currentTangent.x * handleLength,
+      y: current.y + currentTangent.y * handleLength
+    };
+    const c2 = {
+      x: next.x - nextTangent.x * handleLength,
+      y: next.y - nextTangent.y * handleLength
+    };
+    commands.push(`C ${c1.x.toFixed(2)} ${c1.y.toFixed(2)} ${c2.x.toFixed(2)} ${c2.y.toFixed(2)} ${next.x} ${next.y}`);
+  }
+
+  commands.push('Z');
+  return commands.join(' ');
 }
 
 function polygonArea(points: readonly Point[]) {
@@ -284,84 +301,128 @@ function boundsOf(points: readonly Point[]) {
   };
 }
 
-function makePalmateMetrics(variant: PalmateVariant) {
-  const points = makePalmateContourPoints(variant);
-  const finalArea = polygonArea(points);
-  const bounds = boundsOf(points);
-  const centralBodyWidth = variant === 'current-m2b' ? 180 : 152;
-  const upperSinusDepth = variant === 'current-m2b' ? 32 : 66;
-  const lowerSinusDepth = variant === 'current-m2b' ? 18 : 32;
-
-  return [
-    `blade width / height: ${(bounds.width / bounds.height).toFixed(2)}`,
-    `central body width: ${Math.round(centralBodyWidth)} (${Math.round((centralBodyWidth / bounds.width) * 100)}%)`,
-    `final silhouette area: ${Math.round(finalArea)}`,
-    `area retention ratio: observation only`,
-    `upper sinus depth: ${upperSinusDepth}`,
-    `lower sinus depth: ${lowerSinusDepth}`,
-    `reference method: traced landmarks, no retention gate`
-  ];
-}
-
-function renderReferenceTrace(svg: SVGSVGElement) {
+function makeReferenceImage(className: string) {
   const namespace = 'http://www.w3.org/2000/svg';
   const image = document.createElementNS(namespace, 'image');
-  image.setAttribute('href', '/assets/leaf-silhouette-lab/reference/acer-platanoides-scanned-leaf-reference-900.jpg');
-  image.setAttribute('x', '-152');
-  image.setAttribute('y', '-176');
-  image.setAttribute('width', '304');
-  image.setAttribute('height', '386');
-  image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-  image.setAttribute('opacity', '0.22');
+  image.setAttribute('href', PALMATE_REFERENCE_URL);
+  image.setAttribute('x', '0');
+  image.setAttribute('y', '0');
+  image.setAttribute('width', '500');
+  image.setAttribute('height', '634');
+  image.setAttribute('preserveAspectRatio', 'none');
+  image.setAttribute('class', className);
+  return image;
+}
 
+function makeTraceGrid() {
+  const namespace = 'http://www.w3.org/2000/svg';
   const grid = document.createElementNS(namespace, 'g');
   grid.setAttribute('class', 'trace-grid');
-  for (let value = -150; value <= 150; value += 50) {
+  for (let value = 0; value <= 500; value += 50) {
     const vertical = document.createElementNS(namespace, 'line');
     vertical.setAttribute('x1', String(value));
     vertical.setAttribute('x2', String(value));
-    vertical.setAttribute('y1', '-175');
-    vertical.setAttribute('y2', '155');
+    vertical.setAttribute('y1', '0');
+    vertical.setAttribute('y2', '420');
     grid.append(vertical);
 
-    const horizontal = document.createElementNS(namespace, 'line');
-    horizontal.setAttribute('x1', '-160');
-    horizontal.setAttribute('x2', '160');
-    horizontal.setAttribute('y1', String(value));
-    horizontal.setAttribute('y2', String(value));
-    grid.append(horizontal);
+    if (value <= 400) {
+      const horizontal = document.createElementNS(namespace, 'line');
+      horizontal.setAttribute('x1', '0');
+      horizontal.setAttribute('x2', '500');
+      horizontal.setAttribute('y1', String(value));
+      horizontal.setAttribute('y2', String(value));
+      grid.append(horizontal);
+    }
   }
+  return grid;
+}
 
-  const tracePath = document.createElementNS(namespace, 'path');
-  tracePath.setAttribute('class', 'trace-outline');
-  tracePath.setAttribute('d', makePalmateTracePath());
+function makeRawTracePolygon() {
+  const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  polygon.setAttribute('class', 'trace-raw');
+  polygon.setAttribute('points', palmateT2DensePoints.map((point) => `${point.x},${point.y}`).join(' '));
+  return polygon;
+}
 
-  const axis = document.createElementNS(namespace, 'line');
-  axis.setAttribute('class', 'trace-axis');
-  axis.setAttribute('x1', '0');
-  axis.setAttribute('x2', '0');
-  axis.setAttribute('y1', '150');
-  axis.setAttribute('y2', '-175');
+function renderReferenceImage(svg: SVGSVGElement) {
+  svg.replaceChildren(makeReferenceImage('reference-image'));
+}
 
-  const landmarkGroup = document.createElementNS(namespace, 'g');
-  landmarkGroup.setAttribute('class', 'trace-landmarks');
-  makePalmateTraceLabels().forEach(([label, point], index) => {
+function renderDenseReference(svg: SVGSVGElement) {
+  const namespace = 'http://www.w3.org/2000/svg';
+  const pointGroup = document.createElementNS(namespace, 'g');
+  pointGroup.setAttribute('aria-label', '60 explicit contour points');
+  palmateT2DensePoints.forEach((point, index) => {
     const circle = document.createElementNS(namespace, 'circle');
+    circle.setAttribute('class', 'trace-point');
     circle.setAttribute('cx', String(point.x));
     circle.setAttribute('cy', String(point.y));
-    circle.setAttribute('r', label === 'PI' || label === 'CLT' ? '5' : '4');
-    circle.setAttribute('aria-label', label);
-    landmarkGroup.append(circle);
+    circle.setAttribute('r', index % 10 === 0 || index === 31 ? '3.6' : '2.5');
+    pointGroup.append(circle);
 
-    const text = document.createElementNS(namespace, 'text');
-    text.setAttribute('x', String(point.x + (point.x >= 0 ? 7 : -7)));
-    text.setAttribute('y', String(point.y + (index % 2 === 0 ? -7 : 13)));
-    text.setAttribute('text-anchor', point.x >= 0 ? 'start' : 'end');
-    text.textContent = label;
-    landmarkGroup.append(text);
+    if (index % 5 === 0 || index === 31) {
+      const text = document.createElementNS(namespace, 'text');
+      text.setAttribute('class', 'trace-point-index');
+      text.setAttribute('x', String(point.x + 6));
+      text.setAttribute('y', String(point.y - 6));
+      text.textContent = String(index);
+      pointGroup.append(text);
+    }
   });
 
-  svg.replaceChildren(image, grid, axis, tracePath, landmarkGroup);
+  const reviewGroup = document.createElementNS(namespace, 'g');
+  reviewGroup.setAttribute('aria-label', 'Manual deviation review zones');
+  palmateManualReviewZones.forEach((zone) => {
+    const ellipse = document.createElementNS(namespace, 'ellipse');
+    ellipse.setAttribute('class', 'deviation-zone');
+    ellipse.setAttribute('cx', String(zone.cx));
+    ellipse.setAttribute('cy', String(zone.cy));
+    ellipse.setAttribute('rx', String(zone.rx));
+    ellipse.setAttribute('ry', String(zone.ry));
+    reviewGroup.append(ellipse);
+
+    const label = document.createElementNS(namespace, 'text');
+    label.setAttribute('class', 'deviation-label');
+    label.setAttribute('x', String(Math.max(4, zone.cx - zone.rx)));
+    label.setAttribute('y', String(Math.max(12, zone.cy - zone.ry - 4)));
+    label.textContent = `manual check: ${zone.label}`;
+    reviewGroup.append(label);
+  });
+
+  svg.replaceChildren(makeReferenceImage('reference-image faint'), makeTraceGrid(), makeRawTracePolygon(), pointGroup, reviewGroup);
+}
+
+function renderRawTrace(svg: SVGSVGElement) {
+  svg.replaceChildren(makeReferenceImage('reference-image reference-overlay'), makeTraceGrid(), makeRawTracePolygon());
+}
+
+function renderSmoothedTrace(svg: SVGSVGElement) {
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('class', 'leaf-fill');
+  path.setAttribute('d', makeT2LocalSmoothPath(palmateT2DensePoints));
+  svg.replaceChildren(makeReferenceImage('reference-image reference-overlay'), path);
+}
+
+function makePalmateT2Metrics(kind: 'dense' | 'raw' | 'smoothed') {
+  const bounds = boundsOf(palmateT2DensePoints);
+  const metrics = [
+    `explicit contour points: ${palmateT2DensePoints.length}`,
+    `blade width / height: ${(bounds.width / bounds.height).toFixed(2)}`,
+    `raw polygon area: ${Math.round(polygonArea(palmateT2DensePoints))}`,
+    `trace source: Acer platanoides 500 px scan`,
+    `automatic edge detection: no`
+  ];
+
+  if (kind === 'dense') {
+    metrics.push('deviation review: 6 manually marked zones; visual overlay only');
+  } else if (kind === 'raw') {
+    metrics.push('connection: direct closed polyline through all 60 points');
+  } else {
+    metrics.push('smoothing: local cubic spans, max handle 4.5 px');
+    metrics.push('prototypeStatus: t2-dense-trace-awaiting-owner-review');
+  }
+  return metrics;
 }
 
 function renderLeaf(svg: SVGSVGElement, pathData: string) {
@@ -396,21 +457,27 @@ const strapCurrentC2Svg = document.querySelector<SVGSVGElement>('#strap-current-
 const strapD1Svg = document.querySelector<SVGSVGElement>('#strap-d1');
 const strapD2Svg = document.querySelector<SVGSVGElement>('#strap-d2');
 const strapD3Svg = document.querySelector<SVGSVGElement>('#strap-d3');
-const palmateCurrentM2bSvg = document.querySelector<SVGSVGElement>('#palmate-current-m2b');
-const palmateReferenceTraceSvg = document.querySelector<SVGSVGElement>('#palmate-reference-trace');
-const palmateT1Svg = document.querySelector<SVGSVGElement>('#palmate-t1');
-const palmateCurrentM2bMetrics = document.querySelector<HTMLElement>('#palmate-current-m2b-metrics');
-const palmateT1Metrics = document.querySelector<HTMLElement>('#palmate-t1-metrics');
+const palmateReferenceImageSvg = document.querySelector<SVGSVGElement>('#palmate-reference-image');
+const palmateReferenceDenseSvg = document.querySelector<SVGSVGElement>('#palmate-reference-dense');
+const palmateRawTraceSvg = document.querySelector<SVGSVGElement>('#palmate-raw-trace');
+const palmateSmoothedTraceSvg = document.querySelector<SVGSVGElement>('#palmate-smoothed-trace');
+const palmateDenseMetrics = document.querySelector<HTMLElement>('#palmate-dense-metrics');
+const palmateRawMetrics = document.querySelector<HTMLElement>('#palmate-raw-metrics');
+const palmateSmoothedMetrics = document.querySelector<HTMLElement>('#palmate-smoothed-metrics');
+const traceOverlayButton = document.querySelector<HTMLButtonElement>('[data-trace-overlay]');
 if (
   !strapCurrentC2Svg ||
   !strapD1Svg ||
   !strapD2Svg ||
   !strapD3Svg ||
-  !palmateCurrentM2bSvg ||
-  !palmateReferenceTraceSvg ||
-  !palmateT1Svg ||
-  !palmateCurrentM2bMetrics ||
-  !palmateT1Metrics
+  !palmateReferenceImageSvg ||
+  !palmateReferenceDenseSvg ||
+  !palmateRawTraceSvg ||
+  !palmateSmoothedTraceSvg ||
+  !palmateDenseMetrics ||
+  !palmateRawMetrics ||
+  !palmateSmoothedMetrics ||
+  !traceOverlayButton
 ) {
   throw new Error('Leaf Silhouette Lab SVG targets are missing.');
 }
@@ -419,11 +486,13 @@ renderLeaf(strapCurrentC2Svg, makeStrapSilhouettePath('current-c2'));
 renderLeaf(strapD1Svg, makeStrapSilhouettePath('d1-shouldered'));
 renderLeaf(strapD2Svg, makeStrapSilhouettePath('d2-late-taper'));
 renderLeaf(strapD3Svg, makeStrapSilhouettePath('d3-natural-asymmetry'));
-renderLeaf(palmateCurrentM2bSvg, makePalmateSilhouettePath('current-m2b'));
-renderReferenceTrace(palmateReferenceTraceSvg);
-renderLeaf(palmateT1Svg, makePalmateSilhouettePath('t1-traced'));
-renderMetrics(palmateCurrentM2bMetrics, makePalmateMetrics('current-m2b'));
-renderMetrics(palmateT1Metrics, makePalmateMetrics('t1-traced'));
+renderReferenceImage(palmateReferenceImageSvg);
+renderDenseReference(palmateReferenceDenseSvg);
+renderRawTrace(palmateRawTraceSvg);
+renderSmoothedTrace(palmateSmoothedTraceSvg);
+renderMetrics(palmateDenseMetrics, makePalmateT2Metrics('dense'));
+renderMetrics(palmateRawMetrics, makePalmateT2Metrics('raw'));
+renderMetrics(palmateSmoothedMetrics, makePalmateT2Metrics('smoothed'));
 
 const searchParams = new URLSearchParams(window.location.search);
 const requestedLeaf = searchParams.get('leaf');
@@ -437,6 +506,12 @@ document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((button) =
     window.history.replaceState(null, '', `${window.location.pathname}?${searchParams.toString()}`);
     setFilter(nextFilter);
   });
+});
+
+traceOverlayButton.addEventListener('click', () => {
+  const nextState = !document.body.classList.contains('trace-overlay-enabled');
+  document.body.classList.toggle('trace-overlay-enabled', nextState);
+  traceOverlayButton.setAttribute('aria-pressed', String(nextState));
 });
 
 setFilter(initialFilter);

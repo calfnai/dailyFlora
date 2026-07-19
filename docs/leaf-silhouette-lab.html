@@ -89,6 +89,27 @@
         gap: 18px;
       }
 
+      .comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .comparison-grid .specimen {
+        min-height: 500px;
+      }
+
+      .comparison-grid .stage {
+        min-height: 430px;
+        padding: 10px;
+      }
+
+      .comparison-grid svg {
+        height: min(58vh, 430px);
+        min-height: 360px;
+      }
+
       .specimen {
         min-height: 640px;
         border: 1px solid var(--line);
@@ -168,8 +189,65 @@
       .trace-outline {
         fill: none;
         stroke: #050505;
-        stroke-width: 4;
+        stroke-width: 2.2;
         stroke-linejoin: round;
+      }
+
+      .trace-raw {
+        fill: none;
+        stroke: #050505;
+        stroke-width: 1.8;
+        stroke-linejoin: round;
+      }
+
+      .trace-point {
+        fill: #fffdf8;
+        stroke: #050505;
+        stroke-width: 1.25;
+      }
+
+      .trace-point-index {
+        fill: #050505;
+        font: 600 7px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .deviation-zone {
+        fill: none;
+        stroke: #b24b35;
+        stroke-width: 1.6;
+        stroke-dasharray: 6 4;
+      }
+
+      .deviation-label {
+        fill: #8d3828;
+        font: 700 8px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .reference-image {
+        opacity: 1;
+      }
+
+      .reference-image.faint {
+        opacity: 0.34;
+      }
+
+      .reference-overlay {
+        opacity: 0;
+        transition: opacity 120ms ease;
+      }
+
+      .trace-overlay-enabled .reference-overlay {
+        opacity: 0.28;
+      }
+
+      .smoothed-panel .leaf-fill {
+        transition: fill 120ms ease, stroke 120ms ease;
+      }
+
+      .trace-overlay-enabled .smoothed-panel .leaf-fill {
+        fill: rgb(0 0 0 / 10%);
+        stroke: #050505;
+        stroke-width: 2;
       }
 
       .trace-axis {
@@ -213,6 +291,16 @@
         .lab-grid {
           grid-template-columns: 1fr;
         }
+
+        .comparison-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 620px) {
+        .comparison-grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
@@ -227,6 +315,7 @@
           <button type="button" data-filter="all">all</button>
           <button type="button" data-filter="strap">strap</button>
           <button type="button" data-filter="palmate">palmate</button>
+          <button type="button" data-trace-overlay aria-pressed="false">trace overlay</button>
         </nav>
       </header>
 
@@ -271,40 +360,54 @@
           </div>
         </article>
 
-        <article class="specimen" data-specimen="palmate">
-          <div class="specimen-title">
-            <span>Current M2b</span>
-            <span>error control: cut shield / badge reading</span>
-          </div>
-          <div class="stage">
-            <svg id="palmate-current-m2b" viewBox="-182 -190 364 390" role="img" aria-label="Current M2b palmate silhouette error control"></svg>
-          </div>
-          <ul id="palmate-current-m2b-metrics" class="metrics" aria-label="Current M2b metrics"></ul>
-        </article>
+      </section>
 
+      <section class="comparison-grid" aria-label="Palmate T2 dense trace comparison">
         <article class="specimen" data-specimen="palmate">
           <div class="specimen-title">
-            <span>Reference + Landmarks</span>
-            <span>Acer platanoides scan, manual trace landmarks</span>
+            <span>Reference Image</span>
+            <span>Acer platanoides scan</span>
           </div>
           <div class="stage">
-            <svg id="palmate-reference-trace" viewBox="-182 -190 364 390" role="img" aria-label="Reference image with palmate trace landmarks"></svg>
+            <svg id="palmate-reference-image" viewBox="0 0 500 420" role="img" aria-label="Acer platanoides reference image"></svg>
           </div>
           <ul class="metrics" aria-label="Reference trace source">
-            <li>source: Wikimedia Commons, Acer platanoides scanned leaf, Andrew Butko, CC BY-SA 3.0</li>
-            <li>method: manual landmarks + smoothed closed contour; no auto-detection, no texture reuse</li>
+            <li>source: Wikimedia Commons · Andrew Butko · CC BY-SA 3.0 / 2.5</li>
+            <li>reference use: manual contour placement only; no auto-detection</li>
           </ul>
         </article>
 
         <article class="specimen" data-specimen="palmate">
           <div class="specimen-title">
-            <span>T1 Traced Silhouette</span>
-            <span>single traced contour, no random variation</span>
+            <span>Reference + Dense Points</span>
+            <span>60 explicit edge points + manual review zones</span>
           </div>
           <div class="stage">
-            <svg id="palmate-t1" viewBox="-182 -190 364 390" role="img" aria-label="T1 traced palmately five-lobed simple leaf silhouette"></svg>
+            <svg id="palmate-reference-dense" viewBox="0 0 500 420" role="img" aria-label="Reference image with 60 manually placed contour points"></svg>
           </div>
-          <ul id="palmate-t1-metrics" class="metrics" aria-label="T1 traced silhouette metrics"></ul>
+          <ul id="palmate-dense-metrics" class="metrics" aria-label="Dense point trace metrics"></ul>
+        </article>
+
+        <article class="specimen" data-specimen="palmate">
+          <div class="specimen-title">
+            <span>Raw Polyline Trace</span>
+            <span>direct 60-point connection</span>
+          </div>
+          <div class="stage">
+            <svg id="palmate-raw-trace" viewBox="0 0 500 420" role="img" aria-label="Raw T2 polyline trace"></svg>
+          </div>
+          <ul id="palmate-raw-metrics" class="metrics" aria-label="Raw trace metrics"></ul>
+        </article>
+
+        <article class="specimen smoothed-panel" data-specimen="palmate">
+          <div class="specimen-title">
+            <span>Smoothed Trace</span>
+            <span>T2 candidate · local short-span smoothing only</span>
+          </div>
+          <div class="stage">
+            <svg id="palmate-smoothed-trace" viewBox="0 0 500 420" role="img" aria-label="Smoothed T2 dense trace silhouette"></svg>
+          </div>
+          <ul id="palmate-smoothed-metrics" class="metrics" aria-label="Smoothed trace metrics"></ul>
         </article>
       </section>
     </main>
