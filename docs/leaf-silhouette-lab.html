@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DailyFlora Leaf Silhouette Lab</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --paper: #f5f2ec;
+        --ink: #050505;
+        --line: rgb(0 0 0 / 14%);
+        --muted: rgb(0 0 0 / 64%);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background: var(--paper);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      main {
+        width: min(1240px, 100%);
+        margin: 0 auto;
+        padding: 22px;
+      }
+
+      header {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 14px;
+      }
+
+      h1,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(24px, 3.2vw, 42px);
+        line-height: 1;
+        letter-spacing: 0;
+      }
+
+      p {
+        max-width: 72ch;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      button {
+        appearance: none;
+        min-height: 34px;
+        border: 1px solid var(--ink);
+        border-radius: 4px;
+        padding: 0 12px;
+        color: var(--ink);
+        background: transparent;
+        font: 700 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        cursor: pointer;
+      }
+
+      button[aria-pressed="true"] {
+        color: var(--paper);
+        background: var(--ink);
+      }
+
+      .lab-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .specimen {
+        min-height: 640px;
+        border: 1px solid var(--line);
+        background: #fffdf8;
+      }
+
+      .specimen.hidden {
+        display: none;
+      }
+
+      .specimen-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 44px;
+        border-bottom: 1px solid var(--line);
+        padding: 0 12px;
+        font: 700 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .specimen-title span:last-child {
+        color: var(--muted);
+        font-weight: 500;
+        text-transform: none;
+      }
+
+      .stage {
+        display: grid;
+        place-items: center;
+        min-height: 594px;
+        padding: 18px;
+      }
+
+      svg {
+        display: block;
+        width: 100%;
+        height: min(74vh, 560px);
+        min-height: 480px;
+      }
+
+      .leaf-fill {
+        fill: #000;
+        stroke: none;
+      }
+
+      .skeleton-vein {
+        stroke: #050505;
+        stroke-width: 3;
+        stroke-linecap: round;
+      }
+
+      .skeleton-node {
+        fill: #050505;
+      }
+
+      .petiole-node {
+        fill: #fffdf8;
+        stroke: #050505;
+        stroke-width: 3;
+      }
+
+      .sinus-target {
+        fill: none;
+        stroke: #050505;
+        stroke-width: 2;
+        stroke-dasharray: 5 4;
+      }
+
+      .trace-grid line {
+        stroke: rgb(0 0 0 / 10%);
+        stroke-width: 1;
+      }
+
+      .trace-outline {
+        fill: none;
+        stroke: #050505;
+        stroke-width: 4;
+        stroke-linejoin: round;
+      }
+
+      .trace-axis {
+        stroke: rgb(0 0 0 / 45%);
+        stroke-width: 1.5;
+        stroke-dasharray: 7 5;
+      }
+
+      .trace-landmarks circle {
+        fill: #fffdf8;
+        stroke: #050505;
+        stroke-width: 2;
+      }
+
+      .trace-landmarks text {
+        fill: #050505;
+        font: 600 7px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .metrics {
+        display: grid;
+        gap: 4px;
+        margin: -10px 18px 18px;
+        padding: 10px 12px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font: 500 11px/1.35 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        list-style: none;
+      }
+
+      @media (max-width: 900px) {
+        header {
+          align-items: start;
+          flex-direction: column;
+        }
+
+        .controls {
+          justify-content: start;
+        }
+
+        .lab-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>Leaf Silhouette Lab</h1>
+          <p>二维闭合曲线验证页。这里不加载 Three.js，不生成厚度、法线、叶脉、姿态、材质或 InstancedMesh，只检查黑色 silhouette 的第一眼阅读。</p>
+        </div>
+        <nav class="controls" aria-label="Leaf silhouette filter">
+          <button type="button" data-filter="all">all</button>
+          <button type="button" data-filter="strap">strap</button>
+          <button type="button" data-filter="palmate">palmate</button>
+        </nav>
+      </header>
+
+      <section class="lab-grid" aria-label="Leaf silhouette specimens">
+        <article class="specimen" data-specimen="strap">
+          <div class="specimen-title">
+            <span>Current C2</span>
+            <span>control from previous round</span>
+          </div>
+          <div class="stage">
+            <svg id="strap-current-c2" viewBox="-92 -36 184 642" role="img" aria-label="Current C2 strap silhouette control"></svg>
+          </div>
+        </article>
+
+        <article class="specimen" data-specimen="strap">
+          <div class="specimen-title">
+            <span>D1</span>
+            <span>clear basal shoulders</span>
+          </div>
+          <div class="stage">
+            <svg id="strap-d1" viewBox="-92 -36 184 642" role="img" aria-label="Strap silhouette candidate D1"></svg>
+          </div>
+        </article>
+
+        <article class="specimen" data-specimen="strap">
+          <div class="specimen-title">
+            <span>D2</span>
+            <span>late taper standard</span>
+          </div>
+          <div class="stage">
+            <svg id="strap-d2" viewBox="-92 -36 184 642" role="img" aria-label="Strap silhouette candidate D2"></svg>
+          </div>
+        </article>
+
+        <article class="specimen" data-specimen="strap">
+          <div class="specimen-title">
+            <span>D3</span>
+            <span>light natural asymmetry</span>
+          </div>
+          <div class="stage">
+            <svg id="strap-d3" viewBox="-92 -36 184 642" role="img" aria-label="Strap silhouette candidate D3"></svg>
+          </div>
+        </article>
+
+        <article class="specimen" data-specimen="palmate">
+          <div class="specimen-title">
+            <span>Current M2b</span>
+            <span>error control: cut shield / badge reading</span>
+          </div>
+          <div class="stage">
+            <svg id="palmate-current-m2b" viewBox="-182 -190 364 390" role="img" aria-label="Current M2b palmate silhouette error control"></svg>
+          </div>
+          <ul id="palmate-current-m2b-metrics" class="metrics" aria-label="Current M2b metrics"></ul>
+        </article>
+
+        <article class="specimen" data-specimen="palmate">
+          <div class="specimen-title">
+            <span>Reference + Landmarks</span>
+            <span>Acer platanoides scan, manual trace landmarks</span>
+          </div>
+          <div class="stage">
+            <svg id="palmate-reference-trace" viewBox="-182 -190 364 390" role="img" aria-label="Reference image with palmate trace landmarks"></svg>
+          </div>
+          <ul class="metrics" aria-label="Reference trace source">
+            <li>source: Wikimedia Commons, Acer platanoides scanned leaf, Andrew Butko, CC BY-SA 3.0</li>
+            <li>method: manual landmarks + smoothed closed contour; no auto-detection, no texture reuse</li>
+          </ul>
+        </article>
+
+        <article class="specimen" data-specimen="palmate">
+          <div class="specimen-title">
+            <span>T1 Traced Silhouette</span>
+            <span>single traced contour, no random variation</span>
+          </div>
+          <div class="stage">
+            <svg id="palmate-t1" viewBox="-182 -190 364 390" role="img" aria-label="T1 traced palmately five-lobed simple leaf silhouette"></svg>
+          </div>
+          <ul id="palmate-t1-metrics" class="metrics" aria-label="T1 traced silhouette metrics"></ul>
+        </article>
+      </section>
+    </main>
+    <script type="module" src="/src/leafSilhouetteLab.ts"></script>
+  </body>
+</html>
