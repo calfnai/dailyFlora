@@ -1,4 +1,5 @@
 import './styles.css';
+import { buildInfo } from './buildInfo';
 import type { DensityName, RenderQualityName } from './types';
 import { todayKey } from './random';
 import { bouquetDisplayName, createDailySpec, readParams } from './spec';
@@ -191,6 +192,7 @@ const clockTime = document.querySelector<HTMLElement>('#clock-time');
 const clockDate = document.querySelector<HTMLElement>('#clock-date');
 const clockQuoteText = document.querySelector<HTMLElement>('#clock-quote-text');
 const clockQuoteAuthor = document.querySelector<HTMLElement>('#clock-quote-author');
+const releaseMark = document.querySelector<HTMLAnchorElement>('#release-mark');
 
 if (
   !canvas ||
@@ -221,6 +223,18 @@ const ui = {
   flowerPlanLabel,
   qualityLabel
 };
+
+if (releaseMark) {
+  releaseMark.textContent = buildInfo.releaseId;
+  releaseMark.href = withBasePath('version.json');
+  releaseMark.title = [
+    `Release: ${buildInfo.releaseId}`,
+    `Commit: ${buildInfo.commitSha}`,
+    `Branch: ${buildInfo.branch}`,
+    `Built: ${buildInfo.builtAt}`,
+    buildInfo.deploymentId ? `Vercel: ${buildInfo.deploymentId}` : ''
+  ].filter(Boolean).join('\n');
+}
 
 let params = readParams();
 const specialId = readSpecialId();

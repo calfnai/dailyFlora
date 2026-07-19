@@ -1,13 +1,77 @@
+import { execFileSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 
+function readGitValue(args: string[]) {
+  try {
+    return execFileSync('git', args, { cwd: __dirname, encoding: 'utf8' }).trim();
+  } catch {
+    return '';
+  }
+}
+
+function shanghaiStamp(date: Date) {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23'
+  }).formatToParts(date);
+  const value = (type: Intl.DateTimeFormatPartTypes) => parts.find((part) => part.type === type)?.value ?? '00';
+  return `${value('year')}${value('month')}${value('day')}-${value('hour')}${value('minute')}`;
+}
+
+const builtAt = new Date();
+const buildSource = process.env.VERCEL ? 'vercel' : 'local';
+const commitSha = process.env.VERCEL_GIT_COMMIT_SHA || readGitValue(['rev-parse', 'HEAD']) || 'uncommitted';
+const shortSha = commitSha === 'uncommitted' ? commitSha : commitSha.slice(0, 8);
+const branch = process.env.VERCEL_GIT_COMMIT_REF || readGitValue(['branch', '--show-current']) || 'unknown';
+const commitMessage = process.env.VERCEL_GIT_COMMIT_MESSAGE || readGitValue(['log', '-1', '--format=%s']);
+const stampedId = commitMessage.match(/\bDF-(\d{8}-\d{4})\b/)?.[1];
+const dirty = buildSource === 'local' && Boolean(readGitValue(['status', '--porcelain']));
+const releaseStamp = stampedId || shanghaiStamp(builtAt);
+const releaseId = `DF-${releaseStamp}-${shortSha}${dirty ? '-dirty' : ''}`;
+const buildInfo = Object.freeze({
+  releaseId,
+  builtAt: builtAt.toISOString(),
+  timezone: 'Asia/Shanghai',
+  commitSha,
+  shortSha,
+  branch,
+  commitMessage,
+  dirty,
+  buildSource,
+  deploymentId: process.env.VERCEL_DEPLOYMENT_ID || null,
+  deploymentUrl: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
+});
+
+if (process.env.VERCEL && branch === 'codex/dailyflora-integration' && !stampedId) {
+  throw new Error('Production integration commits must include [DF-YYYYMMDD-HHmm] in the commit message.');
+}
+
 export default defineConfig({
   base: './',
+  define: {
+    __DAILYFLORA_BUILD_INFO__: JSON.stringify(buildInfo)
+  },
   plugins: [
     {
-      name: 'copy-aesthetic-review-data',
+      name: 'dailyflora-build-metadata',
+      transformIndexHtml() {
+        return [
+          {
+            tag: 'meta',
+            attrs: { name: 'dailyflora-release', content: buildInfo.releaseId },
+            injectTo: 'head'
+          }
+        ];
+      },
       closeBundle() {
+        writeFileSync(resolve(__dirname, 'dist/version.json'), `${JSON.stringify(buildInfo, null, 2)}\n`);
         mkdirSync(resolve(__dirname, 'dist/data'), { recursive: true });
         copyFileSync(
           resolve(__dirname, 'data/aesthetic-review-dashboard.json'),
