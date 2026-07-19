@@ -409,6 +409,24 @@ body.is-preview .daily-theme {
   backdrop-filter: blur(14px);
 }
 
+.release-mark {
+  position: fixed;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  z-index: 4;
+  color: rgb(255 250 235 / 34%);
+  font: 500 9px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.025em;
+  text-decoration: none;
+  text-shadow: 0 1px 10px rgb(0 0 0 / 80%);
+  transition: color 160ms ease;
+}
+
+.release-mark:hover,
+.release-mark:focus-visible {
+  color: rgb(255 250 235 / 78%);
+}
+
 .account-dock {
   position: fixed;
   top: max(16px, env(safe-area-inset-top));

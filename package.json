@@ -12,6 +12,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build && node scripts/prepare-sites-build.mjs",
     "build:sites": "npm run build",
+    "build:vercel": "tsc && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "github:login": "node scripts/deploy-github-pages.mjs --login",
     "deploy:github": "node scripts/deploy-github-pages.mjs",

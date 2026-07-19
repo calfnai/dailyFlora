@@ -1,4 +1,5 @@
 [
+  "AGENTS.md",
   ".gitignore",
   ".openai/hosting.json",
   ".codex/skills/dailyflora/SKILL.md",
@@ -26,6 +27,7 @@
   "docs/development-document-summary.html",
   "docs/development-process-review.md",
   "docs/member-test.html",
+  "docs/versioning-and-deployments.md",
   "docs/primitive-lab.html",
   "docs/realistic-flower-lab.html",
   "docs/scifi-bouquet-lab.html",
@@ -56,6 +58,7 @@
   "sites/worker.js",
   "signup/index.html",
   "src/avatarLab.ts",
+  "src/buildInfo.ts",
   "src/bouquetScene.ts",
   "src/extendedTypes.ts",
   "src/flowerPlans.ts",
