@@ -13,6 +13,21 @@
     <main class="app-shell" aria-label="DailyFlora 3D bouquet screensaver">
       <canvas id="flora-canvas"></canvas>
 
+      <div class="interface-frame" aria-hidden="true">
+        <span class="interface-corner interface-corner-top"></span>
+        <span class="interface-corner interface-corner-bottom"></span>
+      </div>
+
+      <nav class="language-switcher" id="language-switcher" aria-label="Interface language">
+        <button type="button" data-language="en" aria-pressed="true">EN</button>
+        <button type="button" data-language="zh" aria-pressed="false">中</button>
+        <button type="button" data-language="es" aria-pressed="false">ES</button>
+        <button type="button" data-language="fr" aria-pressed="false">FR</button>
+        <button type="button" data-language="pt" aria-pressed="false">PT</button>
+        <button type="button" data-language="it" aria-pressed="false">IT</button>
+        <button type="button" data-language="ja" aria-pressed="false">日</button>
+      </nav>
+
       <section class="hud" id="hud" aria-live="polite">
         <div class="daily-mark">
           <span class="daily-date" id="daily-date"></span>
@@ -27,7 +42,8 @@
 
       <nav class="site-menu" id="site-menu" aria-label="DailyFlora site menu">
         <button class="site-menu-toggle" id="site-menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu-panel" data-tooltip="菜单">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" /></svg>
+          <svg class="special-legacy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" /></svg>
+          <span data-interface-copy="index">INDEX</span>
         </button>
         <div class="site-menu-panel" id="site-menu-panel" hidden>
           <a href="./about/">About</a>
@@ -42,7 +58,8 @@
 
       <nav class="controls is-collapsed" id="controls" aria-label="Viewing controls">
         <button class="icon-button controls-toggle" id="controls-toggle" type="button" title="Show viewing controls" aria-label="Show viewing controls" aria-expanded="false" aria-controls="controls-panel" data-tooltip="观看设置">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9a3 3 0 0 0 5.83 1H20V6h-1.17A3 3 0 0 0 13 7H4zm0 11h3.17A3 3 0 0 0 13 17h7v-2h-7a3 3 0 0 0-5.83 1H4z" /></svg>
+          <svg class="special-legacy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9a3 3 0 0 0 5.83 1H20V6h-1.17A3 3 0 0 0 13 7H4zm0 11h3.17A3 3 0 0 0 13 17h7v-2h-7a3 3 0 0 0-5.83 1H4z" /></svg>
+          <span data-interface-copy="view">VIEW</span>
         </button>
         <a class="icon-button review-dashboard-button" id="review-dashboard-link" href="./docs/aesthetic-review-dashboard.html?debug=1" target="_blank" rel="noopener" title="Open aesthetic review dashboard" aria-label="Open aesthetic review dashboard" data-tooltip="审美审核" hidden>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 2v14h14V5z" /><path d="M7 8h10v2H7zM7 12h6v2H7zM15.4 13.6l1.4 1.4-3.6 3.6-2.2-2.2 1.4-1.4.8.8z" /></svg>

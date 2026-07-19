@@ -2,9 +2,13 @@
 
 > 自 `0.14.10` 起，新增版本记录使用中英文双语。 / Starting with `0.14.10`, all new release notes are written in both Chinese and English.
 
-## Unreleased - 2026-07-14
+## Unreleased - 2026-07-20
 
-记录今日默认花束的花材丰富度问题。 / Recorded today's default bouquet variety issue.
+记录 GUI v1、空闲时钟与近期默认花束修正。 / Recorded GUI v1, the idle clock, and recent default-bouquet corrections.
+
+- 以当前 `codex/dailyflora-integration` 为基线接入 GUI v1：黑色空间、左下无框花名、右上 `INDEX`、右下 `VIEW`、反向括号动画和七语言选择器；不复制参考 HTML 结构。 / Applied GUI v1 on top of the current `codex/dailyflora-integration` baseline with a black spatial stage, borderless lower-left bouquet name, upper-right `INDEX`, lower-right `VIEW`, opposing corner motion, and a seven-language selector without copying the reference HTML structure.
+- 保持已确认的时钟边界：`clock-settings` 只存在于 `VIEW` 菜单，手动或自动显示的 `clock-overlay` 只包含时间、日期和名言。 / Preserved the accepted clock boundary: `clock-settings` exists only in the `VIEW` menu, while the manual or automatic `clock-overlay` contains only time, date, and quote.
+- GUI v1 完全排除 Special Edition；特殊版继续使用原 HUD、圆形入口、观看按钮、开场、文案、音频和构图。 / Explicitly excluded Special Edition from GUI v1 so its original HUD, circular entry points, viewing button, opening, copy, audio, and composition remain unchanged.
 
 - 新增空闲时钟模式：默认 5 分钟无操作后以淡入方式显示 24 小时制时间、日期和舒缓英文名言；支持手动开启、自动显示开关与间隔持久化，并以渐隐毛玻璃叠层保留花束持续旋转。 / Added an idle clock mode: after five minutes of inactivity it fades in a 24-hour clock, date, and calming English quote; manual opening, persistent interval settings, and automatic display can be controlled while the bouquet continues behind a fading glass overlay.
 
