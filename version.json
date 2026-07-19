@@ -1,0 +1,13 @@
+{
+  "releaseId": "DF-20260720-0128-503820ac",
+  "builtAt": "2026-07-19T19:48:18.843Z",
+  "timezone": "Asia/Shanghai",
+  "commitSha": "503820ac1ef3c91e30139515c7953ea054f2ad73",
+  "shortSha": "503820ac",
+  "branch": "codex/dailyflora-integration",
+  "commitMessage": "[DF-20260720-0128] Require Git-linked production deploys",
+  "dirty": false,
+  "buildSource": "local",
+  "deploymentId": null,
+  "deploymentUrl": null
+}
