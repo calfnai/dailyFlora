@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>DailyFlora GUI v2</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08090d}
+iframe{position:fixed;inset:0;width:100%;height:100%;border:0;background:#08090d}
+.v2-overlay{position:fixed;inset:0;pointer-events:none;z-index:9999;color:#f6f2e8;font-family:"Sarasa Term SC","Iosevka Charon Mono",monospace}
+.v2-outline{position:absolute;inset:12px;border:1px solid rgba(246,242,232,.07)}
+.line{position:absolute;background:rgba(246,242,232,.28);animation-duration:1.05s;animation-fill-mode:both;animation-timing-function:cubic-bezier(.22,1,.36,1)}
+.tl-h{left:-1px;top:-1px;width:54px;height:1px;transform-origin:left center;animation-name:growX}
+.tl-v{left:-1px;top:-1px;width:1px;height:54px;transform-origin:center top;animation-name:growY}
+.br-h{right:-1px;bottom:-1px;width:54px;height:1px;transform-origin:right center;animation-name:growX}
+.br-v{right:-1px;bottom:-1px;width:1px;height:54px;transform-origin:center bottom;animation-name:growY}
+@keyframes growX{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}
+@keyframes growY{from{transform:scaleY(0);opacity:0}to{transform:scaleY(1);opacity:1}}
+.languages{position:absolute;right:132px;top:35px;display:flex;gap:10px;align-items:center;white-space:nowrap;pointer-events:auto}
+.languages button{appearance:none;border:0;background:none;color:rgba(246,242,232,.34);padding:0;font:500 9px/1 "Sarasa Term SC","Iosevka Charon Mono",monospace;letter-spacing:.08em;cursor:pointer}
+.languages button[aria-pressed="true"]{color:#f6f2e8}
+.languages button:hover{color:rgba(246,242,232,.78)}
+@media(max-width:760px){.v2-outline{inset:7px}.tl-h,.br-h{width:46px}.tl-v,.br-v{height:46px}.languages{right:108px;top:18px;gap:7px}.languages button{font-size:8px}}
+</style>
+</head>
+<body>
+<iframe id="viewer" src="../ui-v1/" title="DailyFlora GUI v2"></iframe>
+<div class="v2-overlay" aria-hidden="false">
+  <div class="v2-outline" aria-hidden="true">
+    <span class="line tl-h"></span><span class="line tl-v"></span>
+    <span class="line br-h"></span><span class="line br-v"></span>
+  </div>
+  <div class="languages" role="group" aria-label="Interface language">
+    <button data-lang="en" aria-pressed="true">EN</button><button data-lang="zh">中</button><button data-lang="es">ES</button><button data-lang="fr">FR</button><button data-lang="pt">PT</button><button data-lang="it">IT</button><button data-lang="ja">日</button>
+  </div>
+</div>
+<script>
+const frame=document.getElementById('viewer');
+const buttons=[...document.querySelectorAll('[data-lang]')];
+const pt={brandSystem:'SISTEMA BOTÂNICO GENERATIVO',kicker:'COMPOSIÇÃO DE HOJE',index:'ÍNDICE',view:'VISTA',menuHeading:'DAILYFLORA / ÍNDICE',about:'Sobre',member:'Jardim pessoal',downloads:'Downloads',shop:'Loja de bouquets',scifi:'Flora Sci-Fi',save:'Guardar este bouquet',review:'Revisão estética'};
+function press(lang){buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));localStorage.setItem('dailyflora.gui-language.v4',lang);const d=frame.contentDocument;if(!d)return;const old=d.querySelector('.global-language-toggle');if(old)old.style.display='none';const staticFrame=d.querySelector('.interface-frame');if(staticFrame)staticFrame.style.opacity='0';if(lang!=='pt'){const target=d.querySelector(`[data-language-choice="${lang}"]`);if(target)target.click();return;}d.documentElement.dataset.language='pt';d.documentElement.lang='pt';Object.entries(pt).forEach(([key,value])=>{d.querySelectorAll(`[data-ui-key="${key}"]`).forEach(el=>el.textContent=value)});}
+frame.addEventListener('load',()=>{const saved=localStorage.getItem('dailyflora.gui-language.v4')||'en';press(saved);});
+buttons.forEach(b=>b.addEventListener('click',()=>press(b.dataset.lang)));
+</script>
+</body>
+</html>
