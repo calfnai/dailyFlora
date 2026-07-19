@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DailyFlora Strap 3D Mini Lab</title>
+    <title>DailyFlora Palmate 3D Mini Lab</title>
     <style>
       html,
       body {
@@ -12,11 +12,11 @@
         margin: 0;
         overflow: hidden;
         color: #e8f4dd;
-        background: #11170f;
+        background: #10160f;
         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
 
-      #strap-canvas {
+      #palmate-canvas {
         display: block;
         width: 100vw;
         height: 100vh;
@@ -28,11 +28,11 @@
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        max-width: min(720px, calc(100vw - 24px));
+        max-width: min(760px, calc(100vw - 24px));
         padding: 8px;
         border: 1px solid rgb(190 235 170 / 24%);
         border-radius: 8px;
-        background: rgb(4 10 4 / 70%);
+        background: rgb(4 10 4 / 72%);
         backdrop-filter: blur(8px);
       }
 
@@ -64,34 +64,31 @@
         position: fixed;
         right: 12px;
         bottom: 12px;
-        width: min(420px, calc(100vw - 24px));
+        width: min(440px, calc(100vw - 24px));
         margin: 0;
         padding: 10px 12px;
         border: 1px solid rgb(190 235 170 / 24%);
         border-radius: 8px;
         color: #dff3d4;
-        background: rgb(4 10 4 / 70%);
+        background: rgb(4 10 4 / 72%);
         font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         white-space: pre-wrap;
       }
     </style>
-    <script type="module" crossorigin src="../assets/strap3DMiniLab-oHzzu2Rc.js"></script>
+    <script type="module" crossorigin src="../assets/palmate3DMiniLab-CgVKQ5I3.js"></script>
     <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="../assets/three.module-DQjliVUS.js">
   </head>
   <body>
-    <canvas id="strap-canvas"></canvas>
-    <nav id="view-panel" class="panel" aria-label="Strap 3D view">
+    <canvas id="palmate-canvas"></canvas>
+    <nav id="view-panel" class="panel" aria-label="Palmate 3D view">
       <button type="button" data-view="front">front</button>
       <button type="button" data-view="side">side</button>
       <button type="button" data-view="top">top</button>
       <button type="button" data-view="perspective">perspective</button>
-      <button type="button" data-view="base">base front</button>
-      <button type="button" data-view="base-side">base side</button>
-      <button type="button" data-view="base-top">base top</button>
       <button type="button" data-view="section">section</button>
     </nav>
-    <nav id="mode-panel" class="panel" aria-label="Strap 3D material mode">
+    <nav id="mode-panel" class="panel" aria-label="Palmate 3D material mode">
       <button type="button" data-mode="normal">normal</button>
       <button type="button" data-mode="silhouette">silhouette</button>
       <button type="button" data-mode="wireframe">wireframe</button>

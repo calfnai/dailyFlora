@@ -137,6 +137,69 @@
         stroke: none;
       }
 
+      .skeleton-vein {
+        stroke: #050505;
+        stroke-width: 3;
+        stroke-linecap: round;
+      }
+
+      .skeleton-node {
+        fill: #050505;
+      }
+
+      .petiole-node {
+        fill: #fffdf8;
+        stroke: #050505;
+        stroke-width: 3;
+      }
+
+      .sinus-target {
+        fill: none;
+        stroke: #050505;
+        stroke-width: 2;
+        stroke-dasharray: 5 4;
+      }
+
+      .trace-grid line {
+        stroke: rgb(0 0 0 / 10%);
+        stroke-width: 1;
+      }
+
+      .trace-outline {
+        fill: none;
+        stroke: #050505;
+        stroke-width: 4;
+        stroke-linejoin: round;
+      }
+
+      .trace-axis {
+        stroke: rgb(0 0 0 / 45%);
+        stroke-width: 1.5;
+        stroke-dasharray: 7 5;
+      }
+
+      .trace-landmarks circle {
+        fill: #fffdf8;
+        stroke: #050505;
+        stroke-width: 2;
+      }
+
+      .trace-landmarks text {
+        fill: #050505;
+        font: 600 7px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .metrics {
+        display: grid;
+        gap: 4px;
+        margin: -10px 18px 18px;
+        padding: 10px 12px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font: 500 11px/1.35 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        list-style: none;
+      }
+
       @media (max-width: 900px) {
         header {
           align-items: start;
@@ -152,7 +215,7 @@
         }
       }
     </style>
-    <script type="module" crossorigin src="../assets/leafSilhouetteLab-DfNn3Ajq.js"></script>
+    <script type="module" crossorigin src="../assets/leafSilhouetteLab-DIuYb4-l.js"></script>
     <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-B5Qt9EMX.js">
   </head>
   <body>
@@ -212,12 +275,38 @@
 
         <article class="specimen" data-specimen="palmate">
           <div class="specimen-title">
-            <span>palmate</span>
-            <span>continuous five-lobed leaf</span>
+            <span>Current M2b</span>
+            <span>error control: cut shield / badge reading</span>
           </div>
           <div class="stage">
-            <svg id="palmate-silhouette" viewBox="-182 -160 364 342" role="img" aria-label="Black palmate leaf silhouette"></svg>
+            <svg id="palmate-current-m2b" viewBox="-182 -190 364 390" role="img" aria-label="Current M2b palmate silhouette error control"></svg>
           </div>
+          <ul id="palmate-current-m2b-metrics" class="metrics" aria-label="Current M2b metrics"></ul>
+        </article>
+
+        <article class="specimen" data-specimen="palmate">
+          <div class="specimen-title">
+            <span>Reference + Landmarks</span>
+            <span>Acer platanoides scan, manual trace landmarks</span>
+          </div>
+          <div class="stage">
+            <svg id="palmate-reference-trace" viewBox="-182 -190 364 390" role="img" aria-label="Reference image with palmate trace landmarks"></svg>
+          </div>
+          <ul class="metrics" aria-label="Reference trace source">
+            <li>source: Wikimedia Commons, Acer platanoides scanned leaf, Andrew Butko, CC BY-SA 3.0</li>
+            <li>method: manual landmarks + smoothed closed contour; no auto-detection, no texture reuse</li>
+          </ul>
+        </article>
+
+        <article class="specimen" data-specimen="palmate">
+          <div class="specimen-title">
+            <span>T1 Traced Silhouette</span>
+            <span>single traced contour, no random variation</span>
+          </div>
+          <div class="stage">
+            <svg id="palmate-t1" viewBox="-182 -190 364 390" role="img" aria-label="T1 traced palmately five-lobed simple leaf silhouette"></svg>
+          </div>
+          <ul id="palmate-t1-metrics" class="metrics" aria-label="T1 traced silhouette metrics"></ul>
         </article>
       </section>
     </main>
