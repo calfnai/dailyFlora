@@ -5,8 +5,8 @@
   "productVersion": "0.14",
   "type": "module",
   "engines": {
-    "node": "18.x",
-    "npm": "10.x"
+    "node": "24.x",
+    "npm": ">=10"
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
