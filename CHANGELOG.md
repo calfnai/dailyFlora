@@ -6,6 +6,8 @@
 
 记录今日默认花束的花材丰富度问题。 / Recorded today's default bouquet variety issue.
 
+- 固化正式用户参考图生成契约：每次生成保存一张主参考 WebP、一张 320px 缩略 WebP 和一条追加式参数记录；用户数据不保存或复制系统花材列表，并加入可复用的浏览器 WebP 处理模块。 / Formalized the authenticated user-reference generation contract: each generation keeps one main WebP, one 320px thumbnail WebP, and one append-only parameter record; user data never stores or copies the system material list, and a reusable browser WebP preparation module is now available.
+
 - 新增空闲时钟模式：默认 5 分钟无操作后以淡入方式显示 24 小时制时间、日期和舒缓英文名言；支持手动开启、自动显示开关与间隔持久化，并以渐隐毛玻璃叠层保留花束持续旋转。 / Added an idle clock mode: after five minutes of inactivity it fades in a 24-hour clock, date, and calming English quote; manual opening, persistent interval settings, and automatic display can be controlled while the bouquet continues behind a fading glass overlay.
 
 - 记录并修复 `2026-07-16` 默认花束中穗状/线形花材的问题：蛇鞭菊、风信子、金鱼草不应以同一个等长等量 `SpikeFlower` 模板大比例出现，茎过粗、飞出屏幕和蛇鞭菊炸开花蕊都会直接破坏整体美感。 / Recorded and fixed the default `2026-07-16` bouquet issue where liatris, hyacinth, and snapdragon were reading as the same repeated `SpikeFlower` template with equal length and bloom count; thick stems, off-screen spikes, and explosive liatris styles directly broke the bouquet.

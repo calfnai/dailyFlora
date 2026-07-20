@@ -15,6 +15,11 @@ from concrete feedback on the running pages. Read `docs/project-abstract.md`,
 `docs/dailyflora-aesthetic-system-0.13.md`, `docs/dailyflora-codex-skill.md`,
 and `CHANGELOG.md` together.
 
+The durable contract for future authenticated reference uploads is
+`docs/user-reference-generation-contract.md`. It defines the two-WebP asset
+flow, the single append-only generation record, and the boundary that system
+flower definitions are matched but never copied into user data.
+
 ## Run Locally
 
 ```bash
