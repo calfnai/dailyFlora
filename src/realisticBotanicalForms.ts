@@ -59,36 +59,6 @@ function petalGeometry(length: number, width: number, cup: number, reflex = 0, p
   return geometry;
 }
 
-function ammiPetalGeometry(length: number, width: number, cup = 0.003) {
-  const positions: number[] = [];
-  const rows = 6;
-  const cols = 4;
-  const point = (row: number, col: number) => {
-    const v = row / rows;
-    const u = col / cols * 2 - 1;
-    const shoulder = Math.sin(v * Math.PI * 0.7);
-    return new THREE.Vector3(
-      u * width * shoulder * (1 - 0.035 * v),
-      v * length,
-      Math.sin(v * Math.PI * 0.86) * cup
-    );
-  };
-  for (let row = 0; row < rows; row += 1) {
-    for (let col = 0; col < cols; col += 1) {
-      const a = point(row, col);
-      const b = point(row, col + 1);
-      const c = point(row + 1, col);
-      const d = point(row + 1, col + 1);
-      positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
-      positions.push(b.x, b.y, b.z, d.x, d.y, d.z, c.x, c.y, c.z);
-    }
-  }
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
 function cylinderInstances(count: number, color: THREE.Color, radialSegments = 7, topRatio = 0.9) {
   return new THREE.InstancedMesh(
     new THREE.CylinderGeometry(topRatio, 1, 1, radialSegments, 1, false),
@@ -915,123 +885,89 @@ export function createBabysBreath(options: BotanicalBuildOptions) {
 }
 
 export function createLaceFlower(options: BotanicalBuildOptions) {
-  const rng = createRng(`${options.seed}:ammi-majus-frozen-density-v2`);
+  const rng = createRng(`${options.seed}:ammi-majus-rebuilt-v1`);
   const group = new THREE.Group();
   const green = colorAt(options.palette, 3, '#5e7d52');
-  const hub = new THREE.Vector3(0, 0.08, 0);
+  const hub = new THREE.Vector3(0, 0.22, 0);
   const stem = stemAlong([
     new THREE.Vector3(0, -1.18, 0),
-    new THREE.Vector3(-0.035, -0.7, 0.018),
-    new THREE.Vector3(0.018, -0.28, -0.012),
+    new THREE.Vector3(-0.025, -0.65, 0.012),
+    new THREE.Vector3(0.02, -0.12, -0.01),
     hub
-  ], 0.017, green, 18);
+  ], 0.018, green, 17);
   group.add(stem.mesh);
-  const node = new THREE.Mesh(new THREE.SphereGeometry(0.026, 10, 7), material('#789567', 0.9));
-  node.position.copy(hub);
-  node.scale.set(1.15, 0.85, 1.15);
-  group.add(node);
-
   const segments: Segment[] = [];
   const blooms: Bloom[] = [];
-  const umbelCount = 16;
-  const angleFractions = [0, 0.047, 0.126, 0.184, 0.272, 0.319, 0.404, 0.463, 0.535, 0.608, 0.654, 0.735, 0.786, 0.858, 0.914, 0.972];
+  const umbelCount = 15;
   const miniHubs: THREE.Vector3[] = [];
   for (let i = 0; i < umbelCount; i += 1) {
-    const angle = angleFractions[i] * Math.PI * 2 + rng.range(-0.025, 0.025);
-    const inward = i === 2 || i === 8 || i === 13;
-    const shortenedOuter = i === 1 || i === 4 || i === 7 || i === 11 || i === 15;
-    let radius = inward ? rng.range(0.43, 0.54) : rng.range(0.58, 0.88);
-    if (shortenedOuter) radius *= 0.88;
-    const normalizedRadius = radius / 0.86;
-    const arch = 0.44 * Math.max(0, 1 - normalizedRadius) ** 0.72 - 0.04 * normalizedRadius;
-    const lift = shortenedOuter ? 0.045 : inward ? 0.025 : 0;
+    const angle = i / umbelCount * Math.PI * 2 + rng.range(-0.12, 0.12);
+    const radius = rng.range(0.47, 0.83) * (i % 5 === 0 ? 0.9 : 1);
+    const normalizedRadius = (radius - 0.42) / 0.45;
     const miniHub = new THREE.Vector3(
       Math.cos(angle) * radius,
-      0.31 + arch + lift + rng.range(-0.045, 0.052),
+      hub.y + 0.13 + (1 - normalizedRadius) * 0.31 + rng.range(-0.055, 0.065),
       Math.sin(angle) * radius
     );
     miniHubs.push(miniHub);
-    segments.push({ start: hub, end: miniHub, radius: 0.0056 });
-
-    const radial = new THREE.Vector3(miniHub.x, 0, miniHub.z).normalize();
-    const tangential = new THREE.Vector3(-radial.z, 0, radial.x);
-    const clusterNormal = radial.clone().multiplyScalar(0.1 + (i % 4) * 0.018)
-      .addScaledVector(tangential, Math.sin(i * 1.73) * 0.11)
-      .addScaledVector(up, 0.985)
-      .normalize();
-    const { tangent, bitangent } = tangentFrame(clusterNormal);
-    const floretCount = radius < 0.56
-      ? 9 + (i % 2)
-      : radius < 0.72
-        ? 7 + ((i * 5 + 1) % 3)
-        : 6 + ((i * 5 + 2) % 3);
-    const clusterSpread = (0.086 + (floretCount - 6) * 0.0045 + rng.range(-0.007, 0.007)) * rng.range(0.8, 1.18);
-    const clusterBias = i % 4 === 0 ? -0.18 : i % 5 === 0 ? 0.22 : 0;
+    segments.push({ start: hub, end: miniHub, radius: 0.0054 });
+    const floretCount = 5 + (i % 4);
+    const clusterTilt = new THREE.Vector3(Math.cos(angle) * rng.range(0.08, 0.18), 1, Math.sin(angle) * rng.range(0.08, 0.18)).normalize();
+    const { tangent, bitangent } = tangentFrame(clusterTilt);
     for (let f = 0; f < floretCount; f += 1) {
-      const fa = f / floretCount * Math.PI * 2 + clusterBias + rng.range(-0.18, 0.18);
-      const length = clusterSpread * rng.range(0.78, 1.18);
-      const direction = tangent.clone().multiplyScalar(Math.cos(fa))
+      const fa = f / floretCount * Math.PI * 2 + rng.range(-0.16, 0.16);
+      const reach = rng.range(0.085, 0.14);
+      const secondaryDirection = tangent.clone().multiplyScalar(Math.cos(fa))
         .addScaledVector(bitangent, Math.sin(fa))
-        .addScaledVector(clusterNormal, rng.range(0.06, 0.48))
-        .addScaledVector(radial, rng.range(-0.05, 0.08))
+        .addScaledVector(clusterTilt, rng.range(0.24, 0.48))
         .normalize();
-      const position = miniHub.clone().addScaledVector(direction, length);
-      position.y += rng.range(-0.038, 0.052) + Math.sin(i * 0.9 + f * 1.4) * 0.012;
-      const normal = clusterNormal.clone().addScaledVector(direction, rng.range(0.16, 0.34)).normalize();
-      const stage: BloomStage = f === floretCount - 1 && i % 4 !== 1 ? 'bud' : 'open';
-      blooms.push({ position, normal, stage, scale: rng.range(stage === 'bud' ? 0.86 : 0.82, stage === 'bud' ? 1.08 : 1.05), source: miniHub });
+      const position = miniHub.clone().addScaledVector(secondaryDirection, reach);
+      const stage: BloomStage = f === 0 && i % 5 === 0 ? 'bud' : f === 1 && i % 4 === 0 ? 'half' : 'open';
+      blooms.push({ position, normal: clusterTilt, stage, scale: rng.range(0.9, 1.08), source: miniHub });
       segments.push({ start: miniHub, end: position, radius: 0.0023 });
     }
   }
-
-  for (let i = 0; i < 7; i += 1) {
-    const angle = i / 7 * Math.PI * 2 + rng.range(-0.12, 0.12);
-    const start = hub.clone().add(new THREE.Vector3(Math.cos(angle) * 0.014, -0.012, Math.sin(angle) * 0.014));
-    const end = hub.clone().add(new THREE.Vector3(Math.cos(angle) * rng.range(0.16, 0.24), rng.range(-0.015, 0.038), Math.sin(angle) * rng.range(0.16, 0.24)));
-    segments.push({ start, end, radius: 0.0019 });
-  }
-
-  const stageCounts = blooms.reduce<Record<BloomStage, number>>(
-    (counts, bloom) => ({ ...counts, [bloom.stage]: counts[bloom.stage] + 1 }),
-    { bud: 0, half: 0, open: 0 }
-  );
   group.userData.botanicalAudit = {
     species: 'Ammi majus',
-    frozenFrom: '80d9575e74cf09bbcca764326f48913a597f5aeb',
-    primaryRays: umbelCount,
-    secondaryRange: [Math.min(...miniHubs.map((miniHub, i) => {
-      const radius = Math.hypot(miniHub.x, miniHub.z);
-      return radius < 0.56 ? 9 + (i % 2) : radius < 0.72 ? 7 + ((i * 5 + 1) % 3) : 6 + ((i * 5 + 2) % 3);
-    })), Math.max(...miniHubs.map((miniHub, i) => {
-      const radius = Math.hypot(miniHub.x, miniHub.z);
-      return radius < 0.56 ? 9 + (i % 2) : radius < 0.72 ? 7 + ((i * 5 + 1) % 3) : 6 + ((i * 5 + 2) % 3);
-    }))],
     connectedBlooms: blooms.length,
-    stages: stageCounts
+    stages: assertBloomConnections('Ammi majus', blooms, segments)
   };
   addSegmentMesh(group, segments, green);
-  const petals = new THREE.InstancedMesh(ammiPetalGeometry(0.032, 0.0215, 0.0018), material(colorAt(options.palette, 0), 0.88), blooms.length * 5);
-  const centers = new THREE.InstancedMesh(new THREE.SphereGeometry(0.0072, 8, 6), material(colorAt(options.palette, 2), 0.86), blooms.length);
-  const buds = new THREE.InstancedMesh(new THREE.SphereGeometry(0.018, 8, 6), material(colorAt(options.palette, 1), 0.9), blooms.length);
+  const petals = new THREE.InstancedMesh(petalGeometry(0.047, 0.019, 0.006, 0.001, 0.2), material(colorAt(options.palette, 0), 0.9), blooms.length * 5);
+  const centers = new THREE.InstancedMesh(new THREE.SphereGeometry(0.011, 7, 5), material(colorAt(options.palette, 2), 0.94), blooms.length);
+  const buds = new THREE.InstancedMesh(new THREE.SphereGeometry(0.025, 8, 6), material(colorAt(options.palette, 1), 0.9), blooms.length);
+  const involucralBracts = new THREE.InstancedMesh(petalGeometry(0.13, 0.014, 0.003, 0.018, 0.84), material(green, 0.92), 8);
+  const bractlets = new THREE.InstancedMesh(petalGeometry(0.052, 0.007, 0.002, 0.008, 0.84), material(green, 0.92), miniHubs.length * 2);
+  for (let i = 0; i < 8; i += 1) setPlanar(involucralBracts, i, hub, new THREE.Vector3(1, 1, 1), green, up, i / 8 * Math.PI * 2 + 0.16);
+  let bractletUsed = 0;
+  miniHubs.forEach((miniHub, index) => {
+    for (let b = 0; b < 2; b += 1) {
+      setPlanar(bractlets, bractletUsed, miniHub, new THREE.Vector3(0.88, 0.88, 1), green, up, b * Math.PI + index * 0.21);
+      bractletUsed += 1;
+    }
+  });
   let petalUsed = 0;
   let centerUsed = 0;
   let budUsed = 0;
   blooms.forEach((bloom, index) => {
     if (bloom.stage === 'bud') {
-      setVolume(buds, budUsed, bloom.position, new THREE.Vector3(0.86, 1.18, 0.86).multiplyScalar(bloom.scale), colorAt(options.palette, 1), bloom.normal);
+      setVolume(buds, budUsed, bloom.position, new THREE.Vector3(0.82, 1.05, 0.82).multiplyScalar(bloom.scale), colorAt(options.palette, 1), bloom.normal);
       budUsed += 1;
       return;
     }
-    setVolume(centers, centerUsed, bloom.position.clone().addScaledVector(bloom.normal, 0.004 * bloom.scale), new THREE.Vector3(1.1, 0.8, 1.1).multiplyScalar(bloom.scale), colorAt(options.palette, 2), bloom.normal);
+    const openness = bloom.stage === 'half' ? 0.62 : 1;
+    setVolume(centers, centerUsed, bloom.position, new THREE.Vector3(1, 1, 0.7).multiplyScalar(bloom.scale), colorAt(options.palette, 2), bloom.normal);
     centerUsed += 1;
     for (let p = 0; p < 5; p += 1) {
-      setPlanar(petals, petalUsed, bloom.position, new THREE.Vector3(bloom.scale, bloom.scale, 1), colorAt(options.palette, 0).clone().lerp(colorAt(options.palette, 1), rng.range(0, 0.22)), bloom.normal, p / 5 * Math.PI * 2 + rng.range(-0.045, 0.045));
+      setPlanar(petals, petalUsed, bloom.position, new THREE.Vector3(bloom.scale * openness, bloom.scale * openness, 1), colorAt(options.palette, p).clone().lerp(new THREE.Color('#ffffff'), rng.range(0.02, 0.12)), bloom.normal, p / 5 * Math.PI * 2 + rng.range(-0.08, 0.08));
       petalUsed += 1;
     }
   });
   finish(petals, petalUsed);
   finish(centers, centerUsed);
   finish(buds, budUsed);
-  group.add(petals, centers, buds);
+  finish(involucralBracts, 8);
+  finish(bractlets, bractletUsed);
+  group.add(petals, centers, buds, involucralBracts, bractlets);
   return group;
 }
