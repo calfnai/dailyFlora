@@ -195,10 +195,15 @@ function addAmmiModel(seed = 'ammi-majus-approval-a') {
       .add(up.clone().multiplyScalar(0.985))
       .normalize();
     const { tangent, bitangent } = tangentFrame(clusterNormal);
-    const secondaryCount = 5 + ((i * 7 + 2) % 4);
+    const radialDistance = Math.hypot(miniHub.x, miniHub.z);
+    const secondaryCount = radialDistance < 0.56
+      ? 9 + (i % 2)
+      : radialDistance < 0.72
+        ? 7 + ((i * 5 + 1) % 3)
+        : 6 + ((i * 5 + 2) % 3);
     minSecondary = Math.min(minSecondary, secondaryCount);
     maxSecondary = Math.max(maxSecondary, secondaryCount);
-    const clusterSpread = (0.081 + (secondaryCount - 5) * 0.009 + rng.range(-0.008, 0.008)) * rng.range(0.78, 1.22);
+    const clusterSpread = (0.086 + (secondaryCount - 6) * 0.0045 + rng.range(-0.007, 0.007)) * rng.range(0.8, 1.18);
     const clusterBias = i % 4 === 0 ? -0.18 : i % 5 === 0 ? 0.22 : 0;
 
     for (let f = 0; f < secondaryCount; f += 1) {
@@ -206,18 +211,19 @@ function addAmmiModel(seed = 'ammi-majus-approval-a') {
       const length = clusterSpread * rng.range(0.78, 1.18);
       const direction = tangent.clone().multiplyScalar(Math.cos(a))
         .addScaledVector(bitangent, Math.sin(a))
-        .addScaledVector(clusterNormal, rng.range(0.08, 0.4))
+        .addScaledVector(clusterNormal, rng.range(0.06, 0.48))
         .addScaledVector(radial, rng.range(-0.05, 0.08))
         .normalize();
       const bloom = miniHub.clone().addScaledVector(direction, length);
-      bloom.y += rng.range(-0.03, 0.045) + Math.sin(i * 0.9 + f * 1.4) * 0.009;
+      bloom.y += rng.range(-0.038, 0.052) + Math.sin(i * 0.9 + f * 1.4) * 0.012;
       group.add(cylinderBetween(miniHub, bloom, 0.0025, stemGreen, 5));
-      const isBud = f === secondaryCount - 1 && (i % 3 === 0 || i % 5 === 0);
+      const bloomNormal = clusterNormal.clone().addScaledVector(direction, rng.range(0.16, 0.34)).normalize();
+      const isBud = f === secondaryCount - 1 && i % 4 !== 1;
       if (isBud) {
-        addBud(group, bloom, clusterNormal, rng.range(0.86, 1.08));
+        addBud(group, bloom, bloomNormal, rng.range(0.86, 1.08));
         budCount += 1;
       } else {
-        addFivePetalFlower(group, bloom, clusterNormal, rng.range(0.82, 1.05), rng);
+        addFivePetalFlower(group, bloom, bloomNormal, rng.range(0.82, 1.05), rng);
         flowerCount += 1;
       }
     }
@@ -252,12 +258,13 @@ function createClusterCloseup() {
   group.add(node);
   const normal = new THREE.Vector3(0.12, 1, 0.18).normalize();
   const { tangent, bitangent } = tangentFrame(normal);
-  for (let i = 0; i < 7; i += 1) {
-    const a = i / 7 * Math.PI * 2 + rng.range(-0.12, 0.12);
-    const dir = tangent.clone().multiplyScalar(Math.cos(a)).addScaledVector(bitangent, Math.sin(a)).addScaledVector(normal, 0.2).normalize();
-    const end = miniHub.clone().addScaledVector(dir, rng.range(0.18, 0.25));
+  const closeupCount = 9;
+  for (let i = 0; i < closeupCount; i += 1) {
+    const a = i / closeupCount * Math.PI * 2 + rng.range(-0.14, 0.14);
+    const dir = tangent.clone().multiplyScalar(Math.cos(a)).addScaledVector(bitangent, Math.sin(a)).addScaledVector(normal, rng.range(0.12, 0.34)).normalize();
+    const end = miniHub.clone().addScaledVector(dir, rng.range(0.18, 0.25)).addScaledVector(normal, rng.range(-0.025, 0.03));
     group.add(cylinderBetween(miniHub, end, 0.005, stemGreen, 6));
-    if (i === 2) addBud(group, end, normal, 1.6);
+    if (i === 3) addBud(group, end, normal, 1.6);
     else addFivePetalFlower(group, end, normal, 1.55, rng);
   }
   return group;
