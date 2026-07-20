@@ -529,7 +529,7 @@
         </svg>
       </section>
 
-      <h2 id="data-model">未来数据库分布</h2>
+      <h2 id="data-model">正式数据与存储分布</h2>
       <div class="table-wrap">
         <table>
           <thead>
@@ -553,12 +553,12 @@
             <tr>
               <td><code>generations</code></td>
               <td>member-test 用 mock 列表表达流程。</td>
-              <td>生成参数、文字描述、参考图、消耗积分、结果状态；支持复制再生成，不热改旧记录。</td>
+              <td>每次生成一条追加式记录：所属用户、主参考图和缩略图的存储定位、识别结果、颜色、构图、seed、Three.js 参数、系统版本和结果状态；不保存用户花材列表。</td>
             </tr>
             <tr>
               <td><code>uploads</code></td>
               <td>只展示上传卡片，不实际上传。</td>
-              <td>图片和文字描述的归属、缩略图、文件地址、关联生成记录。</td>
+              <td>主参考 WebP 与 320px 缩略 WebP 进入私有对象存储，不另建重复的用户上传数据库记录；两个文件通过同一个生成记录 ID 关联。</td>
             </tr>
             <tr>
               <td><code>credits</code></td>
