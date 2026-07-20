@@ -68,18 +68,18 @@ function tangentFrame(normal: THREE.Vector3) {
 
 function petalGeometry(length: number, width: number, cup = 0.003) {
   const positions: number[] = [];
-  const rows = 5;
+  const rows = 6;
   const cols = 4;
   const point = (row: number, col: number) => {
     const v = row / rows;
     const u = col / cols * 2 - 1;
     // Keep a softly rounded, broad distal edge instead of tapering each petal
     // into a pointed paper-star tip.
-    const shoulder = Math.sin(v * Math.PI * 0.78);
+    const shoulder = Math.sin(v * Math.PI * 0.7);
     return new THREE.Vector3(
-      u * width * shoulder * (1 - 0.08 * v),
+      u * width * shoulder * (1 - 0.035 * v),
       v * length,
-      Math.sin(v * Math.PI * 0.92) * cup
+      Math.sin(v * Math.PI * 0.86) * cup
     );
   };
   for (let row = 0; row < rows; row += 1) {
@@ -89,7 +89,7 @@ function petalGeometry(length: number, width: number, cup = 0.003) {
       const c = point(row + 1, col);
       const d = point(row + 1, col + 1);
       positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
-      positions.push(b.x, b.y, b.z, d.x, d.y, c.x, c.y, c.z);
+      positions.push(b.x, b.y, b.z, d.x, d.y, d.z, c.x, c.y, c.z);
     }
   }
   const geometry = new THREE.BufferGeometry();
@@ -110,7 +110,7 @@ function placePart(part: THREE.Object3D, center: THREE.Vector3, normal: THREE.Ve
 }
 
 function addFivePetalFlower(group: THREE.Group, center: THREE.Vector3, normal: THREE.Vector3, scale: number, rng: Rng) {
-  const petalGeo = petalGeometry(0.036, 0.020, 0.002);
+  const petalGeo = petalGeometry(0.032, 0.0215, 0.0018);
   const { tangent, bitangent } = tangentFrame(normal);
   const base = new THREE.Color(flowerWhite);
   for (let i = 0; i < 5; i += 1) {
@@ -120,7 +120,7 @@ function addFivePetalFlower(group: THREE.Group, center: THREE.Vector3, normal: T
     placePart(petal, center, normal, roll, scale);
     group.add(petal);
   }
-  const dot = new THREE.Mesh(new THREE.SphereGeometry(0.0085 * scale, 7, 5), material(centerGold, 0.86));
+  const dot = new THREE.Mesh(new THREE.SphereGeometry(0.0072 * scale, 8, 6), material(centerGold, 0.86));
   dot.position.copy(center).addScaledVector(normal, 0.004 * scale);
   dot.scale.set(1.1, 0.8, 1.1);
   dot.quaternion.setFromUnitVectors(up, normal);
@@ -141,14 +141,17 @@ function hubPoint() {
 }
 
 function primaryHubPosition(i: number, count: number, rng: Rng) {
-  const angleOffsets = [-0.08, 0.16, -0.19, 0.27, -0.11, 0.05, -0.28, 0.19, -0.03, 0.24, -0.22, 0.1, -0.15, 0.31, -0.24, 0.02];
-  const angle = i / count * Math.PI * 2 + angleOffsets[i % angleOffsets.length] + rng.range(-0.04, 0.04);
-  const short = i === 3 || i === 9 || i === 13;
-  const radius = (short ? rng.range(0.44, 0.58) : rng.range(0.57, 0.88)) * (i % 5 === 0 ? 0.9 : 1);
+  const angleFractions = [0, 0.047, 0.126, 0.184, 0.272, 0.319, 0.404, 0.463, 0.535, 0.608, 0.654, 0.735, 0.786, 0.858, 0.914, 0.972];
+  const angle = angleFractions[i % angleFractions.length] * Math.PI * 2 + rng.range(-0.025, 0.025);
+  const inward = i === 2 || i === 8 || i === 13;
+  const shortenedOuter = i === 1 || i === 4 || i === 7 || i === 11 || i === 15;
+  let radius = inward ? rng.range(0.43, 0.54) : rng.range(0.58, 0.88);
+  if (shortenedOuter) radius *= 0.88;
   const normalized = radius / 0.86;
   // A shallow compound umbel: centre highest, middle next, outer rim lower.
   const arch = 0.44 * Math.max(0, 1 - normalized) ** 0.72 - 0.04 * normalized;
-  const y = 0.31 + arch + rng.range(-0.05, 0.06);
+  const lift = shortenedOuter ? 0.045 : inward ? 0.025 : 0;
+  const y = 0.31 + arch + lift + rng.range(-0.045, 0.052);
   return new THREE.Vector3(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
 }
 
@@ -171,7 +174,7 @@ function addAmmiModel(seed = 'ammi-majus-approval-a') {
   ], false, 'centripetal');
   group.add(new THREE.Mesh(new THREE.TubeGeometry(stemCurve, 18, 0.017, 7, false), material(stemGreen, 0.92)));
 
-  const node = new THREE.Mesh(new THREE.SphereGeometry(0.032, 10, 7), material('#789567', 0.9));
+  const node = new THREE.Mesh(new THREE.SphereGeometry(0.026, 10, 7), material('#789567', 0.9));
   node.position.copy(hub);
   node.scale.set(1.15, 0.85, 1.15);
   group.add(node);
@@ -186,12 +189,16 @@ function addAmmiModel(seed = 'ammi-majus-approval-a') {
 
   miniHubs.forEach((miniHub, i) => {
     const radial = new THREE.Vector3(miniHub.x, 0, miniHub.z).normalize();
-    const clusterNormal = radial.clone().multiplyScalar(0.14).add(up.clone().multiplyScalar(0.99)).normalize();
+    const tangential = new THREE.Vector3(-radial.z, 0, radial.x);
+    const clusterNormal = radial.clone().multiplyScalar(0.1 + (i % 4) * 0.018)
+      .addScaledVector(tangential, Math.sin(i * 1.73) * 0.11)
+      .add(up.clone().multiplyScalar(0.985))
+      .normalize();
     const { tangent, bitangent } = tangentFrame(clusterNormal);
     const secondaryCount = 5 + ((i * 7 + 2) % 4);
     minSecondary = Math.min(minSecondary, secondaryCount);
     maxSecondary = Math.max(maxSecondary, secondaryCount);
-    const clusterSpread = (0.082 + (secondaryCount - 5) * 0.009 + rng.range(-0.008, 0.008)) * rng.range(0.82, 1.18);
+    const clusterSpread = (0.081 + (secondaryCount - 5) * 0.009 + rng.range(-0.008, 0.008)) * rng.range(0.78, 1.22);
     const clusterBias = i % 4 === 0 ? -0.18 : i % 5 === 0 ? 0.22 : 0;
 
     for (let f = 0; f < secondaryCount; f += 1) {
@@ -203,7 +210,7 @@ function addAmmiModel(seed = 'ammi-majus-approval-a') {
         .addScaledVector(radial, rng.range(-0.05, 0.08))
         .normalize();
       const bloom = miniHub.clone().addScaledVector(direction, length);
-      bloom.y += rng.range(-0.026, 0.04);
+      bloom.y += rng.range(-0.03, 0.045) + Math.sin(i * 0.9 + f * 1.4) * 0.009;
       group.add(cylinderBetween(miniHub, bloom, 0.0025, stemGreen, 5));
       const isBud = f === secondaryCount - 1 && (i % 3 === 0 || i % 5 === 0);
       if (isBud) {
@@ -240,7 +247,7 @@ function createClusterCloseup() {
   const rng = createRng('ammi-cluster-closeup');
   const group = new THREE.Group();
   const miniHub = new THREE.Vector3(0, -0.08, 0);
-  const node = new THREE.Mesh(new THREE.SphereGeometry(0.023, 9, 6), material('#789567', 0.9));
+  const node = new THREE.Mesh(new THREE.SphereGeometry(0.02, 9, 6), material('#789567', 0.9));
   node.position.copy(miniHub);
   group.add(node);
   const normal = new THREE.Vector3(0.12, 1, 0.18).normalize();
@@ -261,7 +268,7 @@ function createHubCloseup() {
   const group = new THREE.Group();
   const hub = new THREE.Vector3(0, 0, 0);
   group.add(cylinderBetween(new THREE.Vector3(0, -0.68, 0), hub, 0.026, stemGreen, 8));
-  const node = new THREE.Mesh(new THREE.SphereGeometry(0.052, 12, 8), material('#789567', 0.9));
+  const node = new THREE.Mesh(new THREE.SphereGeometry(0.044, 12, 8), material('#789567', 0.9));
   node.position.copy(hub);
   group.add(node);
   for (let i = 0; i < 9; i += 1) {
