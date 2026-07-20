@@ -17,6 +17,7 @@ const flowerWarm = '#f7f0d8';
 const flowerBud = '#efe8c9';
 const centerGold = '#d8c56b';
 const stemGreen = '#5f8055';
+const plantTissueRoughness = 0.96;
 
 type AmmiStats = {
   primaryRays: number;
@@ -57,6 +58,133 @@ function cylinderBetween(start: THREE.Vector3, end: THREE.Vector3, radius: numbe
   mesh.position.copy(start).add(end).multiplyScalar(0.5);
   mesh.quaternion.setFromUnitVectors(up, direction.normalize());
   return mesh;
+}
+
+function taperedBetween(
+  start: THREE.Vector3,
+  end: THREE.Vector3,
+  startRadius: number,
+  endRadius: number,
+  color: string | THREE.Color,
+  radialSegments = 7
+) {
+  const direction = end.clone().sub(start);
+  const mesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(endRadius, startRadius, direction.length(), radialSegments, 1, false),
+    material(color, plantTissueRoughness)
+  );
+  mesh.position.copy(start).add(end).multiplyScalar(0.5);
+  mesh.quaternion.setFromUnitVectors(up, direction.normalize());
+  return mesh;
+}
+
+function junctionGeometry() {
+  const rings = [
+    { y: -0.058, radius: 0.019 },
+    { y: -0.034, radius: 0.022 },
+    { y: -0.008, radius: 0.026 },
+    { y: 0.018, radius: 0.025 },
+    { y: 0.043, radius: 0.019 },
+    { y: 0.064, radius: 0.011 }
+  ];
+  const sides = 11;
+  const positions: number[] = [];
+  const point = (ring: number, side: number) => {
+    const angle = side / sides * Math.PI * 2;
+    const irregularity = 1 + Math.sin(angle * 3 + ring * 1.17) * 0.075 + Math.cos(angle * 2 - ring * 0.73) * 0.035;
+    const radius = rings[ring].radius * irregularity;
+    return new THREE.Vector3(Math.cos(angle) * radius, rings[ring].y, Math.sin(angle) * radius);
+  };
+  for (let ring = 0; ring < rings.length - 1; ring += 1) {
+    for (let side = 0; side < sides; side += 1) {
+      const next = (side + 1) % sides;
+      const a = point(ring, side);
+      const b = point(ring, next);
+      const c = point(ring + 1, side);
+      const d = point(ring + 1, next);
+      positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+      positions.push(b.x, b.y, b.z, d.x, d.y, d.z, c.x, c.y, c.z);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function organicBranchGeometry(
+  points: THREE.Vector3[],
+  startRadius: number,
+  endRadius: number,
+  radialSegments = 8,
+  tubularSegments = 10,
+  phase = 0
+) {
+  const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
+  const frames = curve.computeFrenetFrames(tubularSegments, false);
+  const positions: number[] = [];
+  const point = (segment: number, side: number) => {
+    const t = segment / tubularSegments;
+    const center = curve.getPoint(t);
+    const angle = side / radialSegments * Math.PI * 2;
+    const radius = THREE.MathUtils.lerp(startRadius, endRadius, t ** 0.68)
+      * (1 + Math.sin(t * Math.PI) * Math.sin(angle * 2 + phase) * 0.035);
+    return center
+      .addScaledVector(frames.normals[segment], Math.cos(angle) * radius)
+      .addScaledVector(frames.binormals[segment], Math.sin(angle) * radius);
+  };
+  for (let segment = 0; segment < tubularSegments; segment += 1) {
+    for (let side = 0; side < radialSegments; side += 1) {
+      const next = (side + 1) % radialSegments;
+      const a = point(segment, side);
+      const b = point(segment, next);
+      const c = point(segment + 1, side);
+      const d = point(segment + 1, next);
+      positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+      positions.push(b.x, b.y, b.z, d.x, d.y, d.z, c.x, c.y, c.z);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function addPlantJunction(group: THREE.Group, hub: THREE.Vector3, color: string | THREE.Color) {
+  const junction = new THREE.Mesh(junctionGeometry(), material(color, plantTissueRoughness));
+  junction.position.copy(hub);
+  group.add(junction);
+}
+
+function addPrimaryRayConnection(
+  group: THREE.Group,
+  hub: THREE.Vector3,
+  miniHub: THREE.Vector3,
+  index: number,
+  color: string | THREE.Color
+) {
+  const radial = new THREE.Vector3(miniHub.x - hub.x, 0, miniHub.z - hub.z).normalize();
+  const base = hub.clone()
+    .addScaledVector(radial, 0.012 + (index % 3) * 0.0025)
+    .add(new THREE.Vector3(0, -0.012 + (index % 4) * 0.007, 0));
+  const tangential = new THREE.Vector3(-radial.z, 0, radial.x);
+  const shoulder = base.clone().lerp(miniHub, 0.12)
+    .addScaledVector(tangential, (index % 2 ? 1 : -1) * 0.0025)
+    .add(new THREE.Vector3(0, 0.009 + (index % 3) * 0.002, 0));
+  const mid = base.clone().lerp(miniHub, 0.52)
+    .addScaledVector(tangential, Math.sin(index * 1.7) * 0.002)
+    .add(new THREE.Vector3(0, 0.003, 0));
+  group.add(new THREE.Mesh(
+    organicBranchGeometry(
+      [base, shoulder, mid, miniHub],
+      0.0078 + (index % 3) * 0.00035,
+      0.0049,
+      8,
+      10,
+      index * 0.73
+    ),
+    material(color, plantTissueRoughness)
+  ));
 }
 
 function tangentFrame(normal: THREE.Vector3) {
@@ -172,19 +300,15 @@ function addAmmiModel(seed = 'ammi-majus-approval-a') {
     new THREE.Vector3(0.018, -0.28, -0.012),
     hub
   ], false, 'centripetal');
-  group.add(new THREE.Mesh(new THREE.TubeGeometry(stemCurve, 18, 0.017, 7, false), material(stemGreen, 0.92)));
-
-  const node = new THREE.Mesh(new THREE.SphereGeometry(0.026, 10, 7), material('#789567', 0.9));
-  node.position.copy(hub);
-  node.scale.set(1.15, 0.85, 1.15);
-  group.add(node);
+  group.add(new THREE.Mesh(new THREE.TubeGeometry(stemCurve, 18, 0.017, 7, false), material(stemGreen, plantTissueRoughness)));
+  addPlantJunction(group, hub, stemGreen);
 
   const miniHubs: THREE.Vector3[] = [];
   for (let i = 0; i < primaryCount; i += 1) {
     const miniHub = primaryHubPosition(i, primaryCount, rng);
     miniHubs.push(miniHub);
     outerYTotal += miniHub.y;
-    group.add(cylinderBetween(hub, miniHub, 0.0056, stemGreen, 6));
+    addPrimaryRayConnection(group, hub, miniHub, i, stemGreen);
   }
 
   miniHubs.forEach((miniHub, i) => {
@@ -233,7 +357,7 @@ function addAmmiModel(seed = 'ammi-majus-approval-a') {
     const angle = i / 7 * Math.PI * 2 + rng.range(-0.12, 0.12);
     const start = hub.clone().add(new THREE.Vector3(Math.cos(angle) * 0.014, -0.012, Math.sin(angle) * 0.014));
     const end = hub.clone().add(new THREE.Vector3(Math.cos(angle) * rng.range(0.16, 0.24), rng.range(-0.015, 0.038), Math.sin(angle) * rng.range(0.16, 0.24)));
-    group.add(cylinderBetween(start, end, 0.0019, '#779769', 4));
+    group.add(taperedBetween(start, end, 0.0023, 0.0008, '#6f8e63', 5));
   }
 
   const avgOuterY = outerYTotal / primaryCount;
@@ -249,44 +373,29 @@ function addAmmiModel(seed = 'ammi-majus-approval-a') {
   return group;
 }
 
-function createClusterCloseup() {
-  const rng = createRng('ammi-cluster-closeup');
-  const group = new THREE.Group();
-  const miniHub = new THREE.Vector3(0, -0.08, 0);
-  const node = new THREE.Mesh(new THREE.SphereGeometry(0.02, 9, 6), material('#789567', 0.9));
-  node.position.copy(miniHub);
-  group.add(node);
-  const normal = new THREE.Vector3(0.12, 1, 0.18).normalize();
-  const { tangent, bitangent } = tangentFrame(normal);
-  const closeupCount = 9;
-  for (let i = 0; i < closeupCount; i += 1) {
-    const a = i / closeupCount * Math.PI * 2 + rng.range(-0.14, 0.14);
-    const dir = tangent.clone().multiplyScalar(Math.cos(a)).addScaledVector(bitangent, Math.sin(a)).addScaledVector(normal, rng.range(0.12, 0.34)).normalize();
-    const end = miniHub.clone().addScaledVector(dir, rng.range(0.18, 0.25)).addScaledVector(normal, rng.range(-0.025, 0.03));
-    group.add(cylinderBetween(miniHub, end, 0.005, stemGreen, 6));
-    if (i === 3) addBud(group, end, normal, 1.6);
-    else addFivePetalFlower(group, end, normal, 1.55, rng);
-  }
-  return group;
-}
-
-function createHubCloseup() {
-  const rng = createRng('ammi-hub-closeup');
+function createJunctionCloseup(seed: string) {
+  const rng = createRng(seed);
   const group = new THREE.Group();
   const hub = new THREE.Vector3(0, 0, 0);
-  group.add(cylinderBetween(new THREE.Vector3(0, -0.68, 0), hub, 0.026, stemGreen, 8));
-  const node = new THREE.Mesh(new THREE.SphereGeometry(0.044, 12, 8), material('#789567', 0.9));
-  node.position.copy(hub);
-  group.add(node);
-  for (let i = 0; i < 9; i += 1) {
-    const angle = i / 9 * Math.PI * 2 + rng.range(-0.06, 0.06);
-    const end = new THREE.Vector3(Math.cos(angle) * rng.range(0.32, 0.48), rng.range(0.11, 0.28), Math.sin(angle) * rng.range(0.32, 0.48));
-    group.add(cylinderBetween(hub, end, 0.009, stemGreen, 6));
+  const stemCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-0.018, -0.68, 0.01),
+    new THREE.Vector3(0.014, -0.31, -0.008),
+    hub
+  ], false, 'centripetal');
+  group.add(new THREE.Mesh(new THREE.TubeGeometry(stemCurve, 16, 0.02, 8, false), material(stemGreen, plantTissueRoughness)));
+  addPlantJunction(group, hub, stemGreen);
+  const angleFractions = [0, 0.047, 0.126, 0.184, 0.272, 0.319, 0.404, 0.463, 0.535, 0.608, 0.654, 0.735, 0.786, 0.858, 0.914, 0.972];
+  for (let i = 0; i < angleFractions.length; i += 1) {
+    const angle = angleFractions[i] * Math.PI * 2 + rng.range(-0.025, 0.025);
+    const radius = rng.range(0.34, 0.52);
+    const end = new THREE.Vector3(Math.cos(angle) * radius, rng.range(0.16, 0.31), Math.sin(angle) * radius);
+    addPrimaryRayConnection(group, hub, end, i, stemGreen);
   }
-  for (let i = 0; i < 6; i += 1) {
-    const angle = i / 6 * Math.PI * 2 + 0.22;
-    const end = new THREE.Vector3(Math.cos(angle) * rng.range(0.18, 0.25), rng.range(-0.02, 0.04), Math.sin(angle) * rng.range(0.18, 0.25));
-    group.add(cylinderBetween(hub, end, 0.003, '#779769', 4));
+  for (let i = 0; i < 7; i += 1) {
+    const angle = i / 7 * Math.PI * 2 + 0.16;
+    const start = hub.clone().add(new THREE.Vector3(Math.cos(angle) * 0.014, -0.012, Math.sin(angle) * 0.014));
+    const end = hub.clone().add(new THREE.Vector3(Math.cos(angle) * 0.2, rng.range(-0.012, 0.03), Math.sin(angle) * 0.2));
+    group.add(taperedBetween(start, end, 0.0026, 0.0008, '#6f8e63', 5));
   }
   return group;
 }
@@ -309,6 +418,7 @@ function createPanel(name: PanelName, model: THREE.Group, silhouette = false) {
     scene.add(grid);
   }
   if (silhouette) scene.overrideMaterial = silhouetteMaterial;
+  if (name === 'hub') scene.overrideMaterial = new THREE.MeshBasicMaterial({ color: '#8d9189', side: THREE.DoubleSide });
   const camera = new THREE.PerspectiveCamera(name === 'cluster' || name === 'hub' ? 30 : 34, 1, 0.1, 30);
   return { name, scene, camera, model };
 }
@@ -318,16 +428,16 @@ const panels: Panel[] = [
   createPanel('side', addAmmiModel('side')),
   createPanel('top', addAmmiModel('top')),
   createPanel('silhouette', addAmmiModel('silhouette'), true),
-  createPanel('cluster', createClusterCloseup()),
-  createPanel('hub', createHubCloseup())
+  createPanel('cluster', createJunctionCloseup('ammi-junction-color')),
+  createPanel('hub', createJunctionCloseup('ammi-junction-gray'))
 ];
 
 function setCamera(panel: Panel, width: number, height: number) {
   panel.camera.aspect = width / Math.max(1, height);
   if (panel.name === 'side') panel.camera.position.set(2.6, 0.1, 0);
   else if (panel.name === 'top') panel.camera.position.set(0, 2.95, 0.02);
-  else if (panel.name === 'cluster') panel.camera.position.set(0.05, 0.08, 1.05);
-  else if (panel.name === 'hub') panel.camera.position.set(0.05, 0.04, 1.35);
+  else if (panel.name === 'cluster') panel.camera.position.set(0.05, 0.02, 1.05);
+  else if (panel.name === 'hub') panel.camera.position.set(0.05, 0.02, 1.05);
   else panel.camera.position.set(0, 0.08, 2.8);
   const target = panel.name === 'cluster' ? new THREE.Vector3(0, 0.02, 0) : panel.name === 'hub' ? new THREE.Vector3(0, 0.02, 0) : new THREE.Vector3(0, -0.05, 0);
   panel.camera.lookAt(target);
