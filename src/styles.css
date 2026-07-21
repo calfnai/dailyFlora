@@ -1779,3 +1779,34 @@ body.is-preview .daily-theme {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.hand-control-status {
+  position: fixed;
+  left: 14px;
+  bottom: 14px;
+  z-index: 80;
+  max-width: calc(100vw - 28px);
+  padding: 7px 10px;
+  border: 1px solid rgba(222, 236, 226, 0.25);
+  border-radius: 999px;
+  background: rgba(9, 22, 16, 0.74);
+  color: rgba(230, 242, 234, 0.9);
+  font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+}
+
+.hand-control-status[data-connection='connected'] {
+  border-color: rgba(116, 232, 170, 0.5);
+  color: #b8f3cf;
+}
+
+body.is-hand-control-immersive #hud,
+body.is-hand-control-immersive #controls,
+body.is-hand-control-immersive #site-menu,
+body.is-hand-control-immersive #account-dock,
+body.is-hand-control-immersive #release-mark,
+body.is-hand-control-immersive #debug-panel {
+  display: none !important;
+}

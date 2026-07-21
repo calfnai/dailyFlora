@@ -8,6 +8,13 @@ import { BouquetScene } from './bouquetScene';
 import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
 import { themes } from './themes';
 import { IdleClockController, normalizeClockInterval, type ClockDisplaySource, type IdleClockSettings } from './idleClock';
+import {
+  DailyFloraGestureInterpreter,
+  bindHandControlKeyboard,
+  connectCameraController,
+  type GestureActions,
+  type HandControlMode
+} from './cameraController';
 
 type RotationDirection = 1 | -1;
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
@@ -244,6 +251,8 @@ const debugValue = searchParams.get('debug');
 const debugMode = searchParams.has('debug') && debugValue !== '0' && debugValue !== 'false';
 const previewValue = searchParams.get('preview');
 const previewMode = searchParams.has('preview') && previewValue !== '0' && previewValue !== 'false';
+const handControlValue = searchParams.get('hand-control');
+const handControlEnabled = searchParams.has('hand-control') && handControlValue !== '0' && handControlValue !== 'false';
 const internalPreviewMode = debugMode || previewMode;
 const requestedDensity = searchParams.get('density') || searchParams.get('quality');
 const requestedRender = searchParams.get('render');
@@ -1303,13 +1312,18 @@ controlsToggleButton?.addEventListener('click', () => {
 
 pauseButton?.addEventListener('click', () => {
   const paused = scene.togglePause();
+  syncPauseButton(paused);
+  revealUi();
+});
+
+function syncPauseButton(paused: boolean) {
+  if (!pauseButton) return;
   pauseButton.setAttribute('aria-label', paused ? 'Resume rotation' : 'Pause rotation');
   pauseButton.title = paused ? 'Resume rotation' : 'Pause rotation';
   pauseButton.innerHTML = paused
     ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>'
     : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" /></svg>';
-  revealUi();
-});
+}
 
 todayButton?.addEventListener('click', () => {
   toggleCalendar();
@@ -1490,6 +1504,74 @@ window.addEventListener('beforeunload', () => window.clearTimeout(dateRolloverTi
 window.addEventListener('beforeunload', () => window.clearInterval(clockTickTimer));
 window.addEventListener('beforeunload', () => idleClock.stop());
 
+function startHandControl() {
+  const densityOrder: DensityName[] = ['low', 'medium', 'high'];
+  const renderOrder: Array<Exclude<RenderQualityName, 'auto'>> = ['low', 'medium', 'high'];
+  const status = document.createElement('aside');
+  status.className = 'hand-control-status';
+  status.setAttribute('role', 'status');
+  status.setAttribute('aria-live', 'polite');
+  status.title = 'Keyboard fallback: 1 density, 2 detail, 3 clock, 4 auto camera, 5 immersive mode';
+  document.body.append(status);
+  let lastStatus = '';
+  let immersive = false;
+
+  const setStatus = (connection: string, mode: HandControlMode, detail = '') => {
+    const next = `HAND CTRL · ${connection.toUpperCase()} · ${mode.toUpperCase()}${detail ? ` · ${detail}` : ''}`;
+    if (next === lastStatus) return;
+    lastStatus = next;
+    status.textContent = next;
+    status.dataset.connection = connection;
+    status.dataset.mode = mode;
+  };
+
+  const actions: GestureActions = {
+    cycleDensity: () => {
+      const index = densityOrder.indexOf(selectedDensity);
+      setDensity(densityOrder[(index + 1) % densityOrder.length]);
+    },
+    cycleRender: () => {
+      const current = selectedRender === 'auto' ? quality.renderName : selectedRender;
+      const index = renderOrder.indexOf(current);
+      setRender(renderOrder[(index + 1) % renderOrder.length]);
+    },
+    toggleClock: () => {
+      idleClock.toggleManual();
+      revealUi();
+    },
+    setAutomaticCameraEnabled: (enabled) => {
+      scene.setAutomaticCameraEnabled(enabled);
+      syncPauseButton(!enabled);
+      revealUi();
+    },
+    toggleImmersive: () => {
+      immersive = !immersive;
+      document.body.classList.toggle('is-hand-control-immersive', immersive);
+    },
+    moveFramingBy: (deltaX, deltaY) => {
+      scene.moveGestureFramingBy(-deltaX, -deltaY);
+    },
+    rotateBy: (deltaYaw, deltaPitch) => {
+      scene.rotateGestureBy(deltaYaw, deltaPitch);
+    },
+    zoomBy: (delta) => {
+      zoomBy(delta);
+    },
+    setStatus
+  };
+
+  const interpreter = new DailyFloraGestureInterpreter(actions);
+  const disconnect = connectCameraController(interpreter, actions);
+  const unbindKeyboard = bindHandControlKeyboard(actions);
+  setStatus('connecting', 'idle');
+  return () => {
+    disconnect();
+    unbindKeyboard();
+    status.remove();
+    document.body.classList.remove('is-hand-control-immersive');
+  };
+}
+
 setLabels();
 renderAccountState();
 setupDebugMode();
@@ -1509,3 +1591,8 @@ syncClockControls();
 idleClock.start();
 revealUi();
 scene.start();
+
+if (handControlEnabled) {
+  const stopHandControl = startHandControl();
+  window.addEventListener('beforeunload', stopHandControl, { once: true });
+}
