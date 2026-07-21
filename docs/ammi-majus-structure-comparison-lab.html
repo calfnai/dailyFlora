@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ammi majus 结构对照 LAB</title>
     <style>
-      :root{color-scheme:dark;--bg:#070806;--panel:#10140d;--line:rgb(246 235 211 / 15%);--text:#f7eddb;--muted:rgb(247 237 219 / 68%);--gold:#f2d98a;--green:#8fc87f;--bad:#e38b76}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(circle at 15% 0%,rgb(242 217 138 / 10%),transparent 30%),#070806}.shell{width:min(1380px,100%);margin:0 auto;padding:22px}.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:end;margin-bottom:18px;padding:22px;border:1px solid var(--line);border-radius:12px;background:rgb(10 13 8 / 86%)}.eyebrow{margin:0 0 8px;color:var(--gold);font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}h1{margin:0 0 10px;font-size:clamp(32px,5vw,60px);line-height:1;letter-spacing:-.04em}.copy{max-width:92ch;margin:0;color:var(--muted);font-size:14px;line-height:1.65}.stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.stat{padding:8px 11px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px;white-space:nowrap}.stage{position:relative;height:1120px;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,rgb(16 20 13 / 92%),rgb(7 8 6 / 94%))}.stage canvas{position:absolute;inset:0;display:block;width:100%;height:100%}.grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));pointer-events:none}.cell{position:relative;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.cell:nth-child(2n){border-right:0}.cell:nth-child(n+5){border-bottom:0}.label{position:absolute;left:12px;top:10px;z-index:2;max-width:310px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:rgb(7 8 6 / 82%);backdrop-filter:blur(12px)}.label strong{display:block;margin-bottom:3px;font-size:13px}.label span{display:block;color:var(--muted);font-size:11px;line-height:1.45}.bad strong{color:var(--bad)}.good strong{color:var(--green)}.notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}.note{padding:12px;border:1px solid var(--line);border-radius:8px;background:rgb(7 8 6 / 62%);color:var(--muted);font-size:12px;line-height:1.55}.note strong{display:block;margin-bottom:4px;color:var(--gold)}@media(max-width:860px){.hero{grid-template-columns:1fr}.stats{justify-content:flex-start}.stage{height:1900px}.grid{grid-template-columns:1fr;grid-template-rows:repeat(6,1fr)}.cell{border-right:0}.notes{grid-template-columns:1fr}}
+      :root{color-scheme:dark;--bg:#070806;--panel:#10140d;--line:rgb(246 235 211 / 15%);--text:#f7eddb;--muted:rgb(247 237 219 / 68%);--gold:#f2d98a;--green:#8fc87f;--cyan:#9fd7c7;--bad:#e38b76}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(circle at 15% 0%,rgb(242 217 138 / 10%),transparent 30%),#070806}.shell{width:min(1680px,100%);margin:0 auto;padding:22px}.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:end;margin-bottom:18px;padding:22px;border:1px solid var(--line);border-radius:12px;background:rgb(10 13 8 / 86%)}.eyebrow{margin:0 0 8px;color:var(--gold);font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}h1{margin:0 0 10px;font-size:clamp(32px,5vw,60px);line-height:1;letter-spacing:-.04em}.copy{max-width:108ch;margin:0;color:var(--muted);font-size:14px;line-height:1.65}.stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.stat{padding:8px 11px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px;white-space:nowrap}.stage{position:relative;height:1180px;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,rgb(16 20 13 / 92%),rgb(7 8 6 / 94%))}.stage canvas{position:absolute;inset:0;display:block;width:100%;height:100%}.grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));pointer-events:none}.cell{position:relative;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.cell:nth-child(3n){border-right:0}.cell:nth-child(n+7){border-bottom:0}.label{position:absolute;left:12px;top:10px;z-index:2;max-width:310px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:rgb(7 8 6 / 82%);backdrop-filter:blur(12px)}.label strong{display:block;margin-bottom:3px;font-size:13px}.label span{display:block;color:var(--muted);font-size:11px;line-height:1.45}.bad strong{color:var(--bad)}.good strong{color:var(--green)}.candidate strong{color:var(--cyan)}.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}.note{padding:12px;border:1px solid var(--line);border-radius:8px;background:rgb(7 8 6 / 62%);color:var(--muted);font-size:12px;line-height:1.55}.note strong{display:block;margin-bottom:4px;color:var(--gold)}@media(max-width:999px){.hero{grid-template-columns:1fr}.stats{justify-content:flex-start}.stage{height:3000px}.grid{grid-template-columns:1fr;grid-template-rows:repeat(9,1fr)}.cell{border-right:0}.cell:nth-child(n){border-bottom:1px solid var(--line)}.cell:last-child{border-bottom:0}.notes{grid-template-columns:1fr}}
     </style>
   </head>
   <body>
@@ -14,11 +14,12 @@
         <div>
           <p class="eyebrow">DailyFlora Ammi majus structural comparison</p>
           <h1>Ammi majus 复伞形结构对照 LAB</h1>
-          <p class="copy">A 保留已被否决的 16 根粗伞梗与外围孤立簇，用作错误基线。B 重新建立 30 根细伞梗、中心短枝覆盖、非等角分布与局部交叠花面。第一轮只判断阅读顺序与整体结构；不接回 25 花总览，不修改其他花型。</p>
+          <p class="copy">A 保留 16 根粗伞梗错误基线；B 保留“30 根细杆但仍共点、近似单层盘面”的未通过版本；C 改为短纵向分枝区、5 个不规则方向组、错层且局部交叠的蕾丝花面。只判断阅读顺序与整体结构；不接回 25 花总览，不修改其他花型。</p>
         </div>
         <div class="stats">
           <span class="stat">A · 16 thick rays</span>
           <span class="stat">B · 30 fine rays</span>
+          <span class="stat">C · 30 staggered rays / 5 groups</span>
           <span class="stat">shared canvas</span>
         </div>
       </header>
@@ -27,17 +28,21 @@
         <canvas id="ammi-comparison-canvas"></canvas>
         <div class="grid" aria-hidden="true">
           <div class="cell bad"><div class="label"><strong>A · 当前错误版 · 正面</strong><span>粗杆先读、花簇彼此孤立</span></div></div>
-          <div class="cell good"><div class="label"><strong>B · 新结构版 · 正面</strong><span>白色蕾丝花面先读，细支撑退后</span></div></div>
+          <div class="cell good"><div class="label"><strong>B · 未通过版 · 正面</strong><span>更多细杆，但仍形成大盘边缘</span></div></div>
+          <div class="cell candidate"><div class="label"><strong>C · 错层分组版 · 正面</strong><span>花面先读，骨架退到遮挡之后</span></div></div>
           <div class="cell bad"><div class="label"><strong>A · 当前错误版 · 侧面</strong><span>裸露骨架形成张伞感</span></div></div>
-          <div class="cell good"><div class="label"><strong>B · 新结构版 · 侧面</strong><span>近乎平顶的碎高低花面，无清楚伞沿</span></div></div>
+          <div class="cell good"><div class="label"><strong>B · 未通过版 · 侧面</strong><span>单层花面仍有清楚盘沿</span></div></div>
+          <div class="cell candidate"><div class="label"><strong>C · 错层分组版 · 侧面</strong><span>前中后轻微错层，打散横向边线</span></div></div>
           <div class="cell bad"><div class="label"><strong>A · 当前错误版 · 顶视</strong><span>中心空、外围孤岛与数学放射</span></div></div>
-          <div class="cell good"><div class="label"><strong>B · 新结构版 · 顶视</strong><span>中心覆盖、局部交叠与不规则缺口</span></div></div>
+          <div class="cell good"><div class="label"><strong>B · 未通过版 · 顶视</strong><span>仍能看见单点轮毂与平均射线</span></div></div>
+          <div class="cell candidate"><div class="label"><strong>C · 错层分组版 · 顶视</strong><span>多起点、局部拥挤、局部缺口与交叠簇</span></div></div>
         </div>
       </section>
 
       <div class="notes">
         <div class="note"><strong>A · 错误假设</strong>16 根半等角粗伞梗承担第一视觉层级；中央空轮毂，外围小伞簇像独立圆环。</div>
-        <div class="note"><strong>B · 本轮假设</strong>30 根细伞梗分为中心短枝、中层和外围；每簇 8–12 个末端，花面局部靠近但保留边缘缺口。</div>
+        <div class="note"><strong>B · 未通过假设</strong>虽有 30 根细伞梗和中心覆盖，但仍从近似单点发出，并把小簇安放在近似单层盘面。</div>
+        <div class="note"><strong>C · 本轮结构</strong>30 根伞梗分成 5 个不规则方向组，起点沿短纵向分枝区错层；小簇在前中后轻微错层并局部交叠。</div>
       </div>
     </main>
     <script type="module" src="/src/ammiMajusStructureComparisonLab.ts"></script>
