@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { createRng, type Rng } from './random';
 
 type ViewName = 'front' | 'side' | 'top';
-type Variant = 'current' | 'rebuilt' | 'clustered';
+type Variant = 'current' | 'rebuilt' | 'clustered' | 'lace';
 type Segment = { start: THREE.Vector3; end: THREE.Vector3; radius: number };
 type Bloom = { position: THREE.Vector3; normal: THREE.Vector3; scale: number; bud: boolean };
 type Panel = { variant: Variant; view: ViewName; scene: THREE.Scene; camera: THREE.PerspectiveCamera; model: THREE.Group };
@@ -64,6 +64,24 @@ function setCylinder(mesh: THREE.InstancedMesh, index: number, segment: Segment)
 
 function addSegments(group: THREE.Group, segments: Segment[]) {
   const mesh = cylinderInstances(segments.length, 6);
+  segments.forEach((segment, index) => setCylinder(mesh, index, segment));
+  mesh.count = segments.length;
+  mesh.instanceMatrix.needsUpdate = true;
+  group.add(mesh);
+}
+
+function addMutedSegments(group: THREE.Group, segments: Segment[]) {
+  const mesh = new THREE.InstancedMesh(
+    new THREE.CylinderGeometry(0.78, 1, 1, 5, 1, false),
+    new THREE.MeshStandardMaterial({
+      color: '#3d5238',
+      roughness: 0.98,
+      metalness: 0,
+      transparent: true,
+      opacity: 0.46
+    }),
+    segments.length
+  );
   segments.forEach((segment, index) => setCylinder(mesh, index, segment));
   mesh.count = segments.length;
   mesh.instanceMatrix.needsUpdate = true;
@@ -134,10 +152,19 @@ function setVolume(
   mesh.setColorAt(index, color);
 }
 
-function addBlooms(group: THREE.Group, blooms: Bloom[], rng: Rng) {
-  const petals = new THREE.InstancedMesh(petalGeometry(), material(flowerWhite, 0.9), blooms.length * 5);
-  const centers = new THREE.InstancedMesh(new THREE.SphereGeometry(0.0072, 7, 5), material(centerGold, 0.92), blooms.length);
-  const buds = new THREE.InstancedMesh(new THREE.SphereGeometry(0.017, 7, 5), material(flowerWarm, 0.92), blooms.length);
+function addBlooms(
+  group: THREE.Group,
+  blooms: Bloom[],
+  rng: Rng,
+  dimensions = { petalLength: 0.032, petalWidth: 0.0215, petalCup: 0.0018, centerRadius: 0.0072, budRadius: 0.017 }
+) {
+  const petals = new THREE.InstancedMesh(
+    petalGeometry(dimensions.petalLength, dimensions.petalWidth, dimensions.petalCup),
+    material(flowerWhite, 0.9),
+    blooms.length * 5
+  );
+  const centers = new THREE.InstancedMesh(new THREE.SphereGeometry(dimensions.centerRadius, 7, 5), material(centerGold, 0.92), blooms.length);
+  const buds = new THREE.InstancedMesh(new THREE.SphereGeometry(dimensions.budRadius, 7, 5), material(flowerWarm, 0.92), blooms.length);
   let petalUsed = 0;
   let centerUsed = 0;
   let budUsed = 0;
@@ -377,6 +404,126 @@ function createClusteredModel(seed: string) {
   return group;
 }
 
+function createDensityLaceModel(seed: string) {
+  const rng = createRng(`${seed}:density-lace-v1`);
+  const group = new THREE.Group();
+  const branchBase = new THREE.Vector3(0, 0.025, 0);
+  const branchTop = new THREE.Vector3(0.004, 0.165, -0.003);
+  group.add(stemAlong([
+    new THREE.Vector3(0, -1.18, 0),
+    new THREE.Vector3(-0.026, -0.61, 0.011),
+    branchBase,
+    branchTop
+  ], 0.015));
+
+  const primaryCount = 72;
+  const angles = unevenAngles(primaryCount, rng);
+  const segments: Segment[] = [];
+  const blooms: Bloom[] = [];
+  const miniHubs: THREE.Vector3[] = [];
+  const bandCounts = { center: 0, middle: 0, outer: 0 };
+  const bandOrder: Array<'center' | 'middle' | 'outer'> = [
+    ...Array.from({ length: 18 }, () => 'center' as const),
+    ...Array.from({ length: 36 }, () => 'middle' as const),
+    ...Array.from({ length: 18 }, () => 'outer' as const)
+  ];
+  for (let i = bandOrder.length - 1; i > 0; i -= 1) {
+    const swapIndex = Math.floor(rng.range(0, i + 1));
+    [bandOrder[i], bandOrder[swapIndex]] = [bandOrder[swapIndex], bandOrder[i]];
+  }
+
+  for (let i = 0; i < primaryCount; i += 1) {
+    const band = bandOrder[i];
+    bandCounts[band] += 1;
+    const angle = angles[i] + rng.range(-0.035, 0.035);
+    const radius = band === 'center'
+      ? Math.sqrt(rng.range(0.015, 1)) * 0.36
+      : band === 'middle'
+        ? rng.range(0.28, 0.72)
+        : rng.range(0.66, 0.96);
+    const radial = new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle));
+    const tangent = new THREE.Vector3(-Math.sin(angle), 0, Math.cos(angle));
+    const start = radial.clone().multiplyScalar(rng.range(0.008, 0.034))
+      .addScaledVector(tangent, rng.range(-0.02, 0.02));
+    start.y = rng.range(0.025, 0.165);
+
+    let miniHub = radial.clone().multiplyScalar(radius)
+      .addScaledVector(tangent, rng.range(-0.075, 0.075));
+    if (i > 5 && i % 4 === 0) {
+      const neighbor = miniHubs[i - 1];
+      const neighborAngle = rng.range(-Math.PI, Math.PI);
+      const neighborDistance = rng.range(0.015, 0.045);
+      miniHub.lerp(neighbor, rng.range(0.22, 0.36)).add(new THREE.Vector3(
+        Math.cos(neighborAngle) * neighborDistance,
+        0,
+        Math.sin(neighborAngle) * neighborDistance
+      ));
+    }
+    miniHub.y = 0.46 + (1 - Math.min(radius, 0.96) / 0.96) * 0.055 + rng.range(-0.055, 0.06);
+    miniHubs.push(miniHub);
+    segments.push({ start, end: miniHub, radius: rng.range(0.00024, 0.00058) });
+
+    const count = band === 'center'
+      ? Math.round(rng.range(12, 16))
+      : band === 'middle'
+        ? Math.round(rng.range(11, 15))
+        : Math.round(rng.range(10, 14));
+    const spread = band === 'center'
+      ? rng.range(0.07, 0.1)
+      : band === 'middle'
+        ? rng.range(0.09, 0.132)
+        : rng.range(0.1, 0.145);
+    const normal = up.clone()
+      .addScaledVector(radial, rng.range(0.015, 0.075))
+      .addScaledVector(tangent, rng.range(-0.035, 0.035))
+      .normalize();
+    const frame = tangentFrame(normal);
+    const clusterStretch = rng.range(0.82, 1.36);
+
+    for (let f = 0; f < count; f += 1) {
+      const fa = rng.range(0, Math.PI * 2);
+      const localReach = spread * Math.sqrt(rng.range(0.01, 1));
+      const offset = frame.tangent.clone().multiplyScalar(Math.cos(fa) * localReach * clusterStretch)
+        .addScaledVector(frame.bitangent, Math.sin(fa) * localReach / clusterStretch);
+      const bloom = miniHub.clone().add(offset);
+      bloom.y += rng.range(-0.038, 0.045);
+      const tiltAngle = rng.range(-Math.PI, Math.PI);
+      const horizontalTilt = rng.range(0.28, 0.78);
+      const bloomNormal = normal.clone().multiplyScalar(rng.range(0.48, 0.78))
+        .add(new THREE.Vector3(
+          Math.cos(tiltAngle) * horizontalTilt,
+          rng.range(-0.08, 0.2),
+          Math.sin(tiltAngle) * horizontalTilt
+        ))
+        .normalize();
+      segments.push({ start: miniHub, end: bloom, radius: rng.range(0.00016, 0.00034) });
+      blooms.push({
+        position: bloom,
+        normal: bloomNormal,
+        scale: rng.range(0.68, 0.86),
+        bud: f === count - 1 && (i * 3 + f) % 11 === 0
+      });
+    }
+  }
+
+  addMutedSegments(group, segments);
+  addBlooms(group, blooms, rng, {
+    petalLength: 0.025,
+    petalWidth: 0.0175,
+    petalCup: 0.0013,
+    centerRadius: 0.0035,
+    budRadius: 0.0105
+  });
+  group.userData.structureStats = {
+    primaryRays: primaryCount,
+    bands: bandCounts,
+    miniUmbels: primaryCount,
+    blooms: blooms.length,
+    readingOrder: 'continuous fine lace, partial micro-umbels, faint support'
+  };
+  return group;
+}
+
 function createPanel(variant: Variant, view: ViewName) {
   const scene = new THREE.Scene();
   scene.add(new THREE.HemisphereLight('#fff7df', '#172013', 1.8));
@@ -390,7 +537,9 @@ function createPanel(variant: Variant, view: ViewName) {
     ? createCurrentErrorModel('ammi-comparison')
     : variant === 'rebuilt'
       ? createRebuiltModel('ammi-comparison')
-      : createClusteredModel('ammi-comparison');
+      : variant === 'clustered'
+        ? createClusteredModel('ammi-comparison')
+        : createDensityLaceModel('ammi-comparison');
   scene.add(model);
   const grid = new THREE.GridHelper(2.8, 8, '#465446', '#263026');
   grid.position.y = -1.18;
@@ -405,36 +554,40 @@ const panels: Panel[] = [
   createPanel('current', 'front'),
   createPanel('rebuilt', 'front'),
   createPanel('clustered', 'front'),
+  createPanel('lace', 'front'),
   createPanel('current', 'side'),
   createPanel('rebuilt', 'side'),
   createPanel('clustered', 'side'),
+  createPanel('lace', 'side'),
   createPanel('current', 'top'),
   createPanel('rebuilt', 'top'),
-  createPanel('clustered', 'top')
+  createPanel('clustered', 'top'),
+  createPanel('lace', 'top')
 ];
 
 function setCamera(panel: Panel, width: number, height: number) {
   panel.camera.aspect = width / Math.max(1, height);
-  if (panel.view === 'side') panel.camera.position.set(3.0, 0.08, 0);
-  else if (panel.view === 'top') panel.camera.position.set(0, 3.0, 0.015);
-  else panel.camera.position.set(0, 0.08, 3.0);
+  const distance = panel.camera.aspect < 1 ? 3.72 : 3.0;
+  if (panel.view === 'side') panel.camera.position.set(distance, 0.08, 0);
+  else if (panel.view === 'top') panel.camera.position.set(0, distance, 0.015);
+  else panel.camera.position.set(0, 0.92, distance);
   panel.camera.lookAt(0, -0.02, 0);
   panel.camera.updateProjectionMatrix();
 }
 
 function panelRect(index: number, width: number, height: number) {
-  const mobile = width < 1000;
+  const mobile = width < 1100;
   if (mobile) {
-    const cellHeight = Math.floor(height / 9);
-    return { left: 0, bottom: height - (index + 1) * cellHeight, width, height: index === 8 ? height - cellHeight * 8 : cellHeight };
+    const cellHeight = Math.floor(height / 12);
+    return { left: 0, bottom: height - (index + 1) * cellHeight, width, height: index === 11 ? height - cellHeight * 11 : cellHeight };
   }
-  const columnWidth = Math.floor(width / 3);
+  const columnWidth = Math.floor(width / 4);
   const rowHeight = Math.floor(height / 3);
   return {
-    left: (index % 3) * columnWidth,
-    bottom: height - (Math.floor(index / 3) + 1) * rowHeight,
-    width: index % 3 === 2 ? width - columnWidth * 2 : columnWidth,
-    height: Math.floor(index / 3) === 2 ? height - rowHeight * 2 : rowHeight
+    left: (index % 4) * columnWidth,
+    bottom: height - (Math.floor(index / 4) + 1) * rowHeight,
+    width: index % 4 === 3 ? width - columnWidth * 3 : columnWidth,
+    height: Math.floor(index / 4) === 2 ? height - rowHeight * 2 : rowHeight
   };
 }
 
@@ -461,6 +614,7 @@ Object.assign(window, {
   ammiMajusComparisonStats: {
     current: panels[0].model.userData.structureStats,
     rebuilt: panels[1].model.userData.structureStats,
-    clustered: panels[2].model.userData.structureStats
+    clustered: panels[2].model.userData.structureStats,
+    lace: panels[3].model.userData.structureStats
   }
 });
