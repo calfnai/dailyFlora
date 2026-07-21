@@ -127,6 +127,7 @@ export default defineConfig({
         foxtailLilyApprovalLab: resolve(__dirname, 'docs/foxtail-lily-approval-lab.html'),
         ammiMajusApprovalLab: resolve(__dirname, 'docs/ammi-majus-approval-lab.html'),
         ammiMajusStructureComparisonLab: resolve(__dirname, 'docs/ammi-majus-structure-comparison-lab.html'),
+        ammiMajusEApprovalLab: resolve(__dirname, 'docs/ammi-majus-e-approval-lab.html'),
         scifiFlowerLab: resolve(__dirname, 'docs/scifi-flower-lab.html'),
         scifiBouquetLab: resolve(__dirname, 'docs/scifi-bouquet-lab.html'),
         leafSilhouetteLab: resolve(__dirname, 'docs/leaf-silhouette-lab.html'),
