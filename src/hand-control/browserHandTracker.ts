@@ -26,6 +26,12 @@ const mix = (previous: number, next: number, amount: number) => previous + (next
 const distance = (a: NormalizedLandmark, b: NormalizedLandmark) =>
   Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
 
+export function resolvePhysicalHand(categoryName: string | undefined, swapHandedness = true): HandName {
+  const reported: HandName = categoryName?.toLowerCase() === 'left' ? 'left' : 'right';
+  if (!swapHandedness) return reported;
+  return reported === 'left' ? 'right' : 'left';
+}
+
 export function extractHandSignal(points: NormalizedLandmark[], confidence: number): HandSignal {
   const palm = [0, 5, 9, 13, 17];
   const palmX = palm.reduce((sum, index) => sum + points[index].x, 0) / palm.length;
@@ -74,12 +80,12 @@ function smoothHand(previous: HandSignal, next: HandSignal, deltaSeconds: number
   };
 }
 
-function drawHands(canvas: HTMLCanvasElement, result: GestureRecognizerResult) {
+function drawHands(canvas: HTMLCanvasElement, result: GestureRecognizerResult, swapHandedness: boolean) {
   const context = canvas.getContext('2d');
   if (!context) return;
   context.clearRect(0, 0, canvas.width, canvas.height);
   result.landmarks.forEach((points, index) => {
-    const label = result.handedness[index]?.[0]?.categoryName.toLowerCase();
+    const label = resolvePhysicalHand(result.handedness[index]?.[0]?.categoryName, swapHandedness);
     const color = label === 'left' ? '#67e0d0' : '#e8ff69';
     context.strokeStyle = color;
     context.fillStyle = color;
@@ -121,9 +127,22 @@ export class BrowserHandTracker {
   private spreadVelocity = 0;
   private spreadAcceleration = 0;
   private fpsWindow = { started: 0, frames: 0, value: 0 };
+  private swapHandedness = true;
 
   constructor(options: BrowserHandTrackerOptions) {
     this.options = options;
+  }
+
+  setSwapHandedness(enabled: boolean) {
+    if (this.swapHandedness === enabled) return;
+    this.swapHandedness = enabled;
+    this.previousHands = {
+      left: { ...EMPTY_HAND_SIGNAL, landmarks: [] },
+      right: { ...EMPTY_HAND_SIGNAL, landmarks: [] }
+    };
+    this.previousSpread = null;
+    this.spreadVelocity = 0;
+    this.spreadAcceleration = 0;
   }
 
   private async loadRecognizer() {
@@ -194,7 +213,7 @@ export class BrowserHandTracker {
           overlay.width = this.options.video.videoWidth;
           overlay.height = this.options.video.videoHeight;
         }
-        drawHands(overlay, result);
+        drawHands(overlay, result, this.swapHandedness);
 
         const raw: Record<HandName, HandSignal> = {
           left: { ...EMPTY_HAND_SIGNAL, landmarks: [] },
@@ -202,7 +221,9 @@ export class BrowserHandTracker {
         };
         result.landmarks.forEach((points, index) => {
           const category = result.handedness[index]?.[0];
-          const name: HandName = category?.categoryName.toLowerCase() === 'left' ? 'left' : 'right';
+          // MediaPipe's handedness convention assumes a mirrored selfie image.
+          // The recognizer receives the raw webcam frame, so swap by default.
+          const name = resolvePhysicalHand(category?.categoryName, this.swapHandedness);
           raw[name] = extractHandSignal(points, category?.score ?? 0);
         });
         const hands: Record<HandName, HandSignal> = {

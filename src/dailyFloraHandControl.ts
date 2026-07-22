@@ -92,7 +92,12 @@ export function startDailyFloraHandControl(actions: DailyFloraHandActions) {
   });
   monitor.bind({
     start: () => void tracker.start(),
-    stop: () => tracker.stop()
+    stop: () => tracker.stop(),
+    setSwapHandedness: (enabled) => {
+      tracker.setSwapHandedness(enabled);
+      interpreter.reset();
+      monitor.setOutput(`左右手校正 · ${enabled ? 'ON' : 'OFF'}`);
+    }
   });
   const unbindKeyboard = bindHandControlKeyboard(actions);
 

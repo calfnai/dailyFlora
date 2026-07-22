@@ -6,7 +6,7 @@ export type HandMonitor = {
   root: HTMLElement;
   video: HTMLVideoElement;
   overlay: HTMLCanvasElement;
-  bind: (actions: { start: () => void; stop: () => void }) => void;
+  bind: (actions: { start: () => void; stop: () => void; setSwapHandedness: (enabled: boolean) => void }) => void;
   setTrackerStatus: (status: HandTrackerStatus, message: string) => void;
   setMode: (mode: HandControlMode, detail?: string) => void;
   setOutput: (message: string) => void;
@@ -31,6 +31,14 @@ export function createHandMonitor(): HandMonitor {
         <button type="button" data-action="start">启用摄像头</button>
         <button type="button" data-action="stop" class="quiet">关闭</button>
       </div>
+      <label class="hand-camera-swap">
+        <input type="checkbox" data-action="swap-hands" checked>
+        <span>左右手校正</span><i>默认开启；识别反了可关闭</i>
+      </label>
+      <div class="hand-camera-detected">
+        <span data-hand="right">RIGHT · 未检测</span>
+        <span data-hand="left">LEFT · 未检测</span>
+      </div>
       <div class="hand-camera-values">
         <span><b>右食指</b><i data-value="right-index">0%</i></span>
         <span><b>右中指</b><i data-value="right-middle">0%</i></span>
@@ -44,6 +52,18 @@ export function createHandMonitor(): HandMonitor {
       </div>
       <div class="hand-camera-output"><span>ACTUAL OUTPUT</span><b>等待摄像头</b></div>
       <p class="hand-camera-mode">MODE · IDLE</p>
+      <details class="hand-camera-guide" open>
+        <summary>DAILYFLORA 手势表</summary>
+        <p><b>右拇指 + 食指</b><span>按住移动花束 X / Y</span></p>
+        <p><b>右拇指 + 中指</b><span>切换疏密程度</span></p>
+        <p><b>右拇指 + 无名指</b><span>切换精细程度</span></p>
+        <p><b>右拇指 + 小指</b><span>切换时钟</span></p>
+        <p><b>左拇指 + 食指</b><span>自动镜头恢复 / 停止</span></p>
+        <p><b>左拇指 + 小指</b><span>切换沉浸全屏</span></p>
+        <p><b>右手完全张开</b><span>depth 推进 / 拉远，不旋转</span></p>
+        <p><b>右手稍微合拢</b><span>移动手掌旋转镜头</span></p>
+        <p><b>两只手同时出现</b><span>spread 加速度辅助缩放</span></p>
+      </details>
     </div>`;
   document.body.append(root);
   const video = root.querySelector('video') as HTMLVideoElement;
@@ -58,6 +78,9 @@ export function createHandMonitor(): HandMonitor {
   const value = (name: string) => root.querySelector(`[data-value="${name}"]`) as HTMLElement;
   const start = root.querySelector('[data-action="start"]') as HTMLButtonElement;
   const stop = root.querySelector('[data-action="stop"]') as HTMLButtonElement;
+  const swapHands = root.querySelector('[data-action="swap-hands"]') as HTMLInputElement;
+  const rightStatus = root.querySelector('[data-hand="right"]') as HTMLElement;
+  const leftStatus = root.querySelector('[data-hand="left"]') as HTMLElement;
   let collapsed = false;
 
   toggle.addEventListener('click', () => {
@@ -74,6 +97,7 @@ export function createHandMonitor(): HandMonitor {
     bind: (actions) => {
       start.addEventListener('click', actions.start);
       stop.addEventListener('click', actions.stop);
+      swapHands.addEventListener('change', () => actions.setSwapHandedness(swapHands.checked));
     },
     setTrackerStatus: (status, text) => {
       dot.dataset.status = status;
@@ -99,6 +123,10 @@ export function createHandMonitor(): HandMonitor {
       value('depth').textContent = percent(right.depth);
       value('openness').textContent = percent(right.openness);
       value('spread').textContent = `${frame.spread_acceleration >= 0 ? '+' : ''}${frame.spread_acceleration.toFixed(2)}`;
+      rightStatus.textContent = `RIGHT · ${right.tracked ? '已检测' : '未检测'}`;
+      rightStatus.classList.toggle('is-tracked', right.tracked);
+      leftStatus.textContent = `LEFT · ${left.tracked ? '已检测' : '未检测'}`;
+      leftStatus.classList.toggle('is-tracked', left.tracked);
       fps.textContent = `${frame.fps.toFixed(0)} FPS · ${Number(left.tracked) + Number(right.tracked)} HAND`;
     },
     destroy: () => root.remove()

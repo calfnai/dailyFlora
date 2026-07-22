@@ -5,6 +5,7 @@ import {
   GestureInterpreter,
   dominantPinch,
   extractHandSignal,
+  resolvePhysicalHand,
   type HandControlAction,
   type HandSignal,
   type HandSignalFrame
@@ -14,6 +15,13 @@ import {
   createDailyFloraActionRouter,
   type DailyFloraHandActions
 } from '../src/dailyFloraHandControl.ts';
+
+test('raw webcam handedness is corrected to physical left and right by default', () => {
+  assert.equal(resolvePhysicalHand('Left'), 'right');
+  assert.equal(resolvePhysicalHand('Right'), 'left');
+  assert.equal(resolvePhysicalHand('Left', false), 'left');
+  assert.equal(resolvePhysicalHand('Right', false), 'right');
+});
 
 function hand(values: Partial<HandSignal> = {}): HandSignal {
   return {
