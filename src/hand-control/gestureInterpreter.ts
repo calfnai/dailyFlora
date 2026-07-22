@@ -3,6 +3,7 @@ import type {
   HandControlAction,
   HandControlMode,
   HandName,
+  HandPose,
   HandSignal,
   HandSignalFrame
 } from './types.ts';
@@ -11,9 +12,11 @@ const fingers: FingerName[] = ['index', 'middle', 'ring', 'pinky'];
 const pinchOn = 0.72;
 const pinchOff = 0.56;
 const pinchAmbiguityMargin = 0.07;
-const discreteCooldownMs = 450;
 const continuousCooldownMs = 350;
 const twoHandSettleMs = 250;
+const poseHoldMs = 280;
+const fistHoldMs = 120;
+const poseReleaseMs = 180;
 
 function clamp(value: number, lower: number, upper: number) {
   return Math.min(upper, Math.max(lower, value));
@@ -41,6 +44,22 @@ export type GestureInterpreterOptions = {
   onMode?: (mode: HandControlMode, detail?: string) => void;
 };
 
+type CommandPose = Exclude<HandPose, 'none' | 'unknown' | 'open_palm'>;
+type PoseState = { candidate: HandPose; since: number; active: CommandPose | null };
+
+const commandPoses: ReadonlySet<HandPose> = new Set(['thumb_up', 'fist', 'pointing_up', 'victory', 'three_up']);
+const poseLabel: Record<CommandPose, string> = {
+  thumb_up: '👍 THUMB UP',
+  fist: '✊ FIST',
+  pointing_up: '☝ POINTING',
+  victory: '✌ VICTORY',
+  three_up: '3F THREE UP'
+};
+
+function sensedPose(hand: HandSignal): HandPose {
+  return tracked(hand) && hand.pose_confidence >= 0.52 ? hand.pose : 'none';
+}
+
 export class GestureInterpreter {
   private readonly onAction: (action: HandControlAction) => void;
   private readonly onMode: (mode: HandControlMode, detail?: string) => void;
@@ -49,14 +68,17 @@ export class GestureInterpreter {
   private suppressContinuousUntil = 0;
   private bothHandsSince: number | null = null;
   private readonly activePinch: Record<HandName, FingerName | null> = { left: null, right: null };
-  private readonly lastDiscreteAt = new Map<string, number>();
+  private readonly poseState: Record<HandName, PoseState> = {
+    left: { candidate: 'none', since: 0, active: null },
+    right: { candidate: 'none', since: 0, active: null }
+  };
 
   constructor(options: GestureInterpreterOptions) {
     this.onAction = options.onAction;
     this.onMode = options.onMode ?? (() => undefined);
   }
 
-  private updatePinch(handName: HandName, hand: HandSignal, timestampMs: number) {
+  private updatePinch(handName: HandName, hand: HandSignal) {
     const previous = this.activePinch[handName];
     if (!tracked(hand)) {
       this.activePinch[handName] = null;
@@ -68,14 +90,33 @@ export class GestureInterpreter {
     const next = dominantPinch(hand);
     if (!next) return null;
     this.activePinch[handName] = next;
-    const key = `${handName}:${next}`;
-    const last = this.lastDiscreteAt.get(key) ?? -Infinity;
-    if (timestampMs - last >= discreteCooldownMs) {
-      this.lastDiscreteAt.set(key, timestampMs);
-      this.suppressContinuousUntil = timestampMs + continuousCooldownMs;
-      this.onAction({ type: 'pinch', hand: handName, finger: next });
-    }
     return next;
+  }
+
+  private updatePose(handName: HandName, hand: HandSignal, timestampMs: number) {
+    const state = this.poseState[handName];
+    const next = sensedPose(hand);
+    if (next !== state.candidate) {
+      state.candidate = next;
+      state.since = timestampMs;
+      return state.active;
+    }
+
+    const isCommand = commandPoses.has(next);
+    const requiredMs = next === 'fist' ? fistHoldMs : isCommand ? poseHoldMs : poseReleaseMs;
+    if (timestampMs - state.since < requiredMs) return state.active;
+    if (!isCommand) {
+      state.active = null;
+      return null;
+    }
+
+    const command = next as CommandPose;
+    if (state.active !== command) {
+      state.active = command;
+      this.suppressContinuousUntil = timestampMs + continuousCooldownMs;
+      this.onAction({ type: 'pose', hand: handName, pose: command });
+    }
+    return state.active;
   }
 
   process(frame: HandSignalFrame) {
@@ -85,8 +126,29 @@ export class GestureInterpreter {
     const left = frame.hands.left;
     const rightTracked = tracked(right);
     const leftTracked = tracked(left);
-    const rightPinch = this.updatePinch('right', right, frame.timestamp_ms);
-    const leftPinch = this.updatePinch('left', left, frame.timestamp_ms);
+    const rightPinch = this.updatePinch('right', right);
+    const leftPinch = this.updatePinch('left', left);
+    const rightPose = this.updatePose('right', right, frame.timestamp_ms);
+    const leftPose = this.updatePose('left', left, frame.timestamp_ms);
+    const rightCandidate = this.poseState.right.candidate;
+    const leftCandidate = this.poseState.left.candidate;
+    const fistPresented = rightCandidate === 'fist' || leftCandidate === 'fist' || rightPose === 'fist' || leftPose === 'fist';
+    const commandPresented = commandPoses.has(rightCandidate) || commandPoses.has(leftCandidate) || rightPose || leftPose;
+
+    if (fistPresented) {
+      this.previousRight = rightTracked ? { ...right, landmarks: right.landmarks } : null;
+      this.bothHandsSince = null;
+      this.onMode('brake', '✊ ALL CONTROL STOP');
+      return;
+    }
+
+    if (commandPresented) {
+      this.previousRight = rightTracked ? { ...right, landmarks: right.landmarks } : null;
+      const activeHand = rightPose || commandPoses.has(rightCandidate) ? 'RIGHT' : 'LEFT';
+      const activePose = (rightPose ?? leftPose ?? (commandPoses.has(rightCandidate) ? rightCandidate : leftCandidate)) as CommandPose;
+      this.onMode(frame.timestamp_ms < this.suppressContinuousUntil ? 'cooldown' : 'gesture', `${activeHand} · ${poseLabel[activePose]}`);
+      return;
+    }
 
     if (!rightTracked) {
       this.previousRight = null;
@@ -166,6 +228,9 @@ export class GestureInterpreter {
     this.bothHandsSince = null;
     this.activePinch.left = null;
     this.activePinch.right = null;
+    this.poseState.left = { candidate: 'none', since: 0, active: null };
+    this.poseState.right = { candidate: 'none', since: 0, active: null };
+    this.suppressContinuousUntil = 0;
     this.onMode('idle');
   }
 }

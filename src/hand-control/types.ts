@@ -1,6 +1,7 @@
 export type FingerName = 'index' | 'middle' | 'ring' | 'pinky';
 export type HandName = 'left' | 'right';
-export type HandControlMode = 'idle' | 'xy' | 'depth' | 'spread' | 'rotate' | 'cooldown';
+export type HandPose = 'none' | 'unknown' | 'thumb_up' | 'fist' | 'pointing_up' | 'victory' | 'three_up' | 'open_palm';
+export type HandControlMode = 'idle' | 'gesture' | 'brake' | 'xy' | 'depth' | 'spread' | 'rotate' | 'cooldown';
 
 export type HandLandmark = {
   x: number;
@@ -11,6 +12,8 @@ export type HandLandmark = {
 export type HandSignal = {
   tracked: boolean;
   confidence: number;
+  pose: HandPose;
+  pose_confidence: number;
   x: number;
   y: number;
   depth: number;
@@ -35,7 +38,7 @@ export type HandSignalFrame = {
 };
 
 export type HandControlAction =
-  | { type: 'pinch'; hand: HandName; finger: FingerName }
+  | { type: 'pose'; hand: HandName; pose: Exclude<HandPose, 'none' | 'unknown' | 'open_palm'> }
   | { type: 'move_xy'; deltaX: number; deltaY: number }
   | { type: 'zoom'; source: 'depth' | 'spread'; delta: number }
   | { type: 'rotate'; deltaYaw: number; deltaPitch: number };
@@ -45,6 +48,8 @@ export type HandTrackerStatus = 'off' | 'loading' | 'requesting-camera' | 'runni
 export const EMPTY_HAND_SIGNAL: HandSignal = {
   tracked: false,
   confidence: 0,
+  pose: 'none',
+  pose_confidence: 0,
   x: 0.5,
   y: 0.5,
   depth: 0,

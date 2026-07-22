@@ -7,6 +7,7 @@ import {
   EMPTY_HAND_SIGNAL,
   type FingerName,
   type HandName,
+  type HandPose,
   type HandSignal,
   type HandSignalFrame,
   type HandTrackerStatus
@@ -25,6 +26,7 @@ const clamp = (value: number, lower: number, upper: number) => Math.min(upper, M
 const mix = (previous: number, next: number, amount: number) => previous + (next - previous) * amount;
 const distance = (a: NormalizedLandmark, b: NormalizedLandmark) =>
   Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
+const pinchDistanceScale = 1.12;
 
 export function resolvePhysicalHand(categoryName: string | undefined, swapHandedness = true): HandName {
   const reported: HandName = categoryName?.toLowerCase() === 'left' ? 'left' : 'right';
@@ -32,12 +34,68 @@ export function resolvePhysicalHand(categoryName: string | undefined, swapHanded
   return reported === 'left' ? 'right' : 'left';
 }
 
-export function extractHandSignal(points: NormalizedLandmark[], confidence: number): HandSignal {
+function straightness(points: NormalizedLandmark[], mcp: number, pip: number, tip: number) {
+  const first = {
+    x: points[pip].x - points[mcp].x,
+    y: points[pip].y - points[mcp].y,
+    z: points[pip].z - points[mcp].z
+  };
+  const second = {
+    x: points[tip].x - points[pip].x,
+    y: points[tip].y - points[pip].y,
+    z: points[tip].z - points[pip].z
+  };
+  const firstLength = Math.hypot(first.x, first.y, first.z);
+  const secondLength = Math.hypot(second.x, second.y, second.z);
+  if (firstLength < 1e-5 || secondLength < 1e-5) return -1;
+  return (first.x * second.x + first.y * second.y + first.z * second.z) / (firstLength * secondLength);
+}
+
+function fingerExtended(points: NormalizedLandmark[], mcp: number, pip: number, tip: number) {
+  return straightness(points, mcp, pip, tip) >= 0.62 &&
+    distance(points[0], points[tip]) >= distance(points[0], points[pip]) * 1.04;
+}
+
+export function detectsThreeFingersUp(points: NormalizedLandmark[]) {
+  if (points.length < 21) return false;
+  return fingerExtended(points, 5, 6, 8) &&
+    fingerExtended(points, 9, 10, 12) &&
+    fingerExtended(points, 13, 14, 16) &&
+    !fingerExtended(points, 17, 18, 20);
+}
+
+export function classifyHandPose(
+  points: NormalizedLandmark[],
+  categoryName: string | undefined,
+  categoryConfidence: number,
+  handConfidence: number
+): { pose: HandPose; confidence: number } {
+  if (detectsThreeFingersUp(points)) {
+    return { pose: 'three_up', confidence: Math.min(handConfidence, 0.82) };
+  }
+  const normalized = categoryName?.toLowerCase();
+  const pose: HandPose = normalized === 'thumb_up' ? 'thumb_up'
+    : normalized === 'closed_fist' ? 'fist'
+      : normalized === 'pointing_up' ? 'pointing_up'
+        : normalized === 'victory' ? 'victory'
+          : normalized === 'open_palm' ? 'open_palm'
+            : normalized && normalized !== 'none' ? 'unknown' : 'none';
+  return { pose, confidence: pose === 'none' ? 0 : categoryConfidence };
+}
+
+export function extractHandSignal(
+  points: NormalizedLandmark[],
+  confidence: number,
+  pose: HandPose = 'none',
+  poseConfidence = 0
+): HandSignal {
   const palm = [0, 5, 9, 13, 17];
   const palmX = palm.reduce((sum, index) => sum + points[index].x, 0) / palm.length;
   const palmY = palm.reduce((sum, index) => sum + points[index].y, 0) / palm.length;
   const palmWidth = Math.max(0.025, distance(points[5], points[17]));
-  const pinch = (tip: number) => clamp01(1 - distance(points[4], points[tip]) / (palmWidth * 0.78));
+  // Landmark centers cannot overlap when two fingertips with real thickness touch.
+  // Normalize by palm size and allow a comfortable near-touch before hysteresis.
+  const pinch = (tip: number) => clamp01(1 - distance(points[4], points[tip]) / (palmWidth * pinchDistanceScale));
   const extensions = ([8, 12, 16, 20] as const).map((tip, index) => {
     const mcp = [5, 9, 13, 17][index];
     return distance(points[0], points[tip]) / Math.max(0.025, distance(points[0], points[mcp]));
@@ -45,6 +103,8 @@ export function extractHandSignal(points: NormalizedLandmark[], confidence: numb
   return {
     tracked: true,
     confidence,
+    pose,
+    pose_confidence: poseConfidence,
     x: clamp01(1 - palmX),
     y: clamp01(palmY),
     depth: clamp01((palmWidth - 0.055) / 0.2),
@@ -224,7 +284,9 @@ export class BrowserHandTracker {
           // MediaPipe's handedness convention assumes a mirrored selfie image.
           // The recognizer receives the raw webcam frame, so swap by default.
           const name = resolvePhysicalHand(category?.categoryName, this.swapHandedness);
-          raw[name] = extractHandSignal(points, category?.score ?? 0);
+          const gesture = result.gestures[index]?.[0];
+          const classified = classifyHandPose(points, gesture?.categoryName, gesture?.score ?? 0, category?.score ?? 0);
+          raw[name] = extractHandSignal(points, category?.score ?? 0, classified.pose, classified.confidence);
         });
         const hands: Record<HandName, HandSignal> = {
           left: smoothHand(this.previousHands.left, raw.left, deltaSeconds),

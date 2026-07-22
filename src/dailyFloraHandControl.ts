@@ -24,15 +24,15 @@ export function createDailyFloraActionRouter(
   let automaticCameraEnabled = true;
   return (action: HandControlAction) => {
     onOutput(outputLabel(action));
-    if (action.type === 'pinch') {
-      if (action.hand === 'right' && action.finger === 'middle') actions.cycleDensity();
-      else if (action.hand === 'right' && action.finger === 'ring') actions.cycleRender();
-      else if (action.hand === 'right' && action.finger === 'pinky') actions.toggleClock();
-      else if (action.hand === 'left' && action.finger === 'index') {
+    if (action.type === 'pose') {
+      if (action.hand === 'right' && action.pose === 'pointing_up') actions.cycleDensity();
+      else if (action.hand === 'right' && action.pose === 'victory') actions.cycleRender();
+      else if (action.hand === 'right' && action.pose === 'three_up') actions.toggleClock();
+      else if (action.hand === 'left' && action.pose === 'thumb_up') {
         automaticCameraEnabled = !automaticCameraEnabled;
         actions.setAutomaticCameraEnabled(automaticCameraEnabled);
         onOutput(`AUTO CAMERA · ${automaticCameraEnabled ? 'ON' : 'OFF'}`);
-      } else if (action.hand === 'left' && action.finger === 'pinky') actions.toggleImmersive();
+      } else if (action.hand === 'left' && action.pose === 'victory') actions.toggleImmersive();
       return;
     }
     if (action.type === 'move_xy') actions.moveFramingBy(action.deltaX, action.deltaY);
@@ -48,7 +48,13 @@ export function createDailyFloraActionRouter(
 }
 
 const outputLabel = (action: HandControlAction) => {
-  if (action.type === 'pinch') return `${action.hand.toUpperCase()} ${action.finger.toUpperCase()} PINCH`;
+  if (action.type === 'pose') {
+    const label = action.pose === 'thumb_up' ? '👍 THUMB UP'
+      : action.pose === 'fist' ? '✊ BRAKE'
+        : action.pose === 'pointing_up' ? '☝ POINTING'
+          : action.pose === 'victory' ? '✌ VICTORY' : '3F THREE UP';
+    return `${action.hand.toUpperCase()} · ${label}`;
+  }
   if (action.type === 'move_xy') return `XY · ${action.deltaX.toFixed(3)}, ${action.deltaY.toFixed(3)}`;
   if (action.type === 'rotate') return `ROTATE · ${action.deltaYaw.toFixed(3)}, ${action.deltaPitch.toFixed(3)}`;
   return `${action.source.toUpperCase()} ZOOM · ${action.delta.toFixed(3)}`;

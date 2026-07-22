@@ -1,6 +1,12 @@
 import type { HandControlMode, HandSignalFrame, HandTrackerStatus } from './types.ts';
 
 const percent = (value: number) => `${Math.round(value * 100)}%`;
+const poseLabel = (pose: HandSignalFrame['hands']['right']['pose']) => pose === 'thumb_up' ? '👍 THUMB UP'
+  : pose === 'fist' ? '✊ FIST'
+    : pose === 'pointing_up' ? '☝ POINTING'
+      : pose === 'victory' ? '✌ VICTORY'
+        : pose === 'three_up' ? '3F THREE UP'
+          : pose === 'open_palm' ? 'OPEN PALM' : pose === 'unknown' ? 'UNKNOWN' : 'NO GESTURE';
 
 export type HandMonitor = {
   root: HTMLElement;
@@ -40,12 +46,9 @@ export function createHandMonitor(): HandMonitor {
         <span data-hand="left">LEFT · 未检测</span>
       </div>
       <div class="hand-camera-values">
-        <span><b>右食指</b><i data-value="right-index">0%</i></span>
-        <span><b>右中指</b><i data-value="right-middle">0%</i></span>
-        <span><b>右无名指</b><i data-value="right-ring">0%</i></span>
-        <span><b>右小指</b><i data-value="right-pinky">0%</i></span>
-        <span><b>左食指</b><i data-value="left-index">0%</i></span>
-        <span><b>左小指</b><i data-value="left-pinky">0%</i></span>
+        <span><b>右手势</b><i data-value="right-pose">—</i></span>
+        <span><b>左手势</b><i data-value="left-pose">—</i></span>
+        <span><b>食指 PINCH</b><i data-value="right-index">0%</i></span>
         <span><b>深度</b><i data-value="depth">0%</i></span>
         <span><b>张开</b><i data-value="openness">0%</i></span>
         <span><b>双手加速度</b><i data-value="spread">0%</i></span>
@@ -54,12 +57,13 @@ export function createHandMonitor(): HandMonitor {
       <p class="hand-camera-mode">MODE · IDLE</p>
       <details class="hand-camera-guide" open>
         <summary>DAILYFLORA 手势表</summary>
-        <p><b>右拇指 + 食指</b><span>按住移动花束 X / Y</span></p>
-        <p><b>右拇指 + 中指</b><span>切换疏密程度</span></p>
-        <p><b>右拇指 + 无名指</b><span>切换精细程度</span></p>
-        <p><b>右拇指 + 小指</b><span>切换时钟</span></p>
-        <p><b>左拇指 + 食指</b><span>自动镜头恢复 / 停止</span></p>
-        <p><b>左拇指 + 小指</b><span>切换沉浸全屏</span></p>
+        <p><b>右手 ☝</b><span>切换疏密程度</span></p>
+        <p><b>右手 ✌</b><span>切换精细程度</span></p>
+        <p><b>右手三指</b><span>切换时钟（自定义识别）</span></p>
+        <p><b>左手 👍</b><span>自动镜头恢复 / 停止</span></p>
+        <p><b>左手 ✌</b><span>切换沉浸全屏</span></p>
+        <p><b>任一手 ✊</b><span>安全刹车，停止全部控制</span></p>
+        <p><b>右拇指 + 食指</b><span>靠近即 pinch，按住移动 X / Y</span></p>
         <p><b>右手完全张开</b><span>depth 推进 / 拉远，不旋转</span></p>
         <p><b>右手稍微合拢</b><span>移动手掌旋转镜头</span></p>
         <p><b>两只手同时出现</b><span>spread 加速度辅助缩放</span></p>
@@ -115,17 +119,14 @@ export function createHandMonitor(): HandMonitor {
       const right = frame.hands.right;
       const left = frame.hands.left;
       value('right-index').textContent = percent(right.pinch_index);
-      value('right-middle').textContent = percent(right.pinch_middle);
-      value('right-ring').textContent = percent(right.pinch_ring);
-      value('right-pinky').textContent = percent(right.pinch_pinky);
-      value('left-index').textContent = percent(left.pinch_index);
-      value('left-pinky').textContent = percent(left.pinch_pinky);
+      value('right-pose').textContent = poseLabel(right.pose);
+      value('left-pose').textContent = poseLabel(left.pose);
       value('depth').textContent = percent(right.depth);
       value('openness').textContent = percent(right.openness);
       value('spread').textContent = `${frame.spread_acceleration >= 0 ? '+' : ''}${frame.spread_acceleration.toFixed(2)}`;
-      rightStatus.textContent = `RIGHT · ${right.tracked ? '已检测' : '未检测'}`;
+      rightStatus.textContent = `RIGHT · ${right.tracked ? poseLabel(right.pose) : '未检测'}`;
       rightStatus.classList.toggle('is-tracked', right.tracked);
-      leftStatus.textContent = `LEFT · ${left.tracked ? '已检测' : '未检测'}`;
+      leftStatus.textContent = `LEFT · ${left.tracked ? poseLabel(left.pose) : '未检测'}`;
       leftStatus.classList.toggle('is-tracked', left.tracked);
       fps.textContent = `${frame.fps.toFixed(0)} FPS · ${Number(left.tracked) + Number(right.tracked)} HAND`;
     },

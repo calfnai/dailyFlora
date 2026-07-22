@@ -17,18 +17,19 @@ The DailyFlora adapter is a lazy chunk loaded only behind `?hand-control=1`. The
 
 ## Gesture mapping
 
-- Right thumb + index: hold to move the bouquet on the X/Y axes.
-- Right thumb + middle: cycle density.
-- Right thumb + ring: cycle rendering detail.
-- Right thumb + pinky: toggle the clock.
+- Right pointing-up `☝`: cycle density.
+- Right victory `✌`: cycle rendering detail.
+- Right index + middle + ring raised: toggle the clock. MediaPipe has no built-in three-finger category, so this is derived from the 21 landmarks.
+- Left thumbs-up `👍`: toggle the automatic camera path.
+- Left victory `✌`: toggle webpage immersive mode.
+- Closed fist `✊` on either hand: safety brake; suppress every continuous output while held.
+- Right thumb + index: hold to move the bouquet on the X/Y axes. The normalized distance threshold intentionally accepts visibly touching/near-touching fingertips instead of requiring landmark centers to overlap.
 - Fully open right palm: move toward/away from the camera to zoom with depth priority.
 - Slightly closed right palm: rotate; a fully open palm never rotates.
 - Both hands: when depth is stable, spread acceleration supplies secondary zoom.
-- Left thumb + index: toggle the automatic camera path.
-- Left thumb + pinky: toggle webpage immersive mode.
 
 The monitor keeps this entire gesture list visible together with the physical-hand tracking state, normalized input values, current control mode, FPS, and the exact action sent to DailyFlora.
 
-Discrete gestures have a 450 ms cooldown and continuous controls pause for 350 ms after a discrete command. Pinch ambiguity, two-hand settling, per-frame deltas, scene framing, rotation, and zoom are bounded before they reach the visual system.
+Symbolic gestures must remain stable for 280 ms before firing once; the fist starts braking immediately and confirms after 120 ms. A gesture must be released before it can fire again, and continuous controls pause for 350 ms after a discrete command. Pinch hysteresis, ambiguity rejection, two-hand settling, per-frame deltas, scene framing, rotation, and zoom are bounded before they reach the visual system.
 
 Keyboard fallback for testing: `1` density, `2` detail, `3` clock, `4` restore automatic camera, and `5` immersive mode.
