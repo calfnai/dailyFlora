@@ -6,7 +6,8 @@ const poseLabel = (pose: HandSignalFrame['hands']['right']['pose']) => pose === 
     : pose === 'pointing_up' ? '☝ POINTING'
       : pose === 'victory' ? '✌ VICTORY'
         : pose === 'three_up' ? '3F THREE UP'
-          : pose === 'open_palm' ? 'OPEN PALM' : pose === 'unknown' ? 'UNKNOWN' : 'NO GESTURE';
+          : pose === 'four_up' ? '4F FOUR UP'
+            : pose === 'open_palm' ? 'OPEN PALM' : pose === 'unknown' ? 'UNKNOWN' : 'NO GESTURE';
 
 export type HandMonitor = {
   root: HTMLElement;
@@ -49,23 +50,25 @@ export function createHandMonitor(): HandMonitor {
         <span><b>右手势</b><i data-value="right-pose">—</i></span>
         <span><b>左手势</b><i data-value="left-pose">—</i></span>
         <span><b>食指 PINCH</b><i data-value="right-index">0%</i></span>
-        <span><b>深度</b><i data-value="depth">0%</i></span>
-        <span><b>张开</b><i data-value="openness">0%</i></span>
+        <span><b>右 DEPTH</b><i data-value="right-depth">0%</i></span>
+        <span><b>左 DEPTH</b><i data-value="left-depth">0%</i></span>
+        <span><b>右张开</b><i data-value="right-openness">0%</i></span>
+        <span><b>左张开</b><i data-value="left-openness">0%</i></span>
         <span><b>双手加速度</b><i data-value="spread">0%</i></span>
       </div>
       <div class="hand-camera-output"><span>ACTUAL OUTPUT</span><b>等待摄像头</b></div>
       <p class="hand-camera-mode">MODE · IDLE</p>
       <details class="hand-camera-guide" open>
         <summary>DAILYFLORA 手势表</summary>
-        <p><b>右手 ☝</b><span>切换疏密程度</span></p>
-        <p><b>右手 ✌</b><span>切换精细程度</span></p>
-        <p><b>右手三指</b><span>切换时钟（自定义识别）</span></p>
-        <p><b>左手 👍</b><span>自动镜头恢复 / 停止</span></p>
-        <p><b>左手 ✌</b><span>切换沉浸全屏</span></p>
+        <p><b>任一手 ☝</b><span>切换疏密程度</span></p>
+        <p><b>任一手 ✌</b><span>切换精细程度</span></p>
+        <p><b>任一手三指</b><span>切换时钟（自定义识别）</span></p>
+        <p><b>任一手 👍</b><span>自动镜头恢复 / 停止</span></p>
+        <p><b>任一手四指</b><span>切换沉浸全屏（拇指收起）</span></p>
         <p><b>任一手 ✊</b><span>安全刹车，停止全部控制</span></p>
         <p><b>右拇指 + 食指</b><span>靠近即 pinch，按住移动 X / Y</span></p>
-        <p><b>右手完全张开</b><span>depth 推进 / 拉远，不旋转</span></p>
-        <p><b>右手稍微合拢</b><span>移动手掌旋转镜头</span></p>
+        <p><b>任一手完全张开</b><span>depth 推进 / 拉远（已反向）</span></p>
+        <p><b>任一手稍微合拢</b><span>移动手掌旋转镜头</span></p>
         <p><b>两只手同时出现</b><span>spread 加速度辅助缩放</span></p>
       </details>
     </div>`;
@@ -121,8 +124,10 @@ export function createHandMonitor(): HandMonitor {
       value('right-index').textContent = percent(right.pinch_index);
       value('right-pose').textContent = poseLabel(right.pose);
       value('left-pose').textContent = poseLabel(left.pose);
-      value('depth').textContent = percent(right.depth);
-      value('openness').textContent = percent(right.openness);
+      value('right-depth').textContent = percent(right.depth);
+      value('left-depth').textContent = percent(left.depth);
+      value('right-openness').textContent = percent(right.openness);
+      value('left-openness').textContent = percent(left.openness);
       value('spread').textContent = `${frame.spread_acceleration >= 0 ? '+' : ''}${frame.spread_acceleration.toFixed(2)}`;
       rightStatus.textContent = `RIGHT · ${right.tracked ? poseLabel(right.pose) : '未检测'}`;
       rightStatus.classList.toggle('is-tracked', right.tracked);

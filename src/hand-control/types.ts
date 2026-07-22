@@ -1,6 +1,6 @@
 export type FingerName = 'index' | 'middle' | 'ring' | 'pinky';
 export type HandName = 'left' | 'right';
-export type HandPose = 'none' | 'unknown' | 'thumb_up' | 'fist' | 'pointing_up' | 'victory' | 'three_up' | 'open_palm';
+export type HandPose = 'none' | 'unknown' | 'thumb_up' | 'fist' | 'pointing_up' | 'victory' | 'three_up' | 'four_up' | 'open_palm';
 export type HandControlMode = 'idle' | 'gesture' | 'brake' | 'xy' | 'depth' | 'spread' | 'rotate' | 'cooldown';
 
 export type HandLandmark = {

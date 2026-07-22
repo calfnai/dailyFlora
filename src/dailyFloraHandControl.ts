@@ -25,14 +25,14 @@ export function createDailyFloraActionRouter(
   return (action: HandControlAction) => {
     onOutput(outputLabel(action));
     if (action.type === 'pose') {
-      if (action.hand === 'right' && action.pose === 'pointing_up') actions.cycleDensity();
-      else if (action.hand === 'right' && action.pose === 'victory') actions.cycleRender();
-      else if (action.hand === 'right' && action.pose === 'three_up') actions.toggleClock();
-      else if (action.hand === 'left' && action.pose === 'thumb_up') {
+      if (action.pose === 'pointing_up') actions.cycleDensity();
+      else if (action.pose === 'victory') actions.cycleRender();
+      else if (action.pose === 'three_up') actions.toggleClock();
+      else if (action.pose === 'thumb_up') {
         automaticCameraEnabled = !automaticCameraEnabled;
         actions.setAutomaticCameraEnabled(automaticCameraEnabled);
         onOutput(`AUTO CAMERA · ${automaticCameraEnabled ? 'ON' : 'OFF'}`);
-      } else if (action.hand === 'left' && action.pose === 'victory') actions.toggleImmersive();
+      } else if (action.pose === 'four_up') actions.toggleImmersive();
       return;
     }
     if (action.type === 'move_xy') actions.moveFramingBy(action.deltaX, action.deltaY);
@@ -52,7 +52,8 @@ const outputLabel = (action: HandControlAction) => {
     const label = action.pose === 'thumb_up' ? '👍 THUMB UP'
       : action.pose === 'fist' ? '✊ BRAKE'
         : action.pose === 'pointing_up' ? '☝ POINTING'
-          : action.pose === 'victory' ? '✌ VICTORY' : '3F THREE UP';
+          : action.pose === 'victory' ? '✌ VICTORY'
+            : action.pose === 'three_up' ? '3F THREE UP' : '4F FOUR UP';
     return `${action.hand.toUpperCase()} · ${label}`;
   }
   if (action.type === 'move_xy') return `XY · ${action.deltaX.toFixed(3)}, ${action.deltaY.toFixed(3)}`;

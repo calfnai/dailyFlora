@@ -64,6 +64,17 @@ export function detectsThreeFingersUp(points: NormalizedLandmark[]) {
     !fingerExtended(points, 17, 18, 20);
 }
 
+export function detectsFourFingersUp(points: NormalizedLandmark[]) {
+  if (points.length < 21) return false;
+  const palmWidth = Math.max(0.025, distance(points[5], points[17]));
+  const thumbFolded = distance(points[4], points[9]) <= palmWidth * 0.9;
+  return thumbFolded &&
+    fingerExtended(points, 5, 6, 8) &&
+    fingerExtended(points, 9, 10, 12) &&
+    fingerExtended(points, 13, 14, 16) &&
+    fingerExtended(points, 17, 18, 20);
+}
+
 export function classifyHandPose(
   points: NormalizedLandmark[],
   categoryName: string | undefined,
@@ -72,6 +83,9 @@ export function classifyHandPose(
 ): { pose: HandPose; confidence: number } {
   if (detectsThreeFingersUp(points)) {
     return { pose: 'three_up', confidence: Math.min(handConfidence, 0.82) };
+  }
+  if (detectsFourFingersUp(points)) {
+    return { pose: 'four_up', confidence: Math.min(handConfidence, 0.82) };
   }
   const normalized = categoryName?.toLowerCase();
   const pose: HandPose = normalized === 'thumb_up' ? 'thumb_up'

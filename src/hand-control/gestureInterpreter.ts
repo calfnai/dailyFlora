@@ -47,13 +47,14 @@ export type GestureInterpreterOptions = {
 type CommandPose = Exclude<HandPose, 'none' | 'unknown' | 'open_palm'>;
 type PoseState = { candidate: HandPose; since: number; active: CommandPose | null };
 
-const commandPoses: ReadonlySet<HandPose> = new Set(['thumb_up', 'fist', 'pointing_up', 'victory', 'three_up']);
+const commandPoses: ReadonlySet<HandPose> = new Set(['thumb_up', 'fist', 'pointing_up', 'victory', 'three_up', 'four_up']);
 const poseLabel: Record<CommandPose, string> = {
   thumb_up: '👍 THUMB UP',
   fist: '✊ FIST',
   pointing_up: '☝ POINTING',
   victory: '✌ VICTORY',
-  three_up: '3F THREE UP'
+  three_up: '3F THREE UP',
+  four_up: '4F FOUR UP'
 };
 
 function sensedPose(hand: HandSignal): HandPose {
@@ -63,7 +64,8 @@ function sensedPose(hand: HandSignal): HandPose {
 export class GestureInterpreter {
   private readonly onAction: (action: HandControlAction) => void;
   private readonly onMode: (mode: HandControlMode, detail?: string) => void;
-  private previousRight: HandSignal | null = null;
+  private previousHands: Record<HandName, HandSignal | null> = { left: null, right: null };
+  private activeContinuousHand: HandName | null = null;
   private previousSequence = -1;
   private suppressContinuousUntil = 0;
   private bothHandsSince: number | null = null;
@@ -119,6 +121,20 @@ export class GestureInterpreter {
     return state.active;
   }
 
+  private selectContinuousHand(
+    right: HandSignal,
+    left: HandSignal,
+    accepts: (hand: HandSignal) => boolean
+  ): HandName | null {
+    if (this.activeContinuousHand) {
+      const active = this.activeContinuousHand === 'right' ? right : left;
+      if (tracked(active) && accepts(active)) return this.activeContinuousHand;
+    }
+    if (tracked(right) && accepts(right)) return 'right';
+    if (tracked(left) && accepts(left)) return 'left';
+    return null;
+  }
+
   process(frame: HandSignalFrame) {
     if (frame.sequence <= this.previousSequence) return;
     this.previousSequence = frame.sequence;
@@ -126,8 +142,11 @@ export class GestureInterpreter {
     const left = frame.hands.left;
     const rightTracked = tracked(right);
     const leftTracked = tracked(left);
+    const previousRight = this.previousHands.right;
+    const previousLeft = this.previousHands.left;
+    this.previousHands.right = rightTracked ? { ...right, landmarks: right.landmarks } : null;
+    this.previousHands.left = leftTracked ? { ...left, landmarks: left.landmarks } : null;
     const rightPinch = this.updatePinch('right', right);
-    const leftPinch = this.updatePinch('left', left);
     const rightPose = this.updatePose('right', right, frame.timestamp_ms);
     const leftPose = this.updatePose('left', left, frame.timestamp_ms);
     const rightCandidate = this.poseState.right.candidate;
@@ -136,64 +155,66 @@ export class GestureInterpreter {
     const commandPresented = commandPoses.has(rightCandidate) || commandPoses.has(leftCandidate) || rightPose || leftPose;
 
     if (fistPresented) {
-      this.previousRight = rightTracked ? { ...right, landmarks: right.landmarks } : null;
+      this.activeContinuousHand = null;
       this.bothHandsSince = null;
       this.onMode('brake', '✊ ALL CONTROL STOP');
       return;
     }
 
     if (commandPresented) {
-      this.previousRight = rightTracked ? { ...right, landmarks: right.landmarks } : null;
+      this.activeContinuousHand = null;
       const activeHand = rightPose || commandPoses.has(rightCandidate) ? 'RIGHT' : 'LEFT';
       const activePose = (rightPose ?? leftPose ?? (commandPoses.has(rightCandidate) ? rightCandidate : leftCandidate)) as CommandPose;
       this.onMode(frame.timestamp_ms < this.suppressContinuousUntil ? 'cooldown' : 'gesture', `${activeHand} · ${poseLabel[activePose]}`);
       return;
     }
 
-    if (!rightTracked) {
-      this.previousRight = null;
+    if (!rightTracked && !leftTracked) {
+      this.activeContinuousHand = null;
       this.bothHandsSince = null;
-      this.onMode('idle', leftTracked ? 'LEFT ONLY' : 'NO HANDS');
+      this.onMode('idle', 'NO HANDS');
       return;
     }
-    if (leftTracked) this.bothHandsSince ??= frame.timestamp_ms;
+    if (leftTracked && rightTracked) this.bothHandsSince ??= frame.timestamp_ms;
     else this.bothHandsSince = null;
 
-    const previous = this.previousRight;
-    this.previousRight = { ...right, landmarks: right.landmarks };
-    if (!previous) {
-      this.onMode('idle', 'CALIBRATING');
-      return;
-    }
     if (frame.timestamp_ms < this.suppressContinuousUntil) {
       this.onMode('cooldown');
       return;
     }
 
     if (rightPinch === 'index') {
-      const deltaX = clamp(right.x - previous.x, -0.035, 0.035) * 1.8;
-      const deltaY = clamp(right.y - previous.y, -0.035, 0.035) * 1.8;
+      if (!previousRight) {
+        this.onMode('idle', 'CALIBRATING RIGHT PINCH');
+        return;
+      }
+      this.activeContinuousHand = 'right';
+      const deltaX = clamp(right.x - previousRight.x, -0.035, 0.035) * 1.8;
+      const deltaY = clamp(right.y - previousRight.y, -0.035, 0.035) * 1.8;
       if (Math.abs(deltaX) >= 0.004 || Math.abs(deltaY) >= 0.004) {
         this.onAction({ type: 'move_xy', deltaX, deltaY });
       }
       this.onMode('xy');
       return;
     }
-    if (rightPinch || leftPinch) {
+    if (rightPinch) {
       this.onMode('idle', 'PINCH');
       return;
     }
 
-    const depthDelta = right.depth - previous.depth;
-    const openForDepth = right.openness >= 0.82;
-    if (openForDepth && Math.abs(depthDelta) >= 0.006) {
-      this.onAction({ type: 'zoom', source: 'depth', delta: clamp(-depthDelta * 2.8, -0.055, 0.055) });
-      this.onMode('depth');
+    const depthHandName = this.selectContinuousHand(right, left, (hand) => hand.openness >= 0.82);
+    const depthHand = depthHandName === 'right' ? right : depthHandName === 'left' ? left : null;
+    const previousDepthHand = depthHandName === 'right' ? previousRight : depthHandName === 'left' ? previousLeft : null;
+    const depthDelta = depthHand && previousDepthHand ? depthHand.depth - previousDepthHand.depth : 0;
+    if (depthHandName && previousDepthHand && Math.abs(depthDelta) >= 0.006) {
+      this.activeContinuousHand = depthHandName;
+      this.onAction({ type: 'zoom', source: 'depth', delta: clamp(depthDelta * 2.8, -0.055, 0.055) });
+      this.onMode('depth', depthHandName.toUpperCase());
       return;
     }
 
     const twoHandsReady =
-      leftTracked && this.bothHandsSince !== null && frame.timestamp_ms - this.bothHandsSince >= twoHandSettleMs;
+      rightTracked && leftTracked && this.bothHandsSince !== null && frame.timestamp_ms - this.bothHandsSince >= twoHandSettleMs;
     if (twoHandsReady && Math.abs(frame.spread_acceleration) >= 0.08) {
       this.onAction({
         type: 'zoom',
@@ -204,26 +225,37 @@ export class GestureInterpreter {
       return;
     }
 
-    if (openForDepth) {
-      this.onMode('depth', 'READY');
+    if (depthHandName) {
+      this.activeContinuousHand = depthHandName;
+      this.onMode('depth', `${depthHandName.toUpperCase()} · READY`);
       return;
     }
 
-    if (right.openness >= 0.28 && right.openness <= 0.72) {
-      const deltaYaw = clamp(-(right.x - previous.x) * 2.6, -0.085, 0.085);
-      const deltaPitch = clamp((right.y - previous.y) * 1.8, -0.055, 0.055);
+    const rotateHandName = this.selectContinuousHand(
+      right,
+      left,
+      (hand) => hand.openness >= 0.28 && hand.openness <= 0.72
+    );
+    const rotateHand = rotateHandName === 'right' ? right : rotateHandName === 'left' ? left : null;
+    const previousRotateHand = rotateHandName === 'right' ? previousRight : rotateHandName === 'left' ? previousLeft : null;
+    if (rotateHandName && rotateHand && previousRotateHand) {
+      this.activeContinuousHand = rotateHandName;
+      const deltaYaw = clamp(-(rotateHand.x - previousRotateHand.x) * 2.6, -0.085, 0.085);
+      const deltaPitch = clamp((rotateHand.y - previousRotateHand.y) * 1.8, -0.055, 0.055);
       if (Math.abs(deltaYaw) >= 0.004 || Math.abs(deltaPitch) >= 0.004) {
         this.onAction({ type: 'rotate', deltaYaw, deltaPitch });
       }
-      this.onMode('rotate');
+      this.onMode('rotate', rotateHandName.toUpperCase());
       return;
     }
 
+    this.activeContinuousHand = null;
     this.onMode('idle');
   }
 
   reset() {
-    this.previousRight = null;
+    this.previousHands = { left: null, right: null };
+    this.activeContinuousHand = null;
     this.previousSequence = -1;
     this.bothHandsSince = null;
     this.activePinch.left = null;

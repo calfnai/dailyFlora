@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   GestureInterpreter,
   classifyHandPose,
+  detectsFourFingersUp,
   detectsThreeFingersUp,
   dominantPinch,
   extractHandSignal,
@@ -152,6 +153,25 @@ test('three raised fingers are recognized from landmarks without a built-in Medi
   assert.deepEqual(classifyHandPose(points, 'None', 0.8, 0.95), { pose: 'three_up', confidence: 0.82 });
 });
 
+test('four raised fingers with a folded thumb are distinct from an open palm', () => {
+  const points = Array.from({ length: 21 }, (): NormalizedLandmark => ({ x: 0.5, y: 0.8, z: 0 }));
+  points[0] = { x: 0.5, y: 0.92, z: 0 };
+  for (const [mcp, pip, dip, tip, x] of [
+    [5, 6, 7, 8, 0.36],
+    [9, 10, 11, 12, 0.46],
+    [13, 14, 15, 16, 0.56],
+    [17, 18, 19, 20, 0.66]
+  ] as const) {
+    points[mcp] = { x, y: 0.72, z: 0 };
+    points[pip] = { x, y: 0.56, z: 0 };
+    points[dip] = { x, y: 0.4, z: 0 };
+    points[tip] = { x, y: 0.24, z: 0 };
+  }
+  points[4] = { x: 0.48, y: 0.7, z: 0 };
+  assert.equal(detectsFourFingersUp(points), true);
+  assert.deepEqual(classifyHandPose(points, 'Open_Palm', 0.91, 0.96), { pose: 'four_up', confidence: 0.82 });
+});
+
 test('symbolic pose emits once after stability and not while held', () => {
   const recorded = interpreterRecorder();
   const pointing = hand({ pose: 'pointing_up', pose_confidence: 0.9 });
@@ -163,19 +183,26 @@ test('symbolic pose emits once after stability and not while held', () => {
   ]);
 });
 
-test('DailyFlora adapter maps right pointing, victory and three-finger poses', () => {
-  const recorded = dailyRecorder();
-  recorded.route({ type: 'pose', hand: 'right', pose: 'pointing_up' });
-  recorded.route({ type: 'pose', hand: 'right', pose: 'victory' });
-  recorded.route({ type: 'pose', hand: 'right', pose: 'three_up' });
-  assert.deepEqual(recorded.calls.map((call) => call.name), ['density', 'render', 'clock']);
+test('left hand can emit a symbolic command when the right hand is absent', () => {
+  const recorded = interpreterRecorder();
+  const absent = hand({ tracked: false, confidence: 0 });
+  const victory = hand({ pose: 'victory', pose_confidence: 0.91 });
+  recorded.interpreter.process(frame(1, 0, absent, victory));
+  recorded.interpreter.process(frame(2, 300, absent, victory));
+  assert.deepEqual(recorded.actions.filter((action) => action.type === 'pose'), [
+    { type: 'pose', hand: 'left', pose: 'victory' }
+  ]);
 });
 
-test('DailyFlora adapter maps left thumb-up toggle and victory immersive mode', () => {
+test('DailyFlora adapter accepts finalized symbolic commands from either hand', () => {
   const recorded = dailyRecorder();
-  recorded.route({ type: 'pose', hand: 'left', pose: 'thumb_up' });
-  recorded.route({ type: 'pose', hand: 'left', pose: 'thumb_up' });
+  recorded.route({ type: 'pose', hand: 'left', pose: 'pointing_up' });
   recorded.route({ type: 'pose', hand: 'left', pose: 'victory' });
+  recorded.route({ type: 'pose', hand: 'left', pose: 'three_up' });
+  recorded.route({ type: 'pose', hand: 'right', pose: 'thumb_up' });
+  recorded.route({ type: 'pose', hand: 'left', pose: 'thumb_up' });
+  recorded.route({ type: 'pose', hand: 'right', pose: 'four_up' });
+  assert.deepEqual(recorded.calls.slice(0, 3).map((call) => call.name), ['density', 'render', 'clock']);
   assert.deepEqual(
     recorded.calls.filter((call) => call.name === 'auto').map((call) => call.values),
     [[false], [true]]
@@ -193,15 +220,30 @@ test('fist acts as an immediate safety brake and suppresses rotate', () => {
   assert.equal(recorded.mode(), 'brake');
 });
 
-test('open hand depth has priority over two-hand spread', () => {
+test('open hand depth has priority over two-hand spread and uses the reversed direction', () => {
   const recorded = interpreterRecorder();
   const left = hand({ x: 0.2 });
   recorded.interpreter.process(frame(1, 0, hand({ depth: 0.4 }), left));
   recorded.interpreter.process(frame(2, 300, hand({ depth: 0.44 }), left, { spread_acceleration: 0.8 }));
   const zoom = recorded.actions.find((action) => action.type === 'zoom');
   assert.deepEqual(zoom && { type: zoom.type, source: zoom.source }, { type: 'zoom', source: 'depth' });
-  assert.ok(zoom?.type === 'zoom' && zoom.delta < 0);
+  assert.ok(zoom?.type === 'zoom' && zoom.delta > 0);
   assert.equal(recorded.mode(), 'depth');
+});
+
+test('left hand alone can control depth and rotation', () => {
+  const absent = hand({ tracked: false, confidence: 0 });
+  const depth = interpreterRecorder();
+  depth.interpreter.process(frame(1, 0, absent, hand({ depth: 0.4, openness: 0.9 })));
+  depth.interpreter.process(frame(2, 33, absent, hand({ depth: 0.44, openness: 0.9 })));
+  assert.equal(depth.actions.some((action) => action.type === 'zoom' && action.source === 'depth'), true);
+  assert.equal(depth.mode(), 'depth');
+
+  const rotate = interpreterRecorder();
+  rotate.interpreter.process(frame(1, 0, absent, hand({ openness: 0.55, x: 0.5 })));
+  rotate.interpreter.process(frame(2, 33, absent, hand({ openness: 0.55, x: 0.54 })));
+  assert.equal(rotate.actions.some((action) => action.type === 'rotate'), true);
+  assert.equal(rotate.mode(), 'rotate');
 });
 
 test('spread acceleration controls zoom when depth is stable', () => {
