@@ -6,6 +6,9 @@
 
 记录今日默认花束的花材丰富度问题。 / Recorded today's default bouquet variety issue.
 
+- 用户确认 Strap 与 Palmate 两个叶片原型可受控整合：Strap 映射洋水仙、风信子与狐尾百合，Palmate 映射飞燕草；其余 21 个偏写实花型保持无叶，不使用通用叶型兜底。 / Integrated the owner-approved Strap and Palmate prototypes under controlled mappings: Strap for narcissus, hyacinth, and foxtail lily, and Palmate for delphinium; the remaining 21 realistic members stay leafless with no generic fallback.
+- 花、茎、叶现在共享 `PlantStemInstance`，确认叶片使用独立 RNG 并保留 `stemId`、profile 与叶序审计；主花束花朵计划和原有 flower RNG 保持不变。 / Flowers, stems, and approved leaves now share `PlantStemInstance`; confirmed foliage uses an independent RNG and preserves stem/profile/arrangement audits while the bouquet flower plan and flower RNG remain unchanged.
+
 - 新增空闲时钟模式：默认 5 分钟无操作后以淡入方式显示 24 小时制时间、日期和舒缓英文名言；支持手动开启、自动显示开关与间隔持久化，并以渐隐毛玻璃叠层保留花束持续旋转。 / Added an idle clock mode: after five minutes of inactivity it fades in a 24-hour clock, date, and calming English quote; manual opening, persistent interval settings, and automatic display can be controlled while the bouquet continues behind a fading glass overlay.
 
 - 记录并修复 `2026-07-16` 默认花束中穗状/线形花材的问题：蛇鞭菊、风信子、金鱼草不应以同一个等长等量 `SpikeFlower` 模板大比例出现，茎过粗、飞出屏幕和蛇鞭菊炸开花蕊都会直接破坏整体美感。 / Recorded and fixed the default `2026-07-16` bouquet issue where liatris, hyacinth, and snapdragon were reading as the same repeated `SpikeFlower` template with equal length and bloom count; thick stems, off-screen spikes, and explosive liatris styles directly broke the bouquet.

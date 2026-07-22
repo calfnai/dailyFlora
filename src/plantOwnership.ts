@@ -72,6 +72,20 @@ export const temporaryLegacyFoliageProfile: StemFoliageProfile = {
   status: 'temporary-legacy'
 };
 
+export const confirmedStrapBasalProfile: StemFoliageProfile = {
+  foliageProfile: 'confirmed:strap-d2-basal-v1',
+  leafMode: 'attached',
+  leafArrangement: 'basal',
+  status: 'confirmed'
+};
+
+export const confirmedPalmateLobedProfile: StemFoliageProfile = {
+  foliageProfile: 'confirmed:palmate-major-envelope-v1',
+  leafMode: 'attached',
+  leafArrangement: 'alternate',
+  status: 'confirmed'
+};
+
 export const realisticFlowerIds: readonly RealisticFlowerId[] = [
   'daisy',
   'chamomile',
@@ -100,10 +114,30 @@ export const realisticFlowerIds: readonly RealisticFlowerId[] = [
   'rice-flower'
 ];
 
+const confirmedFoliageByMember: Partial<Record<RealisticFlowerId, StemFoliageProfile>> = {
+  narcissus: confirmedStrapBasalProfile,
+  hyacinth: confirmedStrapBasalProfile,
+  'foxtail-lily': confirmedStrapBasalProfile,
+  delphinium: confirmedPalmateLobedProfile
+};
+
 export const realisticFlowerFoliageStatus: Readonly<Record<RealisticFlowerId, StemFoliageProfile>> =
   Object.freeze(Object.fromEntries(
-    realisticFlowerIds.map((id) => [id, Object.freeze({ ...unresolvedFoliageProfile })])
+    realisticFlowerIds.map((id) => [
+      id,
+      Object.freeze({ ...(confirmedFoliageByMember[id] ?? unresolvedFoliageProfile) })
+    ])
   ) as Record<RealisticFlowerId, StemFoliageProfile>);
+
+export function isRealisticFlowerId(value: string): value is RealisticFlowerId {
+  return (realisticFlowerIds as readonly string[]).includes(value);
+}
+
+export function foliageProfileForPlantMember(plantMemberId: string): StemFoliageProfile {
+  return isRealisticFlowerId(plantMemberId)
+    ? realisticFlowerFoliageStatus[plantMemberId]
+    : unresolvedFoliageProfile;
+}
 
 export function validateLeafOwnership(stems: readonly PlantStemInstance[], leaves: readonly LeafInstanceRecord[]) {
   const stemsById = new Map(stems.map((stem) => [stem.stemId, stem]));

@@ -1,12 +1,12 @@
 import * as THREE from 'three';
+import {
+  PALMATE_MAJOR_STRUCTURE_BASELINE_ID,
+  PALMATE_MAJOR_STRUCTURE_LANDMARKS,
+  samplePalmateMajorStructure
+} from './palmateMajorStructure';
 
 type ViewMode = 'front' | 'back' | 'side' | 'top' | 'perspective' | 'base-detail' | 'section';
 type MaterialMode = 'normal' | 'silhouette' | 'wireframe';
-
-type Point = {
-  x: number;
-  y: number;
-};
 
 type Triangle = [number, number, number];
 
@@ -99,85 +99,46 @@ scene.add(grazingLight);
 const root = new THREE.Group();
 scene.add(root);
 
-// Frozen T1 traced blade outline from Leaf Silhouette Lab, mapped to local +Y apex space.
-const t1TracePixels: readonly Point[] = [
-  { x: 0, y: 86 },
-  { x: 18, y: 84 },
-  { x: 38, y: 74 },
-  { x: 82, y: 62 },
-  { x: 154, y: 34 },
-  { x: 132, y: 24 },
-  { x: 108, y: 6 },
-  { x: 118, y: -34 },
-  { x: 152, y: -86 },
-  { x: 110, y: -82 },
-  { x: 72, y: -86 },
-  { x: 52, y: -122 },
-  { x: 0, y: -170 },
-  { x: -52, y: -122 },
-  { x: -72, y: -86 },
-  { x: -110, y: -82 },
-  { x: -152, y: -86 },
-  { x: -118, y: -34 },
-  { x: -108, y: 6 },
-  { x: -132, y: 24 },
-  { x: -154, y: 34 },
-  { x: -82, y: 62 },
-  { x: -38, y: 74 },
-  { x: -18, y: 84 }
+// The owner-approved 24-landmark Major Structure Envelope is the immutable
+// front-outline source. The petiole transition replaces only its basal closure.
+const referencePetiole = PALMATE_MAJOR_STRUCTURE_LANDMARKS[0];
+const referenceCenterX = referencePetiole.x;
+const referenceScale = 5.35 / 366;
+const bladeBaseY = -1.66;
+const toLocal = (point: { x: number; y: number }) =>
+  new THREE.Vector2(
+    (point.x - referenceCenterX) * referenceScale,
+    bladeBaseY + (referencePetiole.y - point.y) * referenceScale
+  );
+
+const sampledMajorEnvelope = samplePalmateMajorStructure(7);
+const samplesPerSegment = 7;
+const rightBasalStart = samplesPerSegment;
+const leftBasalStart = samplesPerSegment * (PALMATE_MAJOR_STRUCTURE_LANDMARKS.length - 1);
+const bladeContour = [
+  ...sampledMajorEnvelope.slice(rightBasalStart, leftBasalStart).map(toLocal),
+  toLocal(PALMATE_MAJOR_STRUCTURE_LANDMARKS[23])
 ];
+const petioleInsertion = toLocal(referencePetiole);
 
-const traceScale = 1 / 48;
-const petioleInsertion = new THREE.Vector2(0, -86 * traceScale);
-
-function sampleClosedCatmull(points: readonly Point[], samplesPerSegment = 5) {
-  const sampled: THREE.Vector2[] = [];
-  const count = points.length;
-  for (let index = 0; index < count; index += 1) {
-    const p0 = points[(index - 1 + count) % count];
-    const p1 = points[index];
-    const p2 = points[(index + 1) % count];
-    const p3 = points[(index + 2) % count];
-    for (let sample = 0; sample < samplesPerSegment; sample += 1) {
-      const t = sample / samplesPerSegment;
-      const t2 = t * t;
-      const t3 = t2 * t;
-      const x =
-        0.5 *
-        (2 * p1.x +
-          (-p0.x + p2.x) * t +
-          (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 +
-          (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3);
-      const y =
-        0.5 *
-        (2 * p1.y +
-          (-p0.y + p2.y) * t +
-          (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 +
-          (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3);
-      sampled.push(new THREE.Vector2(x * traceScale, -y * traceScale));
-    }
-  }
-  return sampled;
-}
-
-const bladeContour = sampleClosedCatmull(t1TracePixels);
-
-// Replace only the tiny basal closure with a continuous, flattened petiole transition.
-// The visible T1 blade outline above both basal shoulders remains unchanged.
 const integratedContour = [
-  ...bladeContour.slice(5, 116),
-  new THREE.Vector2(-0.29, -1.9),
-  new THREE.Vector2(-0.2, -2.08),
-  new THREE.Vector2(-0.13, -2.31),
-  new THREE.Vector2(-0.105, -2.62),
-  new THREE.Vector2(-0.085, -2.72),
-  new THREE.Vector2(0, -2.75),
-  new THREE.Vector2(0.085, -2.72),
-  new THREE.Vector2(0.105, -2.62),
-  new THREE.Vector2(0.13, -2.31),
-  new THREE.Vector2(0.2, -2.08),
-  new THREE.Vector2(0.29, -1.9)
+  ...bladeContour,
+  new THREE.Vector2(-0.76, -1.87),
+  new THREE.Vector2(-0.39, -2.03),
+  new THREE.Vector2(-0.17, -2.28),
+  new THREE.Vector2(-0.11, -2.57),
+  new THREE.Vector2(-0.085, -2.69),
+  new THREE.Vector2(0, -2.73),
+  new THREE.Vector2(0.085, -2.69),
+  new THREE.Vector2(0.11, -2.57),
+  new THREE.Vector2(0.17, -2.28),
+  new THREE.Vector2(0.39, -2.03),
+  new THREE.Vector2(0.76, -1.87)
 ];
+
+const landmarkLocal = new Map(
+  PALMATE_MAJOR_STRUCTURE_LANDMARKS.map((landmark) => [landmark.id, toLocal(landmark)] as const)
+);
 
 function clamp01(value: number) {
   return Math.max(0, Math.min(1, value));
@@ -230,13 +191,14 @@ function distanceToContour(point: THREE.Vector2, contour: readonly THREE.Vector2
   return minimum;
 }
 
-const primaryStart = new THREE.Vector2(0, -1.68);
+const primaryStart = petioleInsertion.clone().add(new THREE.Vector2(0, 0.12));
+const veinTarget = (id: number) => landmarkLocal.get(id)?.clone() ?? new THREE.Vector2();
 const primaryVeins: readonly PrimaryVein[] = [
-  { target: new THREE.Vector2(0, 3.54), control: new THREE.Vector2(-0.04, 0.7), strength: 0.0048, width: 0.115 },
-  { target: new THREE.Vector2(3.16, 1.79), control: new THREE.Vector2(0.84, 0.5), strength: 0.0032, width: 0.13 },
-  { target: new THREE.Vector2(-3.16, 1.79), control: new THREE.Vector2(-0.78, 0.58), strength: 0.0032, width: 0.13 },
-  { target: new THREE.Vector2(3.2, -0.71), control: new THREE.Vector2(1.1, -0.78), strength: 0.0019, width: 0.145 },
-  { target: new THREE.Vector2(-3.2, -0.71), control: new THREE.Vector2(-1.02, -0.72), strength: 0.0019, width: 0.145 }
+  { target: veinTarget(13), control: new THREE.Vector2(-0.03, 0.72), strength: 0.0042, width: 0.12 },
+  { target: veinTarget(8), control: new THREE.Vector2(1.08, 0.22), strength: 0.0028, width: 0.14 },
+  { target: veinTarget(18), control: new THREE.Vector2(-1.04, 0.18), strength: 0.0028, width: 0.14 },
+  { target: veinTarget(4), control: new THREE.Vector2(1.18, -0.92), strength: 0.0016, width: 0.15 },
+  { target: veinTarget(22), control: new THREE.Vector2(-1.16, -0.88), strength: 0.0016, width: 0.15 }
 ];
 
 function primaryVeinField(point: THREE.Vector2) {
@@ -258,23 +220,23 @@ function tipField(point: THREE.Vector2, target: THREE.Vector2, radius: number) {
 
 function midSurfaceAt(point: THREE.Vector2) {
   const bladeBlend = smoothstep(-1.92, -1.48, point.y);
-  const yT = clamp01((point.y + 1.8) / 5.35);
-  const longitudinalArch = Math.sin(yT * Math.PI) * 0.032 * bladeBlend;
-  const extremelyShallowCup = Math.pow(Math.abs(point.x) / 3.25, 2) * 0.003 * bladeBlend;
+  const yT = clamp01((point.y + 1.66) / 5.35);
+  const longitudinalArch = Math.sin(yT * Math.PI) * 0.026 * bladeBlend;
+  const extremelyShallowCup = Math.pow(Math.abs(point.x) / 3.6, 2) * 0.0015 * bladeBlend;
   const { support } = primaryVeinField(point);
-  const membraneDrape = -0.036 * (1 - support) * Math.sin(yT * Math.PI) * bladeBlend;
+  const membraneDrape = -0.042 * (1 - support) * Math.sin(yT * Math.PI) * bladeBlend;
 
   const centralTipField = tipField(point, primaryVeins[0].target, 0.72);
   const rightUpperTipField = tipField(point, primaryVeins[1].target, 0.7);
   const leftUpperTipField = tipField(point, primaryVeins[2].target, 0.7);
-  const centralLift = centralTipField * 0.09;
-  const rightUpperLift = rightUpperTipField * 0.075;
-  const leftUpperLift = leftUpperTipField * 0.052;
-  const rightLowerDrape = tipField(point, primaryVeins[3].target, 0.62) * -0.1;
-  const leftLowerDrape = tipField(point, primaryVeins[4].target, 0.62) * -0.078;
+  const centralLift = centralTipField * 0.042;
+  const rightUpperLift = rightUpperTipField * 0.052;
+  const leftUpperLift = leftUpperTipField * 0.036;
+  const rightLowerDrape = tipField(point, primaryVeins[3].target, 0.72) * -0.074;
+  const leftLowerDrape = tipField(point, primaryVeins[4].target, 0.72) * -0.058;
   const upperTwist =
-    rightUpperTipField * (point.x - primaryVeins[1].target.x) * 0.07 -
-    leftUpperTipField * (point.x - primaryVeins[2].target.x) * 0.052;
+    rightUpperTipField * (point.x - primaryVeins[1].target.x) * 0.044 -
+    leftUpperTipField * (point.x - primaryVeins[2].target.x) * 0.034;
 
   const petioleT = clamp01((point.y + 2.79) / 1.05);
   const petioleCurve = (1 - bladeBlend) * (Math.sin(petioleT * Math.PI) * 0.018 - 0.012);
@@ -464,15 +426,16 @@ function createSectionSamples() {
 }
 
 const leaf = new THREE.Mesh(createPalmateLeafGeometry(), leafMaterial);
-leaf.name = 'T1 traced palmate blade with integrated flattened petiole';
+leaf.name = 'Accepted major-structure palmate blade with integrated flattened petiole';
 leaf.visible = view !== 'section';
 root.add(leaf);
 
 const sectionSamples = createSectionSamples();
 root.add(sectionSamples);
 
-const bladeWidth = 6.42;
-const bladeHeight = 5.33;
+const contourBounds = new THREE.Box2().setFromPoints(integratedContour);
+const bladeWidth = contourBounds.max.x - contourBounds.min.x;
+const bladeHeight = contourBounds.max.y - contourBounds.min.y;
 const petioleLength = 1.0;
 const thicknessRange = '0.0045-0.044';
 
@@ -515,7 +478,7 @@ function updateInfo() {
   if (!infoPanel) return;
   infoPanel.textContent = [
     'Palmate 3D Mini Lab',
-    'baseline: T1 traced silhouette (blade outline frozen)',
+    `baseline: ${PALMATE_MAJOR_STRUCTURE_BASELINE_ID} (24 landmarks frozen)`,
     `view / mode: ${view} / ${mode}`,
     `blade width / height: ${bladeWidth.toFixed(2)} / ${bladeHeight.toFixed(2)}`,
     `petiole length: ${petioleLength.toFixed(2)} (flattened + integrated transition)`,
@@ -523,11 +486,11 @@ function updateInfo() {
     'meshTopology: subdivided + relaxed continuous surface, no centre fan',
     'hasPrimaryRelief: yes, extremely shallow and graded',
     'venation relief: central > upper lateral > lower lateral',
-    'surfaceForm: slight longitudinal arch / lobe-local drape / minimal global cup',
+    'surfaceForm: slight longitudinal arch / interveinal drape / lobe-local pose / minimal global cup',
     view === 'section'
       ? 'section display: mid-blade (left) + basal transition (right); vertical scale x9'
       : 'section display: available via section view',
-    "prototypeStatus: '3d-mini-lab-not-system-integrated'"
+    "prototypeStatus: 'direction-validated-3d-mini-lab-frozen-not-system-integrated'"
   ].join('\n');
 }
 
