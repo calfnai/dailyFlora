@@ -8,13 +8,7 @@ import { BouquetScene } from './bouquetScene';
 import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
 import { themes } from './themes';
 import { IdleClockController, normalizeClockInterval, type ClockDisplaySource, type IdleClockSettings } from './idleClock';
-import {
-  DailyFloraGestureInterpreter,
-  bindHandControlKeyboard,
-  connectCameraController,
-  type GestureActions,
-  type HandControlMode
-} from './cameraController';
+import type { DailyFloraHandActions } from './dailyFloraHandControl';
 
 type RotationDirection = 1 | -1;
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
@@ -1504,28 +1498,12 @@ window.addEventListener('beforeunload', () => window.clearTimeout(dateRolloverTi
 window.addEventListener('beforeunload', () => window.clearInterval(clockTickTimer));
 window.addEventListener('beforeunload', () => idleClock.stop());
 
-function startHandControl() {
+async function startHandControl() {
+  const { startDailyFloraHandControl } = await import('./dailyFloraHandControl.ts');
   const densityOrder: DensityName[] = ['low', 'medium', 'high'];
   const renderOrder: Array<Exclude<RenderQualityName, 'auto'>> = ['low', 'medium', 'high'];
-  const status = document.createElement('aside');
-  status.className = 'hand-control-status';
-  status.setAttribute('role', 'status');
-  status.setAttribute('aria-live', 'polite');
-  status.title = 'Keyboard fallback: 1 density, 2 detail, 3 clock, 4 auto camera, 5 immersive mode';
-  document.body.append(status);
-  let lastStatus = '';
   let immersive = false;
-
-  const setStatus = (connection: string, mode: HandControlMode, detail = '') => {
-    const next = `HAND CTRL · ${connection.toUpperCase()} · ${mode.toUpperCase()}${detail ? ` · ${detail}` : ''}`;
-    if (next === lastStatus) return;
-    lastStatus = next;
-    status.textContent = next;
-    status.dataset.connection = connection;
-    status.dataset.mode = mode;
-  };
-
-  const actions: GestureActions = {
+  const actions: DailyFloraHandActions = {
     cycleDensity: () => {
       const index = densityOrder.indexOf(selectedDensity);
       setDensity(densityOrder[(index + 1) % densityOrder.length]);
@@ -1556,18 +1534,11 @@ function startHandControl() {
     },
     zoomBy: (delta) => {
       zoomBy(delta);
-    },
-    setStatus
+    }
   };
-
-  const interpreter = new DailyFloraGestureInterpreter(actions);
-  const disconnect = connectCameraController(interpreter, actions);
-  const unbindKeyboard = bindHandControlKeyboard(actions);
-  setStatus('connecting', 'idle');
+  const stop = startDailyFloraHandControl(actions);
   return () => {
-    disconnect();
-    unbindKeyboard();
-    status.remove();
+    stop();
     document.body.classList.remove('is-hand-control-immersive');
   };
 }
@@ -1593,6 +1564,7 @@ revealUi();
 scene.start();
 
 if (handControlEnabled) {
-  const stopHandControl = startHandControl();
-  window.addEventListener('beforeunload', stopHandControl, { once: true });
+  let stopHandControl: (() => void) | null = null;
+  void startHandControl().then((stop) => { stopHandControl = stop; });
+  window.addEventListener('beforeunload', () => stopHandControl?.(), { once: true });
 }

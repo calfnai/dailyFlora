@@ -1780,26 +1780,203 @@ body.is-preview .daily-theme {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.hand-control-status {
+.hand-camera-panel {
   position: fixed;
-  left: 14px;
-  bottom: 14px;
-  z-index: 80;
-  max-width: calc(100vw - 28px);
-  padding: 7px 10px;
+  right: 16px;
+  top: 16px;
+  z-index: 90;
+  width: min(330px, calc(100vw - 32px));
   border: 1px solid rgba(222, 236, 226, 0.25);
-  border-radius: 999px;
-  background: rgba(9, 22, 16, 0.74);
+  border-radius: 18px;
+  background: rgba(8, 18, 13, 0.88);
   color: rgba(230, 242, 234, 0.9);
-  font: 600 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
-  letter-spacing: 0.08em;
-  pointer-events: none;
   backdrop-filter: blur(12px);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
 }
 
-.hand-control-status[data-connection='connected'] {
-  border-color: rgba(116, 232, 170, 0.5);
-  color: #b8f3cf;
+.hand-camera-panel.is-collapsed {
+  width: auto;
+  border-radius: 999px;
+}
+
+.hand-camera-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 13px;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: 650 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.hand-camera-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #728078;
+  box-shadow: 0 0 0 3px rgba(114, 128, 120, 0.15);
+}
+
+.hand-camera-dot[data-status='running'] {
+  background: #72e5a6;
+  box-shadow: 0 0 0 3px rgba(114, 229, 166, 0.16), 0 0 14px rgba(114, 229, 166, 0.6);
+}
+
+.hand-camera-dot[data-status='loading'],
+.hand-camera-dot[data-status='requesting-camera'] {
+  background: #e6d86c;
+}
+
+.hand-camera-dot[data-status='error'] {
+  background: #ff7a78;
+}
+
+.hand-camera-body {
+  padding: 0 12px 12px;
+}
+
+.hand-camera-preview {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #0c1611, #13251b);
+}
+
+.hand-camera-preview video,
+.hand-camera-preview canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hand-camera-preview video {
+  transform: scaleX(-1);
+  opacity: 0.72;
+}
+
+.hand-camera-preview canvas {
+  pointer-events: none;
+}
+
+.hand-camera-fps {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  padding: 5px 7px;
+  border-radius: 999px;
+  background: rgba(3, 10, 6, 0.68);
+  font: 600 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.06em;
+}
+
+.hand-camera-message {
+  min-height: 30px;
+  margin: 9px 2px 7px;
+  color: rgba(220, 235, 226, 0.72);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.hand-camera-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.hand-camera-actions button {
+  flex: 1;
+  min-height: 32px;
+  border: 1px solid rgba(199, 225, 207, 0.25);
+  border-radius: 9px;
+  background: rgba(154, 219, 177, 0.13);
+  color: #dff3e5;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.hand-camera-actions button.quiet {
+  flex: 0 0 64px;
+  background: transparent;
+}
+
+.hand-camera-actions button:disabled {
+  cursor: wait;
+  opacity: 0.5;
+}
+
+.hand-camera-values {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-top: 9px;
+}
+
+.hand-camera-values span {
+  min-width: 0;
+  padding: 6px 7px;
+  border-radius: 8px;
+  background: rgba(222, 239, 228, 0.055);
+}
+
+.hand-camera-values b,
+.hand-camera-values i {
+  display: block;
+  overflow: hidden;
+  font: 500 9px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hand-camera-values b {
+  color: rgba(203, 221, 209, 0.58);
+}
+
+.hand-camera-values i {
+  margin-top: 3px;
+  color: #eff8f1;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.hand-camera-output {
+  margin-top: 9px;
+  padding: 9px 10px;
+  border: 1px solid rgba(114, 229, 166, 0.18);
+  border-radius: 10px;
+  background: rgba(114, 229, 166, 0.07);
+}
+
+.hand-camera-output span,
+.hand-camera-output b,
+.hand-camera-mode {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.hand-camera-output span {
+  color: rgba(151, 204, 170, 0.66);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+}
+
+.hand-camera-output b {
+  margin-top: 4px;
+  color: #bdf2cf;
+  font-size: 11px;
+}
+
+.hand-camera-mode {
+  margin: 8px 2px 0;
+  color: rgba(217, 233, 222, 0.64);
+  font-size: 9px;
+  letter-spacing: 0.08em;
 }
 
 body.is-hand-control-immersive #hud,

@@ -6,7 +6,7 @@
 
 记录今日默认花束的花材丰富度问题。 / Recorded today's default bouquet variety issue.
 
-- 增加仅由 `?hand-control=1` 启用的隔离手势控制测试入口：通过本机 Camera Controller 的轻量 WebSocket 数据接收右手四种 pinch、depth 优先缩放、双手 spread 加速度缩放、XY 构图移动、半合掌旋转，以及左手自动镜头与沉浸模式切换；公开首页和现有视觉系统不受影响。 / Added an isolated gesture-control test entry enabled only by `?hand-control=1`: it receives lightweight WebSocket data from the local Camera Controller for four right-hand pinch actions, depth-first zoom, two-hand spread-acceleration zoom, XY framing, semi-closed-palm rotation, and left-hand camera/immersive toggles, without changing the public homepage or existing visual system.
+- 将 `?hand-control=1` 隔离测试从不可靠的“本机 App + localhost WebSocket”改为参考「手控走楼梯」的纯浏览器摄像头方案：网页按需加载 MediaPipe/WASM/模型，直接产生右手四种 pinch、depth 优先缩放、双手 spread 加速度缩放、XY 构图移动、半合掌旋转，以及左手自动镜头与沉浸模式切换。摄像头层、纯手势解释器、监视器和 DailyFlora 映射分文件保存，便于以后独立并入主线；普通首页不加载这些模块。 / Replaced the unreliable local-app plus localhost-WebSocket hand-control test with a browser-camera implementation based on the Hand Stairs pattern: MediaPipe, WASM, and the model load on demand in the page and produce four right-hand pinches, depth-first zoom, spread-acceleration fallback zoom, XY framing, semi-closed-palm rotation, and left-hand camera/immersive toggles. Camera tracking, pure gesture interpretation, monitoring, and the DailyFlora adapter remain separate for later integration, while the normal homepage does not load them.
 
 - 新增空闲时钟模式：默认 5 分钟无操作后以淡入方式显示 24 小时制时间、日期和舒缓英文名言；支持手动开启、自动显示开关与间隔持久化，并以渐隐毛玻璃叠层保留花束持续旋转。 / Added an idle clock mode: after five minutes of inactivity it fades in a 24-hour clock, date, and calming English quote; manual opening, persistent interval settings, and automatic display can be controlled while the bouquet continues behind a fading glass overlay.
 

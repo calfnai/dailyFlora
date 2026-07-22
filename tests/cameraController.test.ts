@@ -2,29 +2,33 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
-  DailyFloraGestureInterpreter,
+  GestureInterpreter,
   dominantPinch,
-  type ControllerFrame,
-  type ControllerHand,
-  type GestureActions,
-  type HandControlMode
-} from '../src/cameraController.ts';
+  extractHandSignal,
+  type HandControlAction,
+  type HandSignal,
+  type HandSignalFrame
+} from '../src/hand-control/index.ts';
+import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
+import {
+  createDailyFloraActionRouter,
+  type DailyFloraHandActions
+} from '../src/dailyFloraHandControl.ts';
 
-function hand(values: Partial<ControllerHand> = {}): ControllerHand {
+function hand(values: Partial<HandSignal> = {}): HandSignal {
   return {
     tracked: true,
-    active: true,
     confidence: 0.96,
     x: 0.5,
     y: 0.5,
     depth: 0.5,
-    pinch: 0,
     pinch_index: 0,
     pinch_middle: 0,
     pinch_ring: 0,
     pinch_pinky: 0,
     openness: 0.9,
     velocity: 0,
+    landmarks: [],
     ...values
   };
 }
@@ -32,31 +36,37 @@ function hand(values: Partial<ControllerHand> = {}): ControllerHand {
 function frame(
   sequence: number,
   timestampMs: number,
-  right: ControllerHand,
-  left = hand({ tracked: false, active: false, confidence: 0 }),
-  values: Partial<ControllerFrame> = {}
-): ControllerFrame {
+  right: HandSignal,
+  left = hand({ tracked: false, confidence: 0 }),
+  values: Partial<HandSignalFrame> = {}
+): HandSignalFrame {
   return {
-    protocol: 'camera-controller/v1',
+    source: 'browser-camera',
     sequence,
     timestamp_ms: timestampMs,
     fps: 30,
-    primary_hand: 'right',
-    primary: right,
     hands: { left, right },
     spread: 0,
     spread_velocity: 0,
     spread_acceleration: 0,
-    events: [],
     ...values
   };
 }
 
-function recorder() {
+function interpreterRecorder() {
+  const actions: HandControlAction[] = [];
+  let mode = 'idle';
+  const interpreter = new GestureInterpreter({
+    onAction: (action) => actions.push(action),
+    onMode: (next) => { mode = next; }
+  });
+  return { interpreter, actions, mode: () => mode };
+}
+
+function dailyRecorder() {
   const calls: Array<{ name: string; values: unknown[] }> = [];
-  let latestMode: HandControlMode = 'idle';
   const record = (name: string) => (...values: unknown[]) => calls.push({ name, values });
-  const actions: GestureActions = {
+  const actions: DailyFloraHandActions = {
     cycleDensity: record('density'),
     cycleRender: record('render'),
     toggleClock: record('clock'),
@@ -64,10 +74,9 @@ function recorder() {
     toggleImmersive: record('immersive'),
     moveFramingBy: record('xy'),
     rotateBy: record('rotate'),
-    zoomBy: record('zoom'),
-    setStatus: (_connection, mode) => { latestMode = mode; }
+    zoomBy: record('zoom')
   };
-  return { actions, calls, mode: () => latestMode };
+  return { calls, route: createDailyFloraActionRouter(actions) };
 }
 
 test('dominant pinch rejects ambiguous neighboring fingers', () => {
@@ -75,44 +84,51 @@ test('dominant pinch rejects ambiguous neighboring fingers', () => {
   assert.equal(dominantPinch(hand({ pinch_middle: 0.82, pinch_ring: 0.79 })), null);
 });
 
-test('right middle pinch cycles density only once', () => {
-  const recorded = recorder();
-  const interpreter = new DailyFloraGestureInterpreter(recorded.actions);
-  const pinched = hand({ pinch_middle: 0.9 });
-  interpreter.process(frame(1, 100, pinched, undefined, {
-    events: [{ name: 'pinch_middle_start', hand: 'right', timestamp_ms: 100 }]
+test('browser landmark extraction distinguishes thumb-to-middle pinch', () => {
+  const points = Array.from({ length: 21 }, (_, index): NormalizedLandmark => ({
+    x: 0.5 + (index % 4) * 0.02,
+    y: 0.75 - Math.floor(index / 4) * 0.08,
+    z: 0
   }));
-  interpreter.process(frame(2, 133, pinched));
-  assert.equal(recorded.calls.filter((call) => call.name === 'density').length, 1);
+  points[0] = { x: 0.5, y: 0.86, z: 0 };
+  points[5] = { x: 0.32, y: 0.62, z: 0 };
+  points[9] = { x: 0.46, y: 0.58, z: 0 };
+  points[13] = { x: 0.58, y: 0.6, z: 0 };
+  points[17] = { x: 0.72, y: 0.64, z: 0 };
+  points[4] = { x: 0.5, y: 0.34, z: 0 };
+  points[8] = { x: 0.24, y: 0.14, z: 0 };
+  points[12] = { x: 0.505, y: 0.345, z: 0 };
+  points[16] = { x: 0.7, y: 0.18, z: 0 };
+  points[20] = { x: 0.8, y: 0.28, z: 0 };
+  const signal = extractHandSignal(points, 0.97);
+  assert.ok(signal.pinch_middle > 0.95);
+  assert.ok(signal.pinch_middle > signal.pinch_index + 0.5);
+  assert.equal(signal.confidence, 0.97);
+  assert.equal(signal.landmarks.length, 21);
 });
 
-test('right ring and pinky pinches map to detail and clock', () => {
-  const recorded = recorder();
-  const interpreter = new DailyFloraGestureInterpreter(recorded.actions);
-  interpreter.process(frame(1, 100, hand({ pinch_ring: 0.91 }), undefined, {
-    events: [{ name: 'pinch_ring_start', hand: 'right', timestamp_ms: 100 }]
-  }));
-  interpreter.process(frame(2, 700, hand({ pinch_pinky: 0.93 }), undefined, {
-    events: [{ name: 'pinch_pinky_start', hand: 'right', timestamp_ms: 700 }]
-  }));
-  assert.equal(recorded.calls.filter((call) => call.name === 'render').length, 1);
-  assert.equal(recorded.calls.filter((call) => call.name === 'clock').length, 1);
-  assert.equal(recorded.calls.some((call) => call.name === 'density'), false);
+test('right middle pinch emits one discrete action until released', () => {
+  const recorded = interpreterRecorder();
+  recorded.interpreter.process(frame(1, 100, hand({ pinch_middle: 0.9 })));
+  recorded.interpreter.process(frame(2, 600, hand({ pinch_middle: 0.9 })));
+  assert.deepEqual(recorded.actions.filter((action) => action.type === 'pinch'), [
+    { type: 'pinch', hand: 'right', finger: 'middle' }
+  ]);
 });
 
-test('left index toggles auto camera and left pinky toggles immersive mode', () => {
-  const recorded = recorder();
-  const interpreter = new DailyFloraGestureInterpreter(recorded.actions);
-  const leftIndex = hand({ pinch_index: 0.9 });
-  interpreter.process(frame(1, 100, hand(), leftIndex, {
-    events: [{ name: 'pinch_index_start', hand: 'left', timestamp_ms: 100 }]
-  }));
-  interpreter.process(frame(2, 600, hand(), leftIndex, {
-    events: [{ name: 'pinch_index_start', hand: 'left', timestamp_ms: 600 }]
-  }));
-  interpreter.process(frame(3, 1100, hand(), hand({ pinch_pinky: 0.92 }), {
-    events: [{ name: 'pinch_pinky_start', hand: 'left', timestamp_ms: 1100 }]
-  }));
+test('DailyFlora adapter maps personalized right-hand pinches', () => {
+  const recorded = dailyRecorder();
+  recorded.route({ type: 'pinch', hand: 'right', finger: 'middle' });
+  recorded.route({ type: 'pinch', hand: 'right', finger: 'ring' });
+  recorded.route({ type: 'pinch', hand: 'right', finger: 'pinky' });
+  assert.deepEqual(recorded.calls.map((call) => call.name), ['density', 'render', 'clock']);
+});
+
+test('DailyFlora adapter maps left index toggle and left pinky immersive mode', () => {
+  const recorded = dailyRecorder();
+  recorded.route({ type: 'pinch', hand: 'left', finger: 'index' });
+  recorded.route({ type: 'pinch', hand: 'left', finger: 'index' });
+  recorded.route({ type: 'pinch', hand: 'left', finger: 'pinky' });
   assert.deepEqual(
     recorded.calls.filter((call) => call.name === 'auto').map((call) => call.values),
     [[false], [true]]
@@ -121,50 +137,53 @@ test('left index toggles auto camera and left pinky toggles immersive mode', () 
 });
 
 test('open hand depth has priority over two-hand spread', () => {
-  const recorded = recorder();
-  const interpreter = new DailyFloraGestureInterpreter(recorded.actions);
+  const recorded = interpreterRecorder();
   const left = hand({ x: 0.2 });
-  interpreter.process(frame(1, 0, hand({ depth: 0.4 }), left));
-  interpreter.process(frame(2, 300, hand({ depth: 0.44 }), left, { spread_acceleration: 0.8 }));
-  const zoom = recorded.calls.find((call) => call.name === 'zoom');
-  assert.ok(zoom);
-  assert.ok(Number(zoom.values[0]) < 0);
+  recorded.interpreter.process(frame(1, 0, hand({ depth: 0.4 }), left));
+  recorded.interpreter.process(frame(2, 300, hand({ depth: 0.44 }), left, { spread_acceleration: 0.8 }));
+  const zoom = recorded.actions.find((action) => action.type === 'zoom');
+  assert.deepEqual(zoom && { type: zoom.type, source: zoom.source }, { type: 'zoom', source: 'depth' });
+  assert.ok(zoom?.type === 'zoom' && zoom.delta < 0);
   assert.equal(recorded.mode(), 'depth');
 });
 
 test('spread acceleration controls zoom when depth is stable', () => {
-  const recorded = recorder();
-  const interpreter = new DailyFloraGestureInterpreter(recorded.actions);
+  const recorded = interpreterRecorder();
   const left = hand({ x: 0.2 });
-  interpreter.process(frame(1, 0, hand(), left));
-  interpreter.process(frame(2, 300, hand(), left, { spread_acceleration: -0.6 }));
-  const zoom = recorded.calls.find((call) => call.name === 'zoom');
-  assert.ok(zoom);
-  assert.ok(Number(zoom.values[0]) > 0);
+  recorded.interpreter.process(frame(1, 0, hand(), left));
+  recorded.interpreter.process(frame(2, 300, hand(), left, { spread_acceleration: -0.6 }));
+  const zoom = recorded.actions.find((action) => action.type === 'zoom');
+  assert.ok(zoom?.type === 'zoom' && zoom.source === 'spread' && zoom.delta > 0);
   assert.equal(recorded.mode(), 'spread');
 });
 
 test('index pinch moves framing and suppresses depth', () => {
-  const recorded = recorder();
-  const interpreter = new DailyFloraGestureInterpreter(recorded.actions);
-  interpreter.process(frame(1, 0, hand({ pinch_index: 0.9, x: 0.5 })));
-  interpreter.process(frame(2, 33, hand({ pinch_index: 0.9, x: 0.53, depth: 0.56 })));
-  assert.equal(recorded.calls.some((call) => call.name === 'xy'), true);
-  assert.equal(recorded.calls.some((call) => call.name === 'zoom'), false);
+  const recorded = interpreterRecorder();
+  recorded.interpreter.process(frame(1, 0, hand({ pinch_index: 0.9, x: 0.5 })));
+  recorded.interpreter.process(frame(2, 400, hand({ pinch_index: 0.9, x: 0.53, depth: 0.56 })));
+  assert.equal(recorded.actions.some((action) => action.type === 'move_xy'), true);
+  assert.equal(recorded.actions.some((action) => action.type === 'zoom'), false);
   assert.equal(recorded.mode(), 'xy');
 });
 
 test('semi-closed palm rotates while fully open palm does not', () => {
-  const recorded = recorder();
-  const interpreter = new DailyFloraGestureInterpreter(recorded.actions);
-  interpreter.process(frame(1, 0, hand({ openness: 0.55, x: 0.5 })));
-  interpreter.process(frame(2, 33, hand({ openness: 0.55, x: 0.53 })));
-  assert.equal(recorded.calls.some((call) => call.name === 'rotate'), true);
-  assert.deepEqual(recorded.calls.find((call) => call.name === 'auto')?.values, [false]);
+  const recorded = interpreterRecorder();
+  recorded.interpreter.process(frame(1, 0, hand({ openness: 0.55, x: 0.5 })));
+  recorded.interpreter.process(frame(2, 33, hand({ openness: 0.55, x: 0.53 })));
+  assert.equal(recorded.actions.some((action) => action.type === 'rotate'), true);
 
-  const openRecorded = recorder();
-  const openInterpreter = new DailyFloraGestureInterpreter(openRecorded.actions);
-  openInterpreter.process(frame(1, 0, hand({ openness: 0.9, x: 0.5 })));
-  openInterpreter.process(frame(2, 33, hand({ openness: 0.9, x: 0.53 })));
-  assert.equal(openRecorded.calls.some((call) => call.name === 'rotate'), false);
+  const open = interpreterRecorder();
+  open.interpreter.process(frame(1, 0, hand({ openness: 0.9, x: 0.5 })));
+  open.interpreter.process(frame(2, 33, hand({ openness: 0.9, x: 0.53 })));
+  assert.equal(open.actions.some((action) => action.type === 'rotate'), false);
+});
+
+test('continuous values stay inside per-frame limiters', () => {
+  const recorded = interpreterRecorder();
+  recorded.interpreter.process(frame(1, 0, hand({ openness: 0.55, x: 0.1, y: 0.1 })));
+  recorded.interpreter.process(frame(2, 33, hand({ openness: 0.55, x: 0.9, y: 0.9 })));
+  const rotate = recorded.actions.find((action) => action.type === 'rotate');
+  assert.ok(rotate?.type === 'rotate');
+  assert.ok(Math.abs(rotate.deltaYaw) <= 0.085);
+  assert.ok(Math.abs(rotate.deltaPitch) <= 0.055);
 });
