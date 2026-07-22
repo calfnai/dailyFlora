@@ -75,6 +75,7 @@ Codex 不应自行决定：
 - `direction-validated-not-production-ready`
 - `3d-mini-lab-frozen-not-system-integrated`
 - `member-mapped-awaiting-bouquet-review`
+- `approved-controlled-integration`
 - `production-ready`
 
 达到本轮目标后记录未解决问题并冻结。冻结不是宣称完成，而是阻止原型在局部参数循环中继续退化。
@@ -87,9 +88,12 @@ Codex 不应自行决定：
 - 远看轮廓、单花器官和连接拓扑分别验收，避免“整体好看”掩盖关键器官错误。
 - 每个物种采用独立结构规则；共享工具仅处理管线、连接、实例化和性能。
 
-## 8. 本轮叶片实验带来的限制
+## 8. 从原型到成员映射的门禁
 
-- Strap 只完成方向验证，根部叶鞘连续拓扑仍未解决。
-- Palmate 只完成独立 Major Structure Envelope 与一次受控 3D 曲面实验。
-- 两者均未绑定真实植物成员，也未接入主花束。
-- 后续若重新开启叶片研究，应从已冻结状态继续，不能重新使用通用叶片模板。
+- 只有用户明确通过的原型才能进入成员映射。
+- 映射必须记录植物形态依据、叶序、生成位置和仍然存在的近似边界。
+- 没有可靠映射的成员必须保持 `unresolved + none`，不能回退通用叶片。
+- 主花束接入不得改变 flower RNG、花朵数量和主要构图；叶片应使用独立 RNG 命名空间。
+- 原型进入主生成管线后仍可标记为受控近似，不应把“已接入”误写成“真实物种叶型完成”。
+
+当前 Strap 与 Palmate 的首批映射见：[写实花型—叶片成员映射 v1](./realistic-leaf-member-mapping-v1.md)。

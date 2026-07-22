@@ -1,13 +1,14 @@
 # DailyFlora 叶片原型状态记录 v1
 
-日期：2026-07-17
+日期：2026-07-23
 
-范围：只记录当前叶片调试原型状态；不表示已完成真实植物成员配置。
+范围：记录两个已验收原型从独立调试到首批受控成员映射的状态；不表示全部植物成员配置完成。
 
 ## Strap prototype
 
 ```ts
-prototypeStatus: 'direction-validated-not-production-ready'
+prototypeStatus: 'approved-controlled-integration'
+recommendedBaseline: 'strap-d2-basal-v1'
 ```
 
 ### 已验证方向
@@ -19,32 +20,33 @@ prototypeStatus: 'direction-validated-not-production-ready'
 - 已验证浅沟截面、薄边缘和基础 3D 弯曲方向。
 - 已保留独立 Mini Lab 调试视图，用于 front、side、top、perspective、base detail、section 和 silhouette 检查。
 
-### 冻结原因
+### 冻结与接入边界
 
 当前 strap 继续通过 `rootLift`、`rootDepth`、`rootSlope`、`rootArc` 等参数微调，已经开始出现厚纸片穿插、碎切口和复杂拓扑，继续收益不足。
 
-因此本阶段停止继续迭代 strap：
+因此停止继续迭代 strap 的原型几何，并只做受控成员映射：
 
 - 不继续修改 strap silhouette。
 - 不继续增加根部参数。
 - 不继续增加网格密度。
 - 不继续修补底边。
-- 不接回主花束。
-- 不映射到 realistic flower 成员。
-- 不宣称 strap 已完成。
+- 已映射洋水仙、风信子与狐尾百合，叶序为基生。
+- 主花束只在现有花材计划实际包含已映射成员时生成少量 Strap 叶片。
+- 不因叶片接入修改花朵计划、花朵 RNG 或主要构图。
+- 不宣称 Strap 是 production-ready 的具体物种扫描叶型。
 
 ### 尚未解决的问题
 
 1. 基部仍缺少真实叶鞘的连续包合拓扑。
 2. 局部存在薄片穿插和程序化切口。
 3. 外层成熟叶的自然弯曲仍不足。
-4. 目前只能作为几何方向验证，不能作为正式植物叶型。
-5. 未绑定任何具体物种和 realistic flower 成员。
+4. 目前是受控程序化原型，不是正式植物扫描模型。
+5. 只绑定洋水仙、风信子与狐尾百合；其他成员不得自动复用。
 
 ## Palmate prototype
 
 ```ts
-prototypeStatus: 'direction-validated-3d-mini-lab-frozen-not-system-integrated'
+prototypeStatus: 'approved-controlled-integration'
 venation: 'palmate'
 bladeTopology: 'simple'
 bladeOutline: 'palmately-5-lobed'
@@ -179,7 +181,7 @@ T1 曾作为 Palmate 首个可用二维 baseline：
 ## Palmate 3D Mini Lab current status
 
 ```ts
-prototypeStatus: 'direction-validated-3d-mini-lab-frozen-not-system-integrated'
+prototypeStatus: 'approved-controlled-integration'
 baseline: 'major-structure-envelope-v1'
 ```
 
@@ -217,16 +219,15 @@ baseline: 'major-structure-envelope-v1'
 
 ### 当前边界
 
-- 仍为独立几何原型，不是 production-ready 叶型。
-- 尚未接入主花束系统。
-- 尚未进行植物成员映射。
-- 尚未绑定任何具体真实物种叶型。
-- 尚未完成 realistic flower 成员配置。
-- 不可直接作为主花束正式叶片使用。
-- 本轮只进行一次受控 3D 曲面验证；人工验收后无论是否达到完美写实均冻结，不再返回二维轮廓循环。
+- 仍不是 production-ready 的具体物种叶型。
+- 已受控映射给飞燕草，用于表达掌状分裂识别线索；它不是飞燕草真实叶片的精确扫描。
+- 当前主花束计划尚未包含飞燕草，因此不为展示 Palmate 而改动花朵构图。
+- 其余 realistic flower 成员不得自动复用 Palmate。
+- 原型几何继续冻结，不再返回二维轮廓循环。
 
 ### 当前结论
 
-Palmate 已完成基于 `major-structure-envelope-v1` 的独立 3D Mini Lab 收尾实验，并保留极浅掌状一级脉、裂片局部姿态、叶脉间轻微下垂及连续叶柄—叶基过渡。当前状态冻结为独立几何方向验证原型，尚未接入主花束系统，也尚未进行植物成员映射。
+Palmate 已完成基于 `major-structure-envelope-v1` 的独立 3D Mini Lab，并保留极浅掌状一级脉、裂片局部姿态、叶脉间轻微下垂及连续叶柄—叶基过渡。经用户验收后，它已作为受控程序化原型映射给飞燕草；映射不代表真实物种扫描，不扩散到其他成员。
 
 跨叶片与花型共用的研究流程见：[偏写实植物器官研究方法 v1](./realistic-organ-research-method-v1.md)。
+完整成员矩阵见：[写实花型—叶片成员映射 v1](./realistic-leaf-member-mapping-v1.md)。

@@ -4,7 +4,8 @@ import {
   realisticFlowerDefinitions,
   type RealisticFlowerDefinition
 } from './realisticFlowerForms';
-import { realisticFlowerFoliageStatus } from './plantOwnership';
+import { realisticFlowerFoliageStatus, type PlantStemInstance } from './plantOwnership';
+import { buildConfirmedFoliage } from './realisticLeafForms';
 
 type ViewName = 'front' | 'side' | 'top';
 type Preview = {
@@ -76,7 +77,7 @@ function renderLabels() {
           <p class="desc">${escapeHtml(definition.description)}</p>
           ${definition.calibration ? `<p class="calibration">${escapeHtml(definition.calibration)}</p>` : ''}
           <p class="print">${escapeHtml(definition.printStructure)}</p>
-          <p class="scope-note">foliageProfile: ${escapeHtml(foliage.foliageProfile)} · leafMode: ${escapeHtml(foliage.leafMode)} · leafArrangement: ${escapeHtml(foliage.leafArrangement)} · 后续需要独立研究</p>
+          <p class="scope-note">foliageProfile: ${escapeHtml(foliage.foliageProfile)} · leafMode: ${escapeHtml(foliage.leafMode)} · leafArrangement: ${escapeHtml(foliage.leafArrangement)} · ${foliage.status === 'confirmed' ? '已按受控成员映射接入' : '后续需要独立研究'}</p>
           ${definition.scopeNote ? `<p class="scope-note">${escapeHtml(definition.scopeNote)}</p>` : ''}
         </div>
       </article>
@@ -138,6 +139,30 @@ function initScenes() {
 
     const camera = new THREE.PerspectiveCamera(37, 1, 0.1, 30);
     const model = createRealisticFlower(definition, `realistic-lab:${definition.id}`);
+    const foliageProfile = realisticFlowerFoliageStatus[definition.id];
+    if (foliageProfile.leafMode === 'attached') {
+      const labStem: PlantStemInstance = {
+        stemId: `realistic-lab:${definition.id}:stem`,
+        plantMemberId: definition.id,
+        source: 'realistic-flower',
+        curvePoints: [
+          new THREE.Vector3(0, -1.08, 0),
+          new THREE.Vector3(0.01, -0.72, 0),
+          new THREE.Vector3(-0.01, -0.28, 0),
+          new THREE.Vector3(0, 0.16, 0)
+        ],
+        ...foliageProfile
+      };
+      const foliage = buildConfirmedFoliage({
+        stems: [labStem],
+        seed: `realistic-lab:${definition.id}`,
+        palette: [definition.palette[definition.palette.length - 1] ?? '#66854f', '#7d9b5c', '#58764a'],
+        density: 1,
+        context: 'realistic-lab'
+      });
+      model.add(foliage.object);
+      model.userData.confirmedLeafCount = foliage.leaves.length;
+    }
     model.scale.setScalar(modelScale(definition));
     model.position.x = 0;
     model.rotation.x = definition.category === 'spike' || definition.category === 'cluster' ? 0 : -0.58;

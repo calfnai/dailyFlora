@@ -405,3 +405,4 @@ git push
 若修改了网页生成效果，请运行 npm run build，并把 dist 发布到 gh-pages。
 不要把无关的本地草稿或 inbox 文件带进提交。
 ```
+2026-07-23 叶片关系定稿：用户确认 Strap 与 Palmate 两个叶片原型可以受控并入生成管线。Strap D2 基生原型只映射洋水仙、风信子和狐尾百合；Palmate Major Structure Envelope 只映射飞燕草。其余 21 个偏写实花型必须保持 `unresolved + none`，不得使用通用椭圆叶兜底。所有确认叶片必须属于具体 `PlantStemInstance`，使用独立 RNG，并继续服从“叶材支撑空气、不挡主花、不改变主要构图”的审美边界。
