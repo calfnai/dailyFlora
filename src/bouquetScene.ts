@@ -4,14 +4,15 @@ import { createRng, hashString } from './random';
 import { withBasePath } from './special';
 import { floraPrimitiveFactories, type FloraPrimitiveName, type FloraPrimitiveRole } from './floraPrimitives';
 import {
+  foliageProfileForPlantMember,
   temporaryLegacyFoliageProfile,
-  unresolvedFoliageProfile,
   validateLeafOwnership,
   type FlowerAuditRecord,
   type LeafInstanceRecord,
   type LeafOwnershipAudit,
   type PlantStemInstance
 } from './plantOwnership';
+import { buildConfirmedFoliage } from './realisticLeafForms';
 
 const tempObject = new THREE.Object3D();
 const tempColor = new THREE.Color();
@@ -673,7 +674,7 @@ function spikeLeanRange(placement: FlowerPlanItem['placement']): [number, number
 
 const bouquetTiePoint = new THREE.Vector3(0, -0.98, 0);
 
-function createUnresolvedFlowerStem(
+function createFlowerStem(
   spec: DailyBouquetSpec,
   stemId: string,
   plantMemberId: string,
@@ -696,7 +697,7 @@ function createUnresolvedFlowerStem(
     plantMemberId,
     source: 'realistic-flower',
     curvePoints: [tie, lower, upper, terminalPoint.clone()],
-    ...unresolvedFoliageProfile
+    ...foliageProfileForPlantMember(plantMemberId)
   };
 }
 
@@ -951,7 +952,7 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
         matrix: primitiveGroup.matrix.toArray(),
         colors: objectColorSignature(primitiveGroup)
       });
-      stems.push(createUnresolvedFlowerStem(spec, `stem:${flowerId}`, batch.typeId, p));
+      stems.push(createFlowerStem(spec, `stem:${flowerId}`, batch.typeId, p));
       group.add(primitiveGroup);
       if (primitive === 'SpikeFlower') group.add(buildSpikeStemConnector(spec, primitiveGroup, localRng));
     }
@@ -987,6 +988,16 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
     leaves.push(...legacy.leaves);
     group.add(foliage);
   }
+
+  const confirmedFoliage = buildConfirmedFoliage({
+    stems,
+    seed: spec.seed,
+    palette: spec.theme.leafPalette,
+    density: spec.leafDensity,
+    context: 'bouquet'
+  });
+  leaves.push(...confirmedFoliage.leaves);
+  group.add(confirmedFoliage.object);
 
   return { object: group, flowerRecords, stems, leaves } satisfies FlowerBuildResult;
 }
@@ -1091,7 +1102,7 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
         matrix: tempObject.matrix.toArray(),
         colors: [tempColor.toArray().join(',')]
       });
-      stems.push(createUnresolvedFlowerStem(spec, `stem:${flowerId}`, 'unresolved-render-placeholder', p));
+      stems.push(createFlowerStem(spec, `stem:${flowerId}`, 'unresolved-render-placeholder', p));
     }
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   };
