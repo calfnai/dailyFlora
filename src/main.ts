@@ -137,6 +137,7 @@ const siteMenu = document.querySelector<HTMLElement>('#site-menu');
 const siteMenuToggle = document.querySelector<HTMLButtonElement>('#site-menu-toggle');
 const siteMenuPanel = document.querySelector<HTMLElement>('#site-menu-panel');
 const siteMenuDebugLink = document.querySelector<HTMLAnchorElement>('#site-menu-debug-link');
+const handControlToggle = document.querySelector<HTMLButtonElement>('#hand-control-toggle');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
 const themeLabel = document.querySelector<HTMLElement>('#daily-theme');
 const themeCnLabel = document.querySelector<HTMLElement>('#daily-theme-cn');
@@ -246,7 +247,7 @@ const debugMode = searchParams.has('debug') && debugValue !== '0' && debugValue 
 const previewValue = searchParams.get('preview');
 const previewMode = searchParams.has('preview') && previewValue !== '0' && previewValue !== 'false';
 const handControlValue = searchParams.get('hand-control');
-const handControlEnabled = searchParams.has('hand-control') && handControlValue !== '0' && handControlValue !== 'false';
+const handControlInitiallyEnabled = searchParams.has('hand-control') && handControlValue !== '0' && handControlValue !== 'false';
 const internalPreviewMode = debugMode || previewMode;
 const requestedDensity = searchParams.get('density') || searchParams.get('quality');
 const requestedRender = searchParams.get('render');
@@ -1543,6 +1544,46 @@ async function startHandControl() {
   };
 }
 
+let stopHandControl: (() => void) | null = null;
+let handControlLoading = false;
+
+function syncHandControlToggle() {
+  if (!handControlToggle) return;
+  const active = stopHandControl !== null;
+  handControlToggle.classList.toggle('is-loading', handControlLoading);
+  handControlToggle.disabled = handControlLoading;
+  handControlToggle.setAttribute('aria-pressed', String(active));
+  handControlToggle.setAttribute('aria-label', active ? '关闭手势控制' : '开启手势控制');
+  handControlToggle.title = active ? '关闭手势控制' : '开启手势控制';
+}
+
+async function enableHandControl() {
+  if (stopHandControl || handControlLoading) return;
+  handControlLoading = true;
+  syncHandControlToggle();
+  try {
+    stopHandControl = await startHandControl();
+  } catch (error) {
+    console.error('Unable to start hand control', error);
+  } finally {
+    handControlLoading = false;
+    syncHandControlToggle();
+  }
+}
+
+function disableHandControl() {
+  stopHandControl?.();
+  stopHandControl = null;
+  syncHandControlToggle();
+}
+
+handControlToggle?.addEventListener('click', () => {
+  if (stopHandControl) disableHandControl();
+  else void enableHandControl();
+});
+
+window.addEventListener('beforeunload', () => stopHandControl?.(), { once: true });
+
 setLabels();
 renderAccountState();
 setupDebugMode();
@@ -1563,8 +1604,5 @@ idleClock.start();
 revealUi();
 scene.start();
 
-if (handControlEnabled) {
-  let stopHandControl: (() => void) | null = null;
-  void startHandControl().then((stop) => { stopHandControl = stop; });
-  window.addEventListener('beforeunload', () => stopHandControl?.(), { once: true });
-}
+syncHandControlToggle();
+if (handControlInitiallyEnabled) void enableHandControl();

@@ -35,6 +35,7 @@ body.is-special {
 
 body.is-preview .site-menu,
 body.is-preview .controls,
+body.is-preview .hand-control-launcher,
 body.is-preview .debug-panel,
 body.is-preview .account-dock,
 body.is-preview .account-panel {
@@ -279,6 +280,37 @@ button {
   border-color: rgb(244 230 129 / 46%);
   background: rgb(255 255 255 / 10%);
   outline: none;
+}
+
+.hand-control-launcher {
+  position: fixed;
+  top: max(19px, env(safe-area-inset-top));
+  right: calc(max(18px, env(safe-area-inset-right)) + 54px);
+  z-index: 19;
+  border: 1px solid rgb(255 255 255 / 14%);
+  background: rgb(7 9 8 / 58%);
+  box-shadow: 0 16px 46px rgb(0 0 0 / 24%);
+  backdrop-filter: blur(18px);
+}
+
+.hand-control-launcher svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hand-control-launcher[aria-pressed='true'] {
+  border-color: rgb(114 229 166 / 52%);
+  color: #bdf2cf;
+  background: rgb(72 154 104 / 24%);
+  box-shadow: 0 0 0 4px rgb(114 229 166 / 8%), 0 16px 46px rgb(0 0 0 / 24%);
+}
+
+.hand-control-launcher.is-loading {
+  cursor: wait;
+  opacity: 0.62;
 }
 
 .site-menu-panel {
@@ -1783,7 +1815,7 @@ body.is-preview .daily-theme {
 .hand-camera-panel {
   position: fixed;
   right: 16px;
-  top: 16px;
+  top: 72px;
   z-index: 90;
   width: min(330px, calc(100vw - 32px));
   border: 1px solid rgba(222, 236, 226, 0.25);
@@ -1796,7 +1828,7 @@ body.is-preview .daily-theme {
 }
 
 .hand-camera-body {
-  max-height: calc(100vh - 58px);
+  max-height: calc(100vh - 124px);
   overflow-y: auto;
   scrollbar-width: thin;
 }
