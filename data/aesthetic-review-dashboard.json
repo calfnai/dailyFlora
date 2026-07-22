@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-13",
+  "updatedAt": "2026-07-23",
   "gate": {
     "status": "pass",
     "title": "0.14 审美基线通过",
@@ -203,6 +203,25 @@
         "全是花、没有绿色缓冲，画面变腻。"
       ],
       "ownerAcceptance": "由用户最终验收；Codex 只能整理证据和提出修正，不能替用户宣布叶材审美通过。"
+    },
+    {
+      "id": "confirmed-leaf-member-mapping",
+      "title": "已验收叶片原型的受控成员映射",
+      "summary": "Strap 与 Palmate 只进入有明确关系的花茎；未研究成员保持无叶，不以通用椭圆叶补位。",
+      "principles": [
+        "Strap D2 基生原型只映射洋水仙、风信子和狐尾百合；Palmate Major Structure Envelope 只映射飞燕草。",
+        "叶片必须属于具体 PlantStemInstance，同一花茎只能使用一个 foliageProfile 和一种叶序。",
+        "主花束只在既有花材计划实际出现已映射成员时生成少量确认叶片，不为叶片改变花朵计划、RNG 或主要构图。",
+        "其余 21 个偏写实花型保持 unresolved + none；没有可靠研究时宁可无叶，不回退通用叶型。",
+        "叶片继续承担空间和空气支撑，不遮挡主花，也不因原型获准接入而扩大绿色体量。"
+      ],
+      "rejectSignals": [
+        "把 Strap 或 Palmate 自动分配给未确认花型。",
+        "为了补绿色体量改变花朵计划或增加叶材数量。",
+        "同一根花茎混用多个叶型或出现无 stemId 的叶片。",
+        "把受控程序化近似宣称为具体物种扫描叶型。"
+      ],
+      "ownerAcceptance": "2026-07-23 用户确认两个叶片原型可用，并要求定稿叶片—花型关系后并入主线。"
     },
     {
       "id": "exclude-lisianthus",
