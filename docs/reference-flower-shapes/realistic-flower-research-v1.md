@@ -2,6 +2,8 @@
 
 本记录服务于 `docs/realistic-flower-lab.html` 的程序化几何校准。目标是先保住物种识别所依赖的花序、单花结构和开放顺序，再处理颜色与审美。模型仍是低面数、程序化的偏写实表达，不是植物学扫描模型。
 
+花型与叶片共用的参考选择、隔离验证、双重验收和冻结规则见：[偏写实植物器官研究方法 v1](./realistic-organ-research-method-v1.md)。本记录中的逐物种规则继续负责具体花序和单花结构；共用方法只约束研究与验收流程，不把不同物种合并回通用几何模板。
+
 ## 1. 绣球 / Hydrangea
 
 - 目标物种或园艺类型：`Hydrangea macrophylla` mophead cultivar group（大叶绣球球形花序园艺类型）。
