@@ -85,6 +85,7 @@ function renderLabels() {
 }
 
 function modelScale(definition: RealisticFlowerDefinition) {
+  if (definition.id === 'lace-flower') return 0.98;
   if (calibratedFlowerIds.has(definition.id)) return definition.category === 'spike' ? 0.7 : 0.69;
   if (definition.category === 'spike') return 0.56;
   if (definition.category === 'cluster') return 0.62;
@@ -97,6 +98,13 @@ function setView(preview: Preview, view: ViewName) {
   const distance = calibratedFlowerIds.has(preview.definition.id)
     ? preview.definition.category === 'spike' ? 4.55 : 4.4
     : preview.definition.category === 'spike' ? 5.4 : 4.7;
+  if (preview.definition.id === 'lace-flower') {
+    if (view === 'side') preview.camera.position.set(distance, 0.2, 0);
+    else if (view === 'top') preview.camera.position.set(0, distance, 0.01);
+    else preview.camera.position.set(0, 0.78, distance);
+    preview.camera.lookAt(0, -0.02, 0);
+    return;
+  }
   if (view === 'side') preview.camera.position.set(distance, 0.15, 0);
   else if (view === 'top') preview.camera.position.set(0, distance, 0.01);
   else preview.camera.position.set(0, 0.15, distance);
@@ -149,7 +157,7 @@ function initScenes() {
     grid.material.opacity = 0.36;
     scene.add(grid);
 
-    const preview: Preview = { definition, cell, scene, camera, model, grid, yaw: index * 0.13 };
+    const preview: Preview = { definition, cell, scene, camera, model, grid, yaw: definition.id === 'lace-flower' ? 0 : index * 0.13 };
     setView(preview, activeView);
     previews.push(preview);
     const counts = countGeometry(model);
