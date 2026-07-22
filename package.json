@@ -6,13 +6,16 @@
   "type": "module",
   "engines": {
     "node": "24.x",
-    "npm": "10.x"
+    "npm": ">=10"
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc && vite build && node scripts/prepare-sites-build.mjs",
+    "typecheck": "tsc && tsc -p tsconfig.api.json",
+    "build": "npm run typecheck && vite build && node scripts/prepare-sites-build.mjs",
     "build:sites": "npm run build",
-    "build:vercel": "tsc && vite build",
+    "build:vercel": "npm run typecheck && vite build",
+    "test": "tsx --test tests/*.test.ts",
+    "backup:user-references": "node scripts/backup-user-references.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "github:login": "node scripts/deploy-github-pages.mjs --login",
     "deploy:github": "node scripts/deploy-github-pages.mjs",
@@ -22,10 +25,14 @@
     "inspiration:ingest": "node scripts/ingest-lobster-inbox.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.8",
+    "@vercel/blob": "^2.6.1",
     "three": "^0.171.0"
   },
   "devDependencies": {
     "@types/three": "^0.184.1",
+    "@vercel/node": "^5.8.26",
+    "tsx": "^4.23.1",
     "typescript": "^5.7.2",
     "vite": "^6.0.5"
   }

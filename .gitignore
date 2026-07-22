@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.npm-cache/
 .tools/
 .DS_Store
 *.local
@@ -14,3 +15,4 @@ data/inbox/*/
 CrashAutoSave*.toe
 .vercel
 .env*
+!.env.example

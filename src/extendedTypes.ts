@@ -101,9 +101,11 @@ export interface PersonalInputRecord {
 }
 
 export type UserReferenceGenerationStatus = 'recognizing' | 'ready' | 'failed';
+export type UserReferenceStorageProvider = 'vercel-blob';
 
 export interface StoredUserReferenceWebp {
   assetId: string;
+  storageProvider: UserReferenceStorageProvider;
   storageKey: string;
   mimeType: 'image/webp';
   width: number;

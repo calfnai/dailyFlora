@@ -1,8 +1,8 @@
 # DailyFlora 用户参考图生成正式契约
 
-状态：正式开发契约（后端待接入）
-版本：1.0
-日期：2026-07-20
+状态：正式开发契约（Vercel Blob + Supabase 实现代码已建立；Supabase 密钥与迁移待连接）
+版本：1.1
+日期：2026-07-22
 
 ## 目的
 
@@ -28,7 +28,7 @@
 2. `thumbnail.webp`：供用户记录列表和超管后台浏览的小缩略图，建议最长边 320px。
 3. 一条用户生成参数记录。
 
-两张 WebP 存入私有对象存储；参数记录存入数据库。Vercel、GitHub 和本地项目目录均不承担用户图片的长期存储。
+两张 WebP 存入 Vercel Private Blob；参数记录存入 Supabase Postgres。Vercel 部署目录、GitHub 和本地项目目录均不承担用户图片的长期存储。Vercel Blob 是独立的私有对象存储，不属于部署包。
 
 ## 系统花材边界
 
@@ -102,7 +102,7 @@ preparing → uploading → recognizing → ready
 - 用户只能创建和读取自己的记录。
 - 普通用户不能根据对象存储路径猜测或读取他人的图片。
 - 超管通过服务端角色校验读取缩略图和主参考图，不能依赖前端隐藏按钮。
-- 前端获得短期临时访问地址，不公开永久裸链。
+- 前端通过需要 Supabase Bearer token 的 DailyFlora API 读取图片，不公开永久裸链或 Blob 读写 token。
 - 删除账户时，两张图片与参数记录进入同一删除流程。
 
 ## 迁移与备份
@@ -122,4 +122,14 @@ preparing → uploading → recognizing → ready
 - `src/userReferenceAssets.ts`
 - `src/extendedTypes.ts`
 
-当前模块不上传、不识别、不写数据库。uniCloud 服务空间建立后，实现层只需补齐认证、私有上传、识别任务和记录持久化。
+当前实现入口还包括：
+
+- `src/userReferenceCloud.ts`：Private Blob 客户端直传、记录创建、完成、失败、列表和删除。
+- `api/reference-uploads.ts`：验证 Supabase 用户后签发五分钟、限定路径和 WebP 类型的上传 token。
+- `api/reference-records.ts`：Supabase 参数记录的创建、读取、完成和一致删除。
+- `api/reference-asset.ts`：验证用户或超管身份后转发私有图片。
+- `api/reference-usage.ts`：超管容量检查。
+- `supabase/migrations/20260722000000_user_reference_generations.sql`：正式数据表与 RLS。
+
+识别服务本身仍是后续模块；当前接口已经固定其 `recognizing → ready/failed` 输入输出边界。
+Preview/Development 与 Production 使用不同的 Private Blob store；数据库记录同时保存并强制过滤 `data_environment`，测试记录不会出现在正式站。
