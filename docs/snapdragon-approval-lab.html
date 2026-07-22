@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>金鱼草器官验收 LAB</title>
+    <link rel="stylesheet" href="./spike-organ-approval-lab.css" />
+  </head>
+  <body data-species="snapdragon">
+    <main class="shell">
+      <header class="hero"><div><p class="eyebrow">DailyFlora organ approval lab</p><h1 data-species-name></h1><p class="en" data-species-en></p><p class="copy" data-species-target></p></div><div><span class="badge">direction validation</span><output id="approval-stats"></output></div></header>
+      <section class="stage-wrap"><canvas id="approval-canvas"></canvas><div class="grid"><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></section>
+    </main>
+    <script type="module" src="/src/realisticSpikeApprovalLab.ts"></script>
+  </body>
+</html>

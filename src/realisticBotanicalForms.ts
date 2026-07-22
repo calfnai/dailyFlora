@@ -59,6 +59,127 @@ function petalGeometry(length: number, width: number, cup: number, reflex = 0, p
   return geometry;
 }
 
+function triangleGeometry(triangles: THREE.Vector3[]) {
+  const positions = triangles.flatMap((point) => [point.x, point.y, point.z]);
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function pushQuad(
+  triangles: THREE.Vector3[],
+  a: THREE.Vector3,
+  b: THREE.Vector3,
+  c: THREE.Vector3,
+  d: THREE.Vector3
+) {
+  triangles.push(a, b, c, b, d, c);
+}
+
+function fusedTubeTriangles(
+  triangles: THREE.Vector3[],
+  rings: Array<{ y: number; rx: number; rz: number }>,
+  segments = 18
+) {
+  const base = rings[0];
+  const center = new THREE.Vector3(0, base.y, 0);
+  for (let i = 0; i < segments; i += 1) {
+    const a0 = i / segments * Math.PI * 2;
+    const a1 = (i + 1) / segments * Math.PI * 2;
+    triangles.push(
+      center.clone(),
+      new THREE.Vector3(Math.cos(a1) * base.rx, base.y, Math.sin(a1) * base.rz),
+      new THREE.Vector3(Math.cos(a0) * base.rx, base.y, Math.sin(a0) * base.rz)
+    );
+  }
+  for (let ring = 0; ring < rings.length - 1; ring += 1) {
+    const lower = rings[ring];
+    const upper = rings[ring + 1];
+    for (let i = 0; i < segments; i += 1) {
+      const a0 = i / segments * Math.PI * 2;
+      const a1 = (i + 1) / segments * Math.PI * 2;
+      pushQuad(
+        triangles,
+        new THREE.Vector3(Math.cos(a0) * lower.rx, lower.y, Math.sin(a0) * lower.rz),
+        new THREE.Vector3(Math.cos(a1) * lower.rx, lower.y, Math.sin(a1) * lower.rz),
+        new THREE.Vector3(Math.cos(a0) * upper.rx, upper.y, Math.sin(a0) * upper.rz),
+        new THREE.Vector3(Math.cos(a1) * upper.rx, upper.y, Math.sin(a1) * upper.rz)
+      );
+    }
+  }
+}
+
+function snapdragonCorollaGeometry(openness: number) {
+  const triangles: THREE.Vector3[] = [];
+  const mouthY = 0.145 * (0.82 + openness * 0.18);
+  fusedTubeTriangles(triangles, [
+    { y: 0, rx: 0.034, rz: 0.03 },
+    { y: mouthY * 0.52, rx: 0.052, rz: 0.04 },
+    { y: mouthY, rx: 0.075, rz: 0.054 }
+  ], 18);
+
+  const addLipLobe = (centerX: number, sign: 1 | -1, width: number, reach: number, lift: number) => {
+    const rows = 4;
+    const cols = 4;
+    const point = (row: number, col: number) => {
+      const v = row / rows;
+      const u = col / cols * 2 - 1;
+      const halfWidth = width * Math.sin(Math.max(0.001, v) * Math.PI) ** 0.58;
+      return new THREE.Vector3(
+        centerX + u * halfWidth,
+        mouthY + v * reach * openness,
+        sign * (0.034 + lift * Math.sin(v * Math.PI * 0.9) * openness) - sign * 0.012 * v * v
+      );
+    };
+    for (let row = 0; row < rows; row += 1) {
+      for (let col = 0; col < cols; col += 1) {
+        pushQuad(triangles, point(row, col), point(row, col + 1), point(row + 1, col), point(row + 1, col + 1));
+      }
+    }
+  };
+
+  addLipLobe(-0.034, 1, 0.043, 0.092, 0.066);
+  addLipLobe(0.034, 1, 0.043, 0.092, 0.066);
+  addLipLobe(-0.06, -1, 0.038, 0.082, 0.026);
+  addLipLobe(0, -1, 0.084, 0.12, 0.068);
+  addLipLobe(0.06, -1, 0.038, 0.082, 0.026);
+  return triangleGeometry(triangles);
+}
+
+function hyacinthCorollaGeometry(openness: number) {
+  const triangles: THREE.Vector3[] = [];
+  const mouthY = 0.13 * (0.88 + openness * 0.12);
+  fusedTubeTriangles(triangles, [
+    { y: 0, rx: 0.027, rz: 0.027 },
+    { y: mouthY * 0.55, rx: 0.05, rz: 0.05 },
+    { y: mouthY, rx: 0.071, rz: 0.071 }
+  ], 24);
+
+  for (let lobe = 0; lobe < 6; lobe += 1) {
+    const centerAngle = lobe / 6 * Math.PI * 2;
+    const rows = 4;
+    const cols = 4;
+    const point = (row: number, col: number) => {
+      const v = row / rows;
+      const u = col / cols * 2 - 1;
+      const angularWidth = 0.37 * (1 - 0.82 * v ** 1.35);
+      const angle = centerAngle + u * angularWidth;
+      const radius = THREE.MathUtils.lerp(0.068, 0.076 + openness * 0.05, v);
+      const forwardReach = Math.sin(v * Math.PI) * 0.055 * openness;
+      const reflex = v * v * 0.075 * openness;
+      const y = mouthY + v * (0.07 + 0.025 * openness) + forwardReach - reflex;
+      return new THREE.Vector3(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
+    };
+    for (let row = 0; row < rows; row += 1) {
+      for (let col = 0; col < cols; col += 1) {
+        pushQuad(triangles, point(row, col), point(row, col + 1), point(row + 1, col), point(row + 1, col + 1));
+      }
+    }
+  }
+  return triangleGeometry(triangles);
+}
+
 function cylinderInstances(count: number, color: THREE.Color, radialSegments = 7, topRatio = 0.9) {
   return new THREE.InstancedMesh(
     new THREE.CylinderGeometry(topRatio, 1, 1, radialSegments, 1, false),
@@ -285,164 +406,200 @@ export function createDelphinium(options: BotanicalBuildOptions) {
 }
 
 export function createSnapdragon(options: BotanicalBuildOptions) {
-  const rng = createRng(`${options.seed}:snapdragon-v2`);
+  const rng = createRng(`${options.seed}:snapdragon-organ-v1`);
   const group = new THREE.Group();
   const green = colorAt(options.palette, 3, '#5b7d4e');
   const axis = stemAlong([
     new THREE.Vector3(0, -1.2, 0),
-    new THREE.Vector3(-0.02, -0.45, 0.015),
-    new THREE.Vector3(0.025, 0.25, -0.02),
-    new THREE.Vector3(-0.015, 1.12, 0.01)
-  ], 0.015, green, 23);
+    new THREE.Vector3(-0.012, -0.45, 0.01),
+    new THREE.Vector3(0.018, 0.28, -0.012),
+    new THREE.Vector3(-0.008, 1.14, 0.006)
+  ], 0.014, green, 24);
   group.add(axis.mesh);
-  const count = 13 + Math.floor(rng.range(0, 6));
-  const pedicels = cylinderInstances(count, green, 7, 0.86);
-  const tubes = new THREE.InstancedMesh(
-    new THREE.CylinderGeometry(0.095, 0.036, 1, 12, 2, false),
-    material(colorAt(options.palette, 0), 0.78),
-    count
-  );
-  const upperLips = new THREE.InstancedMesh(
-    petalGeometry(0.17, 0.085, 0.045, -0.012, 0.12),
-    material(colorAt(options.palette, 0), 0.78),
-    count * 2
-  );
-  const lowerLips = new THREE.InstancedMesh(
-    petalGeometry(0.16, 0.075, 0.055, 0.018, 0.08),
-    material(colorAt(options.palette, 1), 0.78),
-    count * 3
-  );
-  const calyx = new THREE.InstancedMesh(
-    petalGeometry(0.095, 0.03, 0.012, 0, 0.62),
-    material(green, 0.9),
-    count * 5
-  );
-  const throats = new THREE.InstancedMesh(
-    new THREE.SphereGeometry(0.08, 10, 8),
-    material(colorAt(options.palette, 2), 0.8),
-    count
-  );
-  const buds = new THREE.InstancedMesh(
-    new THREE.SphereGeometry(0.1, 10, 8),
+  const count = 17;
+  const openCorollas = new THREE.InstancedMesh(
+    snapdragonCorollaGeometry(1),
     material(colorAt(options.palette, 0), 0.82),
     count
   );
-  let tubeUsed = 0;
-  let upperUsed = 0;
-  let lowerUsed = 0;
+  const halfCorollas = new THREE.InstancedMesh(
+    snapdragonCorollaGeometry(0.56),
+    material(colorAt(options.palette, 1), 0.78),
+    count
+  );
+  const calyx = new THREE.InstancedMesh(
+    petalGeometry(0.088, 0.024, 0.01, 0, 0.58),
+    material(green, 0.9),
+    count * 5
+  );
+  const palates = new THREE.InstancedMesh(
+    new THREE.SphereGeometry(0.052, 12, 8),
+    material(colorAt(options.palette, 2), 0.86),
+    count
+  );
+  const throats = new THREE.InstancedMesh(
+    new THREE.SphereGeometry(0.045, 12, 8),
+    material(new THREE.Color('#692c36').lerp(colorAt(options.palette, 0), 0.24), 0.9),
+    count
+  );
+  const buds = new THREE.InstancedMesh(
+    new THREE.CapsuleGeometry(0.047, 0.075, 5, 10),
+    material(colorAt(options.palette, 0), 0.84),
+    count
+  );
+  const segments: Segment[] = [];
+  const blooms: Bloom[] = [];
+  let openUsed = 0;
+  let halfUsed = 0;
   let calyxUsed = 0;
+  let palateUsed = 0;
   let throatUsed = 0;
   let budUsed = 0;
   for (let i = 0; i < count; i += 1) {
     const progress = i / (count - 1);
     const axisPoint = axis.curve.getPoint(0.28 + progress * 0.68);
-    const angle = (i % 2) * Math.PI + (Math.floor(i / 2) % 2 ? 0.32 : -0.28) + rng.range(-0.12, 0.12);
-    const face = new THREE.Vector3(Math.cos(angle), rng.range(-0.02, 0.08), Math.sin(angle)).normalize();
+    const angle = i * 2.18 + rng.range(-0.18, 0.18);
+    const face = new THREE.Vector3(Math.cos(angle), rng.range(0.08, 0.18), Math.sin(angle)).normalize();
     const stage = stageBottomUp(progress);
-    const base = axisPoint.clone().addScaledVector(face, stage === 'bud' ? 0.075 : 0.12);
-    setCylinder(pedicels, i, axisPoint, base, stage === 'bud' ? 0.0038 : 0.0054);
+    const reach = stage === 'bud' ? 0.055 : stage === 'half' ? 0.083 : 0.105 - progress * 0.012;
+    const base = axisPoint.clone().addScaledVector(face, reach);
+    const bloomScale = stage === 'bud' ? 0.7 - progress * 0.1 : stage === 'half' ? 0.82 : 0.96 - progress * 0.08;
+    segments.push({ start: axisPoint, end: base, radius: stage === 'bud' ? 0.0036 : 0.0048 });
+    blooms.push({ position: base, normal: face, stage, scale: bloomScale, source: axisPoint });
+    if (stage === 'open' && !group.userData.approvalTarget) {
+      group.userData.approvalTarget = base.clone().addScaledVector(face, 0.16);
+      group.userData.connectionTarget = axisPoint.clone().lerp(base, 0.45);
+      group.userData.approvalNormal = face.clone();
+      group.userData.connectionNormal = face.clone();
+    }
     for (let s = 0; s < 5; s += 1) {
-      setPlanar(calyx, calyxUsed, base, new THREE.Vector3(0.76, 0.82, 1), green.clone().lerp(new THREE.Color('#8e9c55'), 0.12), face, s / 5 * Math.PI * 2);
+      setPlanar(calyx, calyxUsed, base, new THREE.Vector3(bloomScale, bloomScale, 1), green.clone().lerp(new THREE.Color('#8e9c55'), 0.12), face, s / 5 * Math.PI * 2);
       calyxUsed += 1;
     }
     if (stage === 'bud') {
-      setVolume(buds, budUsed, base.clone().addScaledVector(face, 0.07), new THREE.Vector3(0.72, 1.14, 0.8).multiplyScalar(0.78), colorAt(options.palette, i), face);
+      setVolume(buds, budUsed, base.clone().addScaledVector(face, 0.038), new THREE.Vector3(0.72, bloomScale, 0.72), colorAt(options.palette, i), face);
       budUsed += 1;
       continue;
     }
-    const openness = stage === 'half' ? 0.7 : 1;
-    const mouth = base.clone().addScaledVector(face, 0.2 * openness);
-    setCylinder(tubes, tubeUsed, base, mouth, openness, colorAt(options.palette, i).clone().lerp(new THREE.Color('#ffffff'), rng.range(0.01, 0.08)));
-    tubeUsed += 1;
+    const corollaColor = colorAt(options.palette, i).clone().lerp(new THREE.Color('#ffffff'), rng.range(0.01, 0.07));
+    if (stage === 'open') {
+      setVolume(openCorollas, openUsed, base, new THREE.Vector3(bloomScale, bloomScale, bloomScale), corollaColor, face);
+      openUsed += 1;
+    } else {
+      setVolume(halfCorollas, halfUsed, base, new THREE.Vector3(bloomScale, bloomScale, bloomScale), corollaColor, face);
+      halfUsed += 1;
+    }
+    const vertical = up.clone().addScaledVector(face, -face.y).normalize();
+    const mouth = base.clone().addScaledVector(face, stage === 'open' ? 0.17 : 0.14);
     setVolume(
       throats,
       throatUsed,
-      mouth.clone().addScaledVector(face, 0.012),
-      new THREE.Vector3(1.18, 0.68, 0.78).multiplyScalar(openness),
-      colorAt(options.palette, 2).clone().lerp(colorAt(options.palette, 1), 0.38),
+      mouth.clone().addScaledVector(face, -0.006),
+      new THREE.Vector3(1.34, 0.42, 0.7).multiplyScalar(bloomScale),
+      new THREE.Color('#692c36').lerp(corollaColor, 0.22),
       face
     );
     throatUsed += 1;
-    for (const angleOffset of [-0.34, 0.34]) {
-      setPlanar(upperLips, upperUsed, mouth, new THREE.Vector3(openness, openness, 1), colorAt(options.palette, 0).clone().lerp(new THREE.Color('#ffffff'), 0.08), face, angleOffset);
-      upperUsed += 1;
-    }
-    for (const angleOffset of [Math.PI - 0.55, Math.PI, Math.PI + 0.55]) {
-      const middle = Math.abs(angleOffset - Math.PI) < 0.01;
-      setPlanar(lowerLips, lowerUsed, mouth.clone().addScaledVector(face, middle ? 0.018 : 0), new THREE.Vector3(openness * (middle ? 1.25 : 0.9), openness, 1), colorAt(options.palette, middle ? 2 : 1), face, angleOffset);
-      lowerUsed += 1;
-    }
+    setVolume(
+      palates,
+      palateUsed,
+      mouth.clone().addScaledVector(vertical, -0.035 * bloomScale).addScaledVector(face, 0.006),
+      new THREE.Vector3(1.26, 0.7, 0.9).multiplyScalar(bloomScale),
+      colorAt(options.palette, 2).clone().lerp(colorAt(options.palette, 1), 0.38),
+      face
+    );
+    palateUsed += 1;
   }
-  finish(pedicels, count);
-  finish(tubes, tubeUsed);
-  finish(upperLips, upperUsed);
-  finish(lowerLips, lowerUsed);
+  group.userData.botanicalAudit = {
+    species: 'Antirrhinum majus',
+    connectedBlooms: blooms.length,
+    stages: assertBloomConnections('Snapdragon', blooms, segments)
+  };
+  addSegmentMesh(group, segments, green);
+  finish(openCorollas, openUsed);
+  finish(halfCorollas, halfUsed);
   finish(calyx, calyxUsed);
+  finish(palates, palateUsed);
   finish(throats, throatUsed);
   finish(buds, budUsed);
-  group.add(pedicels, tubes, upperLips, lowerLips, calyx, throats, buds);
+  group.add(openCorollas, halfCorollas, calyx, throats, palates, buds);
   return group;
 }
 
 export function createHyacinth(options: BotanicalBuildOptions) {
-  const rng = createRng(`${options.seed}:hyacinth-v2`);
+  const rng = createRng(`${options.seed}:hyacinth-organ-v1`);
   const group = new THREE.Group();
   const green = colorAt(options.palette, 3, '#55764e');
   const axis = stemAlong([
     new THREE.Vector3(0, -1.15, 0),
-    new THREE.Vector3(-0.01, -0.45, 0.01),
-    new THREE.Vector3(0.018, 0.25, -0.01),
+    new THREE.Vector3(-0.008, -0.45, 0.007),
+    new THREE.Vector3(0.01, 0.18, -0.006),
     new THREE.Vector3(0, 0.82, 0)
-  ], 0.018, green, 18);
+  ], 0.019, green, 20);
   group.add(axis.mesh);
-  const count = 18 + Math.floor(rng.range(0, 12));
-  const pedicels = cylinderInstances(count, green, 7, 0.88);
-  const tubes = new THREE.InstancedMesh(
-    new THREE.CylinderGeometry(0.064, 0.026, 1, 12, 2, false),
-    material(colorAt(options.palette, 0), 0.76),
-    count
-  );
-  const lobes = new THREE.InstancedMesh(
-    petalGeometry(0.13, 0.036, 0.022, 0.1, 0.4),
-    material(colorAt(options.palette, 1), 0.76),
-    count * 6
-  );
-  const buds = new THREE.InstancedMesh(
-    new THREE.SphereGeometry(0.085, 10, 8),
+  const count = 30;
+  const openCorollas = new THREE.InstancedMesh(
+    hyacinthCorollaGeometry(1),
     material(colorAt(options.palette, 0), 0.8),
     count
   );
-  let tubeUsed = 0;
-  let lobeUsed = 0;
+  const halfCorollas = new THREE.InstancedMesh(
+    hyacinthCorollaGeometry(0.46),
+    material(colorAt(options.palette, 1), 0.82),
+    count
+  );
+  const buds = new THREE.InstancedMesh(
+    new THREE.CapsuleGeometry(0.041, 0.055, 5, 10),
+    material(colorAt(options.palette, 0), 0.84),
+    count
+  );
+  const segments: Segment[] = [];
+  const blooms: Bloom[] = [];
+  let openUsed = 0;
+  let halfUsed = 0;
   let budUsed = 0;
   for (let i = 0; i < count; i += 1) {
     const progress = i / (count - 1);
-    const t = 0.24 + progress * 0.69;
+    const t = 0.34 + progress * 0.57;
     const axisPoint = axis.curve.getPoint(t);
-    const angle = i * 2.39996 + rng.range(-0.11, 0.11);
-    const face = new THREE.Vector3(Math.cos(angle), rng.range(-0.04, 0.08), Math.sin(angle)).normalize();
+    const angle = i * 2.33 + rng.range(-0.16, 0.16);
+    const face = new THREE.Vector3(Math.cos(angle), rng.range(0.02, 0.12), Math.sin(angle)).normalize();
     const stage: BloomStage = progress > 0.82 ? 'bud' : progress > 0.67 ? 'half' : 'open';
-    const base = axisPoint.clone().addScaledVector(face, 0.075);
-    setCylinder(pedicels, i, axisPoint, base, 0.0042);
+    const reach = stage === 'bud' ? 0.035 : stage === 'half' ? 0.046 : 0.058;
+    const base = axisPoint.clone().addScaledVector(face, reach);
+    const bloomScale = (stage === 'bud' ? 0.78 : stage === 'half' ? 0.88 : 0.94) * (1 - progress * 0.08);
+    segments.push({ start: axisPoint, end: base, radius: 0.0038 });
+    blooms.push({ position: base, normal: face, stage, scale: bloomScale, source: axisPoint });
+    if (stage === 'open' && !group.userData.approvalTarget) {
+      group.userData.approvalTarget = base.clone().addScaledVector(face, 0.13);
+      group.userData.connectionTarget = axisPoint.clone().lerp(base, 0.48);
+      group.userData.approvalNormal = face.clone();
+      group.userData.connectionNormal = face.clone();
+    }
     if (stage === 'bud') {
-      setVolume(buds, budUsed, base.clone().addScaledVector(face, 0.055), new THREE.Vector3(0.72, 1.12, 0.72), colorAt(options.palette, i), face);
+      setVolume(buds, budUsed, base.clone().addScaledVector(face, 0.03), new THREE.Vector3(0.72, bloomScale, 0.72), colorAt(options.palette, i), face);
       budUsed += 1;
       continue;
     }
-    const openness = stage === 'half' ? 0.68 : 1;
-    const mouth = base.clone().addScaledVector(face, 0.17 * openness);
-    setCylinder(tubes, tubeUsed, base, mouth, openness, colorAt(options.palette, i).clone().lerp(new THREE.Color('#ffffff'), rng.range(0.01, 0.09)));
-    tubeUsed += 1;
-    for (let p = 0; p < 6; p += 1) {
-      setPlanar(lobes, lobeUsed, mouth, new THREE.Vector3(openness, openness, 1), colorAt(options.palette, p).clone().lerp(new THREE.Color('#ffffff'), rng.range(0.02, 0.12)), face, p / 6 * Math.PI * 2);
-      lobeUsed += 1;
+    const flowerColor = colorAt(options.palette, i).clone().lerp(new THREE.Color('#ffffff'), rng.range(0.02, 0.1));
+    if (stage === 'open') {
+      setVolume(openCorollas, openUsed, base, new THREE.Vector3(bloomScale, bloomScale, bloomScale), flowerColor, face, rng.range(-0.05, 0.05));
+      openUsed += 1;
+    } else {
+      setVolume(halfCorollas, halfUsed, base, new THREE.Vector3(bloomScale, bloomScale, bloomScale), flowerColor, face, rng.range(-0.05, 0.05));
+      halfUsed += 1;
     }
   }
-  finish(pedicels, count);
-  finish(tubes, tubeUsed);
-  finish(lobes, lobeUsed);
+  group.userData.botanicalAudit = {
+    species: 'Hyacinthus orientalis',
+    connectedBlooms: blooms.length,
+    stages: assertBloomConnections('Hyacinth', blooms, segments)
+  };
+  addSegmentMesh(group, segments, green);
+  finish(openCorollas, openUsed);
+  finish(halfCorollas, halfUsed);
   finish(buds, budUsed);
-  group.add(pedicels, tubes, lobes, buds);
+  group.add(openCorollas, halfCorollas, buds);
   return group;
 }
 
@@ -622,81 +779,123 @@ export function createFoxtailLily(options: BotanicalBuildOptions) {
 }
 
 export function createLiatris(options: BotanicalBuildOptions) {
-  const rng = createRng(`${options.seed}:liatris-v2`);
+  const rng = createRng(`${options.seed}:liatris-organ-v1`);
   const group = new THREE.Group();
   const green = colorAt(options.palette, 3, '#55734d');
   const axis = stemAlong([
     new THREE.Vector3(0, -1.22, 0),
-    new THREE.Vector3(-0.01, -0.4, 0.008),
-    new THREE.Vector3(0.015, 0.42, -0.01),
-    new THREE.Vector3(0, 1.18, 0)
-  ], 0.012, green, 24);
+    new THREE.Vector3(-0.008, -0.4, 0.006),
+    new THREE.Vector3(0.01, 0.42, -0.008),
+    new THREE.Vector3(0, 1.2, 0)
+  ], 0.011, green, 26);
   group.add(axis.mesh);
-  const headCount = 24 + Math.floor(rng.range(0, 11));
-  const floretsPerHead = 4;
+  const headCount = 42;
+  const floretsPerHead = 5;
   const tubes = new THREE.InstancedMesh(
-    new THREE.CylinderGeometry(0.008, 0.012, 1, 7, 1, false),
-    material(colorAt(options.palette, 0), 0.8),
+    new THREE.CylinderGeometry(0.009, 0.013, 1, 7, 1, false),
+    material(colorAt(options.palette, 0), 0.84),
     headCount * floretsPerHead
   );
-  const styles = cylinderInstances(headCount * floretsPerHead, colorAt(options.palette, 2), 5, 0.72);
-  const styleForks = cylinderInstances(headCount * floretsPerHead * 2, colorAt(options.palette, 2), 5, 0.65);
+  const floretLobes = new THREE.InstancedMesh(
+    petalGeometry(0.013, 0.0055, 0.002, 0.001, 0.04),
+    material(colorAt(options.palette, 1), 0.84),
+    headCount * floretsPerHead * 5
+  );
+  const styleColor = colorAt(options.palette, 1).clone().lerp(colorAt(options.palette, 2), 0.45);
+  const styles = cylinderInstances(headCount * floretsPerHead, styleColor, 5, 0.7);
+  const styleForks = cylinderInstances(headCount * floretsPerHead * 2, styleColor, 5, 0.62);
   const budHeads = new THREE.InstancedMesh(
-    new THREE.SphereGeometry(0.042, 9, 7),
+    new THREE.CapsuleGeometry(0.025, 0.027, 4, 8),
     material(colorAt(options.palette, 1), 0.86),
     headCount
   );
   const bracts = new THREE.InstancedMesh(
-    petalGeometry(0.052, 0.012, 0.004, 0, 0.72),
+    petalGeometry(0.046, 0.011, 0.004, 0, 0.68),
     material(green, 0.9),
-    headCount * 7
+    headCount * 8
   );
+  const segments: Segment[] = [];
+  const blooms: Bloom[] = [];
   let tubeUsed = 0;
+  let lobeUsed = 0;
   let styleUsed = 0;
   let forkUsed = 0;
   let budUsed = 0;
   let bractUsed = 0;
   for (let i = 0; i < headCount; i += 1) {
     const progress = i / (headCount - 1);
-    const axisPoint = axis.curve.getPoint(0.25 + progress * 0.71);
-    const angle = i * 2.39996 + rng.range(-0.09, 0.09);
+    const axisPoint = axis.curve.getPoint(0.24 + progress * 0.72);
+    const angle = i * 2.29 + rng.range(-0.2, 0.2);
     const radial = new THREE.Vector3(Math.cos(angle), 0, Math.sin(angle));
-    const head = axisPoint.clone().addScaledVector(radial, 0.026);
-    const stage: BloomStage = progress > 0.58 ? 'open' : progress > 0.43 ? 'half' : 'bud';
-    for (let b = 0; b < 7; b += 1) {
-      setPlanar(bracts, bractUsed, head, new THREE.Vector3(0.72, 0.72, 1), green.clone().lerp(colorAt(options.palette, 1), 0.2), radial, b / 7 * Math.PI * 2);
+    const head = axisPoint.clone().addScaledVector(radial, rng.range(0.018, 0.027));
+    const stage: BloomStage = progress > 0.56 ? 'open' : progress > 0.4 ? 'half' : 'bud';
+    segments.push({ start: axisPoint, end: head, radius: 0.0032 });
+    blooms.push({ position: head, normal: radial, stage, scale: 1, source: axisPoint });
+    if (stage === 'open' && !group.userData.approvalTarget) {
+      group.userData.approvalTarget = head.clone().addScaledVector(up, 0.045);
+      group.userData.connectionTarget = axisPoint.clone().lerp(head, 0.48);
+      group.userData.approvalNormal = radial.clone();
+      group.userData.connectionNormal = radial.clone();
+    }
+    for (let b = 0; b < 8; b += 1) {
+      setPlanar(bracts, bractUsed, head, new THREE.Vector3(0.64, 0.7, 1), green.clone().lerp(colorAt(options.palette, 1), 0.18), radial, b / 8 * Math.PI * 2);
       bractUsed += 1;
     }
     if (stage === 'bud') {
-      setVolume(budHeads, budUsed, head, new THREE.Vector3(0.82, 1.06, 0.82), colorAt(options.palette, 1).clone().lerp(new THREE.Color('#70459c'), 0.16), radial);
+      const budDirection = radial.clone().multiplyScalar(0.22).addScaledVector(up, 0.78).normalize();
+      setVolume(budHeads, budUsed, head.clone().addScaledVector(budDirection, 0.018), new THREE.Vector3(0.84, 0.92, 0.84), colorAt(options.palette, 1).clone().lerp(new THREE.Color('#70459c'), 0.14), budDirection);
       budUsed += 1;
       continue;
     }
-    const openness = stage === 'half' ? 0.67 : 1;
+    const openness = stage === 'half' ? 0.64 : 1;
     const { tangent, bitangent } = tangentFrame(radial);
     for (let f = 0; f < floretsPerHead; f += 1) {
       const fa = f / floretsPerHead * Math.PI * 2;
-      const offset = tangent.clone().multiplyScalar(Math.cos(fa) * 0.018).addScaledVector(bitangent, Math.sin(fa) * 0.018);
-      const direction = radial.clone().multiplyScalar(0.48).addScaledVector(offset, 2.2).add(new THREE.Vector3(0, 0.22, 0)).normalize();
-      const start = head.clone().add(offset.multiplyScalar(0.66));
-      const tubeEnd = start.clone().addScaledVector(direction, 0.052 * openness);
+      const offset = tangent.clone().multiplyScalar(Math.cos(fa) * 0.016).addScaledVector(bitangent, Math.sin(fa) * 0.016);
+      const direction = radial.clone().multiplyScalar(0.22)
+        .addScaledVector(tangent, Math.cos(fa) * 0.46)
+        .addScaledVector(bitangent, Math.sin(fa) * 0.46)
+        .addScaledVector(up, 0.56)
+        .normalize();
+      const start = head.clone().add(offset.multiplyScalar(0.58));
+      const tubeEnd = start.clone().addScaledVector(direction, 0.072 * openness);
       setCylinder(tubes, tubeUsed, start, tubeEnd, openness, colorAt(options.palette, f).clone().lerp(new THREE.Color('#ffffff'), rng.range(0.01, 0.07)));
-      const styleEnd = tubeEnd.clone().addScaledVector(direction, 0.035 * openness);
-      setCylinder(styles, styleUsed, tubeEnd, styleEnd, 0.0018);
-      const forkSide = tangent.clone().multiplyScalar(0.006 * openness);
-      setCylinder(styleForks, forkUsed, styleEnd, styleEnd.clone().addScaledVector(direction, 0.012 * openness).add(forkSide), 0.0013);
-      setCylinder(styleForks, forkUsed + 1, styleEnd, styleEnd.clone().addScaledVector(direction, 0.012 * openness).sub(forkSide), 0.0013);
+      for (let lobe = 0; lobe < 5; lobe += 1) {
+        setPlanar(
+          floretLobes,
+          lobeUsed,
+          tubeEnd,
+          new THREE.Vector3(openness, openness, 1),
+          colorAt(options.palette, 1).clone().lerp(new THREE.Color('#ffffff'), 0.08),
+          direction,
+          lobe / 5 * Math.PI * 2
+        );
+        lobeUsed += 1;
+      }
+      const styleStart = tubeEnd.clone().addScaledVector(direction, 0.007 * openness);
+      const styleEnd = styleStart.clone().addScaledVector(direction, 0.022 * openness);
+      setCylinder(styles, styleUsed, styleStart, styleEnd, 0.0016);
+      const forkSide = tangent.clone().multiplyScalar(0.004 * openness);
+      setCylinder(styleForks, forkUsed, styleEnd, styleEnd.clone().addScaledVector(direction, 0.007 * openness).add(forkSide), 0.0012);
+      setCylinder(styleForks, forkUsed + 1, styleEnd, styleEnd.clone().addScaledVector(direction, 0.007 * openness).sub(forkSide), 0.0012);
       tubeUsed += 1;
       styleUsed += 1;
       forkUsed += 2;
     }
   }
+  group.userData.botanicalAudit = {
+    species: 'Liatris spicata',
+    connectedBlooms: blooms.length,
+    stages: assertBloomConnections('Liatris', blooms, segments)
+  };
+  addSegmentMesh(group, segments, green);
   finish(tubes, tubeUsed);
+  finish(floretLobes, lobeUsed);
   finish(styles, styleUsed);
   finish(styleForks, forkUsed);
   finish(budHeads, budUsed);
   finish(bracts, bractUsed);
-  group.add(tubes, styles, styleForks, budHeads, bracts);
+  group.add(tubes, floretLobes, styles, styleForks, budHeads, bracts);
   return group;
 }
 
