@@ -6,6 +6,8 @@
 
 记录今日默认花束的花材丰富度问题。 / Recorded today's default bouquet variety issue.
 
+- 用户于 2026-07-24 复验通过 `2026-07-07`、`2026-07-11`、`2026-07-13`、`2026-07-16` 四个日期花束修正，并授权并入整合主线。 / The owner accepted the four corrected daily bouquets for `2026-07-07`, `2026-07-11`, `2026-07-13`, and `2026-07-16` on 2026-07-24 and authorized their integration.
+- 新版 GUI 在发布版本标记移至左上角、不再遮挡右下角视角控件后通过用户验收。 / The revised GUI passed owner review after the release mark moved to the upper-left and stopped covering the lower-right view control.
 - 修复 Vercel 干净构建中 `dist/version.json` 写入早于 `dist/` 创建导致的发布失败。 / Fixed the Vercel clean-build failure where `dist/version.json` was written before `dist/` existed.
 - 补齐 `docs/leaf-flower-pairing-lab.html` 到 GitHub source deploy manifest，避免 Vercel 从 `main` 干净构建时缺少 Vite 入口文件。 / Added `docs/leaf-flower-pairing-lab.html` to the GitHub source deploy manifest so Vercel clean builds from `main` have every Vite entry file.
 - 用户确认 Strap 与 Palmate 两个叶片原型可受控整合：Strap 映射洋水仙、风信子与狐尾百合，Palmate 映射飞燕草；其余 21 个偏写实花型保持无叶，不使用通用叶型兜底。 / Integrated the owner-approved Strap and Palmate prototypes under controlled mappings: Strap for narcissus, hyacinth, and foxtail lily, and Palmate for delphinium; the remaining 21 realistic members stay leafless with no generic fallback.
