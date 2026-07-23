@@ -32,6 +32,10 @@ const silhouetteButton = requiredElement<HTMLButtonElement>('#silhouette-button'
 const gridButton = requiredElement<HTMLButtonElement>('#grid-button');
 const rotateButton = requiredElement<HTMLButtonElement>('#rotate-button');
 const viewButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-view]'));
+const pairingMode = document.body.dataset.labMode === 'leaf-member-pairing';
+const displayedDefinitions = pairingMode
+  ? realisticFlowerDefinitions.filter((definition) => realisticFlowerFoliageStatus[definition.id].status === 'confirmed')
+  : realisticFlowerDefinitions;
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -65,7 +69,7 @@ function escapeHtml(value: unknown) {
 }
 
 function renderLabels() {
-  labels.innerHTML = realisticFlowerDefinitions.map((definition, index) => {
+  labels.innerHTML = displayedDefinitions.map((definition, index) => {
     const foliage = realisticFlowerFoliageStatus[definition.id];
     return `
       <article class="cell" data-flower="${escapeHtml(definition.id)}" data-foliage-profile="${escapeHtml(foliage.foliageProfile)}" data-leaf-mode="${escapeHtml(foliage.leafMode)}">
@@ -125,7 +129,7 @@ function initScenes() {
   const cells = Array.from(labels.querySelectorAll<HTMLElement>('.cell'));
   let totalDraws = 0;
   let totalTriangles = 0;
-  realisticFlowerDefinitions.forEach((definition, index) => {
+  displayedDefinitions.forEach((definition, index) => {
     const cell = cells[index];
     if (!cell) return;
     const scene = new THREE.Scene();
@@ -181,14 +185,16 @@ function initScenes() {
     totalDraws += counts.draws;
     totalTriangles += counts.triangles;
   });
-  stats.textContent = `1 canvas · ${previews.length} supported forms · draw ${totalDraws} · tri ${totalTriangles.toLocaleString()}`;
+  stats.textContent = `1 canvas · ${previews.length} ${pairingMode ? 'confirmed pairings' : 'supported forms'} · draw ${totalDraws} · tri ${totalTriangles.toLocaleString()}`;
 }
 
 function updateLayout() {
   const width = stage.clientWidth;
-  columns = width >= 1180 ? 3 : width >= 720 ? 2 : 1;
-  rowHeight = columns === 1 ? 560 : 340;
-  const rows = Math.ceil(realisticFlowerDefinitions.length / columns);
+  columns = pairingMode
+    ? width >= 760 ? 2 : 1
+    : width >= 1180 ? 3 : width >= 720 ? 2 : 1;
+  rowHeight = columns === 1 ? 560 : pairingMode ? 430 : 340;
+  const rows = Math.ceil(displayedDefinitions.length / columns);
   stage.style.height = `${rows * rowHeight}px`;
   labels.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
   labels.style.gridAutoRows = `${rowHeight}px`;
