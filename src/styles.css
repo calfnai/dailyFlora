@@ -487,8 +487,8 @@ body.is-preview .daily-theme {
 
 .release-mark {
   position: fixed;
-  right: max(12px, env(safe-area-inset-right));
-  bottom: max(10px, env(safe-area-inset-bottom));
+  top: max(32px, calc(env(safe-area-inset-top) + 18px));
+  left: max(96px, calc(env(safe-area-inset-left) + 78px));
   z-index: 4;
   color: rgb(255 250 235 / 34%);
   font: 500 9px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -2142,7 +2142,7 @@ body.is-clock-visible:not(.is-special) .release-mark {
   }
 
   body:not(.is-special) .release-mark {
-    right: max(22px, calc(env(safe-area-inset-right) + 10px));
-    bottom: max(8px, env(safe-area-inset-bottom));
+    top: max(20px, calc(env(safe-area-inset-top) + 8px));
+    left: max(72px, calc(env(safe-area-inset-left) + 58px));
   }
 }

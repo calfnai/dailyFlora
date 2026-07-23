@@ -6,6 +6,7 @@
 
 记录 GUI v1、空闲时钟与近期默认花束修正。 / Recorded GUI v1, the idle clock, and recent default-bouquet corrections.
 
+- 将新 GUI 的精确版本标识从右下角移到左上角边框之后，避免遮挡 `VIEW` 控制框；版本追踪能力保持不变。 / Moved the exact release identifier from the lower-right corner to the space after the upper-left frame so it no longer obstructs the `VIEW` control while preserving version traceability.
 - 以当前 `codex/dailyflora-integration` 为基线接入 GUI v1：黑色空间、左下无框花名、右上 `INDEX`、右下 `VIEW`、反向括号动画和七语言选择器；不复制参考 HTML 结构。 / Applied GUI v1 on top of the current `codex/dailyflora-integration` baseline with a black spatial stage, borderless lower-left bouquet name, upper-right `INDEX`, lower-right `VIEW`, opposing corner motion, and a seven-language selector without copying the reference HTML structure.
 - 保持已确认的时钟边界：`clock-settings` 只存在于 `VIEW` 菜单，手动或自动显示的 `clock-overlay` 只包含时间、日期和名言。 / Preserved the accepted clock boundary: `clock-settings` exists only in the `VIEW` menu, while the manual or automatic `clock-overlay` contains only time, date, and quote.
 - GUI v1 完全排除 Special Edition；特殊版继续使用原 HUD、圆形入口、观看按钮、开场、文案、音频和构图。 / Explicitly excluded Special Edition from GUI v1 so its original HUD, circular entry points, viewing button, opening, copy, audio, and composition remain unchanged.
