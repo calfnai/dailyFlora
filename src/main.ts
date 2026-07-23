@@ -8,6 +8,7 @@ import { BouquetScene } from './bouquetScene';
 import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
 import { themes } from './themes';
 import { IdleClockController, normalizeClockInterval, type ClockDisplaySource, type IdleClockSettings } from './idleClock';
+import type { DailyFloraHandActions } from './dailyFloraHandControl';
 
 type RotationDirection = 1 | -1;
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
@@ -136,6 +137,7 @@ const siteMenu = document.querySelector<HTMLElement>('#site-menu');
 const siteMenuToggle = document.querySelector<HTMLButtonElement>('#site-menu-toggle');
 const siteMenuPanel = document.querySelector<HTMLElement>('#site-menu-panel');
 const siteMenuDebugLink = document.querySelector<HTMLAnchorElement>('#site-menu-debug-link');
+const handControlToggle = document.querySelector<HTMLButtonElement>('#hand-control-toggle');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
 const themeLabel = document.querySelector<HTMLElement>('#daily-theme');
 const themeCnLabel = document.querySelector<HTMLElement>('#daily-theme-cn');
@@ -271,6 +273,8 @@ const debugValue = searchParams.get('debug');
 const debugMode = searchParams.has('debug') && debugValue !== '0' && debugValue !== 'false';
 const previewValue = searchParams.get('preview');
 const previewMode = searchParams.has('preview') && previewValue !== '0' && previewValue !== 'false';
+const handControlValue = searchParams.get('hand-control');
+const handControlInitiallyEnabled = searchParams.has('hand-control') && handControlValue !== '0' && handControlValue !== 'false';
 const internalPreviewMode = debugMode || previewMode;
 const requestedDensity = searchParams.get('density') || searchParams.get('quality');
 const requestedRender = searchParams.get('render');
@@ -1371,13 +1375,18 @@ languageSwitcher?.addEventListener('click', (event) => {
 
 pauseButton?.addEventListener('click', () => {
   const paused = scene.togglePause();
+  syncPauseButton(paused);
+  revealUi();
+});
+
+function syncPauseButton(paused: boolean) {
+  if (!pauseButton) return;
   pauseButton.setAttribute('aria-label', paused ? 'Resume rotation' : 'Pause rotation');
   pauseButton.title = paused ? 'Resume rotation' : 'Pause rotation';
   pauseButton.innerHTML = paused
     ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>'
     : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" /></svg>';
-  revealUi();
-});
+}
 
 todayButton?.addEventListener('click', () => {
   toggleCalendar();
@@ -1558,6 +1567,91 @@ window.addEventListener('beforeunload', () => window.clearTimeout(dateRolloverTi
 window.addEventListener('beforeunload', () => window.clearInterval(clockTickTimer));
 window.addEventListener('beforeunload', () => idleClock.stop());
 
+async function startHandControl() {
+  const { startDailyFloraHandControl } = await import('./dailyFloraHandControl.ts');
+  const densityOrder: DensityName[] = ['low', 'medium', 'high'];
+  const renderOrder: Array<Exclude<RenderQualityName, 'auto'>> = ['low', 'medium', 'high'];
+  let immersive = false;
+  const actions: DailyFloraHandActions = {
+    cycleDensity: () => {
+      const index = densityOrder.indexOf(selectedDensity);
+      setDensity(densityOrder[(index + 1) % densityOrder.length]);
+    },
+    cycleRender: () => {
+      const current = selectedRender === 'auto' ? quality.renderName : selectedRender;
+      const index = renderOrder.indexOf(current);
+      setRender(renderOrder[(index + 1) % renderOrder.length]);
+    },
+    toggleClock: () => {
+      idleClock.toggleManual();
+      revealUi();
+    },
+    setAutomaticCameraEnabled: (enabled) => {
+      scene.setAutomaticCameraEnabled(enabled);
+      syncPauseButton(!enabled);
+      revealUi();
+    },
+    toggleImmersive: () => {
+      immersive = !immersive;
+      document.body.classList.toggle('is-hand-control-immersive', immersive);
+    },
+    moveFramingBy: (deltaX, deltaY) => {
+      scene.moveGestureFramingBy(-deltaX, -deltaY);
+    },
+    rotateBy: (deltaYaw, deltaPitch) => {
+      scene.rotateGestureBy(deltaYaw, deltaPitch);
+    },
+    zoomBy: (delta) => {
+      zoomBy(delta);
+    }
+  };
+  const stop = startDailyFloraHandControl(actions);
+  return () => {
+    stop();
+    document.body.classList.remove('is-hand-control-immersive');
+  };
+}
+
+let stopHandControl: (() => void) | null = null;
+let handControlLoading = false;
+
+function syncHandControlToggle() {
+  if (!handControlToggle) return;
+  const active = stopHandControl !== null;
+  handControlToggle.classList.toggle('is-loading', handControlLoading);
+  handControlToggle.disabled = handControlLoading;
+  handControlToggle.setAttribute('aria-pressed', String(active));
+  handControlToggle.setAttribute('aria-label', active ? '关闭手势控制' : '开启手势控制');
+  handControlToggle.title = active ? '关闭手势控制' : '开启手势控制';
+}
+
+async function enableHandControl() {
+  if (stopHandControl || handControlLoading) return;
+  handControlLoading = true;
+  syncHandControlToggle();
+  try {
+    stopHandControl = await startHandControl();
+  } catch (error) {
+    console.error('Unable to start hand control', error);
+  } finally {
+    handControlLoading = false;
+    syncHandControlToggle();
+  }
+}
+
+function disableHandControl() {
+  stopHandControl?.();
+  stopHandControl = null;
+  syncHandControlToggle();
+}
+
+handControlToggle?.addEventListener('click', () => {
+  if (stopHandControl) disableHandControl();
+  else void enableHandControl();
+});
+
+window.addEventListener('beforeunload', () => stopHandControl?.(), { once: true });
+
 setLabels();
 if (!specialReference) updateInterfaceLanguage(interfaceLanguage);
 renderAccountState();
@@ -1578,3 +1672,6 @@ syncClockControls();
 idleClock.start();
 revealUi();
 scene.start();
+
+syncHandControlToggle();
+if (handControlInitiallyEnabled) void enableHandControl();
