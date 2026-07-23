@@ -193,6 +193,32 @@ const clockDate = document.querySelector<HTMLElement>('#clock-date');
 const clockQuoteText = document.querySelector<HTMLElement>('#clock-quote-text');
 const clockQuoteAuthor = document.querySelector<HTMLElement>('#clock-quote-author');
 const releaseMark = document.querySelector<HTMLAnchorElement>('#release-mark');
+const languageSwitcher = document.querySelector<HTMLElement>('#language-switcher');
+
+type InterfaceLanguage = 'en' | 'zh' | 'es' | 'fr' | 'pt' | 'it' | 'ja';
+
+const interfaceLanguageStorageKey = 'dailyflora.interface-language.v1';
+const interfaceCopy: Record<InterfaceLanguage, { index: string; view: string; hideView: string; documentLang: string }> = {
+  en: { index: 'INDEX', view: 'VIEW', hideView: 'CLOSE', documentLang: 'en' },
+  zh: { index: '索引', view: '视图', hideView: '收起', documentLang: 'zh-CN' },
+  es: { index: 'ÍNDICE', view: 'VISTA', hideView: 'CERRAR', documentLang: 'es' },
+  fr: { index: 'INDEX', view: 'VUE', hideView: 'FERMER', documentLang: 'fr' },
+  pt: { index: 'ÍNDICE', view: 'VISTA', hideView: 'FECHAR', documentLang: 'pt' },
+  it: { index: 'INDICE', view: 'VISTA', hideView: 'CHIUDI', documentLang: 'it' },
+  ja: { index: '索引', view: '表示', hideView: '閉じる', documentLang: 'ja' }
+};
+
+function readInterfaceLanguage(): InterfaceLanguage {
+  try {
+    const stored = window.localStorage.getItem(interfaceLanguageStorageKey);
+    if (stored && stored in interfaceCopy) return stored as InterfaceLanguage;
+  } catch {
+    // The selector remains usable even when storage is unavailable.
+  }
+  return 'en';
+}
+
+let interfaceLanguage = readInterfaceLanguage();
 
 if (
   !canvas ||
@@ -239,6 +265,7 @@ if (releaseMark) {
 let params = readParams();
 const specialId = readSpecialId();
 const specialReference = specialId ? specialReferences[specialId] : null;
+document.body.classList.toggle('is-special', Boolean(specialReference));
 const searchParams = new URLSearchParams(window.location.search);
 const debugValue = searchParams.get('debug');
 const debugMode = searchParams.has('debug') && debugValue !== '0' && debugValue !== 'false';
@@ -835,10 +862,23 @@ function revealUi() {
   ui.hud.classList.remove('is-hidden');
   ui.controls.classList.remove('is-hidden');
   window.clearTimeout(hideTimer);
+  if (specialReference) {
+    hideTimer = window.setTimeout(() => {
+      ui.hud.classList.add('is-hidden');
+      ui.controls.classList.add('is-hidden');
+    }, ui.controls.classList.contains('is-expanded') ? 7000 : 3200);
+    return;
+  }
+  if (!ui.controls.classList.contains('is-expanded')) return;
   hideTimer = window.setTimeout(() => {
-    ui.hud.classList.add('is-hidden');
-    ui.controls.classList.add('is-hidden');
-  }, ui.controls.classList.contains('is-expanded') ? 7000 : 3200);
+    ui.controls.classList.remove('is-expanded');
+    ui.controls.classList.add('is-collapsed');
+    ui.controlsPanel.hidden = true;
+    ui.controlsToggleButton.setAttribute('aria-expanded', 'false');
+    ui.controlsToggleButton.setAttribute('aria-label', 'Show viewing controls');
+    ui.controlsToggleButton.title = 'Show viewing controls';
+    updateInterfaceLanguage(interfaceLanguage);
+  }, 7000);
 }
 
 function setControlsExpanded(expanded: boolean) {
@@ -848,7 +888,26 @@ function setControlsExpanded(expanded: boolean) {
   ui.controlsToggleButton.setAttribute('aria-expanded', String(expanded));
   ui.controlsToggleButton.setAttribute('aria-label', expanded ? 'Hide viewing controls' : 'Show viewing controls');
   ui.controlsToggleButton.title = expanded ? 'Hide viewing controls' : 'Show viewing controls';
+  if (!specialReference) updateInterfaceLanguage(interfaceLanguage);
   revealUi();
+}
+
+function updateInterfaceLanguage(language: InterfaceLanguage) {
+  interfaceLanguage = language;
+  const copy = interfaceCopy[language];
+  document.documentElement.lang = copy.documentLang;
+  document.querySelectorAll<HTMLElement>('[data-interface-copy]').forEach((element) => {
+    const key = element.dataset.interfaceCopy as 'index' | 'view';
+    element.textContent = key === 'view' && ui.controls.classList.contains('is-expanded') ? copy.hideView : copy[key];
+  });
+  languageSwitcher?.querySelectorAll<HTMLButtonElement>('[data-language]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.language === language));
+  });
+  try {
+    window.localStorage.setItem(interfaceLanguageStorageKey, language);
+  } catch {
+    // Keep the in-memory preference when storage is unavailable.
+  }
 }
 
 function updateUrl(date: string, seed: string) {
@@ -1301,6 +1360,15 @@ controlsToggleButton?.addEventListener('click', () => {
   setControlsExpanded(!controls.classList.contains('is-expanded'));
 });
 
+languageSwitcher?.addEventListener('click', (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLButtonElement)) return;
+  const language = target.dataset.language;
+  if (!language || !(language in interfaceCopy)) return;
+  updateInterfaceLanguage(language as InterfaceLanguage);
+  revealUi();
+});
+
 pauseButton?.addEventListener('click', () => {
   const paused = scene.togglePause();
   pauseButton.setAttribute('aria-label', paused ? 'Resume rotation' : 'Pause rotation');
@@ -1491,6 +1559,7 @@ window.addEventListener('beforeunload', () => window.clearInterval(clockTickTime
 window.addEventListener('beforeunload', () => idleClock.stop());
 
 setLabels();
+if (!specialReference) updateInterfaceLanguage(interfaceLanguage);
 renderAccountState();
 setupDebugMode();
 if (specialReference) {

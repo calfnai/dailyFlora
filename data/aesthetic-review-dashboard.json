@@ -189,6 +189,25 @@
   ],
   "reusableAestheticRules": [
     {
+      "id": "gui-v1-spatial-language",
+      "title": "GUI v1 让界面退后，让 3D 花束居中",
+      "summary": "参考 HTML 只定义黑色空间、信息位置、细线框和动效方向；正式实现继续使用当前集成基线的画布、路由、控件和发布身份。",
+      "principles": [
+        "真实 Three.js 花束是中心视觉，不用静态占位替代。",
+        "左下花名无框，右上 INDEX 与右下 VIEW 分别复用现有菜单和观看控制。",
+        "clock-settings 只在 VIEW 菜单出现，clock-overlay 只显示时间、日期和名言。",
+        "Special Edition 完全排除在 GUI v1 范围之外。",
+        "七语言选择器保持紧凑并持久化。"
+      ],
+      "rejectSignals": [
+        "从落后工作树复制旧 UI，重新带回已经删除的 clock-overlay 设置。",
+        "直接复制参考 HTML 并绕开现有架构。",
+        "为了极简删除现有功能或覆盖 Special Edition。",
+        "移动端语言、INDEX、VIEW 与花名互相遮挡。"
+      ],
+      "ownerAcceptance": "视觉方向来自用户 2026-07-20 提供的 GUI v1 参考；实现后仍由用户进行视觉验收。"
+    },
+    {
       "id": "foliage-space-support",
       "title": "叶材与绿色部分",
       "summary": "叶材和绿色部分是花束空间感上的支撑，不是物理接触式托举花盘，也不是随机装饰。",
