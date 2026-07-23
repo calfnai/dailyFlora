@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 
@@ -87,13 +87,16 @@ export default defineConfig({
           resolve(__dirname, 'sites/worker.js'),
           resolve(__dirname, 'dist/server/index.js')
         );
-        const indexHtml = readFileSync(resolve(__dirname, 'dist/index.html'), 'utf8');
-        for (const route of ['special0629', 'special0629-v2', 'special0629-v3', 'special0629-v4']) {
-          mkdirSync(resolve(__dirname, `dist/${route}`), { recursive: true });
-          writeFileSync(
-            resolve(__dirname, `dist/${route}/index.html`),
-            indexHtml.replace('<head>', '<head>\n    <base href="../" />')
-          );
+        const indexHtmlPath = resolve(__dirname, 'dist/index.html');
+        if (existsSync(indexHtmlPath)) {
+          const indexHtml = readFileSync(indexHtmlPath, 'utf8');
+          for (const route of ['special0629', 'special0629-v2', 'special0629-v3', 'special0629-v4']) {
+            mkdirSync(resolve(__dirname, `dist/${route}`), { recursive: true });
+            writeFileSync(
+              resolve(__dirname, `dist/${route}/index.html`),
+              indexHtml.replace('<head>', '<head>\n    <base href="../" />')
+            );
+          }
         }
         mkdirSync(resolve(__dirname, 'dist/what-did-hubble-see-on-your-birthday'), { recursive: true });
         copyFileSync(
