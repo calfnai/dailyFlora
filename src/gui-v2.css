@@ -1,0 +1,463 @@
+html.df-gui-v1 {
+  --df-interface:
+    "Arial Nova", "Helvetica Neue", Inter, "PingFang SC", "Noto Sans CJK SC",
+    "Microsoft YaHei", Arial, sans-serif;
+  --df-sans: var(--df-interface);
+  --df-mono: var(--df-interface);
+  font-family: var(--df-interface);
+  font-variant-numeric: tabular-nums;
+}
+
+html.df-gui-v1 body,
+html.df-gui-v1 button,
+html.df-gui-v1 input,
+html.df-gui-v1 a {
+  font-family: var(--df-interface);
+}
+
+/* Keep the interface quiet: the bouquet remains the only visual object. */
+html.df-gui-v1 .interface-status {
+  display: none !important;
+}
+
+html.df-gui-v1 .interface-frame::before,
+html.df-gui-v1 .interface-frame::after {
+  display: none;
+}
+
+html.df-gui-v1 .interface-corner {
+  position: absolute;
+  display: block;
+  border-color: rgb(246 242 232 / 28%);
+  opacity: 0;
+  filter: drop-shadow(0 0 9px rgb(244 230 129 / 4%));
+}
+
+html.df-gui-v1 .interface-corner-top-left {
+  top: -1px;
+  left: -1px;
+  width: 76px;
+  height: 76px;
+  border-top: 1px solid;
+  border-left: 1px solid;
+  animation: dfCornerTopLeftGrow 980ms 180ms cubic-bezier(0.2, 0.78, 0.2, 1) both;
+}
+
+html.df-gui-v1 .interface-corner-left-bottom {
+  bottom: -1px;
+  left: -1px;
+  width: 30px;
+  height: 118px;
+  border-bottom: 1px solid;
+  border-left: 1px solid;
+  animation: dfCornerLeftBottomGrow 1160ms 330ms cubic-bezier(0.2, 0.78, 0.2, 1) both;
+}
+
+html.df-gui-v1 .interface-corner-bottom-right {
+  right: -1px;
+  bottom: -1px;
+  width: 84px;
+  height: 84px;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+  animation: dfCornerBottomRightGrow 1060ms 260ms cubic-bezier(0.2, 0.78, 0.2, 1) both;
+}
+
+/* One title at a time. Chinese is the first-visit default; the choice persists. */
+html.df-gui-v1 .daily-mark {
+  grid-template-columns: 86px minmax(0, 1fr) auto;
+  grid-template-areas:
+    "kicker kicker language"
+    "date theme theme"
+    "date plan plan";
+}
+
+html.df-gui-v1 .language-toggle {
+  grid-area: language;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  align-self: start;
+  justify-self: end;
+  margin-top: -1px;
+}
+
+html.df-gui-v1 .language-toggle button {
+  position: relative;
+  min-width: 24px;
+  padding: 0 0 5px;
+  border: 0;
+  color: var(--df-dim);
+  background: transparent;
+  font-size: 8px;
+  font-weight: 520;
+  line-height: 1;
+  letter-spacing: 0.13em;
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+
+html.df-gui-v1 .language-toggle button + button::before {
+  position: absolute;
+  top: 0;
+  left: -7px;
+  color: rgb(246 242 232 / 18%);
+  content: "/";
+  pointer-events: none;
+}
+
+html.df-gui-v1 .language-toggle button::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--df-accent);
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.2);
+  transition:
+    opacity 180ms ease,
+    transform 220ms ease;
+}
+
+html.df-gui-v1 .language-toggle button:hover,
+html.df-gui-v1 .language-toggle button:focus-visible,
+html.df-gui-v1 .language-toggle button[aria-pressed="true"] {
+  color: var(--df-ink);
+  outline: none;
+}
+
+html.df-gui-v1 .language-toggle button[aria-pressed="true"]::after {
+  opacity: 0.78;
+  transform: scaleX(1);
+}
+
+html.df-gui-v1 .daily-date::before {
+  content: "DATE";
+}
+
+html.df-gui-v1 .daily-theme {
+  max-width: min(780px, calc(100vw - 390px));
+}
+
+html.df-gui-v1 .daily-theme-cn,
+html.df-gui-v1 .daily-theme-en {
+  display: none;
+  overflow: visible;
+  color: rgb(246 242 232 / 94%);
+  font-family: var(--df-interface);
+  font-size: 1em;
+  font-weight: 430;
+  line-height: 0.94;
+  text-overflow: clip;
+  text-transform: none;
+  white-space: normal;
+}
+
+html.df-gui-v1[data-language="zh"] .daily-theme-cn {
+  display: block;
+  letter-spacing: 0.018em;
+}
+
+html.df-gui-v1[data-language="en"] .daily-theme-en {
+  display: block;
+  max-width: 24ch;
+  font-size: 0.84em;
+  line-height: 0.98;
+  letter-spacing: 0.018em;
+  text-transform: uppercase;
+}
+
+html.df-gui-v1[data-language="en"] .flower-plan-mark {
+  display: none;
+}
+
+/* Text-only top-level navigation. Do not reuse the About-page flower mark. */
+html.df-gui-v1 .site-menu {
+  transition:
+    opacity 460ms ease,
+    transform 460ms ease;
+}
+
+html.df-gui-v1 body:has(.hud.is-hidden) .site-menu {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-7px);
+}
+
+html.df-gui-v1 .site-menu-toggle {
+  position: relative;
+  display: inline-flex;
+  grid-template-columns: none;
+  align-items: center;
+  width: auto;
+  min-width: 52px;
+  height: 30px;
+  padding: 0 0 7px;
+  border: 0;
+  border-bottom: 1px solid var(--df-line);
+  border-radius: 0;
+  color: var(--df-soft);
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+html.df-gui-v1 .site-menu-toggle > svg {
+  display: none;
+}
+
+html.df-gui-v1 .site-menu-label,
+html.df-gui-v1 .controls-label {
+  font-family: var(--df-interface);
+  font-size: 9px;
+  font-weight: 540;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+html.df-gui-v1 .site-menu-toggle:hover,
+html.df-gui-v1 .site-menu-toggle:focus-visible,
+html.df-gui-v1 .site-menu-toggle[aria-expanded="true"] {
+  border-color: var(--df-line-strong);
+  color: var(--df-ink);
+  background: transparent;
+  outline: none;
+}
+
+html.df-gui-v1 .site-menu-panel,
+html.df-gui-v1 .site-menu-panel a,
+html.df-gui-v1 .site-menu-panel::before,
+html.df-gui-v1 .site-menu-panel a::before,
+html.df-gui-v1 .site-menu-panel a::after {
+  font-family: var(--df-interface);
+}
+
+/* Keep the VIEW hit target fixed. The panel opens above it. */
+html.df-gui-v1 .controls,
+html.df-gui-v1 .controls.is-collapsed,
+html.df-gui-v1 .controls.is-expanded {
+  display: block;
+  width: max-content;
+  max-width: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  backdrop-filter: none;
+}
+
+html.df-gui-v1 .controls-toggle {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  grid-template-columns: none;
+  align-items: center;
+  width: auto;
+  min-width: 48px;
+  height: 30px;
+  padding: 0 0 7px;
+  border: 0;
+  border-bottom: 1px solid var(--df-line);
+  color: var(--df-soft);
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+html.df-gui-v1 .controls-toggle > svg {
+  display: none;
+}
+
+html.df-gui-v1 .controls.is-expanded .controls-toggle,
+html.df-gui-v1 .controls-toggle:hover,
+html.df-gui-v1 .controls-toggle:focus-visible {
+  border-color: var(--df-line-strong);
+  color: var(--df-ink);
+  background: transparent;
+  outline: none;
+}
+
+html.df-gui-v1 .controls-panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  z-index: 1;
+  width: max-content;
+  max-width: min(760px, calc(100vw - 48px));
+  padding: 4px;
+  border: 1px solid var(--df-line);
+  background: rgb(5 6 9 / 78%);
+  box-shadow: 0 22px 74px rgb(0 0 0 / 42%);
+  backdrop-filter: blur(16px) saturate(105%);
+  animation: dfGuiPanelLiftIn 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html.df-gui-v1 .controls-panel button,
+html.df-gui-v1 .controls-panel input,
+html.df-gui-v1 .controls-panel label,
+html.df-gui-v1 .date-calendar,
+html.df-gui-v1 .date-calendar button {
+  font-family: var(--df-interface);
+}
+
+/* Future bouquets do not exist yet. */
+html.df-gui-v1 .calendar-day:disabled,
+html.df-gui-v1 .calendar-nav-button:disabled {
+  color: rgb(246 242 232 / 16%);
+  background: transparent;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+html.df-gui-v1 .calendar-day:disabled:hover,
+html.df-gui-v1 .calendar-day:disabled:focus-visible,
+html.df-gui-v1 .calendar-nav-button:disabled:hover,
+html.df-gui-v1 .calendar-nav-button:disabled:focus-visible {
+  color: rgb(246 242 232 / 16%);
+  background: transparent;
+  outline: none;
+}
+
+@keyframes dfCornerTopLeftGrow {
+  from {
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+  18% { opacity: 1; }
+  to {
+    width: 76px;
+    height: 76px;
+    opacity: 1;
+  }
+}
+
+@keyframes dfCornerLeftBottomGrow {
+  from {
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+  16% { opacity: 1; }
+  to {
+    width: 30px;
+    height: 118px;
+    opacity: 1;
+  }
+}
+
+@keyframes dfCornerBottomRightGrow {
+  from {
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+  18% { opacity: 1; }
+  to {
+    width: 84px;
+    height: 84px;
+    opacity: 1;
+  }
+}
+
+@keyframes dfGuiPanelLiftIn {
+  from {
+    opacity: 0;
+    transform: translateY(7px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dfGuiPanelLiftInMobile {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 7px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@media (max-width: 760px) {
+  html.df-gui-v1 .daily-mark {
+    grid-template-columns: 70px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "kicker kicker language"
+      "date theme theme"
+      "date plan plan";
+  }
+
+  html.df-gui-v1 .language-toggle {
+    gap: 10px;
+  }
+
+  html.df-gui-v1 .language-toggle button {
+    font-size: 7px;
+  }
+
+  html.df-gui-v1 .daily-theme {
+    max-width: calc(100vw - 112px);
+  }
+
+  html.df-gui-v1[data-language="en"] .daily-theme-en {
+    max-width: 19ch;
+    font-size: 0.72em;
+  }
+
+  html.df-gui-v1 .site-menu-toggle,
+  html.df-gui-v1 .controls-toggle {
+    height: 29px;
+  }
+
+  html.df-gui-v1 .controls-panel {
+    right: auto;
+    left: 50%;
+    width: min(560px, calc(100vw - 28px));
+    max-width: calc(100vw - 28px);
+    justify-content: center;
+    transform: translateX(-50%);
+    animation: dfGuiPanelLiftInMobile 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  html.df-gui-v1 .interface-corner-top-left {
+    width: 52px;
+    height: 52px;
+  }
+
+  html.df-gui-v1 .interface-corner-left-bottom {
+    width: 22px;
+    height: 78px;
+  }
+
+  html.df-gui-v1 .interface-corner-bottom-right {
+    width: 58px;
+    height: 58px;
+  }
+}
+
+@media (max-width: 420px) {
+  html.df-gui-v1 .site-menu-label,
+  html.df-gui-v1 .controls-label {
+    font-size: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.df-gui-v1 .interface-corner {
+    animation: none !important;
+    opacity: 1;
+  }
+
+  html.df-gui-v1 .controls-panel {
+    animation: none !important;
+  }
+}

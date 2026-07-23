@@ -1,0 +1,56 @@
+.brand-lockup,
+.interface-frame,
+.interface-status,
+.daily-kicker,
+.language-toggle,
+.site-menu-heading,
+.site-menu-label,
+.controls-label,
+.flower-plan-mark-en {
+  display: none;
+}
+
+html.df-gui-v1 .brand-lockup {
+  display: grid;
+}
+
+html.df-gui-v1 .daily-kicker,
+html.df-gui-v1 .site-menu-heading {
+  display: block;
+}
+
+html.df-gui-v1 .language-toggle {
+  display: flex;
+}
+
+html.df-gui-v1 .interface-frame,
+html.df-gui-v1 .interface-status {
+  display: none;
+}
+
+html.df-gui-v1 .site-menu-label,
+html.df-gui-v1 .controls-label {
+  display: inline;
+}
+
+html.df-gui-v1 .quality-mark {
+  display: none;
+}
+
+html.df-gui-v1 .hud,
+html.df-gui-v1 .controls {
+  animation-fill-mode: backwards;
+}
+
+@keyframes dfGuiControlsIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 760px) {
+  html.df-gui-v1 body:has(.controls.is-expanded) .hud {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(6px);
+  }
+}

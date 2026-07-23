@@ -1,0 +1,254 @@
+/* Targeted GUI pass:
+   - Sarasa Term/Mono trial with a heavier, less-tall title treatment
+   - EN / 中 / ES / FR / IT / 日 global interface switching
+   - restore the original top-left and bottom-right viewport corner frame
+   - keep VIEW controls on one line */
+html.df-gui-v1 {
+  --df-terminal:
+    "Sarasa Term SC", "Sarasa Mono SC", "Cascadia Mono", "SFMono-Regular",
+    Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --df-cjk:
+    "Sarasa Term SC", "Sarasa Mono SC", "Sarasa Gothic SC",
+    "Source Han Sans SC", "Noto Sans CJK SC", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --df-interface: var(--df-terminal);
+  --df-sans: var(--df-cjk);
+  --df-mono: var(--df-terminal);
+}
+
+html.df-gui-v1 body,
+html.df-gui-v1 button,
+html.df-gui-v1 input,
+html.df-gui-v1 a {
+  font-family: var(--df-terminal);
+  font-synthesis: weight;
+}
+
+html.df-gui-v1 .brand-wordmark,
+html.df-gui-v1 .brand-meta,
+html.df-gui-v1 .daily-kicker,
+html.df-gui-v1 .daily-date,
+html.df-gui-v1 .daily-theme-cn,
+html.df-gui-v1 .daily-theme-en,
+html.df-gui-v1 .flower-plan-mark,
+html.df-gui-v1 .language-toggle,
+html.df-gui-v1 .site-menu-label,
+html.df-gui-v1 .site-menu-panel,
+html.df-gui-v1 .controls-label,
+html.df-gui-v1 .controls-panel,
+html.df-gui-v1 .date-calendar {
+  font-family: var(--df-terminal);
+  font-feature-settings: "liga" 0, "calt" 0, "zero" 1, "locl" 1;
+}
+
+/* Restore the exact quiet viewport outline and the two L-shaped accents from
+   the earlier Today 6:46 AM state. Do not add a third corner. */
+html.df-gui-v1 .interface-frame {
+  position: fixed;
+  inset: 12px;
+  z-index: 3;
+  display: block !important;
+  border: 1px solid rgb(246 242 232 / 7%);
+  box-shadow:
+    inset 18px 0 0 -17px rgb(246 242 232 / 10%),
+    inset -18px 0 0 -17px rgb(246 242 232 / 10%);
+  opacity: 0.86;
+  pointer-events: none;
+  transition: opacity 500ms ease;
+}
+
+html.df-gui-v1 .interface-frame::before,
+html.df-gui-v1 .interface-frame::after {
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  border-color: rgb(246 242 232 / 25%);
+  content: "";
+}
+
+html.df-gui-v1 .interface-frame::before {
+  top: -1px;
+  left: -1px;
+  border-top: 1px solid;
+  border-left: 1px solid;
+}
+
+html.df-gui-v1 .interface-frame::after {
+  right: -1px;
+  bottom: -1px;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+}
+
+html.df-gui-v1 body:has(.hud.is-hidden):not(.is-menu-open) .interface-frame {
+  opacity: 0.38;
+}
+
+html.df-gui-v1 body.is-menu-open .interface-frame {
+  opacity: 0.16;
+}
+
+/* Six compact language choices; English is the first-visit default. */
+html.df-gui-v1 .global-language-toggle {
+  right: max(124px, calc(env(safe-area-inset-right) + 124px));
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  align-items: center;
+  max-width: min(154px, calc(100vw - 238px));
+  min-height: 34px;
+  padding: 0 8px;
+  overflow-x: auto;
+  border: 1px solid var(--df-line);
+  background: rgb(5 6 9 / 58%);
+  box-shadow: none;
+  white-space: nowrap;
+  scrollbar-width: none;
+  backdrop-filter: blur(12px);
+}
+
+html.df-gui-v1 .global-language-toggle::-webkit-scrollbar {
+  display: none;
+}
+
+html.df-gui-v1 .global-language-toggle button {
+  flex: 0 0 auto;
+  min-width: 14px;
+  padding: 0;
+  font-family: var(--df-terminal);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+html.df-gui-v1 .global-language-toggle button + button::before {
+  display: none;
+}
+
+html.df-gui-v1 .global-language-toggle button::after {
+  bottom: -12px;
+}
+
+/* One bouquet title at a time. Chinese uses the Chinese source title;
+   all other locales use the existing English title rather than inventing
+   unreviewed machine translations of the bouquet name. */
+html.df-gui-v1 .daily-theme-cn,
+html.df-gui-v1 .daily-theme-en {
+  display: none;
+  font-family: var(--df-terminal);
+  font-weight: 500;
+  line-height: 0.94;
+  letter-spacing: 0.012em;
+  transform: scale(1.025, 0.96);
+  transform-origin: left bottom;
+}
+
+html.df-gui-v1[data-language="zh"] .daily-theme-cn {
+  display: block;
+}
+
+html.df-gui-v1:not([data-language="zh"]) .daily-theme-en {
+  display: block;
+  max-width: 25ch;
+  font-size: 0.78em;
+  text-transform: uppercase;
+}
+
+html.df-gui-v1 .flower-plan-mark-cn,
+html.df-gui-v1 .flower-plan-mark-en {
+  display: none;
+}
+
+html.df-gui-v1[data-language="zh"] .flower-plan-mark-cn,
+html.df-gui-v1:not([data-language="zh"]) .flower-plan-mark-en {
+  display: block;
+}
+
+html.df-gui-v1 .daily-date::before {
+  content: attr(data-label);
+}
+
+html.df-gui-v1 .site-menu-label,
+html.df-gui-v1 .controls-label {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Keep the expanded VIEW interface as one continuous row. Longer localized
+   descriptions stay in tooltips; compact button codes never wrap. */
+html.df-gui-v1 .controls-panel:not([hidden]) {
+  display: flex;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  justify-content: flex-end;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
+}
+
+html.df-gui-v1 .controls-panel > *,
+html.df-gui-v1 .segmented,
+html.df-gui-v1 .zoom-control,
+html.df-gui-v1 .rotation-control {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+html.df-gui-v1 .segment-button,
+html.df-gui-v1 .controls-panel button,
+html.df-gui-v1 .controls-panel label {
+  white-space: nowrap;
+}
+
+html.df-gui-v1 .segment-button {
+  min-width: 34px;
+  padding-inline: 7px;
+  font-family: var(--df-terminal);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+}
+
+html.df-gui-v1 .site-menu-panel a {
+  font-family: var(--df-terminal);
+  font-weight: 500;
+}
+
+@media (max-width: 760px) {
+  html.df-gui-v1 .interface-frame {
+    inset: 7px;
+  }
+
+  html.df-gui-v1 .interface-frame::before,
+  html.df-gui-v1 .interface-frame::after {
+    width: 46px;
+    height: 46px;
+  }
+
+  html.df-gui-v1 .global-language-toggle {
+    top: max(12px, env(safe-area-inset-top));
+    right: max(104px, calc(env(safe-area-inset-right) + 104px));
+    gap: 6px;
+    max-width: min(132px, calc(100vw - 210px));
+    min-height: 32px;
+    padding-inline: 7px;
+  }
+
+  html.df-gui-v1 .global-language-toggle button {
+    font-size: 8px;
+  }
+
+  html.df-gui-v1 .controls-panel:not([hidden]) {
+    justify-content: flex-start;
+    padding-bottom: 6px;
+  }
+
+  html.df-gui-v1 .daily-theme-cn,
+  html.df-gui-v1 .daily-theme-en {
+    transform: scale(1.015, 0.97);
+  }
+}
