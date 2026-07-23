@@ -7,6 +7,7 @@
 记录今日默认花束的花材丰富度问题。 / Recorded today's default bouquet variety issue.
 
 - 修复 Vercel 干净构建中 `dist/version.json` 写入早于 `dist/` 创建导致的发布失败。 / Fixed the Vercel clean-build failure where `dist/version.json` was written before `dist/` existed.
+- 补齐 `docs/leaf-flower-pairing-lab.html` 到 GitHub source deploy manifest，避免 Vercel 从 `main` 干净构建时缺少 Vite 入口文件。 / Added `docs/leaf-flower-pairing-lab.html` to the GitHub source deploy manifest so Vercel clean builds from `main` have every Vite entry file.
 - 用户确认 Strap 与 Palmate 两个叶片原型可受控整合：Strap 映射洋水仙、风信子与狐尾百合，Palmate 映射飞燕草；其余 21 个偏写实花型保持无叶，不使用通用叶型兜底。 / Integrated the owner-approved Strap and Palmate prototypes under controlled mappings: Strap for narcissus, hyacinth, and foxtail lily, and Palmate for delphinium; the remaining 21 realistic members stay leafless with no generic fallback.
 - 花、茎、叶现在共享 `PlantStemInstance`，确认叶片使用独立 RNG 并保留 `stemId`、profile 与叶序审计；主花束花朵计划和原有 flower RNG 保持不变。 / Flowers, stems, and approved leaves now share `PlantStemInstance`; confirmed foliage uses an independent RNG and preserves stem/profile/arrangement audits while the bouquet flower plan and flower RNG remain unchanged.
 - 新增独立“花型 × 叶片搭配验收”页面，只展示四组已确认成员关系；25 种偏写实花型总览不再被误当作花叶搭配交付页。 / Added a dedicated Flower × Leaf Pairing Review page showing only the four confirmed member relationships, so the 25-form realistic flower overview is no longer misrepresented as the pairing deliverable.
