@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DailyFlora Leaf Silhouette Lab</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --paper: #f5f2ec;
+        --ink: #050505;
+        --line: rgb(0 0 0 / 14%);
+        --muted: rgb(0 0 0 / 64%);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background: var(--paper);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      main {
+        width: min(1240px, 100%);
+        margin: 0 auto;
+        padding: 22px;
+      }
+
+      header {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 14px;
+      }
+
+      h1,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(24px, 3.2vw, 42px);
+        line-height: 1;
+        letter-spacing: 0;
+      }
+
+      p {
+        max-width: 72ch;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      button {
+        appearance: none;
+        min-height: 34px;
+        border: 1px solid var(--ink);
+        border-radius: 4px;
+        padding: 0 12px;
+        color: var(--ink);
+        background: transparent;
+        font: 700 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        cursor: pointer;
+      }
+
+      button[aria-pressed="true"] {
+        color: var(--paper);
+        background: var(--ink);
+      }
+
+      .lab-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .comparison-grid .specimen {
+        min-height: 500px;
+      }
+
+      .comparison-grid .stage {
+        min-height: 430px;
+        padding: 10px;
+      }
+
+      .comparison-grid svg {
+        height: min(58vh, 430px);
+        min-height: 360px;
+      }
+
+      .specimen {
+        min-height: 640px;
+        border: 1px solid var(--line);
+        background: #fffdf8;
+      }
+
+      [data-specimen].hidden {
+        display: none;
+      }
+
+      .specimen-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 44px;
+        border-bottom: 1px solid var(--line);
+        padding: 0 12px;
+        font: 700 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .specimen-title span:last-child {
+        color: var(--muted);
+        font-weight: 500;
+        text-transform: none;
+      }
+
+      .stage {
+        display: grid;
+        place-items: center;
+        min-height: 594px;
+        padding: 18px;
+      }
+
+      svg {
+        display: block;
+        width: 100%;
+        height: min(74vh, 560px);
+        min-height: 480px;
+      }
+
+      .leaf-fill {
+        fill: #000;
+        stroke: none;
+      }
+
+      .skeleton-vein {
+        stroke: #050505;
+        stroke-width: 3;
+        stroke-linecap: round;
+      }
+
+      .skeleton-node {
+        fill: #050505;
+      }
+
+      .petiole-node {
+        fill: #fffdf8;
+        stroke: #050505;
+        stroke-width: 3;
+      }
+
+      .sinus-target {
+        fill: none;
+        stroke: #050505;
+        stroke-width: 2;
+        stroke-dasharray: 5 4;
+      }
+
+      .trace-grid line {
+        stroke: rgb(0 0 0 / 10%);
+        stroke-width: 1;
+      }
+
+      .trace-outline {
+        fill: none;
+        stroke: #050505;
+        stroke-width: 2.2;
+        stroke-linejoin: round;
+      }
+
+      .trace-raw {
+        fill: none;
+        stroke: #050505;
+        stroke-width: 1.8;
+        stroke-linejoin: round;
+      }
+
+      .trace-point {
+        fill: #fffdf8;
+        stroke: #050505;
+        stroke-width: 1.25;
+      }
+
+      .point-locked-major-landmark {
+        fill: #ffd447;
+        stroke: #3a2d00;
+        stroke-width: 1.8;
+      }
+
+      .point-protected-structural {
+        fill: #78b8ff;
+        stroke: #143a65;
+      }
+
+      .point-minor-serration {
+        fill: #fffdf8;
+        stroke: #7b7b7b;
+      }
+
+      .point-major-adjusted {
+        fill: #ffd447;
+        stroke: #473600;
+        stroke-width: 2;
+      }
+
+      .trace-point-index {
+        fill: #050505;
+        font: 600 7px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .deviation-zone {
+        fill: none;
+        stroke: #b24b35;
+        stroke-width: 1.6;
+        stroke-dasharray: 6 4;
+      }
+
+      .deviation-label {
+        fill: #8d3828;
+        font: 700 8px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .reference-image {
+        opacity: 1;
+      }
+
+      .reference-image.faint {
+        opacity: 0.34;
+      }
+
+      .reference-overlay {
+        opacity: 0;
+        transition: opacity 120ms ease;
+      }
+
+      .trace-overlay-enabled .reference-overlay {
+        opacity: 0.28;
+      }
+
+      .overlay-comparison {
+        display: none;
+      }
+
+      .trace-overlay-enabled .overlay-comparison {
+        display: inline;
+      }
+
+      .trace-overlay-enabled .candidate-panel .candidate-fill {
+        display: none;
+      }
+
+      .overlay-reference-image {
+        opacity: 0.24;
+      }
+
+      .overlay-revised-raw-trace,
+      .overlay-old-major-structure-trace,
+      .overlay-major-envelope,
+      .overlay-accepted-envelope,
+      .overlay-t2a,
+      .overlay-t2b,
+      .trace-existing-raw,
+      .trace-revised-raw,
+      .old-major-structure-trace,
+      .direct-major-polyline,
+      .major-structure-envelope,
+      .zone-old-major-trace,
+      .zone-major-envelope,
+      .zone-accepted-envelope,
+      .zone-t2a,
+      .zone-t2b {
+        fill: none;
+        stroke-linejoin: round;
+      }
+
+      .trace-existing-raw,
+      .direct-major-polyline {
+        stroke: #c44731;
+        stroke-width: 2.1;
+      }
+
+      .overlay-revised-raw-trace,
+      .trace-revised-raw {
+        stroke: #2368c4;
+        stroke-width: 2.2;
+      }
+
+      .overlay-old-major-structure-trace,
+      .old-major-structure-trace,
+      .zone-old-major-trace {
+        stroke: #24835a;
+        stroke-width: 2;
+        stroke-dasharray: 5 4;
+      }
+
+      .overlay-major-envelope,
+      .major-structure-envelope,
+      .zone-major-envelope {
+        stroke: #b62978;
+        stroke-width: 3;
+      }
+
+      .overlay-accepted-envelope,
+      .zone-accepted-envelope {
+        stroke: #b62978;
+        stroke-width: 3.2;
+      }
+
+      .overlay-t2a,
+      .zone-t2a {
+        stroke: #087f9b;
+        stroke-width: 2.2;
+        stroke-dasharray: 7 4;
+      }
+
+      .overlay-t2b,
+      .zone-t2b {
+        stroke: #d76b19;
+        stroke-width: 2.2;
+      }
+
+      .overlay-panel {
+        margin-top: 12px;
+        min-height: 540px;
+      }
+
+      .overlay-panel .stage {
+        min-height: 450px;
+      }
+
+      .overlay-panel svg {
+        height: min(62vh, 500px);
+        min-height: 400px;
+      }
+
+      .envelope-landmarks circle {
+        fill: #ffd447;
+        stroke: #473600;
+        stroke-width: 1.7;
+      }
+
+      .envelope-landmarks text {
+        fill: #050505;
+        paint-order: stroke;
+        stroke: #fffdf8;
+        stroke-width: 2.5px;
+        font: 600 7px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .faint-trace {
+        opacity: 0.34;
+      }
+
+      .always-visible {
+        display: inline !important;
+      }
+
+      .overlay-landmarks .trace-point:not(.point-locked-major-landmark),
+      .overlay-landmarks text {
+        display: none;
+      }
+
+      .review-zone-section {
+        margin-top: 18px;
+        border-top: 1px solid var(--line);
+        padding-top: 16px;
+      }
+
+      .review-zone-section h2 {
+        margin: 0 0 6px;
+        font-size: 18px;
+      }
+
+      .review-zone-section > p {
+        margin-bottom: 12px;
+      }
+
+      .review-zone-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .review-zone-card {
+        border: 1px solid var(--line);
+        background: #fffdf8;
+      }
+
+      .review-zone-card h3 {
+        margin: 0;
+        border-bottom: 1px solid var(--line);
+        padding: 10px 12px;
+        font: 700 11px/1.25 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        text-transform: uppercase;
+      }
+
+      .review-zone-card svg {
+        height: 260px;
+        min-height: 220px;
+      }
+
+      .history-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        border-top: 1px solid var(--line);
+        padding: 14px;
+      }
+
+      .history-card {
+        border: 1px solid var(--line);
+      }
+
+      .history-card h3 {
+        margin: 0;
+        border-bottom: 1px solid var(--line);
+        padding: 10px;
+        font: 700 11px/1.3 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .history-card .metrics {
+        margin: 0;
+      }
+
+      .error-history {
+        margin-top: 18px;
+        border: 1px solid var(--line);
+        background: #fffdf8;
+      }
+
+      .error-history summary {
+        padding: 13px 15px;
+        font: 700 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        cursor: pointer;
+      }
+
+      .error-history .error-history-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(240px, 0.55fr);
+        gap: 16px;
+        border-top: 1px solid var(--line);
+        padding: 14px;
+      }
+
+      .error-history svg {
+        height: 360px;
+        min-height: 300px;
+      }
+
+      .trace-axis {
+        stroke: rgb(0 0 0 / 45%);
+        stroke-width: 1.5;
+        stroke-dasharray: 7 5;
+      }
+
+      .trace-landmarks circle {
+        fill: #fffdf8;
+        stroke: #050505;
+        stroke-width: 2;
+      }
+
+      .trace-landmarks text {
+        fill: #050505;
+        font: 600 7px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .metrics {
+        display: grid;
+        gap: 4px;
+        margin: -10px 18px 18px;
+        padding: 10px 12px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font: 500 11px/1.35 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        list-style: none;
+      }
+
+      @media (max-width: 900px) {
+        header {
+          align-items: start;
+          flex-direction: column;
+        }
+
+        .controls {
+          justify-content: start;
+        }
+
+        .lab-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .comparison-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .review-zone-grid,
+        .history-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 620px) {
+        .comparison-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .review-zone-grid,
+        .history-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .error-history .error-history-body {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>Leaf Silhouette Lab</h1>
+          <p>二维闭合曲线验证页。这里不加载 Three.js，不生成厚度、法线、叶脉、姿态、材质或 InstancedMesh，只检查黑色 silhouette 的第一眼阅读。</p>
+        </div>
+        <nav class="controls" aria-label="Leaf silhouette filter">
+          <button type="button" data-filter="all">all</button>
+          <button type="button" data-filter="strap">strap</button>
+          <button type="button" data-filter="palmate">palmate</button>
+          <button type="button" data-trace-overlay aria-pressed="false">trace overlay</button>
+        </nav>
+      </header>
+
+      <section class="lab-grid" aria-label="Leaf silhouette specimens">
+        <article class="specimen" data-specimen="strap">
+          <div class="specimen-title">
+            <span>Current C2</span>
+            <span>control from previous round</span>
+          </div>
+          <div class="stage">
+            <svg id="strap-current-c2" viewBox="-92 -36 184 642" role="img" aria-label="Current C2 strap silhouette control"></svg>
+          </div>
+        </article>
+
+        <article class="specimen" data-specimen="strap">
+          <div class="specimen-title">
+            <span>D1</span>
+            <span>clear basal shoulders</span>
+          </div>
+          <div class="stage">
+            <svg id="strap-d1" viewBox="-92 -36 184 642" role="img" aria-label="Strap silhouette candidate D1"></svg>
+          </div>
+        </article>
+
+        <article class="specimen" data-specimen="strap">
+          <div class="specimen-title">
+            <span>D2</span>
+            <span>late taper standard</span>
+          </div>
+          <div class="stage">
+            <svg id="strap-d2" viewBox="-92 -36 184 642" role="img" aria-label="Strap silhouette candidate D2"></svg>
+          </div>
+        </article>
+
+        <article class="specimen" data-specimen="strap">
+          <div class="specimen-title">
+            <span>D3</span>
+            <span>light natural asymmetry</span>
+          </div>
+          <div class="stage">
+            <svg id="strap-d3" viewBox="-92 -36 184 642" role="img" aria-label="Strap silhouette candidate D3"></svg>
+          </div>
+        </article>
+
+      </section>
+
+      <section class="comparison-grid" aria-label="Palmate accepted structure and smoothing candidates">
+        <article class="specimen" data-specimen="palmate">
+          <div class="specimen-title">
+            <span>REFERENCE IMAGE</span>
+            <span>Acer platanoides · visual source</span>
+          </div>
+          <div class="stage">
+            <svg id="palmate-reference-image" viewBox="0 0 500 420" role="img" aria-label="Acer platanoides reference image"></svg>
+          </div>
+        </article>
+
+        <article class="specimen" data-specimen="palmate">
+          <div class="specimen-title">
+            <span>ACCEPTED MAJOR STRUCTURE</span>
+            <span>24 landmarks · frozen baseline</span>
+          </div>
+          <div class="stage">
+            <svg id="palmate-major-trace" viewBox="0 0 500 420" role="img" aria-label="Accepted major structure envelope"></svg>
+          </div>
+          <ul id="palmate-major-trace-metrics" class="metrics" aria-label="Major structure trace metrics"></ul>
+        </article>
+
+        <article class="specimen candidate-panel" data-specimen="palmate">
+          <div class="specimen-title">
+            <span>T2A STRUCTURAL SMOOTH</span>
+            <span>bounded local smoothing</span>
+          </div>
+          <div class="stage">
+            <svg id="palmate-t2a" viewBox="0 0 500 420" role="img" aria-label="T2a structural smooth silhouette"></svg>
+          </div>
+          <ul id="palmate-t2a-metrics" class="metrics" aria-label="T2a structural smooth metrics"></ul>
+        </article>
+
+        <article class="specimen candidate-panel" data-specimen="palmate">
+          <div class="specimen-title">
+            <span>T2B LIGHT SERRATION</span>
+            <span>10 representative edge teeth</span>
+          </div>
+          <div class="stage">
+            <svg id="palmate-t2b" viewBox="0 0 500 420" role="img" aria-label="T2b light serration silhouette"></svg>
+          </div>
+          <ul id="palmate-t2b-metrics" class="metrics" aria-label="T2b light serration metrics"></ul>
+        </article>
+      </section>
+
+      <article class="specimen overlay-panel" data-specimen="palmate">
+        <div class="specimen-title">
+          <span>OVERLAY</span>
+          <span>reference / accepted / T2a / T2b</span>
+        </div>
+        <div class="stage">
+          <svg id="palmate-major-overlay" viewBox="0 0 500 420" role="img" aria-label="Accepted structure and T2 candidates overlay against reference image"></svg>
+        </div>
+        <ul id="palmate-major-overlay-metrics" class="metrics" aria-label="Accepted structure and T2 overlay legend"></ul>
+      </article>
+
+      <section class="review-zone-section" data-specimen="palmate" aria-label="Palmate major structure review zones">
+        <h2>Major Structure Review Zones</h2>
+        <p>每个局部视图同时显示参考图、已接受的主结构、T2a、T2b 和锁定地标。24 个主结构点及 60 点历史轮廓本轮均不修改。</p>
+        <div class="review-zone-grid">
+          <article class="review-zone-card">
+            <h3>1 · central lobe</h3>
+            <svg data-major-review-zone="central-lobe" role="img" aria-label="Central lobe major structure review"></svg>
+          </article>
+          <article class="review-zone-card">
+            <h3>2 · left upper lobe</h3>
+            <svg data-major-review-zone="left-upper-lobe" role="img" aria-label="Left upper lobe major structure review"></svg>
+          </article>
+          <article class="review-zone-card">
+            <h3>3 · right upper lobe</h3>
+            <svg data-major-review-zone="right-upper-lobe" role="img" aria-label="Right upper lobe major structure review"></svg>
+          </article>
+          <article class="review-zone-card">
+            <h3>4 · left lower lobe and base</h3>
+            <svg data-major-review-zone="left-lower-lobe-base" role="img" aria-label="Left lower lobe and base major structure review"></svg>
+          </article>
+          <article class="review-zone-card">
+            <h3>5 · right lower lobe and base</h3>
+            <svg data-major-review-zone="right-lower-lobe-base" role="img" aria-label="Right lower lobe and base major structure review"></svg>
+          </article>
+          <article class="review-zone-card">
+            <h3>6 · petiole insertion and basal edge</h3>
+            <svg data-major-review-zone="petiole-insertion-basal-edge" role="img" aria-label="Petiole insertion and basal edge major structure review"></svg>
+          </article>
+        </div>
+      </section>
+
+      <details class="error-history" data-specimen="palmate">
+        <summary>Frozen trace and rejected smoothing history</summary>
+        <div class="history-grid">
+          <article class="history-card">
+            <h3>Existing Revised 60-point Trace · frozen history</h3>
+            <svg id="palmate-existing-raw" viewBox="0 0 500 420" role="img" aria-label="Existing revised 60-point trace frozen history"></svg>
+            <ul id="palmate-existing-raw-metrics" class="metrics" aria-label="Existing raw trace metrics"></ul>
+          </article>
+          <article class="history-card">
+            <h3>24 Major Structure Landmarks · frozen baseline</h3>
+            <svg id="palmate-major-points" viewBox="0 0 500 420" role="img" aria-label="Accepted major structure landmarks history"></svg>
+            <ul id="palmate-major-points-metrics" class="metrics" aria-label="Major structure point metrics"></ul>
+          </article>
+          <article class="history-card">
+            <h3>T2a Structural Smooth · rejected history</h3>
+            <svg id="palmate-history-t2a" viewBox="0 0 500 420" role="img" aria-label="Rejected T2a structural smooth history"></svg>
+            <ul id="palmate-history-t2a-metrics" class="metrics" aria-label="Rejected T2a metrics and caveat"></ul>
+          </article>
+          <article class="history-card">
+            <h3>T2b Light Serration · rejected history</h3>
+            <svg id="palmate-history-t2b" viewBox="0 0 500 420" role="img" aria-label="Rejected T2b light serration history"></svg>
+            <ul id="palmate-history-t2b-metrics" class="metrics" aria-label="Rejected T2b metrics and caveat"></ul>
+          </article>
+          <article class="history-card">
+            <h3>Old Smoothed Trace · error control</h3>
+            <svg id="palmate-old-smoothed-trace" viewBox="0 0 500 420" role="img" aria-label="Old smoothed trace error control"></svg>
+            <ul id="palmate-old-smoothed-metrics" class="metrics" aria-label="Old smoothed trace failure record"></ul>
+          </article>
+        </div>
+      </details>
+    </main>
+    <script type="module" src="/src/leafSilhouetteLab.ts"></script>
+  </body>
+</html>
