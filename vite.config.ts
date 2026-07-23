@@ -75,6 +75,7 @@ export default defineConfig({
         ];
       },
       closeBundle() {
+        mkdirSync(resolve(__dirname, 'dist'), { recursive: true });
         writeFileSync(resolve(__dirname, 'dist/version.json'), `${JSON.stringify(buildInfo, null, 2)}\n`);
         mkdirSync(resolve(__dirname, 'dist/data'), { recursive: true });
         copyFileSync(
