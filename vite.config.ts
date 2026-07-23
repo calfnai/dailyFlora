@@ -128,6 +128,7 @@ export default defineConfig({
         aestheticReviewDashboard: resolve(__dirname, 'docs/aesthetic-review-dashboard.html'),
         primitiveLab: resolve(__dirname, 'docs/primitive-lab.html'),
         realisticFlowerLab: resolve(__dirname, 'docs/realistic-flower-lab.html'),
+        flowerSystemReview: resolve(__dirname, 'docs/flower-system-review.html'),
         leafFlowerPairingLab: resolve(__dirname, 'docs/leaf-flower-pairing-lab.html'),
         foxtailLilyApprovalLab: resolve(__dirname, 'docs/foxtail-lily-approval-lab.html'),
         ammiMajusApprovalLab: resolve(__dirname, 'docs/ammi-majus-approval-lab.html'),

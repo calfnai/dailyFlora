@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="DailyFlora 花型验收与叶片系统进度工具" />
+    <title>DailyFlora 花型与叶片系统验收</title>
+    <style>
+      :root{color-scheme:dark;--bg:#090a08;--panel:#11140f;--panel2:#171b14;--text:#f2eee3;--muted:#aaa99d;--line:#30342b;--gold:#d9bd72;--green:#93c98b;--red:#e18a7f;--blue:#8fb8d7}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 12% 0%,#34412755,transparent 32%),radial-gradient(circle at 90% 4%,#4c392755,transparent 28%),var(--bg);color:var(--text);font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif}button,input,textarea,select{font:inherit}button,a{color:inherit}.shell{width:min(1480px,100%);margin:auto;padding:22px}.hero,.panel{border:1px solid var(--line);background:linear-gradient(145deg,#151910ee,#0d0f0cee);box-shadow:0 22px 70px #0005}.hero{padding:clamp(24px,5vw,62px);border-radius:20px}.eyebrow{margin:0 0 10px;color:var(--gold);font:700 11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.15em;text-transform:uppercase}.hero-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:28px;align-items:end}h1{max-width:12ch;margin:0;font-size:clamp(44px,7vw,92px);font-weight:520;letter-spacing:-.06em;line-height:.92}.hero-copy{max-width:62ch;margin:20px 0 0;color:var(--muted);font-size:15px;line-height:1.8}.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.metric{padding:18px;border:1px solid var(--line);border-radius:12px;background:#0b0d0a99}.metric b{display:block;color:var(--gold);font:500 clamp(28px,4vw,48px)/1 ui-monospace,SFMono-Regular,Menlo,monospace}.metric span{display:block;margin-top:8px;color:var(--muted);font-size:12px}.note{margin:14px 0 0;color:#c8c5b9;font-size:12px;line-height:1.6}.tabs,.toolbar,.filters,.decision-row,.links{display:flex;flex-wrap:wrap;gap:8px}.tabs{position:sticky;top:0;z-index:30;margin:18px 0;padding:10px;border:1px solid var(--line);border-radius:14px;background:#090a08e8;backdrop-filter:blur(18px)}.tabs button,.toolbar button,.filters button,.decision-row button,.link,.export-button{min-height:38px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:#161a13;color:var(--muted);cursor:pointer;text-decoration:none}.tabs button[aria-pressed="true"],.filters button[aria-pressed="true"]{border-color:#d9bd7288;color:var(--text);background:#d9bd7218}.panel{margin-top:18px;padding:clamp(18px,3vw,34px);border-radius:18px}.panel[hidden]{display:none}.section-head{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:20px}.section-head h2{margin:0;font-size:clamp(30px,4vw,54px);font-weight:520;letter-spacing:-.04em}.section-head p{max-width:66ch;margin:8px 0 0;color:var(--muted);line-height:1.65}.toolbar{justify-content:flex-end}.progress{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin:18px 0}.progress-track{height:8px;overflow:hidden;border-radius:999px;background:#252920}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .25s}.progress output{color:var(--muted);font:600 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace}.filters{margin-bottom:18px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.card{display:flex;min-height:310px;flex-direction:column;padding:17px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(155deg,#181c15,#0f110e)}.card[data-decision="pass"]{border-color:#93c98b77}.card[data-decision="reject"]{border-color:#e18a7f88}.card-top{display:flex;justify-content:space-between;gap:12px}.index{color:var(--gold);font:600 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace}.badge{padding:5px 8px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:9px;letter-spacing:.06em}.card h3{margin:18px 0 3px;font-size:23px;font-weight:560}.english{margin:0;color:#c8aa63;font-family:ui-serif,Georgia,serif;font-size:13px}.description{min-height:58px;margin:14px 0;color:var(--muted);font-size:12px;line-height:1.6}.card .link{align-self:flex-start;min-height:30px;padding:0 11px;font-size:10px}.review{margin-top:auto;padding-top:14px;border-top:1px solid var(--line)}.decision-row button{flex:1;min-width:76px;min-height:34px;padding:0 10px;font-size:11px}.decision-row button[data-choice="pass"][aria-pressed="true"]{border-color:var(--green);color:#d8f3d3;background:#93c98b22}.decision-row button[data-choice="reject"][aria-pressed="true"]{border-color:var(--red);color:#ffd5cf;background:#e18a7f22}.decision-row button[data-choice="pending"][aria-pressed="true"]{border-color:var(--gold);color:#f0db9d;background:#d9bd721c}textarea{width:100%;min-height:72px;margin-top:9px;padding:10px;border:1px solid var(--line);border-radius:9px;resize:vertical;background:#090b08;color:var(--text);font-size:11px;line-height:1.5}textarea:focus{outline:1px solid #d9bd7288}.flow{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:20px 0}.flow-step{position:relative;min-height:118px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#11140f}.flow-step:not(:last-child)::after{content:"→";position:absolute;right:-10px;top:42%;z-index:2;color:var(--gold)}.flow-step b{display:block;color:var(--gold);font:600 11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}.flow-step span{display:block;margin-top:8px;color:var(--muted);font-size:10px;line-height:1.5}.examples{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.example{padding:18px;border:1px solid var(--line);border-radius:14px;background:#11140f}.example h3{margin:0 0 5px;font-size:22px}.example p{margin:8px 0;color:var(--muted);font-size:12px;line-height:1.65}.code{padding:12px;border:1px solid #3b4036;border-radius:9px;background:#090b08;color:#d7d3c7;font:10px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}.status-table{width:100%;border-collapse:collapse}.status-table th,.status-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:11px}.status-table th{color:var(--gold);font:600 10px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}.status-confirmed{color:var(--green)}.status-unresolved{color:var(--muted)}.empty{grid-column:1/-1;padding:34px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);text-align:center}.footer{padding:28px 4px 8px;color:var(--muted);font-size:11px;line-height:1.7}.toast{position:fixed;right:20px;bottom:20px;z-index:50;padding:12px 16px;border:1px solid var(--line);border-radius:999px;background:#181c15;color:var(--text);box-shadow:0 16px 50px #0008;opacity:0;transform:translateY(10px);transition:.2s;pointer-events:none}.toast.is-visible{opacity:1;transform:none}@media(max-width:1050px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.flow{grid-template-columns:repeat(3,1fr)}.flow-step:nth-child(3)::after{display:none}}@media(max-width:720px){.shell{padding:12px}.hero-grid,.examples{grid-template-columns:1fr}.metrics{margin-top:8px}.section-head{align-items:stretch;flex-direction:column}.toolbar{justify-content:flex-start}.grid{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.flow-step::after{display:none}.tabs{top:0;overflow-x:auto;flex-wrap:nowrap}.tabs button{white-space:nowrap}.status-table{display:block;overflow-x:auto}.card{min-height:0}}
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">DailyFlora owner review · 2026-07-24</p>
+        <div class="hero-grid">
+          <div>
+            <h1>花型与叶片系统验收</h1>
+            <p class="hero-copy">先审核 43 个“词表层级条目”，再跟进 25 种写实花型的叶片结合进度。每项可选择通过、不通过或待定，并填写意见。审核结果保存在当前浏览器，也可以导出交给开发继续处理。</p>
+          </div>
+          <aside>
+            <div class="metrics">
+              <div class="metric"><b>16</b><span>原有抽象词表</span></div>
+              <div class="metric"><b>25</b><span>偏写实具名花型</span></div>
+              <div class="metric"><b>1</b><span>已通过混合花型</span></div>
+              <div class="metric"><b>1</b><span>待验收候选</span></div>
+            </div>
+            <p class="note">合计 43 个审核条目，但不是 43 个互不重复的植物物种；抽象词表与写实花型是两层不同用途的系统。</p>
+          </aside>
+        </div>
+      </header>
+
+      <nav class="tabs" aria-label="验收工具分区">
+        <button type="button" data-tab="flowers" aria-pressed="true">01 花型验收</button>
+        <button type="button" data-tab="leaf-system" aria-pressed="false">02 叶片结合范例</button>
+        <button type="button" data-tab="leaf-progress" aria-pressed="false">03 叶片进度</button>
+      </nav>
+
+      <section class="panel" data-panel="flowers">
+        <div class="section-head">
+          <div><p class="eyebrow">43 review entries</p><h2>逐项确认花型</h2><p>“通过 / 不通过 / 待定”与意见会即时保存。需要看 3D 时，点击卡片中的对应 LAB。</p></div>
+          <div class="toolbar"><button type="button" id="export-json">导出 JSON</button><button type="button" id="export-markdown">导出 Markdown</button><button type="button" id="clear-reviews">清空本机审核</button></div>
+        </div>
+        <div class="progress"><div class="progress-track"><div class="progress-fill" id="flower-progress-fill"></div></div><output id="flower-progress">0 / 43 已决定</output></div>
+        <div class="filters" id="flower-filters" aria-label="花型分类筛选"></div>
+        <div class="grid" id="flower-grid"></div>
+      </section>
+
+      <section class="panel" data-panel="leaf-system" hidden>
+        <div class="section-head">
+          <div><p class="eyebrow">How it joins the production renderer</p><h2>叶片如何接入主版本</h2><p>叶片不会改写花朵计划、花朵随机数或主要构图。它从同一根实际花茎读取成员身份，再以独立随机数生成已确认的叶型和叶序。</p></div>
+          <div class="links"><a class="link" href="./leaf-flower-pairing-lab.html">打开 4 组 3D 搭配 LAB</a><a class="link" href="./realistic-flower-lab.html">打开 25 种花型总览</a></div>
+        </div>
+        <div class="flow" aria-label="叶片接入流程">
+          <div class="flow-step"><b>01 Flower plan</b><span>主版本决定今天出现哪些花，不因叶片系统改变。</span></div>
+          <div class="flow-step"><b>02 PlantStemInstance</b><span>每朵花、花茎与成员 ID 绑定到同一实例。</span></div>
+          <div class="flow-step"><b>03 Foliage profile</b><span>只查已确认映射；未研究成员返回 unresolved + none。</span></div>
+          <div class="flow-step"><b>04 Independent RNG</b><span>叶片使用独立 seed，不扰动原有花朵位置与配色。</span></div>
+          <div class="flow-step"><b>05 Geometry + order</b><span>按 Strap / Palmate 与 basal / alternate 生成。</span></div>
+          <div class="flow-step"><b>06 Ownership audit</b><span>检查孤立叶、错茎、多 profile 和遮挡风险。</span></div>
+        </div>
+        <div class="examples" id="leaf-examples"></div>
+      </section>
+
+      <section class="panel" data-panel="leaf-progress" hidden>
+        <div class="section-head">
+          <div><p class="eyebrow">25 realistic members</p><h2>叶片系统推进表</h2><p>当前 4 种已确认，21 种保持未研究、无叶片。这里的“无叶”是安全门禁，不是缺陷兜底。</p></div>
+          <div class="toolbar"><output id="leaf-summary">4 / 25 已确认</output></div>
+        </div>
+        <div class="progress"><div class="progress-track"><div class="progress-fill" id="leaf-progress-fill"></div></div><output>16% 已确认</output></div>
+        <table class="status-table">
+          <thead><tr><th>花型</th><th>当前 profile</th><th>叶序</th><th>管线状态</th><th>下一步</th></tr></thead>
+          <tbody id="leaf-progress-body"></tbody>
+        </table>
+      </section>
+
+      <p class="footer">本工具的审核结果仅保存在当前设备浏览器。导出的 JSON / Markdown 可作为下一轮开发验收输入；项目代码中的正式状态仍只在用户明确确认后更新。</p>
+    </main>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="/src/flowerSystemReview.ts"></script>
+  </body>
+</html>

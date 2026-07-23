@@ -412,3 +412,5 @@ git push
 2026-07-23 叶片关系定稿：用户确认 Strap 与 Palmate 两个叶片原型可以受控并入生成管线。Strap D2 基生原型只映射洋水仙、风信子和狐尾百合；Palmate Major Structure Envelope 只映射飞燕草。其余 21 个偏写实花型必须保持 `unresolved + none`，不得使用通用椭圆叶兜底。所有确认叶片必须属于具体 `PlantStemInstance`，使用独立 RNG，并继续服从“叶材支撑空气、不挡主花、不改变主要构图”的审美边界。
 
 2026-07-24 发布门禁确认：用户复验通过 `2026-07-07`、`2026-07-11`、`2026-07-13`、`2026-07-16` 四个日期花束；新版 GUI 在版本标记移至左上角、不再遮挡右下角视角控件后通过。用户授权把上述花束修正、新 GUI 与浏览器手势控制并入整合主线，完成成品版发布。
+
+2026-07-24 花型与叶片审核工具：新增 `docs/flower-system-review.html`，把 16 个原有抽象词表、25 种偏写实具名花型、1 个已通过混合花型和 1 个候选分层呈现为 43 个审核条目。43 是跨层级审核项，不代表 43 个互不重复的植物物种。工具支持逐项通过、不通过、待定、意见、本机保存和 JSON/Markdown 导出；叶片页同步展示 `flower plan → PlantStemInstance → foliage profile → independent leaf RNG → geometry/order → ownership audit` 的主版本接入流程，以及 4/25 已确认进度。
