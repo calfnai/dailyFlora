@@ -2,7 +2,7 @@
 
 日期：2026-07-23
 
-状态：首批受控映射已定稿并进入主生成管线；未确认成员继续保持 `unresolved + none`。
+状态：三组 Strap 受控映射已定稿并进入主生成管线；飞燕草 Palmate 映射经用户复验否决并撤销，其余未确认成员继续保持 `unresolved + none`。
 
 ## 定稿原则
 
@@ -19,7 +19,8 @@
 | 洋水仙 `narcissus` | `confirmed:strap-d2-basal-v1` | `basal` | 水仙为基生、线形至带状叶；D2 用作受控程序化近似。 |
 | 风信子 `hyacinth` | `confirmed:strap-d2-basal-v1` | `basal` | 风信子叶基生、线形至披针形；使用同一 Strap 拓扑，但不宣称精确物种扫描。 |
 | 狐尾百合 `foxtail-lily` | `confirmed:strap-d2-basal-v1` | `basal` | 狐尾百合从基部莲座抽生狭长带状叶；当前只表达基生长叶关系。 |
-| 飞燕草 `delphinium` | `confirmed:palmate-major-envelope-v1` | `alternate` | 使用已验收的掌状五裂单叶原型表达掌状分裂识别线索；它源自槭属参考包络，是受控近似，不是飞燕草叶片的精确复刻。 |
+
+飞燕草 `delphinium` 曾临时映射 `confirmed:palmate-major-envelope-v1`，但该原型源自槭属参考包络，与飞燕草真实掌状深裂叶差异过大。用户于 2026-07-25 复验否决；当前恢复为 `unresolved + none`，不得在主花束或搭配验收页生成该叶型。
 
 参考：
 
@@ -48,7 +49,7 @@
 | narcissus | 洋水仙 | confirmed:strap-d2-basal-v1 | attached | basal |
 | phalaenopsis | 蝴蝶兰 | unresolved | none | unresolved |
 | calla | 马蹄莲 | unresolved | none | unresolved |
-| delphinium | 飞燕草 | confirmed:palmate-major-envelope-v1 | attached | alternate |
+| delphinium | 飞燕草 | unresolved | none | unresolved |
 | snapdragon | 金鱼草 | unresolved | none | unresolved |
 | hyacinth | 风信子 | confirmed:strap-d2-basal-v1 | attached | basal |
 | foxtail-lily | 狐尾百合 | confirmed:strap-d2-basal-v1 | attached | basal |
@@ -61,11 +62,12 @@
 ## 主花束接入边界
 
 - 当前主花束类型中，水仙与风信子可实际消费确认的 Strap profile。
-- 狐尾百合与飞燕草已完成成员映射，并在偏写实花型 LAB 中显示；它们尚未进入当前主花束的 `FlowerTypeId` 计划，因此本轮不为叶片而改动花朵构图。
+- 狐尾百合已完成成员映射并在偏写实花型 LAB 中显示；它尚未进入当前主花束的 `FlowerTypeId` 计划，因此本轮不为叶片而改动花朵构图。
+- 飞燕草不再消费 Palmate profile；未来必须依据飞燕草自身掌状深裂结构重新研究，不能复用槭属轮廓。
 - 叶片使用独立 RNG 命名空间，不插入现有 flower RNG 流。
 - 同一花茎只允许一个 profile 和一种叶序；叶片节点必须落在所属茎曲线上。
 - 保留的 `temporary-legacy` 独立叶材仍是空间支撑材料，不代表任何写实花型成员。
 
 ## 当前结论
 
-Strap 与 Palmate 已作为两种受控叶片原型进入统一叶片—花茎关系；映射范围限定为以上四个成员。其余成员继续保持无叶，等待未来逐种研究。本状态允许进入整体审美与构建，但不等于叶片系统、真实物种叶型或全部成员配置已经完成。
+Strap 已作为受控叶片原型进入统一叶片—花茎关系，映射范围限定为洋水仙、风信子和狐尾百合。Palmate 独立原型继续保留，但不再映射任何偏写实花型成员。其余 22 个成员保持无叶，等待未来逐种研究。本状态允许三组 Strap 关系进入整体审美与构建，但不等于叶片系统、真实物种叶型或全部成员配置已经完成。
