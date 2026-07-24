@@ -220,14 +220,14 @@ baseline: 'major-structure-envelope-v1'
 ### 当前边界
 
 - 仍不是 production-ready 的具体物种叶型。
-- 已受控映射给飞燕草，用于表达掌状分裂识别线索；它不是飞燕草真实叶片的精确扫描。
-- 当前主花束计划尚未包含飞燕草，因此不为展示 Palmate 而改动花朵构图。
+- 飞燕草映射已经用户复验否决；该槭属来源包络与飞燕草真实掌状深裂结构差异过大。
+- Palmate 当前不映射任何 realistic flower 成员，也不为展示原型而改动花朵构图。
 - 其余 realistic flower 成员不得自动复用 Palmate。
 - 原型几何继续冻结，不再返回二维轮廓循环。
 
 ### 当前结论
 
-Palmate 已完成基于 `major-structure-envelope-v1` 的独立 3D Mini Lab，并保留极浅掌状一级脉、裂片局部姿态、叶脉间轻微下垂及连续叶柄—叶基过渡。经用户验收后，它已作为受控程序化原型映射给飞燕草；映射不代表真实物种扫描，不扩散到其他成员。
+Palmate 已完成基于 `major-structure-envelope-v1` 的独立 3D Mini Lab，并保留极浅掌状一级脉、裂片局部姿态、叶脉间轻微下垂及连续叶柄—叶基过渡。它继续作为独立几何原型保存，但不映射任何偏写实花型成员；飞燕草未来必须使用自身物种结构重新研究。
 
 跨叶片与花型共用的研究流程见：[偏写实植物器官研究方法 v1](./realistic-organ-research-method-v1.md)。
 完整成员矩阵见：[写实花型—叶片成员映射 v1](./realistic-leaf-member-mapping-v1.md)。

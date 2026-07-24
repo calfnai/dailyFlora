@@ -117,8 +117,7 @@ export const realisticFlowerIds: readonly RealisticFlowerId[] = [
 const confirmedFoliageByMember: Partial<Record<RealisticFlowerId, StemFoliageProfile>> = {
   narcissus: confirmedStrapBasalProfile,
   hyacinth: confirmedStrapBasalProfile,
-  'foxtail-lily': confirmedStrapBasalProfile,
-  delphinium: confirmedPalmateLobedProfile
+  'foxtail-lily': confirmedStrapBasalProfile
 };
 
 export const realisticFlowerFoliageStatus: Readonly<Record<RealisticFlowerId, StemFoliageProfile>> =
