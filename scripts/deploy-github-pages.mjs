@@ -200,15 +200,17 @@ function ghApiJson(gh, apiArgs, input) {
     endpoint.endsWith('/git/commits') ||
     endpoint.includes('/git/refs') ||
     endpoint.endsWith('/pages');
-  for (let attempt = 1; attempt <= 4; attempt += 1) {
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
     try {
       const out = ghApi(gh, apiArgs, input).trim();
       return out ? JSON.parse(out) : null;
     } catch (error) {
       const detail = `${error?.stderr || ''}\n${error?.message || ''}`;
-      const transient = /(EPIPE|ECONNRESET|ETIMEDOUT|EAI_AGAIN|ENOTFOUND|HTTP (429|502|503|504)\b)/.test(detail);
-      if (!retryableEndpoint || !transient || attempt === 4) throw error;
-      log(`GitHub API retry ${attempt}/3 after a transient API error on ${endpoint}.`);
+      const transient = /(EPIPE|ECONNRESET|ETIMEDOUT|EAI_AGAIN|ENOTFOUND|operation timed out|HTTP (429|502|503|504)\b)/i.test(
+        detail
+      );
+      if (!retryableEndpoint || !transient || attempt === 6) throw error;
+      log(`GitHub API retry ${attempt}/5 after a transient API error on ${endpoint}.`);
       Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, attempt * 1500);
     }
   }
