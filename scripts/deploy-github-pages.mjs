@@ -206,9 +206,7 @@ function ghApiJson(gh, apiArgs, input) {
       return out ? JSON.parse(out) : null;
     } catch (error) {
       const detail = `${error?.stderr || ''}\n${error?.message || ''}`;
-      const transient = /(EPIPE|ECONNRESET|ETIMEDOUT|EAI_AGAIN|ENOTFOUND|operation timed out|HTTP (429|502|503|504)\b)/i.test(
-        detail
-      );
+      const transient = /(EPIPE|ECONNRESET|ETIMEDOUT|EAI_AGAIN|ENOTFOUND|timeout|HTTP (429|502|503|504)\b)/i.test(detail);
       if (!retryableEndpoint || !transient || attempt === 6) throw error;
       log(`GitHub API retry ${attempt}/5 after a transient API error on ${endpoint}.`);
       Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, attempt * 1500);
