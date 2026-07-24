@@ -49,7 +49,7 @@
       <section class="panel" data-panel="leaf-system" hidden>
         <div class="section-head">
           <div><p class="eyebrow">How it joins the production renderer</p><h2>叶片如何接入主版本</h2><p>叶片不会改写花朵计划、花朵随机数或主要构图。它从同一根实际花茎读取成员身份，再以独立随机数生成已确认的叶型和叶序。</p></div>
-          <div class="links"><a class="link" href="./leaf-flower-pairing-lab.html">打开 4 组 3D 搭配 LAB</a><a class="link" href="./realistic-flower-lab.html">打开 25 种花型总览</a></div>
+          <div class="links"><a class="link" href="./leaf-flower-pairing-lab.html">打开花叶搭配验收 LAB</a><a class="link" href="./realistic-flower-lab.html">打开 25 种花型总览</a></div>
         </div>
         <div class="flow" aria-label="叶片接入流程">
           <div class="flow-step"><b>01 Flower plan</b><span>主版本决定今天出现哪些花，不因叶片系统改变。</span></div>
@@ -64,10 +64,10 @@
 
       <section class="panel" data-panel="leaf-progress" hidden>
         <div class="section-head">
-          <div><p class="eyebrow">25 realistic members</p><h2>叶片系统推进表</h2><p>当前 4 种已确认，21 种保持未研究、无叶片。这里的“无叶”是安全门禁，不是缺陷兜底。</p></div>
-          <div class="toolbar"><output id="leaf-summary">4 / 25 已确认</output></div>
+          <div><p class="eyebrow">25 realistic members</p><h2>叶片系统推进表</h2><p>当前 2 种已确认，1 种待复验，22 种保持未研究、无叶片。这里的“无叶”是安全门禁，不是缺陷兜底。</p></div>
+          <div class="toolbar"><output id="leaf-summary">2 / 25 已确认 · 1 待复验</output></div>
         </div>
-        <div class="progress"><div class="progress-track"><div class="progress-fill" id="leaf-progress-fill"></div></div><output>16% 已确认</output></div>
+        <div class="progress"><div class="progress-track"><div class="progress-fill" id="leaf-progress-fill"></div></div><output id="leaf-progress-output">8% 已确认</output></div>
         <table class="status-table">
           <thead><tr><th>花型</th><th>当前 profile</th><th>叶序</th><th>管线状态</th><th>下一步</th></tr></thead>
           <tbody id="leaf-progress-body"></tbody>

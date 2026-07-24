@@ -203,6 +203,9 @@ function renderLeafSystem() {
   const confirmed = realisticFlowerDefinitions.filter((definition) =>
     realisticFlowerFoliageStatus[definition.id].status === 'confirmed'
   );
+  const reviewNeeded = realisticFlowerDefinitions.filter((definition) =>
+    realisticFlowerFoliageStatus[definition.id].status === 'review-needed'
+  );
   const examples = document.querySelector<HTMLDivElement>('#leaf-examples');
   if (examples) {
     examples.innerHTML = confirmed.map((definition) => {
@@ -242,6 +245,10 @@ leafRng = independent(stemId)</div>
   }
   const fill = document.querySelector<HTMLDivElement>('#leaf-progress-fill');
   if (fill) fill.style.width = `${(confirmed.length / realisticFlowerDefinitions.length) * 100}%`;
+  const summary = document.querySelector<HTMLOutputElement>('#leaf-summary');
+  if (summary) summary.value = `${confirmed.length} / ${realisticFlowerDefinitions.length} 已确认 · ${reviewNeeded.length} 待复验`;
+  const progressOutput = document.querySelector<HTMLOutputElement>('#leaf-progress-output');
+  if (progressOutput) progressOutput.value = `${Math.round((confirmed.length / realisticFlowerDefinitions.length) * 100)}% 已确认`;
 }
 
 function exportReview(format: 'json' | 'markdown') {
