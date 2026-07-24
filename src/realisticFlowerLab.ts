@@ -34,7 +34,10 @@ const rotateButton = requiredElement<HTMLButtonElement>('#rotate-button');
 const viewButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-view]'));
 const pairingMode = document.body.dataset.labMode === 'leaf-member-pairing';
 const displayedDefinitions = pairingMode
-  ? realisticFlowerDefinitions.filter((definition) => realisticFlowerFoliageStatus[definition.id].status === 'confirmed')
+  ? realisticFlowerDefinitions.filter((definition) => {
+    const status = realisticFlowerFoliageStatus[definition.id].status;
+    return status === 'confirmed' || status === 'review-needed';
+  })
   : realisticFlowerDefinitions;
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -71,6 +74,11 @@ function escapeHtml(value: unknown) {
 function renderLabels() {
   labels.innerHTML = displayedDefinitions.map((definition, index) => {
     const foliage = realisticFlowerFoliageStatus[definition.id];
+    const statusCopy = foliage.status === 'confirmed'
+      ? '已按受控成员映射接入'
+      : foliage.status === 'review-needed'
+        ? '待复验：仅在搭配验收页显示'
+        : '后续需要独立研究';
     return `
       <article class="cell" data-flower="${escapeHtml(definition.id)}" data-foliage-profile="${escapeHtml(foliage.foliageProfile)}" data-leaf-mode="${escapeHtml(foliage.leafMode)}">
         <div class="label">
@@ -81,7 +89,7 @@ function renderLabels() {
           <p class="desc">${escapeHtml(definition.description)}</p>
           ${definition.calibration ? `<p class="calibration">${escapeHtml(definition.calibration)}</p>` : ''}
           <p class="print">${escapeHtml(definition.printStructure)}</p>
-          <p class="scope-note">foliageProfile: ${escapeHtml(foliage.foliageProfile)} · leafMode: ${escapeHtml(foliage.leafMode)} · leafArrangement: ${escapeHtml(foliage.leafArrangement)} · ${foliage.status === 'confirmed' ? '已按受控成员映射接入' : '后续需要独立研究'}</p>
+          <p class="scope-note">foliageProfile: ${escapeHtml(foliage.foliageProfile)} · leafMode: ${escapeHtml(foliage.leafMode)} · leafArrangement: ${escapeHtml(foliage.leafArrangement)} · ${statusCopy}</p>
           ${definition.scopeNote ? `<p class="scope-note">${escapeHtml(definition.scopeNote)}</p>` : ''}
         </div>
       </article>
@@ -162,7 +170,8 @@ function initScenes() {
         seed: `realistic-lab:${definition.id}`,
         palette: [definition.palette[definition.palette.length - 1] ?? '#66854f', '#7d9b5c', '#58764a'],
         density: 1,
-        context: 'realistic-lab'
+        context: 'realistic-lab',
+        includeReviewNeeded: pairingMode
       });
       model.add(foliage.object);
       model.userData.confirmedLeafCount = foliage.leaves.length;
@@ -185,7 +194,7 @@ function initScenes() {
     totalDraws += counts.draws;
     totalTriangles += counts.triangles;
   });
-  stats.textContent = `1 canvas · ${previews.length} ${pairingMode ? 'confirmed pairings' : 'supported forms'} · draw ${totalDraws} · tri ${totalTriangles.toLocaleString()}`;
+  stats.textContent = `1 canvas · ${previews.length} ${pairingMode ? 'pairing review items' : 'supported forms'} · draw ${totalDraws} · tri ${totalTriangles.toLocaleString()}`;
 }
 
 function updateLayout() {

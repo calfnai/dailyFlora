@@ -7,13 +7,14 @@ export type FoliageProfileId =
   | 'unresolved'
   | 'temporary-legacy:foliage-grass-branch'
   | `temporary-legacy:${string}`
+  | `review:${string}`
   | `confirmed:${string}`;
 
 export interface StemFoliageProfile {
   foliageProfile: FoliageProfileId;
   leafMode: LeafMode;
   leafArrangement: LeafArrangement;
-  status: 'confirmed' | 'unresolved' | 'temporary-legacy';
+  status: 'confirmed' | 'review-needed' | 'unresolved' | 'temporary-legacy';
 }
 
 export interface PlantStemInstance extends StemFoliageProfile {
@@ -79,6 +80,13 @@ export const confirmedStrapBasalProfile: StemFoliageProfile = {
   status: 'confirmed'
 };
 
+export const reviewNeededStrapBasalProfile: StemFoliageProfile = {
+  foliageProfile: 'review:strap-d2-basal-v1',
+  leafMode: 'attached',
+  leafArrangement: 'basal',
+  status: 'review-needed'
+};
+
 export const confirmedPalmateLobedProfile: StemFoliageProfile = {
   foliageProfile: 'confirmed:palmate-major-envelope-v1',
   leafMode: 'attached',
@@ -116,15 +124,18 @@ export const realisticFlowerIds: readonly RealisticFlowerId[] = [
 
 const confirmedFoliageByMember: Partial<Record<RealisticFlowerId, StemFoliageProfile>> = {
   narcissus: confirmedStrapBasalProfile,
-  hyacinth: confirmedStrapBasalProfile,
   'foxtail-lily': confirmedStrapBasalProfile
+};
+
+const reviewNeededFoliageByMember: Partial<Record<RealisticFlowerId, StemFoliageProfile>> = {
+  hyacinth: reviewNeededStrapBasalProfile
 };
 
 export const realisticFlowerFoliageStatus: Readonly<Record<RealisticFlowerId, StemFoliageProfile>> =
   Object.freeze(Object.fromEntries(
     realisticFlowerIds.map((id) => [
       id,
-      Object.freeze({ ...(confirmedFoliageByMember[id] ?? unresolvedFoliageProfile) })
+      Object.freeze({ ...(confirmedFoliageByMember[id] ?? reviewNeededFoliageByMember[id] ?? unresolvedFoliageProfile) })
     ])
   ) as Record<RealisticFlowerId, StemFoliageProfile>);
 

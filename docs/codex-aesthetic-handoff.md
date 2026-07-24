@@ -409,8 +409,8 @@ git push
 若修改了网页生成效果，请运行 npm run build，并把 dist 发布到 gh-pages。
 不要把无关的本地草稿或 inbox 文件带进提交。
 ```
-2026-07-23 叶片关系定稿，2026-07-25 复验修订：Strap D2 基生原型只映射洋水仙、风信子和狐尾百合。飞燕草使用槭属来源 Palmate 的映射因形态错误被用户否决，恢复 `unresolved + none`；Palmate 只保留为独立原型，不映射成员。其余 22 个偏写实花型必须保持 `unresolved + none`，不得使用通用椭圆叶兜底。所有确认叶片必须属于具体 `PlantStemInstance`，使用独立 RNG，并继续服从“叶材支撑空气、不挡主花、不改变主要构图”的审美边界。
+2026-07-23 叶片关系定稿，2026-07-25 复验修订：Strap D2 基生原型当前只定稿映射洋水仙和狐尾百合；风信子配 Strap 降级为 `review-needed`，只在单独搭配验收页检查“风信子花序 + Strap 基生叶”，不得算作 confirmed。飞燕草使用槭属来源 Palmate 的映射因形态错误被用户否决，恢复 `unresolved + none`；Palmate 只保留为独立原型，不映射成员。其余 22 个偏写实花型必须保持 `unresolved + none`，不得使用通用椭圆叶兜底。所有确认叶片必须属于具体 `PlantStemInstance`，使用独立 RNG，并继续服从“叶材支撑空气、不挡主花、不改变主要构图”的审美边界。
 
 2026-07-24 发布门禁确认：用户复验通过 `2026-07-07`、`2026-07-11`、`2026-07-13`、`2026-07-16` 四个日期花束；新版 GUI 在版本标记移至左上角、不再遮挡右下角视角控件后通过。用户授权把上述花束修正、新 GUI 与浏览器手势控制并入整合主线，完成成品版发布。
 
-2026-07-24 花型与叶片审核工具：新增 `docs/flower-system-review.html`，把 16 个原有抽象词表、25 种偏写实具名花型、1 个已通过混合花型和 1 个候选分层呈现为 43 个审核条目。43 是跨层级审核项，不代表 43 个互不重复的植物物种。工具支持逐项通过、不通过、待定、意见、本机保存和 JSON/Markdown 导出；叶片页同步展示 `flower plan → PlantStemInstance → foliage profile → independent leaf RNG → geometry/order → ownership audit` 的主版本接入流程。经 2026-07-25 复验，当前已确认进度为 3/25。
+2026-07-24 花型与叶片审核工具：新增 `docs/flower-system-review.html`，把 16 个原有抽象词表、25 种偏写实具名花型、1 个已通过混合花型和 1 个候选分层呈现为 43 个审核条目。43 是跨层级审核项，不代表 43 个互不重复的植物物种。工具支持逐项通过、不通过、待定、意见、本机保存和 JSON/Markdown 导出；叶片页同步展示 `flower plan → PlantStemInstance → foliage profile → independent leaf RNG → geometry/order → ownership audit` 的主版本接入流程。经 2026-07-25 复验，当前已确认进度为 2/25，风信子为 review-needed。
