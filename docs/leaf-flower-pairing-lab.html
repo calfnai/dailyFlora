@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DailyFlora 花型 × 叶片搭配验收</title>
+    <style>
+      :root{color-scheme:dark;--bg:#080907;--text:#f7f0e3;--muted:rgb(247 240 227 / 68%);--line:rgb(247 240 227 / 15%);--good:#8bd68c;--warn:#f2cb62}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(circle at 12% 0%,rgb(242 203 98 / 13%),transparent 28%),radial-gradient(circle at 88% 8%,rgb(139 214 140 / 10%),transparent 30%),#080907}button,a{font:inherit}a{color:inherit}h1,h2,p{margin-top:0}.shell{width:min(1320px,100%);margin:0 auto;padding:24px}.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:20px;padding:28px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,rgb(17 21 15 / 96%),rgb(28 31 21 / 84%))}.eyebrow{margin-bottom:9px;color:var(--warn);font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}h1{max-width:14ch;margin-bottom:14px;font-size:clamp(40px,6vw,76px);line-height:.98;letter-spacing:-.045em}.copy{max-width:76ch;margin-bottom:0;color:var(--muted);font-size:15px;line-height:1.7}.hero-side{padding:18px;border:1px solid var(--line);border-radius:11px;background:rgb(8 10 7 / 52%)}.hero-side strong{display:block;margin-bottom:10px;color:var(--good);font-size:28px}.mapping{display:grid;gap:8px;margin:0;padding:0;list-style:none}.mapping li{padding:9px 11px;border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:13px;line-height:1.45}.mapping b{color:var(--text)}.links,.tools{display:flex;flex-wrap:wrap;gap:8px}.links{margin-top:14px}.pill,button,output{display:inline-flex;min-height:38px;align-items:center;justify-content:center;padding:0 13px;border:1px solid var(--line);border-radius:999px;color:var(--text);background:rgb(16 21 15 / 88%);font-size:13px;text-decoration:none}button{cursor:pointer}button:hover,button[aria-pressed="true"],.pill:hover{border-color:rgb(242 203 98 / 58%);background:rgb(242 203 98 / 12%)}output{color:var(--muted);font-variant-numeric:tabular-nums}.lab{margin-top:24px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:14px}.section-head h2{margin-bottom:7px;font-size:clamp(28px,3vw,42px)}.tools{position:sticky;top:10px;z-index:20;padding:10px;background:rgb(8 10 7 / 88%);backdrop-filter:blur(18px)}.stage{position:relative;min-height:860px;overflow:hidden;border:1px solid var(--line);border-radius:14px;background:radial-gradient(circle at 50% 0%,rgb(247 240 227 / 7%),transparent 32%),linear-gradient(180deg,rgb(16 21 15 / 88%),rgb(8 10 7 / 84%))}#realistic-canvas{position:absolute;inset:0;display:block;width:100%;height:100%;cursor:grab;touch-action:none}.labels{position:absolute;inset:0;display:grid;pointer-events:none}.cell{position:relative;min-width:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.label{position:absolute;top:12px;right:12px;bottom:12px;width:min(47%,250px);overflow:auto;padding:13px;border:1px solid var(--line);border-radius:9px;background:rgb(8 10 7 / 92%)}.meta{display:flex;justify-content:space-between;gap:6px;margin-bottom:7px;color:var(--muted);font-size:9px;font-weight:800;letter-spacing:.07em}.connected{color:var(--good)}.label h3{margin:0 0 3px;font-size:18px}.en{margin-bottom:2px;color:var(--warn);font-size:12px;font-weight:700}.species{margin-bottom:8px;color:#d8c98c;font-family:ui-serif,Georgia,serif;font-size:10px;font-style:italic}.desc,.calibration,.print,.scope-note{margin-bottom:0;color:var(--muted);font-size:10px;line-height:1.48}.calibration{margin-top:7px;color:rgb(247 240 227 / 82%)}.print{margin-top:7px;padding-top:7px;border-top:1px solid var(--line);color:rgb(139 214 140 / 78%)}.scope-note{margin-top:7px;color:rgb(242 203 98 / 78%)}@media(max-width:900px){.hero{grid-template-columns:1fr}.section-head{align-items:stretch;flex-direction:column}.tools{position:static}}@media(max-width:759px){.shell{padding:14px}.hero{padding:20px}.label{top:auto;left:10px;right:10px;bottom:10px;width:auto;height:218px}.stage{min-height:2240px}}
+    </style>
+  </head>
+  <body data-lab-mode="leaf-member-pairing">
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">DailyFlora confirmed foliage relationships</p>
+          <h1>花型 × 叶片搭配验收</h1>
+          <p class="copy">这里不是 25 种花型总览，只显示已经定稿的四组花叶关系。所有模型直接读取主生成管线中的同一份成员映射和叶片 geometry；未研究的 21 种花型不会在这里出现，也不会用通用叶片补位。</p>
+          <div class="links"><a class="pill" href="./realistic-flower-lab.html">查看 25 种花型总览</a><a class="pill" href="./aesthetic-review-dashboard.html?debug=1">返回审美 Dashboard</a></div>
+        </div>
+        <aside class="hero-side">
+          <strong>4 组确认关系</strong>
+          <ul class="mapping">
+            <li><b>洋水仙 / Narcissus</b> → Strap · basal</li>
+            <li><b>风信子 / Hyacinth</b> → Strap · basal</li>
+            <li><b>狐尾百合 / Foxtail Lily</b> → Strap · basal</li>
+            <li><b>飞燕草 / Delphinium</b> → Palmate · alternate</li>
+          </ul>
+        </aside>
+      </header>
+
+      <section class="lab" aria-labelledby="lab-title">
+        <div class="section-head">
+          <div><p class="eyebrow">One canvas · four confirmed members</p><h2 id="lab-title">已定稿成员搭配</h2><p class="copy">切换正面、侧面与顶视检查叶片和花茎的关系；轮廓模式用于确认叶片没有盖住花型主体。</p></div>
+          <div class="tools" aria-label="Leaf flower pairing controls">
+            <button type="button" data-view="front" aria-pressed="true">正面</button><button type="button" data-view="side" aria-pressed="false">侧面</button><button type="button" data-view="top" aria-pressed="false">顶视</button><button id="silhouette-button" type="button" aria-pressed="false">轮廓</button><button id="grid-button" type="button" aria-pressed="true">网格</button><button id="rotate-button" type="button" aria-pressed="true">自动旋转</button><output id="lab-stats">载入 4 组搭配…</output>
+          </div>
+        </div>
+        <div class="stage" id="realistic-stage"><canvas id="realistic-canvas" aria-label="4 组已确认花型与叶片搭配"></canvas><div class="labels" id="realistic-labels"></div></div>
+      </section>
+    </main>
+    <script type="module" src="/src/realisticFlowerLab.ts"></script>
+  </body>
+</html>

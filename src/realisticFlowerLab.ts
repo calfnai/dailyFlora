@@ -4,7 +4,8 @@ import {
   realisticFlowerDefinitions,
   type RealisticFlowerDefinition
 } from './realisticFlowerForms';
-import { realisticFlowerFoliageStatus } from './plantOwnership';
+import { realisticFlowerFoliageStatus, type PlantStemInstance } from './plantOwnership';
+import { buildConfirmedFoliage } from './realisticLeafForms';
 
 type ViewName = 'front' | 'side' | 'top';
 type Preview = {
@@ -31,6 +32,10 @@ const silhouetteButton = requiredElement<HTMLButtonElement>('#silhouette-button'
 const gridButton = requiredElement<HTMLButtonElement>('#grid-button');
 const rotateButton = requiredElement<HTMLButtonElement>('#rotate-button');
 const viewButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-view]'));
+const pairingMode = document.body.dataset.labMode === 'leaf-member-pairing';
+const displayedDefinitions = pairingMode
+  ? realisticFlowerDefinitions.filter((definition) => realisticFlowerFoliageStatus[definition.id].status === 'confirmed')
+  : realisticFlowerDefinitions;
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -64,7 +69,7 @@ function escapeHtml(value: unknown) {
 }
 
 function renderLabels() {
-  labels.innerHTML = realisticFlowerDefinitions.map((definition, index) => {
+  labels.innerHTML = displayedDefinitions.map((definition, index) => {
     const foliage = realisticFlowerFoliageStatus[definition.id];
     return `
       <article class="cell" data-flower="${escapeHtml(definition.id)}" data-foliage-profile="${escapeHtml(foliage.foliageProfile)}" data-leaf-mode="${escapeHtml(foliage.leafMode)}">
@@ -76,7 +81,7 @@ function renderLabels() {
           <p class="desc">${escapeHtml(definition.description)}</p>
           ${definition.calibration ? `<p class="calibration">${escapeHtml(definition.calibration)}</p>` : ''}
           <p class="print">${escapeHtml(definition.printStructure)}</p>
-          <p class="scope-note">foliageProfile: ${escapeHtml(foliage.foliageProfile)} · leafMode: ${escapeHtml(foliage.leafMode)} · leafArrangement: ${escapeHtml(foliage.leafArrangement)} · 后续需要独立研究</p>
+          <p class="scope-note">foliageProfile: ${escapeHtml(foliage.foliageProfile)} · leafMode: ${escapeHtml(foliage.leafMode)} · leafArrangement: ${escapeHtml(foliage.leafArrangement)} · ${foliage.status === 'confirmed' ? '已按受控成员映射接入' : '后续需要独立研究'}</p>
           ${definition.scopeNote ? `<p class="scope-note">${escapeHtml(definition.scopeNote)}</p>` : ''}
         </div>
       </article>
@@ -124,7 +129,7 @@ function initScenes() {
   const cells = Array.from(labels.querySelectorAll<HTMLElement>('.cell'));
   let totalDraws = 0;
   let totalTriangles = 0;
-  realisticFlowerDefinitions.forEach((definition, index) => {
+  displayedDefinitions.forEach((definition, index) => {
     const cell = cells[index];
     if (!cell) return;
     const scene = new THREE.Scene();
@@ -138,6 +143,30 @@ function initScenes() {
 
     const camera = new THREE.PerspectiveCamera(37, 1, 0.1, 30);
     const model = createRealisticFlower(definition, `realistic-lab:${definition.id}`);
+    const foliageProfile = realisticFlowerFoliageStatus[definition.id];
+    if (foliageProfile.leafMode === 'attached') {
+      const labStem: PlantStemInstance = {
+        stemId: `realistic-lab:${definition.id}:stem`,
+        plantMemberId: definition.id,
+        source: 'realistic-flower',
+        curvePoints: [
+          new THREE.Vector3(0, -1.08, 0),
+          new THREE.Vector3(0.01, -0.72, 0),
+          new THREE.Vector3(-0.01, -0.28, 0),
+          new THREE.Vector3(0, 0.16, 0)
+        ],
+        ...foliageProfile
+      };
+      const foliage = buildConfirmedFoliage({
+        stems: [labStem],
+        seed: `realistic-lab:${definition.id}`,
+        palette: [definition.palette[definition.palette.length - 1] ?? '#66854f', '#7d9b5c', '#58764a'],
+        density: 1,
+        context: 'realistic-lab'
+      });
+      model.add(foliage.object);
+      model.userData.confirmedLeafCount = foliage.leaves.length;
+    }
     model.scale.setScalar(modelScale(definition));
     model.position.x = 0;
     model.rotation.x = definition.category === 'spike' || definition.category === 'cluster' ? 0 : -0.58;
@@ -156,14 +185,16 @@ function initScenes() {
     totalDraws += counts.draws;
     totalTriangles += counts.triangles;
   });
-  stats.textContent = `1 canvas · ${previews.length} supported forms · draw ${totalDraws} · tri ${totalTriangles.toLocaleString()}`;
+  stats.textContent = `1 canvas · ${previews.length} ${pairingMode ? 'confirmed pairings' : 'supported forms'} · draw ${totalDraws} · tri ${totalTriangles.toLocaleString()}`;
 }
 
 function updateLayout() {
   const width = stage.clientWidth;
-  columns = width >= 1180 ? 3 : width >= 720 ? 2 : 1;
-  rowHeight = columns === 1 ? 560 : 340;
-  const rows = Math.ceil(realisticFlowerDefinitions.length / columns);
+  columns = pairingMode
+    ? width >= 760 ? 2 : 1
+    : width >= 1180 ? 3 : width >= 720 ? 2 : 1;
+  rowHeight = columns === 1 ? 560 : pairingMode ? 430 : 340;
+  const rows = Math.ceil(displayedDefinitions.length / columns);
   stage.style.height = `${rows * rowHeight}px`;
   labels.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
   labels.style.gridAutoRows = `${rowHeight}px`;

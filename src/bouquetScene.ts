@@ -4,14 +4,15 @@ import { createRng, hashString } from './random';
 import { withBasePath } from './special';
 import { floraPrimitiveFactories, type FloraPrimitiveName, type FloraPrimitiveRole } from './floraPrimitives';
 import {
+  foliageProfileForPlantMember,
   temporaryLegacyFoliageProfile,
-  unresolvedFoliageProfile,
   validateLeafOwnership,
   type FlowerAuditRecord,
   type LeafInstanceRecord,
   type LeafOwnershipAudit,
   type PlantStemInstance
 } from './plantOwnership';
+import { buildConfirmedFoliage } from './realisticLeafForms';
 
 const tempObject = new THREE.Object3D();
 const tempColor = new THREE.Color();
@@ -673,7 +674,7 @@ function spikeLeanRange(placement: FlowerPlanItem['placement']): [number, number
 
 const bouquetTiePoint = new THREE.Vector3(0, -0.98, 0);
 
-function createUnresolvedFlowerStem(
+function createFlowerStem(
   spec: DailyBouquetSpec,
   stemId: string,
   plantMemberId: string,
@@ -696,7 +697,7 @@ function createUnresolvedFlowerStem(
     plantMemberId,
     source: 'realistic-flower',
     curvePoints: [tie, lower, upper, terminalPoint.clone()],
-    ...unresolvedFoliageProfile
+    ...foliageProfileForPlantMember(plantMemberId)
   };
 }
 
@@ -951,7 +952,7 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
         matrix: primitiveGroup.matrix.toArray(),
         colors: objectColorSignature(primitiveGroup)
       });
-      stems.push(createUnresolvedFlowerStem(spec, `stem:${flowerId}`, batch.typeId, p));
+      stems.push(createFlowerStem(spec, `stem:${flowerId}`, batch.typeId, p));
       group.add(primitiveGroup);
       if (primitive === 'SpikeFlower') group.add(buildSpikeStemConnector(spec, primitiveGroup, localRng));
     }
@@ -987,6 +988,16 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
     leaves.push(...legacy.leaves);
     group.add(foliage);
   }
+
+  const confirmedFoliage = buildConfirmedFoliage({
+    stems,
+    seed: spec.seed,
+    palette: spec.theme.leafPalette,
+    density: spec.leafDensity,
+    context: 'bouquet'
+  });
+  leaves.push(...confirmedFoliage.leaves);
+  group.add(confirmedFoliage.object);
 
   return { object: group, flowerRecords, stems, leaves } satisfies FlowerBuildResult;
 }
@@ -1091,7 +1102,7 @@ function buildFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
         matrix: tempObject.matrix.toArray(),
         colors: [tempColor.toArray().join(',')]
       });
-      stems.push(createUnresolvedFlowerStem(spec, `stem:${flowerId}`, 'unresolved-render-placeholder', p));
+      stems.push(createFlowerStem(spec, `stem:${flowerId}`, 'unresolved-render-placeholder', p));
     }
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   };
@@ -2212,6 +2223,8 @@ export class BouquetScene {
   private baseCameraDistance = 5.36;
   private targetCameraDistance = 5.36;
   private presentationTargetX = 0;
+  private gestureTargetX = 0;
+  private gestureTargetY = 0;
   private cameraTargetY = 0.7;
   private baseCameraTargetY = 0.7;
   private targetCameraTargetY = 0.7;
@@ -2494,7 +2507,11 @@ export class BouquetScene {
     const yaw = this.cameraYaw + routeOffsets.yaw;
     const pitch = THREE.MathUtils.clamp(this.cameraPitch, minCameraPitch, maxCameraPitch);
     const distance = THREE.MathUtils.clamp(this.cameraDistance, 3.2, 8.7);
-    const target = new THREE.Vector3(this.presentationTargetX, this.cameraTargetY, 0);
+    const target = new THREE.Vector3(
+      this.presentationTargetX + this.gestureTargetX,
+      this.cameraTargetY + this.gestureTargetY,
+      0
+    );
     const horizontal = Math.cos(pitch) * distance;
 
     this.camera.position.set(
@@ -2635,6 +2652,36 @@ export class BouquetScene {
   setClockLayout(active: boolean) {
     this.presentationTargetX = active ? 1.08 : 0;
     this.updateCamera(emptyRouteOffsets);
+  }
+
+  moveGestureFramingBy(deltaX: number, deltaY: number) {
+    this.gestureTargetX = THREE.MathUtils.clamp(this.gestureTargetX + deltaX, -1.15, 1.15);
+    this.gestureTargetY = THREE.MathUtils.clamp(this.gestureTargetY + deltaY, -0.72, 0.72);
+    return { x: this.gestureTargetX, y: this.gestureTargetY };
+  }
+
+  rotateGestureBy(deltaYaw: number, deltaPitch: number) {
+    this.routePausedByDrag = true;
+    this.targetCameraYaw += THREE.MathUtils.clamp(deltaYaw, -0.085, 0.085);
+    this.targetCameraPitch = THREE.MathUtils.clamp(
+      this.targetCameraPitch + THREE.MathUtils.clamp(deltaPitch, -0.055, 0.055),
+      minCameraPitch,
+      maxCameraPitch
+    );
+    this.baseCameraPitch = this.targetCameraPitch;
+    return { yaw: this.targetCameraYaw, pitch: this.targetCameraPitch };
+  }
+
+  setAutomaticCameraEnabled(enabled: boolean) {
+    this.isPaused = !enabled;
+    if (enabled) {
+      this.routePausedByDrag = false;
+      this.targetCameraYaw = this.cameraYaw;
+      this.targetCameraPitch = this.cameraPitch;
+      this.targetCameraDistance = this.cameraDistance;
+      this.targetCameraTargetY = this.cameraTargetY;
+    }
+    return enabled;
   }
 
   zoomBy(delta: number) {

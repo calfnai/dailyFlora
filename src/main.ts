@@ -8,6 +8,7 @@ import { BouquetScene } from './bouquetScene';
 import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
 import { themes } from './themes';
 import { IdleClockController, normalizeClockInterval, type ClockDisplaySource, type IdleClockSettings } from './idleClock';
+import type { DailyFloraHandActions } from './dailyFloraHandControl';
 
 type RotationDirection = 1 | -1;
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
@@ -136,6 +137,7 @@ const siteMenu = document.querySelector<HTMLElement>('#site-menu');
 const siteMenuToggle = document.querySelector<HTMLButtonElement>('#site-menu-toggle');
 const siteMenuPanel = document.querySelector<HTMLElement>('#site-menu-panel');
 const siteMenuDebugLink = document.querySelector<HTMLAnchorElement>('#site-menu-debug-link');
+const handControlToggle = document.querySelector<HTMLButtonElement>('#hand-control-toggle');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
 const themeLabel = document.querySelector<HTMLElement>('#daily-theme');
 const themeCnLabel = document.querySelector<HTMLElement>('#daily-theme-cn');
@@ -193,6 +195,32 @@ const clockDate = document.querySelector<HTMLElement>('#clock-date');
 const clockQuoteText = document.querySelector<HTMLElement>('#clock-quote-text');
 const clockQuoteAuthor = document.querySelector<HTMLElement>('#clock-quote-author');
 const releaseMark = document.querySelector<HTMLAnchorElement>('#release-mark');
+const languageSwitcher = document.querySelector<HTMLElement>('#language-switcher');
+
+type InterfaceLanguage = 'en' | 'zh' | 'es' | 'fr' | 'pt' | 'it' | 'ja';
+
+const interfaceLanguageStorageKey = 'dailyflora.interface-language.v1';
+const interfaceCopy: Record<InterfaceLanguage, { index: string; view: string; hideView: string; documentLang: string }> = {
+  en: { index: 'INDEX', view: 'VIEW', hideView: 'CLOSE', documentLang: 'en' },
+  zh: { index: '索引', view: '视图', hideView: '收起', documentLang: 'zh-CN' },
+  es: { index: 'ÍNDICE', view: 'VISTA', hideView: 'CERRAR', documentLang: 'es' },
+  fr: { index: 'INDEX', view: 'VUE', hideView: 'FERMER', documentLang: 'fr' },
+  pt: { index: 'ÍNDICE', view: 'VISTA', hideView: 'FECHAR', documentLang: 'pt' },
+  it: { index: 'INDICE', view: 'VISTA', hideView: 'CHIUDI', documentLang: 'it' },
+  ja: { index: '索引', view: '表示', hideView: '閉じる', documentLang: 'ja' }
+};
+
+function readInterfaceLanguage(): InterfaceLanguage {
+  try {
+    const stored = window.localStorage.getItem(interfaceLanguageStorageKey);
+    if (stored && stored in interfaceCopy) return stored as InterfaceLanguage;
+  } catch {
+    // The selector remains usable even when storage is unavailable.
+  }
+  return 'en';
+}
+
+let interfaceLanguage = readInterfaceLanguage();
 
 if (
   !canvas ||
@@ -239,11 +267,14 @@ if (releaseMark) {
 let params = readParams();
 const specialId = readSpecialId();
 const specialReference = specialId ? specialReferences[specialId] : null;
+document.body.classList.toggle('is-special', Boolean(specialReference));
 const searchParams = new URLSearchParams(window.location.search);
 const debugValue = searchParams.get('debug');
 const debugMode = searchParams.has('debug') && debugValue !== '0' && debugValue !== 'false';
 const previewValue = searchParams.get('preview');
 const previewMode = searchParams.has('preview') && previewValue !== '0' && previewValue !== 'false';
+const handControlValue = searchParams.get('hand-control');
+const handControlInitiallyEnabled = searchParams.has('hand-control') && handControlValue !== '0' && handControlValue !== 'false';
 const internalPreviewMode = debugMode || previewMode;
 const requestedDensity = searchParams.get('density') || searchParams.get('quality');
 const requestedRender = searchParams.get('render');
@@ -835,10 +866,23 @@ function revealUi() {
   ui.hud.classList.remove('is-hidden');
   ui.controls.classList.remove('is-hidden');
   window.clearTimeout(hideTimer);
+  if (specialReference) {
+    hideTimer = window.setTimeout(() => {
+      ui.hud.classList.add('is-hidden');
+      ui.controls.classList.add('is-hidden');
+    }, ui.controls.classList.contains('is-expanded') ? 7000 : 3200);
+    return;
+  }
+  if (!ui.controls.classList.contains('is-expanded')) return;
   hideTimer = window.setTimeout(() => {
-    ui.hud.classList.add('is-hidden');
-    ui.controls.classList.add('is-hidden');
-  }, ui.controls.classList.contains('is-expanded') ? 7000 : 3200);
+    ui.controls.classList.remove('is-expanded');
+    ui.controls.classList.add('is-collapsed');
+    ui.controlsPanel.hidden = true;
+    ui.controlsToggleButton.setAttribute('aria-expanded', 'false');
+    ui.controlsToggleButton.setAttribute('aria-label', 'Show viewing controls');
+    ui.controlsToggleButton.title = 'Show viewing controls';
+    updateInterfaceLanguage(interfaceLanguage);
+  }, 7000);
 }
 
 function setControlsExpanded(expanded: boolean) {
@@ -848,7 +892,26 @@ function setControlsExpanded(expanded: boolean) {
   ui.controlsToggleButton.setAttribute('aria-expanded', String(expanded));
   ui.controlsToggleButton.setAttribute('aria-label', expanded ? 'Hide viewing controls' : 'Show viewing controls');
   ui.controlsToggleButton.title = expanded ? 'Hide viewing controls' : 'Show viewing controls';
+  if (!specialReference) updateInterfaceLanguage(interfaceLanguage);
   revealUi();
+}
+
+function updateInterfaceLanguage(language: InterfaceLanguage) {
+  interfaceLanguage = language;
+  const copy = interfaceCopy[language];
+  document.documentElement.lang = copy.documentLang;
+  document.querySelectorAll<HTMLElement>('[data-interface-copy]').forEach((element) => {
+    const key = element.dataset.interfaceCopy as 'index' | 'view';
+    element.textContent = key === 'view' && ui.controls.classList.contains('is-expanded') ? copy.hideView : copy[key];
+  });
+  languageSwitcher?.querySelectorAll<HTMLButtonElement>('[data-language]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.language === language));
+  });
+  try {
+    window.localStorage.setItem(interfaceLanguageStorageKey, language);
+  } catch {
+    // Keep the in-memory preference when storage is unavailable.
+  }
 }
 
 function updateUrl(date: string, seed: string) {
@@ -1301,15 +1364,29 @@ controlsToggleButton?.addEventListener('click', () => {
   setControlsExpanded(!controls.classList.contains('is-expanded'));
 });
 
+languageSwitcher?.addEventListener('click', (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLButtonElement)) return;
+  const language = target.dataset.language;
+  if (!language || !(language in interfaceCopy)) return;
+  updateInterfaceLanguage(language as InterfaceLanguage);
+  revealUi();
+});
+
 pauseButton?.addEventListener('click', () => {
   const paused = scene.togglePause();
+  syncPauseButton(paused);
+  revealUi();
+});
+
+function syncPauseButton(paused: boolean) {
+  if (!pauseButton) return;
   pauseButton.setAttribute('aria-label', paused ? 'Resume rotation' : 'Pause rotation');
   pauseButton.title = paused ? 'Resume rotation' : 'Pause rotation';
   pauseButton.innerHTML = paused
     ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>'
     : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" /></svg>';
-  revealUi();
-});
+}
 
 todayButton?.addEventListener('click', () => {
   toggleCalendar();
@@ -1490,7 +1567,93 @@ window.addEventListener('beforeunload', () => window.clearTimeout(dateRolloverTi
 window.addEventListener('beforeunload', () => window.clearInterval(clockTickTimer));
 window.addEventListener('beforeunload', () => idleClock.stop());
 
+async function startHandControl() {
+  const { startDailyFloraHandControl } = await import('./dailyFloraHandControl.ts');
+  const densityOrder: DensityName[] = ['low', 'medium', 'high'];
+  const renderOrder: Array<Exclude<RenderQualityName, 'auto'>> = ['low', 'medium', 'high'];
+  let immersive = false;
+  const actions: DailyFloraHandActions = {
+    cycleDensity: () => {
+      const index = densityOrder.indexOf(selectedDensity);
+      setDensity(densityOrder[(index + 1) % densityOrder.length]);
+    },
+    cycleRender: () => {
+      const current = selectedRender === 'auto' ? quality.renderName : selectedRender;
+      const index = renderOrder.indexOf(current);
+      setRender(renderOrder[(index + 1) % renderOrder.length]);
+    },
+    toggleClock: () => {
+      idleClock.toggleManual();
+      revealUi();
+    },
+    setAutomaticCameraEnabled: (enabled) => {
+      scene.setAutomaticCameraEnabled(enabled);
+      syncPauseButton(!enabled);
+      revealUi();
+    },
+    toggleImmersive: () => {
+      immersive = !immersive;
+      document.body.classList.toggle('is-hand-control-immersive', immersive);
+    },
+    moveFramingBy: (deltaX, deltaY) => {
+      scene.moveGestureFramingBy(-deltaX, -deltaY);
+    },
+    rotateBy: (deltaYaw, deltaPitch) => {
+      scene.rotateGestureBy(deltaYaw, deltaPitch);
+    },
+    zoomBy: (delta) => {
+      zoomBy(delta);
+    }
+  };
+  const stop = startDailyFloraHandControl(actions);
+  return () => {
+    stop();
+    document.body.classList.remove('is-hand-control-immersive');
+  };
+}
+
+let stopHandControl: (() => void) | null = null;
+let handControlLoading = false;
+
+function syncHandControlToggle() {
+  if (!handControlToggle) return;
+  const active = stopHandControl !== null;
+  handControlToggle.classList.toggle('is-loading', handControlLoading);
+  handControlToggle.disabled = handControlLoading;
+  handControlToggle.setAttribute('aria-pressed', String(active));
+  handControlToggle.setAttribute('aria-label', active ? '关闭手势控制' : '开启手势控制');
+  handControlToggle.title = active ? '关闭手势控制' : '开启手势控制';
+}
+
+async function enableHandControl() {
+  if (stopHandControl || handControlLoading) return;
+  handControlLoading = true;
+  syncHandControlToggle();
+  try {
+    stopHandControl = await startHandControl();
+  } catch (error) {
+    console.error('Unable to start hand control', error);
+  } finally {
+    handControlLoading = false;
+    syncHandControlToggle();
+  }
+}
+
+function disableHandControl() {
+  stopHandControl?.();
+  stopHandControl = null;
+  syncHandControlToggle();
+}
+
+handControlToggle?.addEventListener('click', () => {
+  if (stopHandControl) disableHandControl();
+  else void enableHandControl();
+});
+
+window.addEventListener('beforeunload', () => stopHandControl?.(), { once: true });
+
 setLabels();
+if (!specialReference) updateInterfaceLanguage(interfaceLanguage);
 renderAccountState();
 setupDebugMode();
 if (specialReference) {
@@ -1509,3 +1672,6 @@ syncClockControls();
 idleClock.start();
 revealUi();
 scene.start();
+
+syncHandControlToggle();
+if (handControlInitiallyEnabled) void enableHandControl();
