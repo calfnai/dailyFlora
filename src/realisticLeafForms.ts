@@ -19,6 +19,7 @@ export type ConfirmedFoliageBuild = {
 export type ConfirmedFoliageContext = 'bouquet' | 'realistic-lab';
 
 const STRAP_PROFILE = 'confirmed:strap-d2-basal-v1' as const;
+const STRAP_REVIEW_PROFILE = 'review:strap-d2-basal-v1' as const;
 const PALMATE_PROFILE = 'confirmed:palmate-major-envelope-v1' as const;
 const worldUp = new THREE.Vector3(0, 1, 0);
 const worldForward = new THREE.Vector3(0, 0, 1);
@@ -378,6 +379,7 @@ export function buildConfirmedFoliage(options: {
   palette: readonly string[];
   density: number;
   context?: ConfirmedFoliageContext;
+  includeReviewNeeded?: boolean;
 }) : ConfirmedFoliageBuild {
   const group = new THREE.Group();
   group.name = 'confirmed-realistic-foliage';
@@ -386,7 +388,9 @@ export function buildConfirmedFoliage(options: {
   const strapMature = createConfirmedStrapGeometry('mature');
   const strapYoung = createConfirmedStrapGeometry('young');
   const palmate = createConfirmedPalmateGeometry();
-  const eligible = options.stems.filter((stem) => stem.leafMode === 'attached' && stem.status === 'confirmed');
+  const eligible = options.stems.filter((stem) =>
+    stem.leafMode === 'attached' && (stem.status === 'confirmed' || (options.includeReviewNeeded === true && stem.status === 'review-needed'))
+  );
   let renderedLeafCount = 0;
   const maxLeaves = context === 'realistic-lab' ? 6 : Math.max(8, Math.round(14 * options.density));
 
@@ -396,7 +400,7 @@ export function buildConfirmedFoliage(options: {
     const retain = context === 'realistic-lab' || rng.value() < Math.min(0.68, 0.24 + options.density * 0.28);
     if (!retain) return;
 
-    if (stem.foliageProfile === STRAP_PROFILE) {
+    if (stem.foliageProfile === STRAP_PROFILE || stem.foliageProfile === STRAP_REVIEW_PROFILE) {
       const count = context === 'realistic-lab' ? 3 : 2;
       for (let index = 0; index < count && renderedLeafCount < maxLeaves; index += 1) {
         const age = index === count - 1 ? 'young' : 'mature';

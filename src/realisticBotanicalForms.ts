@@ -420,8 +420,22 @@ export function createHyacinth(options: BotanicalBuildOptions) {
     const t = 0.24 + progress * 0.69;
     const axisPoint = axis.curve.getPoint(t);
     const angle = i * 2.39996 + rng.range(-0.11, 0.11);
-    const face = new THREE.Vector3(Math.cos(angle), rng.range(-0.04, 0.08), Math.sin(angle)).normalize();
     const stage: BloomStage = progress > 0.82 ? 'bud' : progress > 0.67 ? 'half' : 'open';
+    const stageProgress = stage === 'open'
+      ? progress / 0.67
+      : stage === 'half'
+        ? (progress - 0.67) / 0.15
+        : (progress - 0.82) / 0.18;
+    const verticalBias = stage === 'open'
+      ? THREE.MathUtils.lerp(-0.34, -0.11, stageProgress)
+      : stage === 'half'
+        ? THREE.MathUtils.lerp(-0.08, 0.12, stageProgress)
+        : THREE.MathUtils.lerp(0.18, 0.42, stageProgress);
+    const face = new THREE.Vector3(
+      Math.cos(angle),
+      verticalBias + rng.range(-0.025, 0.025),
+      Math.sin(angle)
+    ).normalize();
     const base = axisPoint.clone().addScaledVector(face, 0.075);
     setCylinder(pedicels, i, axisPoint, base, 0.0042);
     if (stage === 'bud') {

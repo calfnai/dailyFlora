@@ -203,6 +203,9 @@ function renderLeafSystem() {
   const confirmed = realisticFlowerDefinitions.filter((definition) =>
     realisticFlowerFoliageStatus[definition.id].status === 'confirmed'
   );
+  const reviewNeeded = realisticFlowerDefinitions.filter((definition) =>
+    realisticFlowerFoliageStatus[definition.id].status === 'review-needed'
+  );
   const examples = document.querySelector<HTMLDivElement>('#leaf-examples');
   if (examples) {
     examples.innerHTML = confirmed.map((definition) => {
@@ -226,17 +229,26 @@ leafRng = independent(stemId)</div>
     body.innerHTML = realisticFlowerDefinitions.map((definition) => {
       const foliage = realisticFlowerFoliageStatus[definition.id];
       const confirmedStatus = foliage.status === 'confirmed';
+      const reviewNeededStatus = foliage.status === 'review-needed';
       return `<tr>
         <td><b>${escapeHtml(definition.cn)}</b><br><span class="english">${escapeHtml(definition.en)}</span></td>
         <td>${escapeHtml(foliage.foliageProfile)}</td>
         <td>${escapeHtml(foliage.leafArrangement)}</td>
-        <td class="${confirmedStatus ? 'status-confirmed' : 'status-unresolved'}">${confirmedStatus ? '已确认并接入' : '未研究 · 不生成叶片'}</td>
-        <td>${confirmedStatus ? '进入整束遮挡与空气感复验' : '先研究物种叶型，再做独立原型验收'}</td>
+        <td class="${confirmedStatus ? 'status-confirmed' : reviewNeededStatus ? 'status-review-needed' : 'status-unresolved'}">${
+          confirmedStatus ? '已确认并接入' : reviewNeededStatus ? '待复验 · 仅验收页显示' : '未研究 · 不生成叶片'
+        }</td>
+        <td>${
+          confirmedStatus ? '进入整束遮挡与空气感复验' : reviewNeededStatus ? '单独检查花序与基生叶关系' : '先研究物种叶型，再做独立原型验收'
+        }</td>
       </tr>`;
     }).join('');
   }
   const fill = document.querySelector<HTMLDivElement>('#leaf-progress-fill');
   if (fill) fill.style.width = `${(confirmed.length / realisticFlowerDefinitions.length) * 100}%`;
+  const summary = document.querySelector<HTMLOutputElement>('#leaf-summary');
+  if (summary) summary.value = `${confirmed.length} / ${realisticFlowerDefinitions.length} 已确认 · ${reviewNeeded.length} 待复验`;
+  const progressOutput = document.querySelector<HTMLOutputElement>('#leaf-progress-output');
+  if (progressOutput) progressOutput.value = `${Math.round((confirmed.length / realisticFlowerDefinitions.length) * 100)}% 已确认`;
 }
 
 function exportReview(format: 'json' | 'markdown') {
