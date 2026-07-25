@@ -280,6 +280,21 @@ function copyReferenceGalleryToDist(pagesRoot) {
   );
 }
 
+function copyVercelIgnoreConfigToDist(pagesRoot) {
+  const entries = [
+    ['vercel.json', 'vercel.json'],
+    ['scripts/vercel-ignore-build.mjs', 'scripts/vercel-ignore-build.mjs']
+  ];
+
+  for (const [source, destination] of entries) {
+    const sourcePath = path.join(repoRoot, source);
+    const destinationPath = path.join(pagesRoot, destination);
+    if (!fs.existsSync(sourcePath)) fail(`Vercel ignore config asset is missing: ${source}`);
+    fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
+    fs.copyFileSync(sourcePath, destinationPath);
+  }
+}
+
 function readManifestFiles() {
   const manifest = JSON.parse(fs.readFileSync(sourceManifestPath, 'utf8'));
   if (!Array.isArray(manifest)) fail('scripts/deploy-source-files.json must be a JSON array.');
@@ -432,6 +447,7 @@ function main() {
   if (!fs.existsSync(distIndex)) fail('Built index.html does not exist. Run npm run build first.');
 
   copyReferenceGalleryToDist(pagesRoot);
+  copyVercelIgnoreConfigToDist(pagesRoot);
 
   const pagesPrefix = path.relative(repoRoot, pagesRoot);
   const pagesEntries = treeEntries(
