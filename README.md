@@ -70,6 +70,10 @@ accident. Use `node scripts/deploy-github-pages.mjs --main=tracked` only when
 you intentionally want to sync all tracked files except ignored build/inbox
 paths and workflow files.
 
+Vercel production is triggered from `codex/dailyflora-integration`. The `main`
+branch is kept as a source snapshot health check, while `gh-pages` is a static
+GitHub Pages artifact branch and is ignored by Vercel preview builds.
+
 If a new Codex conversation says the project cannot sync to GitHub, read
 `docs/github-sync-runbook.md`. The usual cause is missing system-level `gh`
 installation or missing GitHub authentication, not a repository limitation.
