@@ -15,6 +15,38 @@ from concrete feedback on the running pages. Read `docs/project-abstract.md`,
 `docs/dailyflora-aesthetic-system-0.13.md`, `docs/dailyflora-codex-skill.md`,
 and `CHANGELOG.md` together.
 
+The durable contract for future authenticated reference uploads is
+`docs/user-reference-generation-contract.md`. It defines the two-WebP asset
+flow, the single append-only generation record, and the boundary that system
+flower definitions are matched but never copied into user data.
+
+## User Reference Cloud Setup
+
+The authenticated upload backend uses Supabase Auth/Postgres and Vercel Private
+Blob. GitHub contains source code only and never receives runtime user images.
+
+1. Apply `supabase/migrations/20260722000000_user_reference_generations.sql` to
+   the connected Supabase project.
+2. In Vercel Storage, create a **Private** Blob store and connect it to the
+   DailyFlora project. Use separate stores for Preview and Production.
+3. Configure the variables listed in `.env.example`. Keep
+   `SUPABASE_SERVICE_ROLE_KEY` and `BLOB_READ_WRITE_TOKEN` server-only.
+4. Use `src/userReferenceCloud.ts` after a real Supabase session is available.
+
+The default account limit is 20 reference records and can be changed with
+`DAILYFLORA_MAX_REFERENCE_RECORDS_PER_USER`. Super admins can inspect aggregate
+storage through `/api/reference-usage`. Administrative backups are created with:
+
+```bash
+npm run backup:user-references -- /absolute/path/to/new-backup-directory
+```
+
+This is an admin migration/backup mechanism, not a user-facing export flow.
+Preview and Development map to the `preview` data environment; Production maps
+to `production`. API queries always filter that environment, so preview records
+cannot appear on the formal site even when both environments share one Supabase
+project.
+
 ## Run Locally
 
 ```bash

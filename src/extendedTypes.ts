@@ -100,3 +100,69 @@ export interface PersonalInputRecord {
   createdAt: string;
 }
 
+export type UserReferenceGenerationStatus = 'recognizing' | 'ready' | 'failed';
+export type UserReferenceStorageProvider = 'vercel-blob';
+
+export interface StoredUserReferenceWebp {
+  assetId: string;
+  storageProvider: UserReferenceStorageProvider;
+  storageKey: string;
+  mimeType: 'image/webp';
+  width: number;
+  height: number;
+  bytes: number;
+}
+
+export interface UserReferenceRecognitionResult {
+  summary: string;
+  confidence?: number;
+  modelVersion: string;
+  completedAt: string;
+}
+
+export interface UserReferenceComposition {
+  density?: number;
+  openness?: number;
+  asymmetry?: number;
+  depth?: number;
+  lineDirection?: string;
+  notes?: string[];
+}
+
+/**
+ * One append-only user generation record. System flower definitions remain in
+ * the shared DailyFlora library and must never be copied into this record.
+ */
+interface UserReferenceGenerationRecordBase {
+  recordId: string;
+  userId: string;
+  referenceAsset: StoredUserReferenceWebp;
+  thumbnailAsset: StoredUserReferenceWebp;
+  matcherVersion: string;
+  systemVersion: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecognizingUserReferenceGenerationRecord extends UserReferenceGenerationRecordBase {
+  status: 'recognizing';
+}
+
+export interface ReadyUserReferenceGenerationRecord extends UserReferenceGenerationRecordBase {
+  status: 'ready';
+  recognitionResult: UserReferenceRecognitionResult;
+  palette: string[];
+  composition: UserReferenceComposition;
+  seed: string;
+  renderParams: Readonly<Record<string, unknown>>;
+}
+
+export interface FailedUserReferenceGenerationRecord extends UserReferenceGenerationRecordBase {
+  status: 'failed';
+  failureCode: string;
+}
+
+export type UserReferenceGenerationRecord =
+  | RecognizingUserReferenceGenerationRecord
+  | ReadyUserReferenceGenerationRecord
+  | FailedUserReferenceGenerationRecord;
