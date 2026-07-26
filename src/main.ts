@@ -489,6 +489,8 @@ function updateClockSettings(next: Partial<IdleClockSettings>) {
 
 function showClock(source: ClockDisplaySource) {
   clockDisplaySource = source;
+  setControlsExpanded(false, false);
+  hideUiNow();
   const quote = clockQuotes[Math.floor(Math.random() * clockQuotes.length)];
   if (clockQuoteText) clockQuoteText.textContent = quote[0];
   if (clockQuoteAuthor) clockQuoteAuthor.textContent = quote[1];
@@ -929,14 +931,20 @@ function revealUi() {
   }, ui.controls.classList.contains('is-expanded') ? 7000 : 3200);
 }
 
-function setControlsExpanded(expanded: boolean) {
+function hideUiNow() {
+  window.clearTimeout(hideTimer);
+  ui.hud.classList.add('is-hidden');
+  ui.controls.classList.add('is-hidden');
+}
+
+function setControlsExpanded(expanded: boolean, reveal = true) {
   ui.controls.classList.toggle('is-expanded', expanded);
   ui.controls.classList.toggle('is-collapsed', !expanded);
   ui.controlsPanel.hidden = !expanded;
   ui.controlsToggleButton.setAttribute('aria-expanded', String(expanded));
   ui.controlsToggleButton.setAttribute('aria-label', expanded ? 'Hide viewing controls' : 'Show viewing controls');
   ui.controlsToggleButton.title = expanded ? 'Hide viewing controls' : 'Show viewing controls';
-  revealUi();
+  if (reveal) revealUi();
 }
 
 function updateUrl(date: string, seed: string) {
@@ -1539,8 +1547,12 @@ rotationPresetButton?.addEventListener('click', () => {
 });
 
 clockToggleButton?.addEventListener('click', () => {
-  idleClock.toggleManual();
-  revealUi();
+  const visible = idleClock.toggleManual();
+  if (visible) {
+    hideUiNow();
+  } else {
+    revealUi();
+  }
 });
 
 function updateClockIntervalFrom(input: HTMLInputElement | null) {
@@ -1571,9 +1583,15 @@ window.addEventListener('resize', () => {
 
 ['pointermove', 'pointerdown', 'touchstart', 'keydown'].forEach((eventName) => {
   window.addEventListener(eventName, (event) => {
-    revealUi();
     const target = event.target;
-    if (target instanceof Element && target.closest('[data-clock-interaction]')) return;
+    if (target instanceof Element && target.closest('[data-clock-interaction]')) {
+      if (!clockDisplaySource) revealUi();
+      return;
+    }
+    if (clockDisplaySource === 'manual' && target instanceof Element && target.closest('#clock-overlay')) {
+      return;
+    }
+    revealUi();
     idleClock.noteActivity();
   }, { passive: true });
 });
