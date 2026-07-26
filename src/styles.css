@@ -37,7 +37,8 @@ body.is-preview .site-menu,
 body.is-preview .controls,
 body.is-preview .debug-panel,
 body.is-preview .account-dock,
-body.is-preview .account-panel {
+body.is-preview .account-panel,
+body.is-preview .interface-frame {
   display: none !important;
 }
 
@@ -73,6 +74,48 @@ button {
   display: block;
   touch-action: none;
   cursor: grab;
+}
+
+.interface-frame {
+  position: fixed;
+  inset: max(1px, env(safe-area-inset-top)) max(1px, env(safe-area-inset-right)) max(1px, env(safe-area-inset-bottom)) max(1px, env(safe-area-inset-left));
+  z-index: 3;
+  pointer-events: none;
+}
+
+.interface-corner {
+  position: absolute;
+  width: clamp(42px, 5vw, 64px);
+  height: clamp(42px, 5vw, 64px);
+  opacity: 0.7;
+}
+
+.interface-corner-top {
+  top: 0;
+  left: 0;
+  border-top: 1px solid rgb(243 239 230 / 34%);
+  border-left: 1px solid rgb(243 239 230 / 34%);
+  transform-origin: left top;
+  animation: interface-corner-forward 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.interface-corner-bottom {
+  right: 0;
+  bottom: 0;
+  border-right: 1px solid rgb(243 239 230 / 34%);
+  border-bottom: 1px solid rgb(243 239 230 / 34%);
+  transform-origin: right bottom;
+  animation: interface-corner-reverse 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes interface-corner-forward {
+  from { clip-path: inset(0 100% 100% 0); opacity: 0; }
+  to { clip-path: inset(0); opacity: 0.7; }
+}
+
+@keyframes interface-corner-reverse {
+  from { clip-path: inset(100% 0 0 100%); opacity: 0; }
+  to { clip-path: inset(0); opacity: 0.7; }
 }
 
 .clock-overlay {
@@ -361,6 +404,31 @@ button {
   border-color: rgb(244 230 129 / 48%);
   background: rgb(244 230 129 / 14%);
   outline: none;
+}
+
+.hand-control-launcher {
+  border: 1px solid rgb(255 255 255 / 14%);
+  background: rgb(255 255 255 / 8%);
+}
+
+.hand-control-launcher svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hand-control-launcher[aria-pressed='true'] {
+  border-color: rgb(114 229 166 / 52%);
+  color: #bdf2cf;
+  background: rgb(72 154 104 / 24%);
+  box-shadow: 0 0 0 4px rgb(114 229 166 / 8%), 0 16px 46px rgb(0 0 0 / 24%);
+}
+
+.hand-control-launcher.is-loading {
+  cursor: wait;
+  opacity: 0.62;
 }
 
 .hud {
@@ -1240,6 +1308,15 @@ body.is-preview .daily-theme {
   outline: none;
 }
 
+.calendar-nav-button:disabled,
+.calendar-day:disabled,
+.calendar-day.is-disabled {
+  color: rgb(255 249 232 / 20%);
+  cursor: not-allowed;
+  opacity: 0.42;
+  pointer-events: none;
+}
+
 .calendar-weekdays,
 .calendar-grid {
   display: grid;
@@ -1282,6 +1359,281 @@ body.is-preview .daily-theme {
 .calendar-day.is-selected:focus-visible {
   color: #17120a;
   background: #fff0a6;
+}
+
+.hand-camera-panel {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  top: max(72px, calc(env(safe-area-inset-top) + 58px));
+  z-index: 90;
+  overflow: hidden;
+  width: min(330px, calc(100vw - 32px));
+  border: 1px solid rgb(222 236 226 / 25%);
+  border-radius: 8px;
+  color: rgb(230 242 234 / 90%);
+  background: rgb(8 18 13 / 88%);
+  box-shadow: 0 18px 60px rgb(0 0 0 / 28%);
+  backdrop-filter: blur(12px);
+}
+
+.hand-camera-panel.is-collapsed {
+  width: auto;
+  border-radius: 999px;
+}
+
+.hand-camera-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 13px;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: 650 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.hand-camera-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #728078;
+  box-shadow: 0 0 0 3px rgb(114 128 120 / 15%);
+}
+
+.hand-camera-dot[data-status='running'] {
+  background: #72e5a6;
+  box-shadow: 0 0 0 3px rgb(114 229 166 / 16%), 0 0 14px rgb(114 229 166 / 60%);
+}
+
+.hand-camera-dot[data-status='loading'],
+.hand-camera-dot[data-status='requesting-camera'] {
+  background: #e6d86c;
+}
+
+.hand-camera-dot[data-status='error'] {
+  background: #ff7a78;
+}
+
+.hand-camera-body {
+  max-height: calc(100vh - 124px);
+  overflow-y: auto;
+  padding: 0 12px 12px;
+  scrollbar-width: thin;
+}
+
+.hand-camera-preview {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #0c1611, #13251b);
+}
+
+.hand-camera-preview video,
+.hand-camera-preview canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hand-camera-preview video {
+  transform: scaleX(-1);
+  opacity: 0.72;
+}
+
+.hand-camera-preview canvas {
+  pointer-events: none;
+}
+
+.hand-camera-fps {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  padding: 5px 7px;
+  border-radius: 999px;
+  background: rgb(3 10 6 / 68%);
+  font: 600 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.06em;
+}
+
+.hand-camera-message,
+.hand-camera-mode {
+  color: rgb(217 233 222 / 64%);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.hand-camera-actions,
+.hand-camera-detected,
+.hand-camera-values {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.hand-camera-actions {
+  grid-template-columns: 1fr auto;
+}
+
+.hand-camera-actions button {
+  min-height: 32px;
+  border: 1px solid rgb(199 225 207 / 25%);
+  border-radius: 8px;
+  color: #dff3e5;
+  background: rgb(154 219 177 / 13%);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.hand-camera-actions button.quiet {
+  min-width: 64px;
+  background: transparent;
+}
+
+.hand-camera-actions button:disabled {
+  cursor: wait;
+  opacity: 0.5;
+}
+
+.hand-camera-swap {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 2px 0;
+  color: rgb(221 237 226 / 80%);
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.hand-camera-swap input {
+  accent-color: #72e5a6;
+}
+
+.hand-camera-swap i {
+  justify-self: end;
+  color: rgb(196 216 203 / 48%);
+  font-size: 9px;
+  font-style: normal;
+}
+
+.hand-camera-detected {
+  grid-template-columns: 1fr 1fr;
+}
+
+.hand-camera-detected span,
+.hand-camera-values span {
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid rgb(222 239 228 / 8%);
+  border-radius: 8px;
+  color: rgb(203 221 209 / 48%);
+  background: rgb(222 239 228 / 4%);
+  font: 600 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.hand-camera-detected span.is-tracked {
+  border-color: rgb(114 229 166 / 24%);
+  color: #bdf2cf;
+  background: rgb(114 229 166 / 8%);
+}
+
+.hand-camera-values {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.hand-camera-values b,
+.hand-camera-values i {
+  display: block;
+  overflow: hidden;
+  font: 500 9px/1.25 ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hand-camera-values i {
+  margin-top: 3px;
+  color: #eff8f1;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.hand-camera-output {
+  margin-top: 9px;
+  padding: 9px 10px;
+  border: 1px solid rgb(114 229 166 / 18%);
+  border-radius: 8px;
+  background: rgb(114 229 166 / 7%);
+}
+
+.hand-camera-output span,
+.hand-camera-output b,
+.hand-camera-mode {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.hand-camera-output span {
+  color: rgb(151 204 170 / 66%);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+}
+
+.hand-camera-output b {
+  margin-top: 4px;
+  color: #bdf2cf;
+  font-size: 11px;
+}
+
+.hand-camera-guide {
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px solid rgb(213 233 219 / 11%);
+}
+
+.hand-camera-guide summary {
+  color: rgb(189 242 207 / 78%);
+  font: 600 9px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.hand-camera-guide p {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 7px;
+  margin: 7px 2px 0;
+  font-size: 9px;
+  line-height: 1.3;
+}
+
+.hand-camera-guide b {
+  color: rgb(226 240 230 / 72%);
+  font-weight: 600;
+}
+
+.hand-camera-guide span {
+  color: rgb(202 220 208 / 52%);
+}
+
+body.is-hand-control-immersive #hud,
+body.is-hand-control-immersive #controls,
+body.is-hand-control-immersive #site-menu,
+body.is-hand-control-immersive #account-dock,
+body.is-hand-control-immersive #release-mark,
+body.is-hand-control-immersive #debug-panel {
+  display: none !important;
+}
+
+body.is-clock-visible .interface-frame,
+.is-special .interface-frame {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .segmented,

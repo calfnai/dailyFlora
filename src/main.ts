@@ -7,6 +7,7 @@ import { BouquetScene } from './bouquetScene';
 import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
 import { themes } from './themes';
 import { IdleClockController, normalizeClockInterval, type ClockDisplaySource, type IdleClockSettings } from './idleClock';
+import type { DailyFloraHandActions } from './dailyFloraHandControl';
 
 type RotationDirection = 1 | -1;
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
@@ -217,6 +218,7 @@ const siteMenuToggle = document.querySelector<HTMLButtonElement>('#site-menu-tog
 const siteMenuPanel = document.querySelector<HTMLElement>('#site-menu-panel');
 const siteMenuDebugLink = document.querySelector<HTMLAnchorElement>('#site-menu-debug-link');
 const siteLanguageSwitcher = document.querySelector<HTMLElement>('#site-language-switcher');
+const handControlToggle = document.querySelector<HTMLButtonElement>('#hand-control-toggle');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
 const themeLabel = document.querySelector<HTMLElement>('#daily-theme');
 const themeCnLabel = document.querySelector<HTMLElement>('#daily-theme-cn');
@@ -317,6 +319,9 @@ const previewMode = searchParams.has('preview') && previewValue !== '0' && previ
 const internalPreviewMode = debugMode || previewMode;
 const requestedDensity = searchParams.get('density') || searchParams.get('quality');
 const requestedRender = searchParams.get('render');
+const maxSelectableDate = todayKey();
+const initialDate = params.date > maxSelectableDate ? maxSelectableDate : params.date;
+const initialSeed = params.date > maxSelectableDate && params.seed === params.date ? maxSelectableDate : params.seed;
 let selectedDensity = requestedDensity
   ? normalizeDensity(requestedDensity)
   : internalPreviewMode
@@ -335,7 +340,7 @@ let selectedTheme = specialReference ? specialReference.theme.id : params.theme;
 let quality = resolveQuality(selectedDensity, selectedRender);
 let spec = specialReference
   ? createSpecialSpec(specialReference, new URLSearchParams(window.location.search).get('date') || undefined)
-  : createDailySpec(params.date, params.seed, selectedTheme);
+  : createDailySpec(initialDate, initialSeed, selectedTheme);
 let followsToday = !specialReference && !searchParams.has('date') && !searchParams.has('seed');
 let scene = new BouquetScene(ui.canvas, spec, quality);
 (window as Window & {
@@ -399,6 +404,7 @@ document.body.append(calendarPanel);
 todayButton?.setAttribute('aria-haspopup', 'dialog');
 todayButton?.setAttribute('aria-controls', 'date-calendar');
 todayButton?.setAttribute('aria-expanded', 'false');
+if (datePicker) datePicker.max = maxSelectableDate;
 
 function THREEClamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -1008,6 +1014,10 @@ function dateKeyFromParts(year: number, month: number, day: number) {
   return `${year}-${paddedMonth}-${paddedDay}`;
 }
 
+function clampDateKeyToToday(dateKey: string) {
+  return dateKey > maxSelectableDate ? maxSelectableDate : dateKey;
+}
+
 function daysInMonth(year: number, month: number) {
   return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
 }
@@ -1067,21 +1077,31 @@ function renderCalendar() {
     const isSelected =
       selected.year === calendarView.year && selected.month === calendarView.month && selected.day === day;
     const isToday = today.year === calendarView.year && today.month === calendarView.month && today.day === day;
+    const isFuture = dateKey > maxSelectableDate;
     dayButtons.push(`
       <button
-        class="calendar-day${isSelected ? ' is-selected' : ''}${isToday ? ' is-today' : ''}"
+        class="calendar-day${isSelected ? ' is-selected' : ''}${isToday ? ' is-today' : ''}${isFuture ? ' is-disabled' : ''}"
         type="button"
         data-calendar-date="${dateKey}"
         aria-pressed="${isSelected}"
+        aria-disabled="${isFuture}"
+        ${isFuture ? 'disabled' : ''}
       >${day}</button>
     `);
   }
+
+  const nextMonthDateKey = dateKeyFromParts(
+    calendarView.month === 11 ? calendarView.year + 1 : calendarView.year,
+    calendarView.month === 11 ? 0 : calendarView.month + 1,
+    1
+  );
+  const canGoNext = nextMonthDateKey <= maxSelectableDate;
 
   calendarPanel.innerHTML = `
     <div class="calendar-header">
       <button class="calendar-nav-button" type="button" data-calendar-nav="-1" aria-label="Previous month">‹</button>
       <strong>${monthLabel}</strong>
-      <button class="calendar-nav-button" type="button" data-calendar-nav="1" aria-label="Next month">›</button>
+      <button class="calendar-nav-button" type="button" data-calendar-nav="1" aria-label="Next month" ${canGoNext ? '' : 'disabled aria-disabled="true"'}>›</button>
     </div>
     <div class="calendar-weekdays" aria-hidden="true">
       <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
@@ -1144,7 +1164,7 @@ function applyRoutePreset(preset: (typeof rotationPresets)[number]) {
 
 function randomDateKey() {
   const start = new Date('2026-01-01T00:00:00');
-  const end = new Date('2026-12-31T00:00:00');
+  const end = new Date(`${maxSelectableDate}T00:00:00`);
   const dayMs = 24 * 60 * 60 * 1000;
   const days = Math.floor((end.getTime() - start.getTime()) / dayMs);
   const date = new Date(start.getTime() + Math.floor(Math.random() * (days + 1)) * dayMs);
@@ -1405,13 +1425,18 @@ controlsToggleButton?.addEventListener('click', () => {
   setControlsExpanded(!controls.classList.contains('is-expanded'));
 });
 
-pauseButton?.addEventListener('click', () => {
-  const paused = scene.togglePause();
+function syncPauseButton(paused: boolean) {
+  if (!pauseButton) return;
   pauseButton.setAttribute('aria-label', paused ? 'Resume rotation' : 'Pause rotation');
   pauseButton.title = paused ? 'Resume rotation' : 'Pause rotation';
   pauseButton.innerHTML = paused
     ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>'
     : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" /></svg>';
+}
+
+pauseButton?.addEventListener('click', () => {
+  const paused = scene.togglePause();
+  syncPauseButton(paused);
   revealUi();
 });
 
@@ -1422,9 +1447,11 @@ todayButton?.addEventListener('click', () => {
 
 datePicker?.addEventListener('change', () => {
   if (!datePicker.value) return;
+  const selectedDate = clampDateKeyToToday(datePicker.value);
+  if (datePicker.value !== selectedDate) datePicker.value = selectedDate;
   previewCount = 0;
-  rebuild(datePicker.value, datePicker.value);
-  syncTodayMode(datePicker.value, datePicker.value);
+  rebuild(selectedDate, selectedDate);
+  syncTodayMode(selectedDate, selectedDate);
   datePicker.blur();
 });
 
@@ -1434,15 +1461,12 @@ calendarPanel.addEventListener('click', (event) => {
 
   const navValue = target.dataset.calendarNav;
   if (navValue) {
-    calendarView.month += Number(navValue);
-    if (calendarView.month < 0) {
-      calendarView.month = 11;
-      calendarView.year -= 1;
-    }
-    if (calendarView.month > 11) {
-      calendarView.month = 0;
-      calendarView.year += 1;
-    }
+    const nextMonth = calendarView.month + Number(navValue);
+    const nextYear = calendarView.year + (nextMonth < 0 ? -1 : nextMonth > 11 ? 1 : 0);
+    const normalizedNextMonth = nextMonth < 0 ? 11 : nextMonth > 11 ? 0 : nextMonth;
+    if (dateKeyFromParts(nextYear, normalizedNextMonth, 1) > maxSelectableDate) return;
+    calendarView.month = normalizedNextMonth;
+    calendarView.year = nextYear;
     renderCalendar();
     positionCalendarPanel();
     revealUi();
@@ -1451,6 +1475,7 @@ calendarPanel.addEventListener('click', (event) => {
 
   const dateKey = target.dataset.calendarDate;
   if (dateKey) {
+    if (dateKey > maxSelectableDate) return;
     selectCalendarDate(dateKey);
   }
 });
@@ -1568,6 +1593,90 @@ function updateClockIntervalFrom(input: HTMLInputElement | null) {
   input?.addEventListener('change', () => updateClockSettings({ autoEnabled: input.checked }));
 });
 
+async function startHandControl() {
+  const { startDailyFloraHandControl } = await import('./dailyFloraHandControl');
+  const densityOrder: DensityName[] = ['low', 'medium', 'high'];
+  const renderOrder: Array<Exclude<RenderQualityName, 'auto'>> = ['low', 'medium', 'high'];
+  let immersive = false;
+  const actions: DailyFloraHandActions = {
+    cycleDensity: () => {
+      const index = densityOrder.indexOf(selectedDensity);
+      setDensity(densityOrder[(index + 1) % densityOrder.length]);
+    },
+    cycleRender: () => {
+      const current = selectedRender === 'auto' ? quality.renderName : selectedRender;
+      const index = renderOrder.indexOf(current);
+      setRender(renderOrder[(index + 1) % renderOrder.length]);
+    },
+    toggleClock: () => {
+      const visible = idleClock.toggleManual();
+      if (visible) hideUiNow();
+      else revealUi();
+    },
+    setAutomaticCameraEnabled: (enabled) => {
+      scene.setAutomaticCameraEnabled(enabled);
+      syncPauseButton(!enabled);
+      revealUi();
+    },
+    toggleImmersive: () => {
+      immersive = !immersive;
+      document.body.classList.toggle('is-hand-control-immersive', immersive);
+    },
+    moveFramingBy: (deltaX, deltaY) => {
+      scene.moveGestureFramingBy(-deltaX, -deltaY);
+    },
+    rotateBy: (deltaYaw, deltaPitch) => {
+      scene.rotateGestureBy(deltaYaw, deltaPitch);
+    },
+    zoomBy: (delta) => {
+      zoomBy(delta);
+    }
+  };
+  const stop = startDailyFloraHandControl(actions);
+  return () => {
+    stop();
+    document.body.classList.remove('is-hand-control-immersive');
+  };
+}
+
+let stopHandControl: (() => void) | null = null;
+let handControlLoading = false;
+
+function syncHandControlToggle() {
+  if (!handControlToggle) return;
+  const active = stopHandControl !== null;
+  handControlToggle.classList.toggle('is-loading', handControlLoading);
+  handControlToggle.disabled = handControlLoading;
+  handControlToggle.setAttribute('aria-pressed', String(active));
+  handControlToggle.setAttribute('aria-label', active ? '关闭手势控制' : '开启手势控制');
+  handControlToggle.title = active ? '关闭手势控制' : '开启手势控制';
+}
+
+async function enableHandControl() {
+  if (stopHandControl || handControlLoading) return;
+  handControlLoading = true;
+  syncHandControlToggle();
+  try {
+    stopHandControl = await startHandControl();
+  } catch (error) {
+    console.error('Unable to start hand control', error);
+  } finally {
+    handControlLoading = false;
+    syncHandControlToggle();
+  }
+}
+
+function disableHandControl() {
+  stopHandControl?.();
+  stopHandControl = null;
+  syncHandControlToggle();
+}
+
+handControlToggle?.addEventListener('click', () => {
+  if (stopHandControl) disableHandControl();
+  else void enableHandControl();
+});
+
 window.addEventListener('resize', () => {
   const nextQuality = resolveQuality(selectedDensity, selectedRender);
   const qualityChanged = nextQuality.densityName !== quality.densityName || nextQuality.renderName !== quality.renderName;
@@ -1603,6 +1712,7 @@ window.addEventListener('beforeunload', () => window.clearInterval(debugTimer));
 window.addEventListener('beforeunload', () => window.clearTimeout(dateRolloverTimer));
 window.addEventListener('beforeunload', () => window.clearInterval(clockTickTimer));
 window.addEventListener('beforeunload', () => idleClock.stop());
+window.addEventListener('beforeunload', () => stopHandControl?.(), { once: true });
 
 updateInterfaceLanguage(readInterfaceLanguage());
 setLabels();

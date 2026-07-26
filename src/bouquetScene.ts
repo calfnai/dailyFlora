@@ -2212,6 +2212,8 @@ export class BouquetScene {
   private baseCameraDistance = 5.36;
   private targetCameraDistance = 5.36;
   private presentationTargetX = 0;
+  private gestureTargetX = 0;
+  private gestureTargetY = 0;
   private cameraTargetY = 0.7;
   private baseCameraTargetY = 0.7;
   private targetCameraTargetY = 0.7;
@@ -2494,7 +2496,11 @@ export class BouquetScene {
     const yaw = this.cameraYaw + routeOffsets.yaw;
     const pitch = THREE.MathUtils.clamp(this.cameraPitch, minCameraPitch, maxCameraPitch);
     const distance = THREE.MathUtils.clamp(this.cameraDistance, 3.2, 8.7);
-    const target = new THREE.Vector3(this.presentationTargetX, this.cameraTargetY, 0);
+    const target = new THREE.Vector3(
+      this.presentationTargetX + this.gestureTargetX,
+      this.cameraTargetY + this.gestureTargetY,
+      0
+    );
     const horizontal = Math.cos(pitch) * distance;
 
     this.camera.position.set(
@@ -2635,6 +2641,36 @@ export class BouquetScene {
   setClockLayout(active: boolean) {
     this.presentationTargetX = active ? 1.08 : 0;
     this.updateCamera(emptyRouteOffsets);
+  }
+
+  moveGestureFramingBy(deltaX: number, deltaY: number) {
+    this.gestureTargetX = THREE.MathUtils.clamp(this.gestureTargetX + deltaX, -1.15, 1.15);
+    this.gestureTargetY = THREE.MathUtils.clamp(this.gestureTargetY + deltaY, -0.72, 0.72);
+    return { x: this.gestureTargetX, y: this.gestureTargetY };
+  }
+
+  rotateGestureBy(deltaYaw: number, deltaPitch: number) {
+    this.routePausedByDrag = true;
+    this.targetCameraYaw += THREE.MathUtils.clamp(deltaYaw, -0.085, 0.085);
+    this.targetCameraPitch = THREE.MathUtils.clamp(
+      this.targetCameraPitch + THREE.MathUtils.clamp(deltaPitch, -0.055, 0.055),
+      minCameraPitch,
+      maxCameraPitch
+    );
+    this.baseCameraPitch = this.targetCameraPitch;
+    return { yaw: this.targetCameraYaw, pitch: this.targetCameraPitch };
+  }
+
+  setAutomaticCameraEnabled(enabled: boolean) {
+    this.isPaused = !enabled;
+    if (enabled) {
+      this.routePausedByDrag = false;
+      this.targetCameraYaw = this.cameraYaw;
+      this.targetCameraPitch = this.cameraPitch;
+      this.targetCameraDistance = this.cameraDistance;
+      this.targetCameraTargetY = this.cameraTargetY;
+    }
+    return enabled;
   }
 
   zoomBy(delta: number) {
