@@ -82,6 +82,10 @@ export default defineConfig({
           resolve(__dirname, 'data/aesthetic-review-dashboard.json'),
           resolve(__dirname, 'dist/data/aesthetic-review-dashboard.json')
         );
+        copyFileSync(
+          resolve(__dirname, 'data/flower-system-owner-review-2026-07-25.json'),
+          resolve(__dirname, 'dist/data/flower-system-owner-review-2026-07-25.json')
+        );
         mkdirSync(resolve(__dirname, 'dist/server'), { recursive: true });
         copyFileSync(
           resolve(__dirname, 'sites/worker.js'),

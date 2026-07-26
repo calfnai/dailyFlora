@@ -132,12 +132,23 @@
         color: var(--good);
       }
 
+      .status.reject {
+        color: var(--bad);
+      }
+
       .link-row,
+      .section-actions,
       .filters,
       .primitive-list {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
+      }
+
+      .section-actions {
+        max-width: 680px;
+        align-items: center;
+        justify-content: flex-end;
       }
 
       .pill,
@@ -153,6 +164,18 @@
         font: inherit;
         font-size: 13px;
         text-decoration: none;
+      }
+
+      .pill.route {
+        color: var(--text);
+        border-color: rgb(242 203 98 / 42%);
+        background: rgb(242 203 98 / 8%);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      .pill.route:hover {
+        border-color: var(--warn);
+        background: rgb(242 203 98 / 16%);
       }
 
       .filter-button {
@@ -593,6 +616,10 @@
             <h2>复用审美规则</h2>
             <p class="section-copy">这些规则跨参考组复用，不需要每组重复填写。某一组特别依赖某条规则时，再在卡片里单独指出。</p>
           </div>
+          <div class="section-actions">
+            <a class="pill route" href="./flower-system-review.html">花型验收 LAB · /docs/flower-system-review.html</a>
+            <a class="pill route" href="./dailyflora-flower-plan-samples.html">固定花束 LAB · /docs/dailyflora-flower-plan-samples.html</a>
+          </div>
         </div>
         <div class="rules-grid" id="rules-grid"></div>
       </section>
@@ -603,6 +630,12 @@
             <p class="kicker">Daily bouquet corrections</p>
             <h2>日期花束回炉记录</h2>
             <p class="section-copy">这里记录实际运行页面暴露的问题。修正只表示进入复验，不代表用户已经认可。</p>
+          </div>
+          <div class="section-actions">
+            <a class="pill route" href="../?date=2026-07-07&amp;render=high&amp;density=high">07-07 LAB · /?date=2026-07-07&amp;render=high&amp;density=high</a>
+            <a class="pill route" href="../?date=2026-07-11&amp;render=high&amp;density=high">07-11 LAB · /?date=2026-07-11&amp;render=high&amp;density=high</a>
+            <a class="pill route" href="../?date=2026-07-13&amp;render=high&amp;density=high">07-13 LAB · /?date=2026-07-13&amp;render=high&amp;density=high</a>
+            <a class="pill route" href="../?date=2026-07-16&amp;render=high&amp;density=high">07-16 LAB · /?date=2026-07-16&amp;render=high&amp;density=high</a>
           </div>
         </div>
         <div class="rules-grid" id="daily-correction-grid"></div>
@@ -615,29 +648,37 @@
             <h2>16 类目标形态词表</h2>
             <p class="section-copy">这 16 类已经进入 Primitive Lab，并已达到用户确认的花库及格线。CosmosOpenFlower 是从山岗小花/热带丛林经验中补登记的小面花，旧 7 类只保留为历史粗分类和兼容别名。</p>
           </div>
+          <div class="section-actions">
+            <a class="pill route" href="./primitive-lab.html#candidate-title">Primitive LAB · /docs/primitive-lab.html</a>
+          </div>
         </div>
         <div class="shape-grid" id="shape-grid"></div>
       </section>
 
-      <section class="section" id="candidate-title" aria-labelledby="accepted-hybrid-title">
+      <section class="section" id="accepted-hybrid-section" aria-labelledby="accepted-hybrid-title">
         <div class="section-head">
           <div>
             <p class="kicker">Accepted hybrid vocabulary</p>
             <h2 id="accepted-hybrid-title">已验收混合花型</h2>
             <p class="section-copy">这里收纳已经通过用户验收、但不应被误归入核心抽象词表或真正结构科幻词表的稳定花型。分类边界和验收状态同样需要保留。</p>
           </div>
+          <div class="section-actions">
+            <a class="pill route" href="./primitive-lab.html#candidate-title">混合花型 LAB · /docs/primitive-lab.html</a>
+          </div>
         </div>
         <div class="shape-grid" id="accepted-hybrid-grid"></div>
       </section>
 
-      <section class="section">
+      <section class="section" id="candidate-title">
         <div class="section-head">
           <div>
             <p class="kicker">Candidate shape vocabulary</p>
-            <h2>待验收候选花型</h2>
-            <p class="section-copy">当前只剩褶边副冠水仙型待验收。候选只进入实验和复盘，不自动改写正式词表；只有用户确认其正面、侧面和 360° 旋转都真正成立，才升级。</p>
+            <h2>未通过候选花型</h2>
+            <p class="section-copy">褶边副冠水仙型已在 2026-07-25 用户验收中明确不通过。它继续留在实验和回炉区，不进入正式词表，也不升级为第 17 类。</p>
           </div>
-          <a class="pill" href="./primitive-lab.html#candidate-title">在 Primitive Lab 验收</a>
+          <div class="section-actions">
+            <a class="pill route" href="./primitive-lab.html#candidate-title">候选回炉 LAB · /docs/primitive-lab.html</a>
+          </div>
         </div>
         <div class="shape-grid" id="candidate-shape-grid"></div>
       </section>
@@ -649,7 +690,10 @@
             <h2>花库验收</h2>
             <p class="section-copy">隐藏标签后，单个形态应能被用户判断为对应的花材/叶材类型。当前结论是花库验收达到及格线，可以作为下一阶段整束 composition 的基础。</p>
           </div>
-          <a class="pill" href="./primitive-lab.html">打开 Primitive Lab</a>
+          <div class="section-actions">
+            <a class="pill route" href="./primitive-lab.html">花库 LAB · /docs/primitive-lab.html</a>
+            <a class="pill route" href="./realistic-flower-lab.html">写实花型 LAB · /docs/realistic-flower-lab.html</a>
+          </div>
         </div>
         <div class="primitive-grid" id="primitive-grid"></div>
       </section>
@@ -661,7 +705,11 @@
             <h2>参考图到执行任务</h2>
             <p class="section-copy">每组卡片固定呈现：人话结论、正向信号、负向约束、对应 primitive、当前实现、失败原因、下一步任务和审查角色复盘。</p>
           </div>
-          <div class="filters" id="filters" aria-label="筛选复盘卡"></div>
+          <div class="section-actions">
+            <a class="pill route" href="./dailyflora-reference-gallery.html">参考图库 · /docs/dailyflora-reference-gallery.html</a>
+            <a class="pill route" href="./dailyflora-flower-plan-samples.html">花束 LAB · /docs/dailyflora-flower-plan-samples.html</a>
+            <div class="filters" id="filters" aria-label="筛选复盘卡"></div>
+          </div>
         </div>
         <div class="group-grid" id="group-grid"></div>
         <div class="empty" id="empty" hidden>没有符合筛选条件的复盘卡。</div>
@@ -716,6 +764,7 @@
         blocked: 'blocked',
         'needs-work': 'needs-work',
         'needs-owner-review': '待用户验收',
+        reject: '不通过',
         pass: 'pass'
       };
 
@@ -917,7 +966,7 @@
                 <h3>${escapeHtml(item.date)} · ${escapeHtml(item.name)}</h3>
                 <p><strong>用户反馈：</strong>${escapeHtml(item.ownerFeedback)}</p>
                 <p><strong>本轮修正：</strong>${escapeHtml(item.correction)}</p>
-                <a class="pill" href="${escapeHtml(item.url)}">打开日期花束</a>
+                <a class="pill route" href="${escapeHtml(item.url)}">打开日期花束 · ${escapeHtml((item.url || '').replace('../', '/'))}</a>
               </article>
             `
           )
@@ -1175,6 +1224,37 @@
         renderFilters();
         wireFilters();
       });
+    </script>
+    <script>
+      (() => {
+        const shareToken = new URLSearchParams(window.location.search).get('_vercel_share');
+        if (!shareToken) return;
+
+        const preservePreviewAccess = (root = document) => {
+          root.querySelectorAll('a[href]').forEach((link) => {
+            const rawHref = link.getAttribute('href') || '';
+            if (
+              rawHref.startsWith('#') ||
+              rawHref.startsWith('mailto:') ||
+              rawHref.startsWith('tel:') ||
+              rawHref.startsWith('javascript:')
+            ) {
+              return;
+            }
+
+            const url = new URL(rawHref, window.location.href);
+            if (url.origin !== window.location.origin) return;
+            if (!url.searchParams.has('_vercel_share')) {
+              url.searchParams.set('_vercel_share', shareToken);
+              link.href = url.href;
+            }
+          });
+        };
+
+        preservePreviewAccess();
+        const observer = new MutationObserver(() => preservePreviewAccess());
+        observer.observe(document.body, { childList: true, subtree: true });
+      })();
     </script>
   </body>
 </html>
