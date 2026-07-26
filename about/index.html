@@ -12,10 +12,11 @@
       <header class="site-header">
         <a class="brand" href="../" aria-label="DailyFlora 首页"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA</a>
         <nav class="site-nav" aria-label="站点导航">
+          <a href="../">今日花束</a>
+          <a href="../member/">我的花园</a>
           <a href="./" aria-current="page">关于</a>
-          <a href="../bouquet-shop/">花束商店</a>
-          <a href="../downloads/">下载</a>
-          <a class="nav-cta" href="../signup/">建立我的花园</a>
+          <a href="../bouquet-shop/">周边与线下</a>
+          <a href="../downloads/">多端入口</a>
         </nav>
       </header>
 
@@ -27,11 +28,11 @@
             <p class="lead">DailyFlora 是一座每天醒来一次的数字花园。日期成为种子，色彩、花材与空间规则彼此生长，生成一束只属于今天的 3D 花。</p>
             <div class="button-row">
               <a class="button primary" href="../"><span>看今天的花</span><span class="arrow" aria-hidden="true">↗</span></a>
-              <a class="button" href="../signup/">收藏每日花束</a>
+              <a class="button" href="../member/#signup">收藏每日花束</a>
             </div>
           </div>
           <figure class="live-frame" aria-label="今日 DailyFlora 实时花束">
-            <iframe src="../?preview=1&amp;render=high" title="今日生成花束" loading="eager"></iframe>
+            <iframe src="../?preview=1&amp;embed=flower&amp;render=high" title="今日生成花束纯预览" loading="eager"></iframe>
             <figcaption class="frame-caption"><strong>今日生成</strong><span>由日期与花材规则实时生长</span></figcaption>
           </figure>
         </section>
@@ -83,11 +84,14 @@
       <footer class="site-footer">
         <div class="footer-main wrap">
           <p class="footer-statement">每天一束，不必占有。<br />明天再来，看花如何变化。</p>
-          <nav class="footer-col" aria-label="探索"><strong>探索</strong><a href="../">今日花束</a><a href="../bouquet-shop/">花束商店</a><a href="../downloads/">下载</a></nav>
-          <nav class="footer-col" aria-label="账户"><strong>账户</strong><a href="../signup/">注册</a><a href="../member/">个人花园</a><a href="../docs/dev-index.html">开发记录</a></nav>
+          <nav class="footer-col" aria-label="探索"><strong>探索</strong><a href="../">今日花束</a><a href="../member/">我的花园</a><a href="../bouquet-shop/">周边与线下</a><a href="../downloads/">多端入口</a></nav>
+          <nav class="footer-col" aria-label="系统"><strong>系统</strong><a href="../version.json" data-release-code>读取版本代码…</a><a href="../docs/dev-index.html">开发记录</a></nav>
         </div>
         <div class="footer-bottom wrap"><span>© 2026 DailyFlora. An independent digital garden.</span><span>Made slowly, generated daily.</span></div>
       </footer>
     </div>
+    <script>
+      fetch('../version.json').then((response) => response.ok ? response.json() : null).then((info) => { if (info?.releaseId) document.querySelectorAll('[data-release-code]').forEach((node) => { node.textContent = info.releaseId; }); }).catch(() => {});
+    </script>
   </body>
 </html>
