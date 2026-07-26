@@ -108,10 +108,11 @@
     {
       "date": "2026-07-08 / 2026-07-09",
       "name": "每日中文名重复 bug",
-      "status": "fixed-needs-build",
+      "status": "pass",
       "ownerFeedback": "某些 7 月 8 日、7 月 9 日中文名竟然一样，说明命名遗漏了 bug。",
       "diagnosis": "原命名逻辑只由少量 mood 与 flowerPlan 组合生成，两个日期如果抽到同一 mood 与同一 plan，就会出现主中文名重复；日期印记虽然不同，但花花自己的中文名不应重复。",
-      "correction": "新增日期专属的月标记和日标记，默认中文名由 mood + 月标记 + 日标记 + planName 组成；保留少量手工 override，但普通日期不会再因 mood/plan 相同而撞名。",
+      "correction": "新增日期专属的月标记和日标记，默认中文名由 mood + 月标记 + 日标记 + planName 组成；保留少量手工 override，但普通日期不会再因 mood/plan 相同而撞名。2026-07-27 已加入命名回归测试并随生产构建发布。",
+      "ownerAcceptance": "代码已发布：2026-07-08 与 2026-07-09 的花花自身中文名不再重复。",
       "url": "../?date=2026-07-08&render=high&density=high"
     }
   ],
