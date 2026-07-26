@@ -182,7 +182,7 @@
       const preferenceInput = $('#preference-input');
       const bouquetName = $('#bouquet-name');
       const toast = $('#local-toast');
-      function todayCompact() { return new Date().toISOString().slice(0, 10).replaceAll('-', ''); }
+      function todayCompact() { return new Date().toISOString().slice(0, 10).split('-').join(''); }
       function memberId() { return `DF-MEMBER-${todayCompact()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`; }
       function favoriteId(favorite) { return `DF-DATE-${String(favorite.date || '').split('-').join('') || 'UNKNOWN'}`; }
       function toHex(value) { return Math.round(value).toString(16).padStart(2, '0'); }
