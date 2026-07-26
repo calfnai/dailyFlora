@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-24",
+  "updatedAt": "2026-07-25",
   "gate": {
     "status": "pass",
     "title": "0.14 审美基线通过",
@@ -503,12 +503,12 @@
       "name": "褶边副冠水仙型",
       "englishName": "Frilled Narcissus Corona Flower",
       "primitive": "FrilledNarcissusFlower",
-      "status": "needs-owner-review",
+      "status": "reject",
       "source": "2026-07-05 trumpet-throat v1/v3 realism experiment",
       "examples": "六片略向后反折的花被、明显杯状副冠、波浪褶边、深喉、可见花蕊和背部绿色连接点",
       "whyNeeded": "保留 v1/v3 被认可的正面基准，并把 cup/corona 的深度、褶边和花蕊做成真正可旋转的 3D 结构；它必须与简化洋水仙管心型和 Datura 大喇叭型明显不同。",
       "acceptance": "正面应先读成六片花被围绕褶边副冠；侧面能看出副冠突出与深喉，但不能变成单纯喇叭。360° 旋转时花瓣、褶边、花蕊和绿色连接点都应连续成立。",
-      "ownerNote": "先作为候选花型完善；只有用户确认它真的做得很好，才把正式花库从 16 类扩为 17 类。"
+      "ownerNote": "2026-07-25 用户在 43 项花型验收中明确选择不通过。继续保留为未入库候选并回炉修改，不把正式花库从 16 类扩为 17 类。"
     }
   ],
   "sciFiFlowerExperiment": {
