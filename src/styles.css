@@ -359,14 +359,8 @@ body:not(.is-special) .language-switcher button:focus-visible {
 }
 
 .hand-control-launcher {
-  position: fixed;
-  top: max(19px, env(safe-area-inset-top));
-  right: calc(max(18px, env(safe-area-inset-right)) + 54px);
-  z-index: 19;
   border: 1px solid rgb(255 255 255 / 14%);
-  background: rgb(7 9 8 / 58%);
-  box-shadow: 0 16px 46px rgb(0 0 0 / 24%);
-  backdrop-filter: blur(18px);
+  background: rgb(255 255 255 / 8%);
 }
 
 .hand-control-launcher svg {
@@ -2276,13 +2270,20 @@ body.is-preview .language-switcher {
 }
 
 body.is-clock-visible:not(.is-special) .hud,
-body.is-clock-visible:not(.is-special) .controls,
 body.is-clock-visible:not(.is-special) .site-menu,
 body.is-clock-visible:not(.is-special) .language-switcher,
 body.is-clock-visible:not(.is-special) .interface-frame,
 body.is-clock-visible:not(.is-special) .release-mark {
   opacity: 0;
   pointer-events: none;
+}
+
+body.is-clock-visible:not(.is-special) .controls {
+  z-index: 22;
+}
+
+body.is-clock-visible:not(.is-special) .controls:not(.is-expanded) {
+  opacity: 0.38;
 }
 
 @media (prefers-reduced-motion: reduce) {
