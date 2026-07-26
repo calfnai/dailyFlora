@@ -632,10 +632,10 @@
             <p class="section-copy">这里记录实际运行页面暴露的问题。修正只表示进入复验，不代表用户已经认可。</p>
           </div>
           <div class="section-actions">
-            <a class="pill route" href="../index.html?date=2026-07-07&amp;render=high&amp;density=high">07-07 LAB</a>
-            <a class="pill route" href="../index.html?date=2026-07-11&amp;render=high&amp;density=high">07-11 LAB</a>
-            <a class="pill route" href="../index.html?date=2026-07-13&amp;render=high&amp;density=high">07-13 LAB</a>
-            <a class="pill route" href="../index.html?date=2026-07-16&amp;render=high&amp;density=high">07-16 LAB</a>
+            <a class="pill route" href="../?date=2026-07-07&amp;render=high&amp;density=high">07-07 LAB · /?date=2026-07-07&amp;render=high&amp;density=high</a>
+            <a class="pill route" href="../?date=2026-07-11&amp;render=high&amp;density=high">07-11 LAB · /?date=2026-07-11&amp;render=high&amp;density=high</a>
+            <a class="pill route" href="../?date=2026-07-13&amp;render=high&amp;density=high">07-13 LAB · /?date=2026-07-13&amp;render=high&amp;density=high</a>
+            <a class="pill route" href="../?date=2026-07-16&amp;render=high&amp;density=high">07-16 LAB · /?date=2026-07-16&amp;render=high&amp;density=high</a>
           </div>
         </div>
         <div class="rules-grid" id="daily-correction-grid"></div>
@@ -966,7 +966,7 @@
                 <h3>${escapeHtml(item.date)} · ${escapeHtml(item.name)}</h3>
                 <p><strong>用户反馈：</strong>${escapeHtml(item.ownerFeedback)}</p>
                 <p><strong>本轮修正：</strong>${escapeHtml(item.correction)}</p>
-                <a class="pill" href="${escapeHtml(item.url)}">打开日期花束</a>
+                <a class="pill route" href="${escapeHtml(item.url)}">打开日期花束 · ${escapeHtml((item.url || '').replace('../', '/'))}</a>
               </article>
             `
           )
@@ -1224,6 +1224,37 @@
         renderFilters();
         wireFilters();
       });
+    </script>
+    <script>
+      (() => {
+        const shareToken = new URLSearchParams(window.location.search).get('_vercel_share');
+        if (!shareToken) return;
+
+        const preservePreviewAccess = (root = document) => {
+          root.querySelectorAll('a[href]').forEach((link) => {
+            const rawHref = link.getAttribute('href') || '';
+            if (
+              rawHref.startsWith('#') ||
+              rawHref.startsWith('mailto:') ||
+              rawHref.startsWith('tel:') ||
+              rawHref.startsWith('javascript:')
+            ) {
+              return;
+            }
+
+            const url = new URL(rawHref, window.location.href);
+            if (url.origin !== window.location.origin) return;
+            if (!url.searchParams.has('_vercel_share')) {
+              url.searchParams.set('_vercel_share', shareToken);
+              link.href = url.href;
+            }
+          });
+        };
+
+        preservePreviewAccess();
+        const observer = new MutationObserver(() => preservePreviewAccess());
+        observer.observe(document.body, { childList: true, subtree: true });
+      })();
     </script>
   </body>
 </html>

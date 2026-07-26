@@ -73,6 +73,7 @@
 - 审美审核入口只在 debug 版主界面可见，不能只靠用户记住 `docs/aesthetic-review-dashboard.html`。
 - debug 版由 URL 参数 `?debug` 或 `?debug=1` 开启；debug 版必须显示当前 FPS 和资源占用信息。
 - 普通观赏模式不显示审美审核入口，审美复盘页本身也必须检查 `debug` 参数。
+- Vercel 受保护预览的 Dashboard 如果入口 URL 带 `_vercel_share`，所有同域 LAB 和日期花束链接必须继承该参数；否则用户点进深层 LAB 会被 Vercel SSO 拦截，看起来像页面不渲染。
 - GitHub Pages 发布时不能用原始 HTML 覆盖 Vite 已编译的 `docs/aesthetic-review-dashboard.html`；否则 dashboard 和 Primitive Lab 的脚本不会执行，页面会退化成只剩静态文字。
 - 新增关键审美记忆或 skill 文档时，必须同时加入 `scripts/deploy-source-files.json`；如果 dashboard 要在线上链接这些文档，还要在部署脚本中复制到 `dist/docs`。
 - 自动隐藏 UI 上的按钮必须有清楚的人话提示。
