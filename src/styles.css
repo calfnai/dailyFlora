@@ -332,6 +332,37 @@ button {
   font-weight: 800;
 }
 
+.site-language-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 2px 0;
+  border-top: 1px solid rgb(255 248 226 / 14%);
+}
+
+.site-language-switcher button {
+  min-width: 32px;
+  min-height: 28px;
+  border: 1px solid rgb(255 248 226 / 16%);
+  border-radius: 999px;
+  color: rgb(255 248 226 / 62%);
+  background: rgb(255 255 255 / 4%);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+.site-language-switcher button:hover,
+.site-language-switcher button:focus-visible,
+.site-language-switcher button[aria-pressed='true'] {
+  color: rgb(255 248 226);
+  border-color: rgb(244 230 129 / 48%);
+  background: rgb(244 230 129 / 14%);
+  outline: none;
+}
+
 .hud {
   left: max(18px, env(safe-area-inset-left));
   top: max(16px, env(safe-area-inset-top));

@@ -33,6 +33,7 @@ type ReferenceState = {
   themeId: string;
   themeName: string;
 };
+type InterfaceLanguage = 'en' | 'zh' | 'es' | 'fr' | 'pt' | 'it' | 'ja';
 
 const minRotationSpeed = 0.012;
 const maxRotationSpeed = 0.13;
@@ -48,6 +49,86 @@ const renderLabels: Record<Exclude<RenderQualityName, 'auto'>, string> = {
 };
 const accountStorageKey = 'dailyflora.account.v1';
 const favoritesStorageKey = 'dailyflora.favorites.v1';
+const interfaceLanguageStorageKey = 'dailyflora.interface-language.v1';
+const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record<string, string>> = {
+  zh: {
+    documentLang: 'zh-CN',
+    about: '关于',
+    favorite: '收藏今日花束',
+    custom: '生成我的专属花束',
+    objects: '周边与线下',
+    sync: '多端同步',
+    scifi: 'scifi',
+    garden: '我的花园',
+    review: '审美审核'
+  },
+  en: {
+    documentLang: 'en',
+    about: 'About',
+    favorite: "Save today's bouquet",
+    custom: 'Generate my bouquet',
+    objects: 'Objects & offline',
+    sync: 'Multi-device sync',
+    scifi: 'scifi',
+    garden: 'My garden',
+    review: 'Aesthetic review'
+  },
+  es: {
+    documentLang: 'es',
+    about: 'Acerca de',
+    favorite: 'Guardar ramo de hoy',
+    custom: 'Generar mi ramo',
+    objects: 'Objetos y offline',
+    sync: 'Sincronización multi-dispositivo',
+    scifi: 'scifi',
+    garden: 'Mi jardín',
+    review: 'Revisión estética'
+  },
+  fr: {
+    documentLang: 'fr',
+    about: 'À propos',
+    favorite: 'Enregistrer le bouquet',
+    custom: 'Générer mon bouquet',
+    objects: 'Objets et hors ligne',
+    sync: 'Synchronisation multi-écrans',
+    scifi: 'scifi',
+    garden: 'Mon jardin',
+    review: 'Revue esthétique'
+  },
+  pt: {
+    documentLang: 'pt',
+    about: 'Sobre',
+    favorite: 'Salvar buquê de hoje',
+    custom: 'Gerar meu buquê',
+    objects: 'Objetos e offline',
+    sync: 'Sincronização multidispositivo',
+    scifi: 'scifi',
+    garden: 'Meu jardim',
+    review: 'Revisão estética'
+  },
+  it: {
+    documentLang: 'it',
+    about: 'Informazioni',
+    favorite: 'Salva il bouquet',
+    custom: 'Genera il mio bouquet',
+    objects: 'Oggetti e offline',
+    sync: 'Sincronizzazione multi-dispositivo',
+    scifi: 'scifi',
+    garden: 'Il mio giardino',
+    review: 'Revisione estetica'
+  },
+  ja: {
+    documentLang: 'ja',
+    about: '概要',
+    favorite: '今日の花束を保存',
+    custom: '自分の花束を生成',
+    objects: 'グッズとオフライン',
+    sync: 'マルチデバイス同期',
+    scifi: 'scifi',
+    garden: '私の庭',
+    review: '美的レビュー'
+  }
+};
 const themeEnglishNames: Record<string, string> = {
   'tropical-forest': 'Tropical Forest',
   'moon-white': 'Moon White Hand-Tied',
@@ -135,6 +216,7 @@ const siteMenu = document.querySelector<HTMLElement>('#site-menu');
 const siteMenuToggle = document.querySelector<HTMLButtonElement>('#site-menu-toggle');
 const siteMenuPanel = document.querySelector<HTMLElement>('#site-menu-panel');
 const siteMenuDebugLink = document.querySelector<HTMLAnchorElement>('#site-menu-debug-link');
+const siteLanguageSwitcher = document.querySelector<HTMLElement>('#site-language-switcher');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
 const themeLabel = document.querySelector<HTMLElement>('#daily-theme');
 const themeCnLabel = document.querySelector<HTMLElement>('#daily-theme-cn');
@@ -655,6 +737,24 @@ function toggleSiteMenu(forceOpen?: boolean) {
   const open = forceOpen ?? siteMenuPanel.hidden;
   siteMenuPanel.hidden = !open;
   siteMenuToggle.setAttribute('aria-expanded', String(open));
+}
+
+function readInterfaceLanguage(): InterfaceLanguage {
+  const stored = window.localStorage.getItem(interfaceLanguageStorageKey);
+  return stored && stored in interfaceCopy ? (stored as InterfaceLanguage) : 'zh';
+}
+
+function updateInterfaceLanguage(language: InterfaceLanguage) {
+  const copy = interfaceCopy[language];
+  document.documentElement.lang = copy.documentLang;
+  document.querySelectorAll<HTMLElement>('[data-i18n-key]').forEach((element) => {
+    const key = element.dataset.i18nKey;
+    if (key && copy[key]) element.textContent = copy[key];
+  });
+  siteLanguageSwitcher?.querySelectorAll<HTMLButtonElement>('[data-language]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.language === language));
+  });
+  window.localStorage.setItem(interfaceLanguageStorageKey, language);
 }
 
 function toggleFavorite() {
@@ -1262,6 +1362,14 @@ siteMenuToggle?.addEventListener('click', () => {
   revealUi();
 });
 
+siteLanguageSwitcher?.addEventListener('click', (event) => {
+  const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-language]');
+  const language = button?.dataset.language;
+  if (!language || !(language in interfaceCopy)) return;
+  updateInterfaceLanguage(language as InterfaceLanguage);
+  revealUi();
+});
+
 document.addEventListener('pointerdown', (event) => {
   const target = event.target;
   if (siteMenuPanel && siteMenu && !siteMenuPanel.hidden && target instanceof Node && !siteMenu.contains(target)) {
@@ -1478,6 +1586,7 @@ window.addEventListener('beforeunload', () => window.clearTimeout(dateRolloverTi
 window.addEventListener('beforeunload', () => window.clearInterval(clockTickTimer));
 window.addEventListener('beforeunload', () => idleClock.stop());
 
+updateInterfaceLanguage(readInterfaceLanguage());
 setLabels();
 renderAccountState();
 setupDebugMode();

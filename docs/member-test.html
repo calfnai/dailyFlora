@@ -3,21 +3,25 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DailyFlora 用户中心 Mockup</title>
+    <meta name="description" content="DailyFlora 个人花园 MVP：本机收藏、专属花束预览和未来权益状态。" />
+    <title>DailyFlora 我的花园</title>
     <style>
       :root {
         color-scheme: dark;
-        --bg: #080a07;
-        --surface: #11160f;
-        --surface-2: #171f15;
-        --line: rgb(247 240 227 / 14%);
-        --text: #f7f0e3;
-        --muted: rgb(247 240 227 / 68%);
-        --accent: #f2cb62;
-        --good: #87d486;
-        --warn: #efb960;
-        --cool: #9fc6ff;
-        --bad: #ef8b73;
+        --bg: #050706;
+        --panel: rgb(255 250 230 / 6%);
+        --panel-strong: rgb(255 250 230 / 10%);
+        --line: rgb(255 250 230 / 14%);
+        --text: #fff7dc;
+        --muted: rgb(255 247 220 / 66%);
+        --faint: rgb(255 247 220 / 44%);
+        --gold: #f2df83;
+        --leaf: #89ad7a;
+        --rose: #f0a0a9;
+        --ink: #10120d;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       }
 
       * {
@@ -26,917 +30,585 @@
 
       body {
         margin: 0;
-        min-width: 320px;
-        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        min-height: 100vh;
         color: var(--text);
         background:
-          radial-gradient(circle at 12% 0%, rgb(242 203 98 / 10%), transparent 28%),
-          radial-gradient(circle at 88% 10%, rgb(135 212 134 / 8%), transparent 24%),
-          linear-gradient(180deg, #080a07, #0d110c 58%, #080a07);
-      }
-
-      button,
-      input,
-      textarea,
-      select {
-        font: inherit;
+          radial-gradient(circle at 18% 12%, rgb(137 173 122 / 24%), transparent 28rem),
+          radial-gradient(circle at 78% 8%, rgb(240 160 169 / 18%), transparent 24rem),
+          linear-gradient(140deg, #050706 0%, #0d120d 42%, #070806 100%);
       }
 
       a {
-        color: var(--accent);
+        color: inherit;
       }
 
-      .shell {
-        display: grid;
-        grid-template-columns: 280px minmax(0, 1fr);
-        min-height: 100vh;
+      .page {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
       }
 
-      .sidebar {
-        display: grid;
-        align-content: start;
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         gap: 18px;
-        padding: 22px;
-        border-right: 1px solid var(--line);
-        background: rgb(8 10 7 / 78%);
+        padding: 18px 0;
+        background: linear-gradient(180deg, rgb(5 7 6 / 96%), rgb(5 7 6 / 68%));
+        backdrop-filter: blur(18px);
       }
 
       .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 850;
+        letter-spacing: 0.18em;
+      }
+
+      .brand-mark {
+        width: 16px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 36% 26%, #fff7dc 0 12%, transparent 13%),
+          conic-gradient(from 28deg, var(--leaf), var(--gold), var(--rose), var(--leaf));
+        box-shadow: 0 0 24px rgb(242 223 131 / 32%);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .nav a {
+        text-decoration: none;
+      }
+
+      .nav a:hover {
+        color: var(--text);
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: 0 16px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--text);
+        background: rgb(255 255 255 / 5%);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 760;
+        cursor: pointer;
+      }
+
+      .button.primary {
+        color: var(--ink);
+        border-color: transparent;
+        background: var(--gold);
+      }
+
+      .hero {
         display: grid;
-        gap: 8px;
+        grid-template-columns: minmax(0, 1.05fr) minmax(300px, 0.95fr);
+        gap: 42px;
+        align-items: end;
+        min-height: 62vh;
+        padding: 64px 0 42px;
+      }
+
+      .eyebrow {
+        margin: 0 0 14px;
+        color: var(--gold);
+        font-size: 11px;
+        font-weight: 820;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
       }
 
       h1,
       h2,
       h3,
       p {
-        margin: 0;
+        margin-top: 0;
       }
 
       h1 {
-        font-size: 28px;
-        line-height: 1;
+        max-width: 760px;
+        margin-bottom: 22px;
+        font-size: clamp(46px, 8vw, 108px);
+        line-height: 0.92;
         letter-spacing: 0;
       }
 
-      h2 {
-        font-size: 22px;
-        line-height: 1.16;
+      h1 em {
+        color: var(--rose);
+        font-style: normal;
       }
 
-      h3 {
-        font-size: 16px;
-      }
-
-      p,
-      label,
-      td {
+      .lead {
+        max-width: 650px;
+        margin-bottom: 28px;
         color: var(--muted);
-        line-height: 1.58;
+        font-size: clamp(17px, 2vw, 22px);
+        line-height: 1.68;
       }
 
-      .panel,
-      .card,
-      .upload-zone,
-      .preview-stage {
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .status-panel {
         border: 1px solid var(--line);
         border-radius: 8px;
-        background: rgb(17 22 15 / 78%);
+        padding: 22px;
+        background: rgb(255 255 255 / 6%);
+        box-shadow: 0 24px 80px rgb(0 0 0 / 30%);
       }
 
-      .profile {
-        display: grid;
-        gap: 12px;
-        padding: 14px;
-      }
-
-      .avatar-row {
+      .member-row {
         display: flex;
-        gap: 12px;
         align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--line);
       }
 
       .avatar {
         display: grid;
         place-items: center;
-        width: 56px;
+        width: 54px;
         aspect-ratio: 1;
-        border: 1px solid var(--line);
         border-radius: 50%;
-        color: #10150f;
-        background:
-          radial-gradient(circle at 48% 34%, #f2cb62, transparent 30%),
-          radial-gradient(circle at 58% 55%, #87d486, transparent 36%),
-          #f7f0e3;
-        font-size: 22px;
+        color: var(--ink);
+        background: linear-gradient(135deg, var(--gold), var(--rose));
         font-weight: 900;
       }
 
-      .stat-grid {
-        display: grid;
-        gap: 8px;
+      .member-name {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 820;
       }
 
-      .stat {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 10px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: rgb(255 255 255 / 4%);
-      }
-
-      .stat strong {
-        color: var(--text);
-      }
-
-      .nav-list {
-        display: grid;
-        gap: 8px;
-      }
-
-      .nav-list a {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-        min-height: 40px;
-        align-items: center;
-        padding: 0 10px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        color: inherit;
-        text-decoration: none;
-        background: rgb(255 255 255 / 4%);
-      }
-
-      .content {
-        min-width: 0;
-        padding: 24px;
-      }
-
-      .topbar {
-        display: flex;
-        justify-content: space-between;
-        gap: 18px;
-        align-items: start;
-        margin-bottom: 18px;
-      }
-
-      .page-title {
-        display: grid;
-        gap: 8px;
-      }
-
-      .page-title p {
-        max-width: 76ch;
-      }
-
-      .pill,
-      .status {
-        display: inline-flex;
-        width: fit-content;
-        min-height: 24px;
-        align-items: center;
-        padding: 0 8px;
-        border: 1px solid currentColor;
-        border-radius: 999px;
-        color: var(--warn);
-        font-size: 12px;
-        font-weight: 750;
-      }
-
-      .pill.good,
-      .status.good {
-        color: var(--good);
-      }
-
-      .pill.cool,
-      .status.cool {
-        color: var(--cool);
-      }
-
-      .workspace {
-        display: grid;
-        grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.92fr);
-        gap: 16px;
-        align-items: start;
-      }
-
-      .panel {
-        display: grid;
-        gap: 14px;
-        padding: 16px;
-      }
-
-      .panel-head {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        align-items: start;
-      }
-
-      .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-      }
-
-      label {
-        display: grid;
-        gap: 7px;
-        font-size: 12px;
-      }
-
-      input,
-      textarea,
-      select {
-        width: 100%;
-        min-height: 40px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 0 11px;
-        color: var(--text);
-        background: rgb(255 255 255 / 6%);
-        outline: none;
-      }
-
-      textarea {
-        min-height: 84px;
-        padding-top: 10px;
-        resize: vertical;
-      }
-
-      input:focus,
-      textarea:focus,
-      select:focus {
-        border-color: rgb(242 203 98 / 44%);
-        background: rgb(255 255 255 / 9%);
-      }
-
-      .upload-zone {
-        position: relative;
-        display: grid;
-        place-items: center;
-        min-height: 220px;
-        padding: 18px;
-        overflow: hidden;
-        text-align: center;
-        cursor: pointer;
-      }
-
-      .upload-zone input {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        cursor: pointer;
-      }
-
-      .upload-copy {
-        display: grid;
-        gap: 7px;
-        justify-items: center;
-      }
-
-      .preview-image {
-        display: none;
-        width: 100%;
-        height: 100%;
-        max-height: 310px;
-        object-fit: cover;
-        border-radius: 8px;
-      }
-
-      .upload-zone.has-image {
-        padding: 0;
-      }
-
-      .upload-zone.has-image .upload-copy {
-        display: none;
-      }
-
-      .upload-zone.has-image .preview-image {
-        display: block;
-      }
-
-      .button-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      button,
-      .button {
-        display: inline-flex;
-        min-height: 38px;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 0 12px;
-        color: var(--text);
-        background: rgb(255 255 255 / 6%);
-        text-decoration: none;
-        cursor: pointer;
-      }
-
-      .primary {
-        color: #151307;
-        border-color: transparent;
-        background: var(--accent);
-        font-weight: 850;
-      }
-
-      button:disabled {
-        cursor: not-allowed;
-        opacity: 0.48;
-      }
-
-      .recognition {
-        display: grid;
-        gap: 12px;
-      }
-
-      .preview-stage {
-        display: grid;
-        gap: 12px;
-        padding: 15px;
-        background:
-          radial-gradient(circle at 40% 30%, var(--color-a, rgb(242 203 98 / 28%)), transparent 23%),
-          radial-gradient(circle at 62% 42%, var(--color-b, rgb(135 212 134 / 22%)), transparent 24%),
-          radial-gradient(circle at 48% 62%, var(--color-c, rgb(159 198 255 / 18%)), transparent 28%),
-          rgb(8 10 7 / 70%);
-      }
-
-      .generated-flower {
-        position: relative;
-        min-height: 230px;
-        overflow: hidden;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background:
-          radial-gradient(circle at 48% 36%, var(--color-a, #f2cb62), transparent 7%),
-          radial-gradient(circle at 39% 45%, var(--color-b, #87d486), transparent 8%),
-          radial-gradient(circle at 58% 48%, var(--color-c, #9fc6ff), transparent 9%),
-          radial-gradient(circle at 50% 58%, rgb(247 240 227 / 20%), transparent 22%),
-          #071008;
-      }
-
-      .stem {
-        position: absolute;
-        left: 50%;
-        bottom: -28px;
-        width: 2px;
-        height: 190px;
-        background: linear-gradient(var(--stem-tilt, 0deg), transparent, rgb(135 212 134 / 70%));
-        transform-origin: bottom;
-        transform: rotate(var(--rotate));
-      }
-
-      .bloom {
-        position: absolute;
-        width: var(--size);
-        aspect-ratio: 1;
-        left: var(--x);
-        top: var(--y);
-        border-radius: 50%;
-        background:
-          radial-gradient(circle at 50% 50%, rgb(255 255 255 / 80%) 0 10%, transparent 11%),
-          conic-gradient(from var(--spin), var(--color-a), var(--color-b), var(--color-c), var(--color-a));
-        box-shadow: 0 0 24px rgb(255 255 255 / 12%);
-        opacity: 0.92;
-      }
-
-      .chip-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      .chip {
-        display: inline-flex;
-        min-height: 28px;
-        align-items: center;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        padding: 0 9px;
-        color: rgb(247 240 227 / 84%);
-        background: rgb(255 255 255 / 5%);
-        font-size: 12px;
-      }
-
-      .swatches {
-        display: flex;
-        gap: 8px;
-      }
-
-      .swatch {
-        width: 36px;
-        aspect-ratio: 1;
-        border: 1px solid var(--line);
-        border-radius: 50%;
-        background: var(--swatch);
-      }
-
-      .record-grid {
-        display: grid;
-        gap: 10px;
-      }
-
-      .record {
-        display: grid;
-        grid-template-columns: 72px minmax(0, 1fr);
-        gap: 12px;
-        padding: 12px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: rgb(255 255 255 / 4%);
-      }
-
-      .thumb {
-        width: 72px;
-        aspect-ratio: 1;
-        border-radius: 8px;
-        background:
-          radial-gradient(circle at 45% 38%, var(--thumb-a), transparent 24%),
-          radial-gradient(circle at 62% 48%, var(--thumb-b), transparent 28%),
-          radial-gradient(circle at 50% 65%, var(--thumb-c), transparent 30%),
-          #070907;
-      }
-
-      .meta {
-        display: grid;
-        gap: 4px;
-        min-width: 0;
-      }
-
-      .meta p {
+      .member-note {
+        margin: 4px 0 0;
+        color: var(--muted);
         font-size: 13px;
       }
 
-      table {
+      .truth-list {
+        display: grid;
+        gap: 12px;
+        margin: 18px 0 0;
+      }
+
+      .truth-list div {
+        display: grid;
+        grid-template-columns: 82px 1fr;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .truth-list strong {
+        color: var(--text);
+      }
+
+      .section {
+        padding: 42px 0;
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 30px;
+        margin-bottom: 20px;
+      }
+
+      .section-head h2 {
+        max-width: 720px;
+        margin-bottom: 0;
+        font-size: clamp(30px, 4vw, 56px);
+        line-height: 1.02;
+      }
+
+      .section-head p {
+        max-width: 390px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .collection-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .flower-card {
+        overflow: hidden;
+        min-height: 360px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .flower-card img {
+        display: block;
         width: 100%;
-        border-collapse: collapse;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        background: #111;
       }
 
-      th,
-      td {
-        padding: 11px 10px;
-        border-bottom: 1px solid var(--line);
-        text-align: left;
-        vertical-align: top;
+      .flower-card-content {
+        padding: 16px;
       }
 
-      th {
-        color: rgb(247 240 227 / 86%);
-        font-size: 12px;
-        letter-spacing: 0.08em;
+      .flower-card time,
+      .tag {
+        color: var(--gold);
+        font-size: 11px;
+        font-weight: 820;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
-        background: rgb(255 255 255 / 4%);
       }
 
-      tr:last-child td {
-        border-bottom: 0;
+      .flower-card h3 {
+        margin: 10px 0 8px;
+        font-size: 22px;
       }
 
-      .history {
-        margin-top: 16px;
+      .flower-card p {
+        color: var(--muted);
+        line-height: 1.6;
       }
 
-      .empty {
-        min-height: 150px;
+      .empty-card {
         display: grid;
         place-items: center;
-        border: 1px dashed var(--line);
+        min-height: 360px;
+        padding: 26px;
+        border: 1px dashed rgb(255 250 230 / 22%);
         border-radius: 8px;
         color: var(--muted);
+        background: rgb(255 255 255 / 4%);
         text-align: center;
       }
 
-      @media (max-width: 1040px) {
-        .shell {
-          grid-template-columns: 1fr;
-        }
-
-        .sidebar {
-          border-right: 0;
-          border-bottom: 1px solid var(--line);
-        }
-
-        .workspace {
-          grid-template-columns: 1fr;
-        }
+      .two-column {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 0.8fr);
+        gap: 16px;
       }
 
-      @media (max-width: 720px) {
-        .content {
-          padding: 18px;
-        }
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 24px;
+        background: var(--panel);
+      }
 
+      .panel h3 {
+        margin-bottom: 10px;
+        font-size: 24px;
+      }
+
+      .panel p {
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .ledger {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+        font-size: 14px;
+      }
+
+      .ledger th,
+      .ledger td {
+        padding: 14px 0;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+      }
+
+      .ledger th {
+        color: var(--faint);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .ledger td:last-child,
+      .ledger th:last-child {
+        text-align: right;
+      }
+
+      .signed-in-only,
+      .signed-out-only {
+        display: none;
+      }
+
+      body[data-state='member'] .signed-in-only,
+      body[data-state='guest'] .signed-out-only {
+        display: block;
+      }
+
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 48px 0 28px;
+        color: var(--faint);
+        font-size: 12px;
+      }
+
+      @media (max-width: 820px) {
         .topbar,
-        .panel-head {
-          display: grid;
+        .section-head,
+        .footer {
+          align-items: flex-start;
+          flex-direction: column;
         }
 
-        .form-grid {
+        .nav {
+          flex-wrap: wrap;
+        }
+
+        .hero,
+        .two-column {
+          grid-template-columns: 1fr;
+          min-height: auto;
+        }
+
+        .collection-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .truth-list div {
           grid-template-columns: 1fr;
         }
       }
     </style>
   </head>
-  <body>
-    <main class="shell">
-      <aside class="sidebar">
-        <section class="brand">
-          <span class="pill good">member mockup</span>
-          <h1>DailyFlora ID</h1>
-          <p>一个低成本 MVP 用户中心：先把上传、识别、生成记录、积分和订单入口的体验跑通。</p>
-        </section>
-
-        <section class="profile">
-          <div class="avatar-row">
-            <div class="avatar">花</div>
-            <div>
-              <h3>小花</h3>
-              <p>gardenia@example.com</p>
-            </div>
-          </div>
-          <div class="stat-grid">
-            <div class="stat"><span>积分</span><strong id="credit-count">128</strong></div>
-            <div class="stat"><span>已生成</span><strong id="generated-count">2</strong></div>
-            <div class="stat"><span>获奖返还</span><strong>120</strong></div>
-          </div>
-        </section>
-
-        <nav class="nav-list" aria-label="用户中心导航">
-          <a href="#upload-workbench"><span>上传识别</span><strong>当前</strong></a>
-          <a href="#history"><span>我的花花</span><strong id="nav-history-count">2</strong></a>
-          <a href="#account"><span>资料安全</span><strong>mock</strong></a>
-          <a href="./dev-index.html"><span>开发组目录</span><strong>docs</strong></a>
+  <body data-state="guest">
+    <div class="page">
+      <header class="topbar">
+        <a class="brand" href="../" aria-label="DailyFlora 首页"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA</a>
+        <nav class="nav" aria-label="站点导航">
+          <a href="../">今日花束</a>
+          <a href="../about/">关于</a>
+          <a href="../signup/">收藏今日花束</a>
+          <a href="../signup/">生成我的专属花束</a>
+          <a href="../bouquet-shop/">周边与线下</a>
+          <a href="../downloads/">多端同步</a>
         </nav>
-      </aside>
+      </header>
 
-      <section class="content">
-        <div class="topbar">
-          <div class="page-title">
-            <span class="pill cool">upload to bouquet</span>
-            <h2>上传参考图，识别成一束花花</h2>
-            <p>当前是纯前端 mockup：会读取上传图片、提取平均色、结合偏好文字，生成一份可复制、可重新生成的新花花方案。不会上传文件，也不会写入真实数据库。</p>
-          </div>
-          <a class="button" href="../">回到首页</a>
-        </div>
-
-        <section class="workspace" id="upload-workbench">
-          <div class="panel">
-            <div class="panel-head">
-              <div>
-                <h2>新建定制花花</h2>
-                <p>上传参考图后，识别结果会出现在右侧。旧记录不热修改，点击生成会新增一份记录。</p>
-              </div>
-              <span class="status good">12 credits</span>
+      <main>
+        <section class="hero" id="signup">
+          <div>
+            <p class="eyebrow">My DailyFlora Garden</p>
+            <h1>把今天喜欢的花，留进<em>我的花园</em>。</h1>
+            <p class="lead">这里是会员页的 0.14.11 预览：首屏优先展示“我的收藏”，后面再放专属花束生成、Credits 账本和未来权益。当前账户仍是本机 MVP，不是云端注册。</p>
+            <div class="hero-actions signed-out-only">
+              <a class="button primary" href="../signup/">免费建立本机花园</a>
+              <a class="button" href="../signup/">生成我的专属花束</a>
             </div>
-
-            <label class="upload-zone" id="upload-zone">
-              <input id="reference-file" type="file" accept="image/*" />
-              <img class="preview-image" id="preview-image" alt="上传参考图预览" />
-              <span class="upload-copy">
-                <strong>选择一张参考图</strong>
-                <span>支持花束、色彩氛围、局部花材。MVP 阶段只在浏览器本地识别。</span>
-              </span>
-            </label>
-
-            <div class="form-grid">
-              <label>
-                花花名称
-                <input id="bouquet-name" value="我的清晨花花" maxlength="28" />
-              </label>
-              <label>
-                想要的方向
-                <select id="style-select">
-                  <option value="auto">自动判断</option>
-                  <option value="air">空气感</option>
-                  <option value="rainbow">彩虹多色</option>
-                  <option value="fruit">果材/莓果</option>
-                  <option value="warm">暖色饱满</option>
-                </select>
-              </label>
-            </div>
-
-            <label>
-              文字偏好
-              <textarea id="preference-input" maxlength="140">更清透，枝条外扩，不要太满，要有小花和一点果点。</textarea>
-            </label>
-
-            <div class="button-row">
-              <button class="primary" id="recognize-button" type="button" disabled>识别成花花方案</button>
-              <button id="sample-button" type="button">使用示例图感</button>
-              <button id="reset-button" type="button">清空</button>
+            <div class="hero-actions signed-in-only">
+              <a class="button primary" href="#myfav">查看我的收藏</a>
+              <a class="button" href="#create">生成预览</a>
             </div>
           </div>
-
-          <aside class="recognition">
-            <section class="preview-stage" id="result-stage" aria-live="polite">
-              <div class="panel-head">
-                <div>
-                  <span class="pill">recognition</span>
-                  <h2 id="result-title">等待上传</h2>
-                </div>
-                <span class="status" id="result-status">not ready</span>
-              </div>
-              <div class="generated-flower" id="generated-flower"></div>
+          <aside class="status-panel">
+            <div class="member-row">
               <div>
-                <h3>识别出的花花规则</h3>
-                <p id="result-summary">上传参考图后，这里会显示主色、花材角色、空间结构和建议 seed。</p>
+                <p class="member-name" id="member-name">访客花园</p>
+                <p class="member-note" id="member-note">注册后在这台设备保存收藏。</p>
               </div>
-              <div class="swatches" id="swatches"></div>
-              <div class="chip-list" id="primitive-chips"></div>
-              <div class="button-row">
-                <button class="primary" id="generate-button" type="button" disabled>生成并保存记录</button>
-                <a class="button" id="open-live-link" href="../?theme=dewberry-morning&render=high&density=high" target="_blank" rel="noopener">打开相近花束</a>
-              </div>
-            </section>
-
-            <section class="panel" id="account">
-              <div class="panel-head">
-                <div>
-                  <h2>资料与订单入口</h2>
-                  <p>付款方式未决定，这里只保留未来字段。</p>
-                </div>
-                <span class="status cool">mock only</span>
-              </div>
-              <table>
-                <tbody>
-                  <tr><td>昵称 / 头像 / 密码</td><td>可编辑 UI，正式版需要认证流程。</td></tr>
-                  <tr><td>订单</td><td>暂未开放，只预留入口。</td></tr>
-                  <tr><td>积分流水</td><td>生成消耗、订阅发放、获奖返还、人工调整。</td></tr>
-                </tbody>
-              </table>
-            </section>
+              <div class="avatar" id="avatar">访</div>
+            </div>
+            <div class="truth-list">
+              <div><strong>账户</strong><span>本机 localStorage MVP。Supabase Auth 尚未接入。</span></div>
+              <div><strong>同步</strong><span>收藏和 Credits 只保存在当前浏览器，不承诺跨设备同步。</span></div>
+              <div><strong>支付</strong><span>订阅、付款、真实积分消耗都未上线。</span></div>
+            </div>
           </aside>
         </section>
 
-        <section class="panel history" id="history">
-          <div class="panel-head">
+        <section class="section" id="myfav">
+          <div class="section-head">
             <div>
-              <h2>我的花花</h2>
-              <p>生成记录是追加式的；复制再生成会产生新记录，不修改旧记录。</p>
+              <p class="eyebrow">Saved bouquets first</p>
+              <h2>我的收藏</h2>
             </div>
-            <span class="status good" id="history-count">2 records</span>
+            <p>收藏不是活动噱头，而是一份可回看的花园索引。真实登录完成前，这些记录只属于当前设备。</p>
           </div>
-          <div class="record-grid" id="record-grid"></div>
+          <div class="collection-grid" id="collection-grid"></div>
         </section>
-      </section>
-    </main>
+
+        <section class="section" id="create">
+          <div class="two-column">
+            <article class="panel">
+              <span class="tag">Personal bouquet preview</span>
+              <h3>生成我的专属花束</h3>
+              <p>这一块先保留为创作入口：用日期、颜色、心情或参考图生成个人花束方向。0.14.11 不伪装成已完成的后端生成服务，生成记录也不会上传云端。</p>
+              <a class="button primary" href="../signup/">进入注册引导</a>
+            </article>
+            <article class="panel">
+              <span class="tag">Construction state</span>
+              <h3>现在能做什么</h3>
+              <p>可以查看每日花束、建立本机账户、保存当前浏览器内的收藏、预览会员信息结构。还不能真实注册、跨端同步、付费订阅或兑换线下权益。</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="credits">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Credits</p>
+              <h2>Credits</h2>
+            </div>
+            <p class="signed-out-only">未注册时，这里解释未来权益；注册后会显示当前设备上的账本预览。</p>
+            <p class="signed-in-only">这不是促销页。先用账本方式展示来源、用途和状态，等真实账户系统完成后再接云端记录。</p>
+          </div>
+          <div class="panel signed-out-only">
+            <h3>未来它会记录什么</h3>
+            <p>Credits 未来用于专属花束生成、实体花束兑换、线下合作权益和会员实验功能。现在不会扣费、不会购买，也不会写入服务器。</p>
+          </div>
+          <div class="panel signed-in-only">
+            <table class="ledger" aria-label="Credits 账本预览">
+              <thead><tr><th>日期</th><th>项目</th><th>状态</th><th>变化</th></tr></thead>
+              <tbody id="ledger-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="status">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Roadmap honesty</p>
+              <h2>未来权益先说清楚。</h2>
+            </div>
+            <p>0.14.11 是 UI 刷新，不是后端发布。Supabase Auth、RLS、Vercel env、session 和支付订阅要单独进 0.14.12。</p>
+          </div>
+          <div class="two-column">
+            <article class="panel"><h3>已可体验</h3><p>Web 每日花束、本机注册、本机收藏、会员页视觉结构、周边与多端同步路线图。</p></article>
+            <article class="panel"><h3>未完成</h3><p>真实 Supabase 注册、跨设备同步、积分云端账本、付款订阅、线下兑换、下载包。</p></article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>© 2026 DailyFlora · Member MVP</span>
+        <span>Device-local account · Supabase Auth not enabled</span>
+      </footer>
+    </div>
 
     <script>
-      const initialRecords = [
+      const accountKey = 'dailyflora.account.v1';
+      const favoritesKey = 'dailyflora.favorites.v1';
+      const fallbackFavorites = [
         {
-          name: '晨露莓园空气束',
-          seed: 'dewberry-morning-air',
-          source: '上传参考图 + 更清透、枝条外扩',
-          status: '已生成，消耗 12 积分',
-          colors: ['#fff7df', '#bfe878', '#7dc9ff']
+          date: '2026-07-13',
+          themeName: 'Her Real Bouquet v4',
+          flowerPlanName: '桌面花束方向',
+          img: './assets/member-ui-direction/favorite-0713.png'
         },
         {
-          name: '荔枝花园彩虹束',
-          seed: 'lychee-garden-rainbow',
-          source: '参考图库 + 彩虹多色',
-          status: '已通过，候选每日花花',
-          colors: ['#fff6e7', '#ff9fbd', '#8ee9d0']
+          date: '2026-07-08',
+          themeName: 'January Sky',
+          flowerPlanName: '蓝白枝线',
+          img: './assets/member-ui-direction/favorite-0708.png'
+        },
+        {
+          date: 'Special',
+          themeName: 'Private reference',
+          flowerPlanName: '参考图生成方向',
+          img: './assets/member-ui-direction/favorite-special.png'
         }
       ];
 
-      const roleMap = {
-        air: {
-          title: '空气感小花束',
-          theme: 'dewberry-morning',
-          seed: 'member-air-bouquet',
-          primitives: ['CosmosOpenFlower', 'UmbelMiniCluster', 'SpikeFlower', 'FoliageGrassBranch', 'FruitPodCluster'],
-          summary: '识别为轻盈、清透、外开线条方向：适合小花矩阵、低位雾团、嫩绿枝线和少量果点。'
-        },
-        rainbow: {
-          title: '彩虹花园束',
-          theme: 'lychee-garden-rainbow',
-          seed: 'member-rainbow-bouquet',
-          primitives: ['CosmosOpenFlower', 'DiskFlower', 'StarPinwheelFlower', 'FruitPodCluster', 'FoliageGrassBranch'],
-          summary: '识别为多色彩虹方向：颜色应按花材角色分配，用绿色和浅色空气缓冲，果点必须挂在枝条上。'
-        },
-        fruit: {
-          title: '浆果森林束',
-          theme: 'tropical-forest',
-          seed: 'member-berry-grove',
-          primitives: ['FruitPodCluster', 'HangingBellFruit', 'CosmosOpenFlower', 'UmbelMiniCluster', 'FoliageGrassBranch'],
-          summary: '识别为果材/莓果方向：小果、小花和细枝叶混合，保持可爱和童话感，不做端庄大主花。'
-        },
-        warm: {
-          title: '秋日果汁束',
-          theme: 'sea-salt-lemon',
-          seed: 'member-warm-juice',
-          primitives: ['LayeredDahliaFlower', 'RuffledRoseFlower', 'DiskFlower', 'HangingBellFruit', 'FoliageGrassBranch'],
-          summary: '识别为暖色饱满方向：橙黄主花可以更密，但要用白色小花、果点和绿色边缘避免沉重。'
+      function readJson(key, fallback) {
+        try {
+          const value = localStorage.getItem(key);
+          return value ? JSON.parse(value) : fallback;
+        } catch {
+          return fallback;
         }
-      };
-
-      const uploadZone = document.querySelector('#upload-zone');
-      const fileInput = document.querySelector('#reference-file');
-      const previewImage = document.querySelector('#preview-image');
-      const recognizeButton = document.querySelector('#recognize-button');
-      const sampleButton = document.querySelector('#sample-button');
-      const resetButton = document.querySelector('#reset-button');
-      const generateButton = document.querySelector('#generate-button');
-      const resultStage = document.querySelector('#result-stage');
-      const resultTitle = document.querySelector('#result-title');
-      const resultStatus = document.querySelector('#result-status');
-      const resultSummary = document.querySelector('#result-summary');
-      const primitiveChips = document.querySelector('#primitive-chips');
-      const swatches = document.querySelector('#swatches');
-      const generatedFlower = document.querySelector('#generated-flower');
-      const recordGrid = document.querySelector('#record-grid');
-      const historyCount = document.querySelector('#history-count');
-      const generatedCount = document.querySelector('#generated-count');
-      const navHistoryCount = document.querySelector('#nav-history-count');
-      const creditCount = document.querySelector('#credit-count');
-      const openLiveLink = document.querySelector('#open-live-link');
-      const styleSelect = document.querySelector('#style-select');
-      const preferenceInput = document.querySelector('#preference-input');
-      const bouquetName = document.querySelector('#bouquet-name');
-
-      let records = [...initialRecords];
-      let detected = null;
-      let credits = 128;
-
-      function toHex(value) {
-        return Math.round(value).toString(16).padStart(2, '0');
       }
 
-      function averageColor(image) {
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d', { willReadFrequently: true });
-        const size = 64;
-        canvas.width = size;
-        canvas.height = size;
-        context.drawImage(image, 0, 0, size, size);
-        const data = context.getImageData(0, 0, size, size).data;
-        let r = 0;
-        let g = 0;
-        let b = 0;
-        let count = 0;
-        for (let index = 0; index < data.length; index += 16) {
-          r += data[index];
-          g += data[index + 1];
-          b += data[index + 2];
-          count += 1;
-        }
-        return {
-          r: r / count,
-          g: g / count,
-          b: b / count
-        };
+      function initials(name) {
+        const clean = String(name || '').trim();
+        return clean ? clean.slice(0, 1).toUpperCase() : '访';
       }
 
-      function paletteFromColor(color) {
-        const base = `#${toHex(color.r)}${toHex(color.g)}${toHex(color.b)}`;
-        const pale = `#${toHex((color.r + 255) / 2)}${toHex((color.g + 247) / 2)}${toHex((color.b + 226) / 2)}`;
-        const leaf = `#${toHex((color.r * 0.22) + 98)}${toHex((color.g * 0.34) + 130)}${toHex((color.b * 0.18) + 72)}`;
-        return [pale, base, leaf];
-      }
+      const account = readJson(accountKey, null);
+      const storedFavorites = readJson(favoritesKey, []);
+      const isMember = Boolean(account);
+      document.body.dataset.state = isMember ? 'member' : 'guest';
+      document.querySelector('#member-name').textContent = isMember ? account.name || 'DailyFlora 用户' : '访客花园';
+      document.querySelector('#member-note').textContent = isMember
+        ? `${account.email || '本机账户'} · ${storedFavorites.length} 个本机收藏`
+        : '注册后在这台设备保存收藏。';
+      document.querySelector('#avatar').textContent = initials(account?.name);
 
-      function inferStyle(color) {
-        const manual = styleSelect.value;
-        const words = preferenceInput.value;
-        if (manual !== 'auto') return manual;
-        if (/彩虹|多色|多巴胺/.test(words)) return 'rainbow';
-        if (/果|莓|荔枝/.test(words)) return 'fruit';
-        if (/暖|橙|黄|饱满/.test(words)) return 'warm';
-        const max = Math.max(color.r, color.g, color.b);
-        const min = Math.min(color.r, color.g, color.b);
-        if (max - min > 70) return 'rainbow';
-        if (color.r > color.b + 28 && color.r > color.g - 10) return 'warm';
-        if (color.b > color.r + 18) return 'air';
-        return 'air';
-      }
+      const collection = isMember && storedFavorites.length
+        ? storedFavorites.map((item) => ({
+            date: item.date,
+            themeName: item.themeName,
+            flowerPlanName: item.flowerPlanName,
+            img: './assets/member-ui-direction/favorite-0713.png'
+          }))
+        : fallbackFavorites;
 
-      function renderMockFlower(colors) {
-        resultStage.style.setProperty('--color-a', colors[0]);
-        resultStage.style.setProperty('--color-b', colors[1]);
-        resultStage.style.setProperty('--color-c', colors[2]);
-        generatedFlower.innerHTML = Array.from({ length: 12 }, (_, index) => {
-          const x = 24 + ((index * 19) % 48);
-          const y = 18 + ((index * 31) % 50);
-          const size = 22 + ((index * 7) % 24);
-          return `<span class="bloom" style="--x:${x}%;--y:${y}%;--size:${size}px;--spin:${index * 27}deg"></span>`;
-        }).join('') + Array.from({ length: 9 }, (_, index) => {
-          const rotate = -42 + index * 11;
-          return `<span class="stem" style="--rotate:${rotate}deg"></span>`;
-        }).join('');
+      const grid = document.querySelector('#collection-grid');
+      if (!isMember) {
+        const empty = document.createElement('article');
+        empty.className = 'empty-card';
+        empty.innerHTML = '<div><h3>还没有建立花园</h3><p>从注册引导页进入后，收藏会保存在这台设备。下面先展示花园卡片的视觉样式。</p><a class="button primary" href="../signup/">去注册引导页</a></div>';
+        grid.append(empty);
       }
-
-      function applyDetection(next) {
-        detected = next;
-        resultTitle.textContent = next.title;
-        resultStatus.textContent = 'ready';
-        resultStatus.className = 'status good';
-        resultSummary.textContent = `${next.summary} 建议 seed：${next.seed}`;
-        primitiveChips.innerHTML = next.primitives.map((item) => `<span class="chip">${item}</span>`).join('');
-        swatches.innerHTML = next.colors.map((color) => `<span class="swatch" style="--swatch:${color}"></span>`).join('');
-        renderMockFlower(next.colors);
-        openLiveLink.href = `../?date=2026-07-03&seed=${encodeURIComponent(next.seed)}&theme=${encodeURIComponent(next.theme)}&render=high&density=high`;
-        generateButton.disabled = false;
-      }
-
-      function renderRecords() {
-        recordGrid.innerHTML = records.map((record) => `
-          <article class="record">
-            <div class="thumb" style="--thumb-a:${record.colors[0]};--thumb-b:${record.colors[1]};--thumb-c:${record.colors[2]}"></div>
-            <div class="meta">
-              <h3>${record.name}</h3>
-              <p><code>seed=${record.seed}</code></p>
-              <p>${record.source}</p>
-              <span class="status good">${record.status}</span>
-            </div>
-          </article>
-        `).join('');
-        const count = records.length;
-        historyCount.textContent = `${count} records`;
-        generatedCount.textContent = String(count);
-        navHistoryCount.textContent = String(count);
-        creditCount.textContent = String(credits);
-      }
-
-      fileInput.addEventListener('change', () => {
-        const file = fileInput.files?.[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          previewImage.src = String(reader.result);
-          uploadZone.classList.add('has-image');
-          recognizeButton.disabled = false;
-        };
-        reader.readAsDataURL(file);
+      collection.forEach((item) => {
+        const card = document.createElement('article');
+        card.className = 'flower-card';
+        card.innerHTML = `
+          <img src="${item.img}" alt="" loading="lazy" />
+          <div class="flower-card-content">
+            <time>${item.date}</time>
+            <h3>${item.themeName || 'DailyFlora bouquet'}</h3>
+            <p>${item.flowerPlanName || '收藏的每日花束'} · 本机记录</p>
+          </div>
+        `;
+        grid.append(card);
       });
 
-      recognizeButton.addEventListener('click', () => {
-        if (!previewImage.src) return;
-        if (!previewImage.complete) {
-          previewImage.addEventListener('load', () => recognizeButton.click(), { once: true });
-          return;
-        }
-        const color = averageColor(previewImage);
-        const colors = paletteFromColor(color);
-        const style = inferStyle(color);
-        const role = roleMap[style];
-        applyDetection({
-          ...role,
-          title: `${bouquetName.value || role.title} / ${role.title}`,
-          colors
-        });
+      const ledgerRows = [
+        ['2026-07-27', '建立本机花园', 'MVP 记录', '+20'],
+        ['2026-07-27', '收藏今日花束', '本机记录', '+5'],
+        ['未来', '专属花束生成', '未接入云端', '待定']
+      ];
+      const ledger = document.querySelector('#ledger-body');
+      ledgerRows.forEach((row) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = row.map((cell) => `<td>${cell}</td>`).join('');
+        ledger?.append(tr);
       });
-
-      sampleButton.addEventListener('click', () => {
-        uploadZone.classList.remove('has-image');
-        fileInput.value = '';
-        recognizeButton.disabled = false;
-        applyDetection({
-          ...roleMap.air,
-          title: `${bouquetName.value || '我的清晨花花'} / 空气感小花束`,
-          colors: ['#fff7df', '#bfe878', '#7dc9ff']
-        });
-      });
-
-      resetButton.addEventListener('click', () => {
-        fileInput.value = '';
-        previewImage.removeAttribute('src');
-        uploadZone.classList.remove('has-image');
-        recognizeButton.disabled = true;
-        generateButton.disabled = true;
-        detected = null;
-        resultTitle.textContent = '等待上传';
-        resultStatus.textContent = 'not ready';
-        resultStatus.className = 'status';
-        resultSummary.textContent = '上传参考图后，这里会显示主色、花材角色、空间结构和建议 seed。';
-        primitiveChips.innerHTML = '';
-        swatches.innerHTML = '';
-        renderMockFlower(['#f2cb62', '#87d486', '#9fc6ff']);
-      });
-
-      generateButton.addEventListener('click', () => {
-        if (!detected || credits < 12) return;
-        credits -= 12;
-        records = [
-          {
-            name: detected.title.split(' / ')[0],
-            seed: detected.seed,
-            source: `上传识别 + ${preferenceInput.value.slice(0, 28)}`,
-            status: '新生成，消耗 12 积分',
-            colors: detected.colors
-          },
-          ...records
-        ];
-        renderRecords();
-      });
-
-      renderMockFlower(['#f2cb62', '#87d486', '#9fc6ff']);
-      renderRecords();
     </script>
   </body>
 </html>

@@ -30,13 +30,23 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" /></svg>
         </button>
         <div class="site-menu-panel" id="site-menu-panel" hidden>
-          <a href="./about/">About</a>
-          <a href="./member/">Member</a>
-          <a href="./downloads/">Downloads</a>
-          <a href="./bouquet-shop/">Bouquet Shop</a>
-          <a href="./scifi/">SciFi Flora</a>
-          <a class="site-menu-primary" href="./signup/">收藏这束花</a>
-          <a id="site-menu-debug-link" href="./docs/aesthetic-review-dashboard.html?debug=1" hidden>审美审核</a>
+          <a href="./about/" data-i18n-key="about">关于</a>
+          <a href="./signup/" data-i18n-key="favorite">收藏今日花束</a>
+          <a href="./signup/" data-i18n-key="custom">生成我的专属花束</a>
+          <a href="./bouquet-shop/" data-i18n-key="objects">周边与线下</a>
+          <a href="./downloads/" data-i18n-key="sync">多端同步</a>
+          <a href="./scifi/" data-i18n-key="scifi">scifi</a>
+          <a class="site-menu-primary" href="./member/" data-i18n-key="garden">我的花园</a>
+          <div class="site-language-switcher" id="site-language-switcher" role="group" aria-label="Interface language">
+            <button type="button" data-language="en" aria-pressed="false">EN</button>
+            <button type="button" data-language="zh" aria-pressed="true">中</button>
+            <button type="button" data-language="es" aria-pressed="false">ES</button>
+            <button type="button" data-language="fr" aria-pressed="false">FR</button>
+            <button type="button" data-language="pt" aria-pressed="false">PT</button>
+            <button type="button" data-language="it" aria-pressed="false">IT</button>
+            <button type="button" data-language="ja" aria-pressed="false">日</button>
+          </div>
+          <a id="site-menu-debug-link" href="./docs/aesthetic-review-dashboard.html?debug=1" data-i18n-key="review" hidden>审美审核</a>
         </div>
       </nav>
 
