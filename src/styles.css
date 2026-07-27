@@ -168,6 +168,36 @@ button {
   text-shadow: 0 2px 24px rgb(0 0 0 / 45%);
 }
 
+.clock-close-button {
+  position: absolute;
+  top: -18px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  aspect-ratio: 1;
+  border: 1px solid rgb(255 248 226 / 18%);
+  border-radius: 50%;
+  color: rgb(255 248 226 / 76%);
+  background: rgb(7 9 8 / 46%);
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+}
+
+.clock-close-button svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.clock-close-button:hover,
+.clock-close-button:focus-visible {
+  color: rgb(255 248 226);
+  border-color: rgb(244 230 129 / 44%);
+  background: rgb(255 255 255 / 9%);
+  outline: none;
+}
+
 .clock-time {
   margin: 0;
   font-size: clamp(72px, 12vw, 176px);
@@ -433,9 +463,9 @@ button {
 
 .hud {
   left: max(18px, env(safe-area-inset-left));
-  top: max(16px, env(safe-area-inset-top));
+  bottom: max(34px, env(safe-area-inset-bottom));
   display: flex;
-  align-items: center;
+  align-items: end;
   gap: 12px;
   color: rgb(255 250 235 / 76%);
   text-shadow: 0 1px 18px rgb(0 0 0 / 70%);
@@ -468,21 +498,25 @@ body.is-preview .daily-theme {
 
 .daily-mark {
   display: grid;
-  gap: 2px;
+  gap: 5px;
+  max-width: min(980px, calc(100vw - 180px));
+  padding-left: 18px;
+  border-left: 1px solid rgb(243 239 230 / 34%);
 }
 
 .daily-date {
-  font-size: 12px;
+  color: rgb(243 239 230 / 46%);
+  font-size: 10px;
   line-height: 1.1;
-  letter-spacing: 0;
+  letter-spacing: 0.15em;
 }
 
 .daily-theme {
   display: grid;
-  gap: 3px;
-  font-size: clamp(18px, 2.4vw, 28px);
-  line-height: 1.02;
-  font-weight: 520;
+  gap: 0;
+  font-size: clamp(18px, 1.55vw, 23px);
+  line-height: 1;
+  font-weight: 480;
   letter-spacing: 0;
 }
 
@@ -492,17 +526,53 @@ body.is-preview .daily-theme {
 }
 
 .daily-theme-en {
-  color: rgb(255 250 235 / 52%);
-  font-size: 0.48em;
-  font-weight: 460;
-  line-height: 1.12;
+  color: rgb(243 239 230 / 86%);
+  font-size: 1em;
+  font-weight: 520;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.daily-theme-cn-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+  color: rgb(243 239 230 / 52%);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+}
+
+.daily-inline-date {
+  color: rgb(243 239 230 / 46%);
+  font-size: 10px;
+  font-weight: 520;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.daily-theme-en-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: baseline;
 }
 
 .flower-plan-mark {
-  max-width: min(560px, calc(100vw - 34px));
-  color: rgb(255 250 235 / 58%);
-  font-size: 11px;
-  line-height: 1.35;
+  overflow: hidden;
+  max-width: min(980px, calc(100vw - 190px));
+  color: rgb(243 239 230 / 42%);
+  font-size: 9px;
+  letter-spacing: 0.07em;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flower-plan-mark-en {
+  text-transform: uppercase;
 }
 
 .quality-mark {
@@ -1630,6 +1700,9 @@ body.is-hand-control-immersive #debug-panel {
   display: none !important;
 }
 
+body.is-clock-visible #hud,
+body.is-clock-visible #controls,
+body.is-clock-visible #site-menu,
 body.is-clock-visible .interface-frame,
 .is-special .interface-frame {
   opacity: 0;

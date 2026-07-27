@@ -66,6 +66,11 @@ export class IdleClockController {
     return true;
   }
 
+  hideVisible() {
+    this.hide();
+    this.schedule();
+  }
+
   private schedule() {
     window.clearTimeout(this.timer);
     if (!this.settings.autoEnabled || this.visibleSource === 'manual' || this.visibleSource === 'auto') return;

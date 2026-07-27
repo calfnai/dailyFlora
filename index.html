@@ -20,11 +20,16 @@
 
       <section class="hud" id="hud" aria-live="polite">
         <div class="daily-mark">
-          <span class="daily-date" id="daily-date"></span>
-          <span class="daily-theme" id="daily-theme">
-            <span class="daily-theme-cn" id="daily-theme-cn"></span>
+          <span class="daily-date" id="daily-date">DAILY COMPOSITION</span>
+          <span class="daily-theme daily-theme-en-line" id="daily-theme">
             <span class="daily-theme-en" id="daily-theme-en" lang="en"></span>
+            <span class="daily-inline-date" id="daily-date-en" lang="en"></span>
           </span>
+          <span class="daily-theme-cn-line">
+            <span class="daily-theme-cn" id="daily-theme-cn"></span>
+            <span class="daily-inline-date" id="daily-date-cn"></span>
+          </span>
+          <span class="flower-plan-mark flower-plan-mark-en" id="flower-plan-mark-en" lang="en"></span>
           <span class="flower-plan-mark" id="flower-plan-mark"></span>
         </div>
         <div class="quality-mark" id="quality-mark"></div>
@@ -132,23 +137,15 @@
       </nav>
       <aside class="clock-overlay" id="clock-overlay" aria-live="polite" aria-hidden="true">
         <div class="clock-content">
+          <button class="clock-close-button" id="clock-close-button" type="button" aria-label="关闭时钟" title="关闭时钟">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.4 5 12.6 12.6-1.4 1.4L5 6.4z" /><path d="M5 17.6 17.6 5l1.4 1.4L6.4 19z" /></svg>
+          </button>
           <p class="clock-time" id="clock-time"></p>
           <p class="clock-date" id="clock-date"></p>
           <blockquote class="clock-quote">
             <p id="clock-quote-text"></p>
             <footer id="clock-quote-author"></footer>
           </blockquote>
-          <div class="clock-settings" data-clock-interaction>
-            <label class="clock-interval-label">
-              <span>钟</span>
-              <input id="clock-overlay-interval" type="number" min="1" max="120" step="1" inputmode="numeric" aria-label="Minutes before automatic clock" />
-              <span>分后显示</span>
-            </label>
-            <label class="clock-auto-label">
-              <input id="clock-overlay-auto-enabled" type="checkbox" aria-label="Enable automatic clock" />
-              <span>自动显示</span>
-            </label>
-          </div>
         </div>
       </aside>
       <aside class="debug-panel" id="debug-panel" aria-label="Debug rendering stats" hidden></aside>

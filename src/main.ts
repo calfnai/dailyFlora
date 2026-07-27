@@ -220,10 +220,13 @@ const siteMenuDebugLink = document.querySelector<HTMLAnchorElement>('#site-menu-
 const siteLanguageSwitcher = document.querySelector<HTMLElement>('#site-language-switcher');
 const handControlToggle = document.querySelector<HTMLButtonElement>('#hand-control-toggle');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
+const dateEnLabel = document.querySelector<HTMLElement>('#daily-date-en');
+const dateCnLabel = document.querySelector<HTMLElement>('#daily-date-cn');
 const themeLabel = document.querySelector<HTMLElement>('#daily-theme');
 const themeCnLabel = document.querySelector<HTMLElement>('#daily-theme-cn');
 const themeEnLabel = document.querySelector<HTMLElement>('#daily-theme-en');
 const flowerPlanLabel = document.querySelector<HTMLElement>('#flower-plan-mark');
+const flowerPlanEnLabel = document.querySelector<HTMLElement>('#flower-plan-mark-en');
 const qualityLabel = document.querySelector<HTMLElement>('#quality-mark');
 const reviewDashboardLink = document.querySelector<HTMLAnchorElement>('#review-dashboard-link');
 const debugPanel = document.querySelector<HTMLElement>('#debug-panel');
@@ -275,8 +278,7 @@ const clockTime = document.querySelector<HTMLElement>('#clock-time');
 const clockDate = document.querySelector<HTMLElement>('#clock-date');
 const clockQuoteText = document.querySelector<HTMLElement>('#clock-quote-text');
 const clockQuoteAuthor = document.querySelector<HTMLElement>('#clock-quote-author');
-const clockOverlayIntervalInput = document.querySelector<HTMLInputElement>('#clock-overlay-interval');
-const clockOverlayAutoEnabledInput = document.querySelector<HTMLInputElement>('#clock-overlay-auto-enabled');
+const clockCloseButton = document.querySelector<HTMLButtonElement>('#clock-close-button');
 
 if (
   !canvas ||
@@ -285,10 +287,13 @@ if (
   !controlsToggleButton ||
   !controlsPanel ||
   !dateLabel ||
+  !dateEnLabel ||
+  !dateCnLabel ||
   !themeLabel ||
   !themeCnLabel ||
   !themeEnLabel ||
   !flowerPlanLabel ||
+  !flowerPlanEnLabel ||
   !qualityLabel
 ) {
   throw new Error('DailyFlora could not find the required page elements.');
@@ -301,10 +306,13 @@ const ui = {
   controlsToggleButton,
   controlsPanel,
   dateLabel,
+  dateEnLabel,
+  dateCnLabel,
   themeLabel,
   themeCnLabel,
   themeEnLabel,
   flowerPlanLabel,
+  flowerPlanEnLabel,
   qualityLabel
 };
 
@@ -440,6 +448,27 @@ function flowerPlanText() {
   return spec.flowerPlan.items.map((item) => item.cn).join(' / ');
 }
 
+function flowerPlanTextEn() {
+  return spec.flowerPlan.items.map((item) => item.en).join(' / ');
+}
+
+function displayNameWithoutDate(value: string) {
+  const parts = value.split(' · ');
+  return parts.length > 1 ? parts.slice(1).join(' · ') : value;
+}
+
+function formatDisplayDates(dateKey: string) {
+  const match = dateKey.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return { en: dateKey, cn: dateKey };
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const englishMonth = new Intl.DateTimeFormat('en', { month: 'short', timeZone: 'Asia/Shanghai' })
+    .format(new Date(Date.UTC(year, month - 1, day)))
+    .toUpperCase();
+  return { en: `${englishMonth} ${day},${year}`, cn: `${month}月${day}日` };
+}
+
 function safeJsonParse<T>(value: string | null, fallback: T): T {
   if (!value) return fallback;
   try {
@@ -467,10 +496,10 @@ function updateClockTime() {
 
 function syncClockControls() {
   const { autoEnabled, intervalMinutes } = clockSettings;
-  [clockIntervalInput, clockOverlayIntervalInput].forEach((input) => {
+  [clockIntervalInput].forEach((input) => {
     if (input) input.value = String(intervalMinutes);
   });
-  [clockAutoEnabledInput, clockOverlayAutoEnabledInput].forEach((input) => {
+  [clockAutoEnabledInput].forEach((input) => {
     if (input) input.checked = autoEnabled;
   });
   if (clockToggleButton) {
@@ -836,9 +865,13 @@ function renderAccountState() {
 
 function setLabels() {
   const name = bouquetDisplayName(spec);
-  ui.dateLabel.textContent = spec.dateLabel;
-  ui.themeCnLabel.textContent = name.cn;
-  ui.themeEnLabel.textContent = name.en;
+  const displayDates = formatDisplayDates(spec.dateLabel);
+  ui.dateLabel.textContent = 'DAILY COMPOSITION';
+  ui.themeEnLabel.textContent = `${displayNameWithoutDate(name.en).toUpperCase()} ·`;
+  ui.dateEnLabel.textContent = displayDates.en;
+  ui.themeCnLabel.textContent = `${displayNameWithoutDate(name.cn)} ·`;
+  ui.dateCnLabel.textContent = displayDates.cn;
+  ui.flowerPlanEnLabel.textContent = `${themeEnglishName()} · ${spec.flowerPlan.enName} · ${flowerPlanTextEn()}`;
   ui.flowerPlanLabel.textContent = `${spec.theme.name} · ${spec.flowerPlan.cnName} · ${flowerPlanText()}`;
   ui.flowerPlanLabel.title = `${spec.flowerPlan.reference}\n${spec.flowerPlan.silhouette}\n避免：${spec.flowerPlan.avoid}`;
   if (datePicker) datePicker.value = spec.dateLabel;
@@ -1580,16 +1613,21 @@ clockToggleButton?.addEventListener('click', () => {
   }
 });
 
+clockCloseButton?.addEventListener('click', () => {
+  idleClock.hideVisible();
+  revealUi();
+});
+
 function updateClockIntervalFrom(input: HTMLInputElement | null) {
   if (!input) return;
   updateClockSettings({ intervalMinutes: normalizeClockInterval(Number(input.value)) });
 }
 
-[clockIntervalInput, clockOverlayIntervalInput].forEach((input) => {
+[clockIntervalInput].forEach((input) => {
   input?.addEventListener('change', () => updateClockIntervalFrom(input));
 });
 
-[clockAutoEnabledInput, clockOverlayAutoEnabledInput].forEach((input) => {
+[clockAutoEnabledInput].forEach((input) => {
   input?.addEventListener('change', () => updateClockSettings({ autoEnabled: input.checked }));
 });
 
