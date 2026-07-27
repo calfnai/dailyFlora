@@ -264,20 +264,33 @@ if (releaseMark) {
   ].filter(Boolean).join('\n');
 }
 
-let params = readParams();
 const specialId = readSpecialId();
 const specialReference = specialId ? specialReferences[specialId] : null;
 document.body.classList.toggle('is-special', Boolean(specialReference));
 const searchParams = new URLSearchParams(window.location.search);
+let params = readParams();
 const debugValue = searchParams.get('debug');
 const debugMode = searchParams.has('debug') && debugValue !== '0' && debugValue !== 'false';
 const previewValue = searchParams.get('preview');
 const previewMode = searchParams.has('preview') && previewValue !== '0' && previewValue !== 'false';
+const embedMode = searchParams.get('embed') === 'flower';
 const handControlValue = searchParams.get('hand-control');
 const handControlInitiallyEnabled = searchParams.has('hand-control') && handControlValue !== '0' && handControlValue !== 'false';
 const internalPreviewMode = debugMode || previewMode;
 const requestedDensity = searchParams.get('density') || searchParams.get('quality');
 const requestedRender = searchParams.get('render');
+const maxSelectableDate = todayKey();
+const requestedSeed = searchParams.get('seed');
+const requestedDate = params.date;
+const clampedRequestedDate = clampDateKeyToToday(requestedDate);
+if (clampedRequestedDate !== requestedDate) {
+  params = {
+    ...params,
+    date: clampedRequestedDate,
+    seed: !requestedSeed || params.seed === requestedDate ? clampedRequestedDate : params.seed
+  };
+}
+if (datePicker) datePicker.max = maxSelectableDate;
 let selectedDensity = requestedDensity
   ? normalizeDensity(requestedDensity)
   : internalPreviewMode
@@ -286,6 +299,7 @@ let selectedDensity = requestedDensity
       ? 'medium'
       : normalizeDensity(params.density);
 document.body.classList.toggle('is-preview', previewMode);
+document.body.classList.toggle('is-flower-embed', embedMode);
 siteMenuDebugLink && (siteMenuDebugLink.hidden = !debugMode);
 let selectedRender = requestedRender
   ? normalizeRender(requestedRender)
@@ -295,7 +309,7 @@ let selectedRender = requestedRender
 let selectedTheme = specialReference ? specialReference.theme.id : params.theme;
 let quality = resolveQuality(selectedDensity, selectedRender);
 let spec = specialReference
-  ? createSpecialSpec(specialReference, new URLSearchParams(window.location.search).get('date') || undefined)
+  ? createSpecialSpec(specialReference, searchParams.get('date') ? clampedRequestedDate : undefined)
   : createDailySpec(params.date, params.seed, selectedTheme);
 let followsToday = !specialReference && !searchParams.has('date') && !searchParams.has('seed');
 let scene = new BouquetScene(ui.canvas, spec, quality);
@@ -511,6 +525,10 @@ function saveFavoriteBouquets(nextFavorites: FavoriteBouquet[]) {
 
 function currentFavoriteId() {
   return `${spec.dateLabel}:${spec.seed}:${spec.theme.id}`;
+}
+
+function publicFavoriteCode(favorite: Pick<FavoriteBouquet, 'date'>) {
+  return `DF-DATE-${favorite.date.split('-').join('')}`;
 }
 
 function currentFavorite() {
@@ -740,7 +758,7 @@ function renderCollectionList() {
     .map(
       (favorite) => `
         <button class="collection-item" type="button" data-favorite-id="${favorite.id}">
-          <span class="collection-item-date">${favorite.date}</span>
+          <span class="collection-item-date">${publicFavoriteCode(favorite)} · ${favorite.date}</span>
           <span class="collection-item-title">${favorite.themeName}</span>
           <span class="collection-item-meta">${favorite.flowerPlanName} · ${favorite.themeEnglishName}</span>
         </button>
@@ -959,6 +977,25 @@ function syncTodayMode(date: string, seed: string) {
   followsToday = !specialReference && date === todayKey() && seed === date;
 }
 
+function isValidDateKey(dateKey: string) {
+  const match = dateKey.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+}
+
+function clampDateKeyToToday(dateKey: string) {
+  if (!isValidDateKey(dateKey)) return maxSelectableDate;
+  return dateKey > maxSelectableDate ? maxSelectableDate : dateKey;
+}
+
 function parseDateKey(dateKey: string) {
   const [year, month, day] = dateKey.split('-').map((part) => Number(part));
   const fallback = new Date();
@@ -984,9 +1021,10 @@ function firstWeekday(year: number, month: number) {
 }
 
 function selectCalendarDate(dateKey: string) {
+  const safeDateKey = clampDateKeyToToday(dateKey);
   previewCount = 0;
-  rebuild(dateKey, dateKey);
-  syncTodayMode(dateKey, dateKey);
+  rebuild(safeDateKey, safeDateKey);
+  syncTodayMode(safeDateKey, safeDateKey);
   closeCalendar();
 }
 
@@ -1034,21 +1072,31 @@ function renderCalendar() {
     const isSelected =
       selected.year === calendarView.year && selected.month === calendarView.month && selected.day === day;
     const isToday = today.year === calendarView.year && today.month === calendarView.month && today.day === day;
+    const isFuture = dateKey > maxSelectableDate;
     dayButtons.push(`
       <button
-        class="calendar-day${isSelected ? ' is-selected' : ''}${isToday ? ' is-today' : ''}"
+        class="calendar-day${isSelected ? ' is-selected' : ''}${isToday ? ' is-today' : ''}${isFuture ? ' is-disabled' : ''}"
         type="button"
         data-calendar-date="${dateKey}"
         aria-pressed="${isSelected}"
+        aria-disabled="${isFuture}"
+        ${isFuture ? 'disabled' : ''}
       >${day}</button>
     `);
   }
+
+  const nextMonthDateKey = dateKeyFromParts(
+    calendarView.month === 11 ? calendarView.year + 1 : calendarView.year,
+    calendarView.month === 11 ? 0 : calendarView.month + 1,
+    1
+  );
+  const canGoNext = nextMonthDateKey <= maxSelectableDate;
 
   calendarPanel.innerHTML = `
     <div class="calendar-header">
       <button class="calendar-nav-button" type="button" data-calendar-nav="-1" aria-label="Previous month">‹</button>
       <strong>${monthLabel}</strong>
-      <button class="calendar-nav-button" type="button" data-calendar-nav="1" aria-label="Next month">›</button>
+      <button class="calendar-nav-button" type="button" data-calendar-nav="1" aria-label="Next month" ${canGoNext ? '' : 'disabled aria-disabled="true"'}>›</button>
     </div>
     <div class="calendar-weekdays" aria-hidden="true">
       <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
@@ -1111,7 +1159,7 @@ function applyRoutePreset(preset: (typeof rotationPresets)[number]) {
 
 function randomDateKey() {
   const start = new Date('2026-01-01T00:00:00');
-  const end = new Date('2026-12-31T00:00:00');
+  const end = new Date(`${maxSelectableDate}T00:00:00`);
   const dayMs = 24 * 60 * 60 * 1000;
   const days = Math.floor((end.getTime() - start.getTime()) / dayMs);
   const date = new Date(start.getTime() + Math.floor(Math.random() * (days + 1)) * dayMs);
@@ -1395,9 +1443,11 @@ todayButton?.addEventListener('click', () => {
 
 datePicker?.addEventListener('change', () => {
   if (!datePicker.value) return;
+  const safeDateKey = clampDateKeyToToday(datePicker.value);
+  datePicker.value = safeDateKey;
   previewCount = 0;
-  rebuild(datePicker.value, datePicker.value);
-  syncTodayMode(datePicker.value, datePicker.value);
+  rebuild(safeDateKey, safeDateKey);
+  syncTodayMode(safeDateKey, safeDateKey);
   datePicker.blur();
 });
 
@@ -1407,6 +1457,10 @@ calendarPanel.addEventListener('click', (event) => {
 
   const navValue = target.dataset.calendarNav;
   if (navValue) {
+    const nextMonth = calendarView.month + Number(navValue);
+    const nextYear = calendarView.year + (nextMonth < 0 ? -1 : nextMonth > 11 ? 1 : 0);
+    const normalizedNextMonth = nextMonth < 0 ? 11 : nextMonth > 11 ? 0 : nextMonth;
+    if (dateKeyFromParts(nextYear, normalizedNextMonth, 1) > maxSelectableDate) return;
     calendarView.month += Number(navValue);
     if (calendarView.month < 0) {
       calendarView.month = 11;
@@ -1424,6 +1478,7 @@ calendarPanel.addEventListener('click', (event) => {
 
   const dateKey = target.dataset.calendarDate;
   if (dateKey) {
+    if (dateKey > maxSelectableDate) return;
     selectCalendarDate(dateKey);
   }
 });

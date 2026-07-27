@@ -1319,6 +1319,15 @@ body.is-preview .daily-theme {
   outline: none;
 }
 
+.calendar-nav-button:disabled,
+.calendar-day:disabled,
+.calendar-day.is-disabled {
+  color: rgb(255 249 232 / 20%);
+  cursor: not-allowed;
+  opacity: 0.42;
+  pointer-events: none;
+}
+
 .calendar-weekdays,
 .calendar-grid {
   display: grid;
@@ -2267,6 +2276,13 @@ body:not(.is-special) .special-legacy-icon,
 body.is-preview .interface-frame,
 body.is-preview .language-switcher {
   display: none;
+}
+
+body.is-flower-embed .hud,
+body.is-flower-embed .release-mark,
+body.is-flower-embed .interface-frame,
+body.is-flower-embed .language-switcher {
+  display: none !important;
 }
 
 body.is-clock-visible:not(.is-special) .hud,
