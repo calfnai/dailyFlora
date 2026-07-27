@@ -1,4 +1,5 @@
 import './styles.css';
+import { buildInfo } from './buildInfo';
 import type { DensityName, RenderQualityName } from './types';
 import { todayKey } from './random';
 import { bouquetDisplayName, createDailySpec, readParams } from './spec';
@@ -54,6 +55,9 @@ const interfaceLanguageStorageKey = 'dailyflora.interface-language.v1';
 const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record<string, string>> = {
   zh: {
     documentLang: 'zh-CN',
+    index: 'INDEX',
+    view: 'VIEW',
+    hideView: 'CLOSE',
     about: '关于',
     favorite: '收藏今日花束',
     custom: '生成我的专属花束',
@@ -65,6 +69,9 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
   },
   en: {
     documentLang: 'en',
+    index: 'INDEX',
+    view: 'VIEW',
+    hideView: 'CLOSE',
     about: 'About',
     favorite: "Save today's bouquet",
     custom: 'Generate my bouquet',
@@ -76,6 +83,9 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
   },
   es: {
     documentLang: 'es',
+    index: 'ÍNDICE',
+    view: 'VISTA',
+    hideView: 'CERRAR',
     about: 'Acerca de',
     favorite: 'Guardar ramo de hoy',
     custom: 'Generar mi ramo',
@@ -87,6 +97,9 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
   },
   fr: {
     documentLang: 'fr',
+    index: 'INDEX',
+    view: 'VUE',
+    hideView: 'FERMER',
     about: 'À propos',
     favorite: 'Enregistrer le bouquet',
     custom: 'Générer mon bouquet',
@@ -98,6 +111,9 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
   },
   pt: {
     documentLang: 'pt',
+    index: 'ÍNDICE',
+    view: 'VISTA',
+    hideView: 'FECHAR',
     about: 'Sobre',
     favorite: 'Salvar buquê de hoje',
     custom: 'Gerar meu buquê',
@@ -109,6 +125,9 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
   },
   it: {
     documentLang: 'it',
+    index: 'INDICE',
+    view: 'VISTA',
+    hideView: 'CHIUDI',
     about: 'Informazioni',
     favorite: 'Salva il bouquet',
     custom: 'Genera il mio bouquet',
@@ -120,6 +139,9 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
   },
   ja: {
     documentLang: 'ja',
+    index: '索引',
+    view: '表示',
+    hideView: '閉じる',
     about: '概要',
     favorite: '今日の花束を保存',
     custom: '自分の花束を生成',
@@ -279,6 +301,7 @@ const clockDate = document.querySelector<HTMLElement>('#clock-date');
 const clockQuoteText = document.querySelector<HTMLElement>('#clock-quote-text');
 const clockQuoteAuthor = document.querySelector<HTMLElement>('#clock-quote-author');
 const clockCloseButton = document.querySelector<HTMLButtonElement>('#clock-close-button');
+const releaseMark = document.querySelector<HTMLAnchorElement>('#release-mark');
 
 if (
   !canvas ||
@@ -315,6 +338,17 @@ const ui = {
   flowerPlanEnLabel,
   qualityLabel
 };
+
+if (releaseMark) {
+  releaseMark.textContent = buildInfo.releaseId;
+  releaseMark.href = withBasePath('version.json');
+  releaseMark.title = [
+    `Release: ${buildInfo.releaseId}`,
+    `Commit: ${buildInfo.commitSha}`,
+    `Branch: ${buildInfo.branch}`,
+    `Built: ${buildInfo.builtAt}`
+  ].join('\n');
+}
 
 let params = readParams();
 const specialId = readSpecialId();
@@ -788,6 +822,13 @@ function updateInterfaceLanguage(language: InterfaceLanguage) {
     const key = element.dataset.i18nKey;
     if (key && copy[key]) element.textContent = copy[key];
   });
+  document.querySelectorAll<HTMLElement>('[data-interface-copy]').forEach((element) => {
+    const key = element.dataset.interfaceCopy;
+    if (!key) return;
+    element.textContent = key === 'view' && ui.controls.classList.contains('is-expanded')
+      ? copy.hideView
+      : copy[key];
+  });
   siteLanguageSwitcher?.querySelectorAll<HTMLButtonElement>('[data-language]').forEach((button) => {
     button.setAttribute('aria-pressed', String(button.dataset.language === language));
   });
@@ -965,8 +1006,7 @@ function revealUi() {
   ui.controls.classList.remove('is-hidden');
   window.clearTimeout(hideTimer);
   hideTimer = window.setTimeout(() => {
-    ui.hud.classList.add('is-hidden');
-    ui.controls.classList.add('is-hidden');
+    if (ui.controls.classList.contains('is-expanded')) setControlsExpanded(false, false);
   }, ui.controls.classList.contains('is-expanded') ? 7000 : 3200);
 }
 
@@ -983,6 +1023,9 @@ function setControlsExpanded(expanded: boolean, reveal = true) {
   ui.controlsToggleButton.setAttribute('aria-expanded', String(expanded));
   ui.controlsToggleButton.setAttribute('aria-label', expanded ? 'Hide viewing controls' : 'Show viewing controls');
   ui.controlsToggleButton.title = expanded ? 'Hide viewing controls' : 'Show viewing controls';
+  const language = readInterfaceLanguage();
+  const interfaceLabel = ui.controlsToggleButton.querySelector<HTMLElement>('[data-interface-copy="view"]');
+  if (interfaceLabel) interfaceLabel.textContent = expanded ? interfaceCopy[language].hideView : interfaceCopy[language].view;
   if (reveal) revealUi();
 }
 

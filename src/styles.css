@@ -78,7 +78,7 @@ button {
 
 .interface-frame {
   position: fixed;
-  inset: max(1px, env(safe-area-inset-top)) max(1px, env(safe-area-inset-right)) max(1px, env(safe-area-inset-bottom)) max(1px, env(safe-area-inset-left));
+  inset: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
   z-index: 3;
   pointer-events: none;
 }
@@ -93,8 +93,8 @@ button {
 .interface-corner-top {
   top: 0;
   left: 0;
-  border-top: 1px solid rgb(243 239 230 / 34%);
-  border-left: 1px solid rgb(243 239 230 / 34%);
+  border-top: 1px solid rgb(243 239 230 / 26%);
+  border-left: 1px solid rgb(243 239 230 / 26%);
   transform-origin: left top;
   animation: interface-corner-forward 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -102,8 +102,8 @@ button {
 .interface-corner-bottom {
   right: 0;
   bottom: 0;
-  border-right: 1px solid rgb(243 239 230 / 34%);
-  border-bottom: 1px solid rgb(243 239 230 / 34%);
+  border-right: 1px solid rgb(243 239 230 / 26%);
+  border-bottom: 1px solid rgb(243 239 230 / 26%);
   transform-origin: right bottom;
   animation: interface-corner-reverse 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -2230,4 +2230,263 @@ body.is-clock-visible .interface-frame,
 @keyframes clock-enter-mobile {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Preserve the production editorial chrome on the ordinary daily bouquet. */
+body:not(.is-special) .site-menu {
+  top: max(28px, calc(env(safe-area-inset-top) + 10px));
+  right: max(34px, calc(env(safe-area-inset-right) + 16px));
+  gap: 8px;
+}
+
+body:not(.is-special) .site-menu-toggle {
+  width: auto;
+  min-width: 84px;
+  min-height: 38px;
+  aspect-ratio: auto;
+  padding: 0 17px;
+  border-color: rgb(243 239 230 / 24%);
+  border-radius: 0;
+  color: rgb(243 239 230 / 90%);
+  background: rgb(8 9 13 / 34%);
+  box-shadow: none;
+  font-family: "SFMono-Regular", "Sarasa Term SC", "Iosevka Charon Mono", Menlo, Consolas, monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  backdrop-filter: blur(14px);
+}
+
+body:not(.is-special) .site-menu-toggle:hover,
+body:not(.is-special) .site-menu-toggle:focus-visible {
+  border-color: rgb(243 239 230 / 50%);
+  background: rgb(243 239 230 / 7%);
+}
+
+body:not(.is-special) .site-menu-panel {
+  min-width: 224px;
+  padding: 6px;
+  border-color: rgb(243 239 230 / 20%);
+  border-radius: 0;
+  background: rgb(8 9 13 / 88%);
+  box-shadow: 0 22px 70px rgb(0 0 0 / 44%);
+  font-family: "SFMono-Regular", "Sarasa Term SC", "Iosevka Charon Mono", Menlo, Consolas, monospace;
+}
+
+body:not(.is-special) .site-menu-panel a {
+  border-radius: 0;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+body:not(.is-special) .site-menu-panel .site-menu-primary {
+  color: rgb(243 239 230 / 94%);
+  background: rgb(243 239 230 / 9%);
+  font-weight: 560;
+}
+
+body:not(.is-special) .hud {
+  top: auto;
+  right: auto;
+  bottom: max(58px, calc(env(safe-area-inset-bottom) + 40px));
+  left: max(40px, calc(env(safe-area-inset-left) + 22px));
+  align-items: flex-end;
+  gap: 14px;
+  color: rgb(243 239 230 / 92%);
+  font-family: "SFMono-Regular", "Sarasa Term SC", "Iosevka Charon Mono", Menlo, Consolas, monospace;
+  text-shadow: 0 2px 24px rgb(0 0 0 / 66%);
+}
+
+body:not(.is-special) .daily-mark {
+  max-width: min(980px, calc(100vw - 180px));
+}
+
+.release-mark {
+  position: fixed;
+  top: max(32px, calc(env(safe-area-inset-top) + 18px));
+  left: max(96px, calc(env(safe-area-inset-left) + 78px));
+  z-index: 4;
+  color: rgb(255 250 235 / 34%);
+  font: 500 9px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.025em;
+  text-decoration: none;
+  text-shadow: 0 1px 10px rgb(0 0 0 / 80%);
+  transition: color 160ms ease;
+}
+
+.release-mark:hover,
+.release-mark:focus-visible {
+  color: rgb(255 250 235 / 78%);
+  outline: none;
+}
+
+body:not(.is-special) .controls {
+  right: max(34px, calc(env(safe-area-inset-right) + 16px));
+  bottom: max(34px, calc(env(safe-area-inset-bottom) + 16px));
+  width: auto;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px;
+  border-color: rgb(243 239 230 / 20%);
+  border-radius: 0;
+  background: rgb(8 9 13 / 80%);
+  box-shadow: 0 18px 60px rgb(0 0 0 / 38%);
+  font-family: "SFMono-Regular", "Sarasa Term SC", "Iosevka Charon Mono", Menlo, Consolas, monospace;
+  transform: none;
+}
+
+body:not(.is-special) .controls.is-collapsed {
+  width: auto;
+  padding: 0;
+}
+
+body:not(.is-special) .controls.is-hidden {
+  transform: translateY(8px);
+}
+
+body:not(.is-special) .controls-toggle {
+  width: auto;
+  min-width: 76px;
+  height: 38px;
+  padding: 0 17px;
+  border: 1px solid rgb(243 239 230 / 24%);
+  border-radius: 0;
+  color: rgb(243 239 230 / 90%);
+  background: rgb(8 9 13 / 34%);
+  box-shadow: none;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  backdrop-filter: blur(14px);
+}
+
+body:not(.is-special) .controls.is-expanded .controls-toggle,
+body:not(.is-special) .controls-toggle:hover,
+body:not(.is-special) .controls-toggle:focus-visible {
+  border-color: rgb(243 239 230 / 50%);
+  background: rgb(243 239 230 / 7%);
+}
+
+body:not(.is-special) .controls-panel {
+  max-width: min(640px, calc(100vw - 68px));
+}
+
+body:not(.is-special) .special-legacy-icon,
+.is-special [data-interface-copy] {
+  display: none;
+}
+
+body.is-clock-visible #release-mark {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (min-width: 681px) {
+  body:not(.is-special):has(.controls.is-expanded) .daily-mark {
+    max-width: min(520px, calc(100vw - 720px));
+  }
+
+  body:not(.is-special):has(.controls.is-expanded) .quality-mark {
+    display: none;
+  }
+}
+
+@media (max-width: 680px) {
+  body:not(.is-special) .interface-frame {
+    inset: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+
+  body:not(.is-special) .site-menu {
+    top: max(20px, calc(env(safe-area-inset-top) + 8px));
+    right: max(20px, calc(env(safe-area-inset-right) + 8px));
+  }
+
+  body:not(.is-special) .site-menu-toggle {
+    min-width: 70px;
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 9px;
+  }
+
+  body:not(.is-special) .hud {
+    top: auto;
+    right: auto;
+    bottom: max(42px, calc(env(safe-area-inset-bottom) + 30px));
+    left: max(28px, calc(env(safe-area-inset-left) + 16px));
+    width: auto;
+    height: auto;
+    max-width: calc(100vw - 116px);
+    gap: 0;
+  }
+
+  body:not(.is-special) .daily-mark {
+    max-width: 100%;
+    padding-left: 12px;
+  }
+
+  body:not(.is-special) .daily-date {
+    font-size: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  body:not(.is-special) .daily-theme {
+    font-size: clamp(16px, 4.6vw, 19px);
+    line-height: 0.98;
+  }
+
+  body:not(.is-special) .daily-theme-en-line {
+    gap: 6px;
+  }
+
+  body:not(.is-special) .daily-theme-cn-line {
+    gap: 5px;
+    font-size: 10px;
+  }
+
+  body:not(.is-special) .flower-plan-mark {
+    overflow: visible;
+    max-width: 100%;
+    font-size: 8px;
+    line-height: 1.35;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  body:not(.is-special) .quality-mark {
+    display: none;
+  }
+
+  body:not(.is-special) .controls {
+    right: max(20px, calc(env(safe-area-inset-right) + 8px));
+    bottom: max(20px, calc(env(safe-area-inset-bottom) + 8px));
+    width: auto;
+    max-width: calc(100vw - 40px);
+    justify-content: flex-end;
+    transform: none;
+  }
+
+  body:not(.is-special) .controls.is-hidden {
+    transform: translateY(8px);
+  }
+
+  body:not(.is-special) .controls-toggle {
+    min-width: 70px;
+    height: 34px;
+    padding: 0 12px;
+    font-size: 9px;
+  }
+
+  body:not(.is-special) .controls-panel {
+    max-width: calc(100vw - 56px);
+  }
+
+  body:not(.is-special):has(.controls.is-expanded) .hud {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  body:not(.is-special) .release-mark {
+    top: max(20px, calc(env(safe-area-inset-top) + 8px));
+    left: max(72px, calc(env(safe-area-inset-left) + 58px));
+  }
 }
