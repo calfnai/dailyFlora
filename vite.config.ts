@@ -31,10 +31,21 @@ function shanghaiStamp(date: Date) {
 
 const builtAt = new Date();
 const buildSource = process.env.VERCEL ? 'vercel' : 'local';
-const commitSha = process.env.VERCEL_GIT_COMMIT_SHA || readGitValue(['rev-parse', 'HEAD']) || 'uncommitted';
+const commitSha =
+  process.env.VERCEL_GIT_COMMIT_SHA ||
+  process.env.DAILYFLORA_GIT_COMMIT_SHA ||
+  readGitValue(['rev-parse', 'HEAD']) ||
+  'uncommitted';
 const shortSha = commitSha === 'uncommitted' ? commitSha : commitSha.slice(0, 8);
-const branch = process.env.VERCEL_GIT_COMMIT_REF || readGitValue(['branch', '--show-current']) || 'unknown';
-const commitMessage = process.env.VERCEL_GIT_COMMIT_MESSAGE || readGitValue(['log', '-1', '--format=%s']);
+const branch =
+  process.env.VERCEL_GIT_COMMIT_REF ||
+  process.env.DAILYFLORA_GIT_COMMIT_REF ||
+  readGitValue(['branch', '--show-current']) ||
+  'unknown';
+const commitMessage =
+  process.env.VERCEL_GIT_COMMIT_MESSAGE ||
+  process.env.DAILYFLORA_GIT_COMMIT_MESSAGE ||
+  readGitValue(['log', '-1', '--format=%s']);
 const dirty = buildSource === 'local' && Boolean(readGitValue(['status', '--porcelain']));
 const releaseId = `DF-${shanghaiStamp(builtAt)}-${shortSha}${dirty ? '-dirty' : ''}`;
 const buildInfo = Object.freeze({
