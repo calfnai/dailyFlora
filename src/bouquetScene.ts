@@ -2638,6 +2638,20 @@ export class BouquetScene {
     return this.zoomOffset;
   }
 
+  resetView() {
+    this.zoomOffset = 0;
+    this.gestureTargetX = 0;
+    this.gestureTargetY = 0;
+    this.presentationTargetX = 0;
+    this.routePausedByDrag = false;
+    this.routeTime = 0;
+    this.targetCameraYaw = this.cameraYaw;
+    this.targetCameraPitch = this.baseCameraPitch;
+    this.targetCameraDistance = this.baseCameraDistance;
+    this.targetCameraTargetY = this.baseCameraTargetY;
+    return this.zoomOffset;
+  }
+
   setClockLayout(active: boolean) {
     this.presentationTargetX = active ? 1.08 : 0;
     this.updateCamera(emptyRouteOffsets);

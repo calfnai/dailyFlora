@@ -125,6 +125,11 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         about: resolve(__dirname, 'about/index.html'),
+        howToUse: resolve(__dirname, 'how-to-use/index.html'),
+        legalTerms: resolve(__dirname, 'legal/terms/index.html'),
+        legalPrivacy: resolve(__dirname, 'legal/privacy/index.html'),
+        legalCredits: resolve(__dirname, 'legal/credits/index.html'),
+        legalCopyright: resolve(__dirname, 'legal/copyright/index.html'),
         bouquetShop: resolve(__dirname, 'bouquet-shop/index.html'),
         downloads: resolve(__dirname, 'downloads/index.html'),
         member: resolve(__dirname, 'member/index.html'),

@@ -3,13 +3,66 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DailyFlora 我的花园</title>
-    <script>
-      const target = `../docs/member-test.html${window.location.hash || ''}`;
-      window.location.replace(target);
-    </script>
+    <meta name="description" content="DailyFlora 个人花园：当前浏览器中的本机账户与花束收藏。" />
+    <title>我的花园 — DailyFlora</title>
+    <link rel="stylesheet" href="../src/marketing.css" />
   </head>
   <body>
-    <p>正在打开我的花园。<a href="../docs/member-test.html">如果没有自动跳转，点这里</a>。</p>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="../" aria-label="DailyFlora 首页"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA</a>
+        <nav class="site-nav" aria-label="站点导航"><a href="../">今日花束</a><a href="../about/">关于</a><a href="../signup/">收藏今日花束</a><a href="../bouquet-shop/">周边与线下</a><a href="../downloads/">多端同步</a><a href="../scifi/">scifi</a><a class="nav-cta" href="./" aria-current="page">我的花园</a></nav>
+      </header>
+
+      <main class="garden-app wrap">
+        <section class="product-hero garden-hero">
+          <div class="product-hero-copy"><p class="eyebrow">My DailyFlora Garden</p><h1>把今天喜欢的花，留进我的花园。</h1><p>当前账户与收藏保存在这台设备的浏览器中。真实云端注册、Supabase Auth、跨设备同步与支付尚未开放。</p><div class="button-row" id="guest-actions"><a class="button primary" href="../signup/">建立本机花园</a><a class="button" href="../">查看今日花束</a></div></div>
+          <aside class="garden-panel status-panel"><div class="panel-row"><div><p class="eyebrow">Current state</p><h2 id="member-name">访客花园</h2></div><span class="state-pill" id="member-state">本机 MVP</span></div><p id="member-note">注册后可在这台设备保存收藏。</p><div class="garden-metrics"><span><strong id="favorite-count">0</strong>本机收藏</span><span><strong>0</strong>云端同步</span><span><strong>0</strong>真实支付</span></div></aside>
+        </section>
+
+        <section class="product-section" id="favorites">
+          <div class="product-section-head"><div><p class="eyebrow">Saved bouquets</p><h2>我的收藏</h2></div><p>只展示保存在当前浏览器 localStorage 中的真实记录，不用占位数据补齐。</p></div>
+          <div class="record-grid" id="favorite-list"><article class="saved-empty"><strong>还没有收藏</strong><span>回到今日花束，保存一束喜欢的花。</span></article></div>
+        </section>
+
+        <section class="product-section">
+          <div class="studio-board"><article><span>01</span><h3>本机账户</h3><p>称呼和邮箱只保存在当前浏览器。密码不会保存或发送。</p></article><article><span>02</span><h3>本机收藏</h3><p>收藏记录包括日期、生成种子、主题和花材方案元数据。</p></article><article><span>03</span><h3>云端以后再接</h3><p>Supabase、跨设备同步、积分和支付将作为独立版本上线，不在当前页面伪装完成。</p></article></div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-main wrap">
+          <p class="footer-statement">DailyFlora is created and directed by CALFN LAU.</p>
+          <nav class="footer-col" aria-label="DailyFlora"><strong>DailyFlora</strong><a href="../">Today</a><a href="./">My Garden</a><a href="../how-to-use/">How to Use</a><a href="../about/">About</a></nav>
+          <nav class="footer-col" aria-label="Explore"><strong>Explore</strong><a href="../scifi/">SciFi Flora</a><a href="../downloads/">Platforms</a><a href="../bouquet-shop/">Objects &amp; Collaborations</a></nav>
+          <nav class="footer-col" aria-label="Legal"><strong>Legal</strong><a href="../legal/terms/">Terms of Use</a><a href="../legal/privacy/">Privacy Policy</a><a href="../legal/credits/">Credits &amp; Attributions</a><a href="../legal/copyright/">Copyright</a></nav>
+          <div class="footer-contact"><strong>Contact</strong><br />CALFN LAU<br /><a href="mailto:find@calfn.com">find@calfn.com</a></div>
+        </div>
+        <div class="footer-bottom wrap"><span>© 2026 CALFN LAU. All rights reserved.</span><span>DailyFlora 由 CALFN LAU 创作并保留相关权利。</span></div>
+      </footer>
+    </div>
+    <script>
+      const readJson = (key, fallback) => {
+        try { const value = localStorage.getItem(key); return value ? JSON.parse(value) : fallback; }
+        catch { return fallback; }
+      };
+      const account = readJson('dailyflora.account.v1', null);
+      const favorites = readJson('dailyflora.favorites.v1', []);
+      document.querySelector('#member-name').textContent = account?.name || '访客花园';
+      document.querySelector('#member-note').textContent = account
+        ? `${account.email || '本机账户'} · ${favorites.length} 个本机收藏`
+        : '注册后可在这台设备保存收藏。';
+      document.querySelector('#favorite-count').textContent = String(favorites.length);
+      const list = document.querySelector('#favorite-list');
+      if (favorites.length) {
+        list.innerHTML = favorites.map((item) => `
+          <a class="saved-card panel" href="../?date=${encodeURIComponent(item.date)}&seed=${encodeURIComponent(item.seed)}">
+            <span>${item.date}</span>
+            <strong>${item.themeName || 'DailyFlora bouquet'}</strong>
+            <span>${item.flowerPlanName || '每日花束'} · 本机记录</span>
+          </a>
+        `).join('');
+      }
+    </script>
   </body>
 </html>

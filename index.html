@@ -76,6 +76,9 @@
             </button>
             <input class="date-picker" id="date-picker" type="date" aria-label="Pick bouquet date" />
           </span>
+          <button class="icon-button compact-button" id="today-reset-button" type="button" title="返回今日花束" aria-label="返回今日花束" data-tooltip="返回今日花束">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5a7 7 0 1 1-6.2 3.75l1.77.94A5 5 0 1 0 12 7H9.8l2.6 2.6L11 11 6 6l5-5 1.4 1.4L9.8 5z" /></svg>
+          </button>
           <button class="icon-button" id="shuffle-button" type="button" title="Preview another seed" aria-label="Preview another seed" data-tooltip="随机跳到某一天">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h5v5h-2V6.5l-4.2 4.2-1.4-1.4L17.6 5H16zM4 7h3.4c1.6 0 3 .8 3.9 2.1l3.4 5c.5.7 1.3 1.1 2.1 1.1H21v2h-4.2c-1.6 0-3-.8-3.9-2.1l-3.4-5C9 9.4 8.2 9 7.4 9H4z" /><path d="M17.6 19l-4.2-4.3 1.4-1.4 4.2 4.2V16h2v5h-5v-2zM4 17h3.4c.8 0 1.6-.4 2.1-1.1l1-1.5 1.4 1.4-1 1.2c-.9 1.3-2.3 2-3.9 2H4z" /></svg>
           </button>
@@ -93,6 +96,9 @@
             </button>
             <button class="icon-button compact-button" id="zoom-in-button" type="button" title="Zoom in" aria-label="Zoom in" data-tooltip="拉近">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z" /></svg>
+            </button>
+            <button class="icon-button compact-button" id="reset-view-button" type="button" title="恢复默认视角" aria-label="恢复默认视角" data-tooltip="恢复默认视角">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h6v2H7.6A7 7 0 1 1 5 12H3a9 9 0 1 0 3-6.7V9H4z" /><path d="M11 8h2v5h-2zM11 15h2v2h-2z" /></svg>
             </button>
           </div>
           <div class="segmented density-control" aria-label="Bouquet density">
@@ -135,8 +141,34 @@
               <span data-i18n-key="automatic">自动</span>
             </label>
           </div>
+          <button class="icon-button compact-button" id="help-button" type="button" title="查看使用方法" aria-label="查看使用方法" data-tooltip="查看使用方法">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8Z" /><path d="M11 16h2v2h-2zm1-10a4 4 0 0 0-4 4h2a2 2 0 1 1 2.8 1.83A3 3 0 0 0 11 14.58V15h2v-.42a1 1 0 0 1 .6-.92A4 4 0 0 0 12 6Z" /></svg>
+          </button>
         </div>
       </nav>
+      <aside class="shortcut-help" id="shortcut-help" role="dialog" aria-modal="false" aria-labelledby="shortcut-help-title" hidden>
+        <div class="shortcut-help-panel">
+          <button class="shortcut-help-x" id="shortcut-help-x" type="button" aria-label="关闭快捷键说明" title="关闭">×</button>
+          <p class="shortcut-help-kicker">HOW TO USE</p>
+          <h2 id="shortcut-help-title">全屏观看快捷键</h2>
+          <p class="shortcut-help-intro" id="shortcut-help-intro">这些按键在每日花束页面中均可使用。</p>
+          <dl class="shortcut-list">
+            <div><dt><kbd>Esc</kbd></dt><dd data-shortcut-copy="escape">退出全屏或关闭当前浮层</dd></div>
+            <div><dt><kbd>←</kbd><kbd>→</kbd></dt><dd data-shortcut-copy="dates">切换前一天与后一天</dd></div>
+            <div><dt><kbd>R</kbd></dt><dd data-shortcut-copy="random">随机查看一个日期</dd></div>
+            <div><dt><kbd>+</kbd><kbd>−</kbd></dt><dd data-shortcut-copy="zoom">拉近或拉远花束</dd></div>
+            <div><dt><kbd>0</kbd></dt><dd data-shortcut-copy="reset">恢复默认视角</dd></div>
+            <div><dt><kbd>Space</kbd></dt><dd data-shortcut-copy="rotation">暂停或继续自动旋转</dd></div>
+            <div><dt><kbd>H</kbd></dt><dd data-shortcut-copy="interface">显示或隐藏界面</dd></div>
+            <div><dt><kbd>?</kbd></dt><dd data-shortcut-copy="help">重新打开快捷键说明</dd></div>
+          </dl>
+          <label class="shortcut-dismiss"><input id="shortcut-help-dismiss" type="checkbox" /><span id="shortcut-help-dismiss-label">以后不再提示</span></label>
+          <div class="shortcut-help-actions">
+            <a href="./how-to-use/" id="shortcut-help-more">完整使用方法</a>
+            <button id="shortcut-help-close" type="button">关闭</button>
+          </div>
+        </div>
+      </aside>
       <aside class="clock-overlay" id="clock-overlay" aria-live="polite" aria-hidden="true">
         <button class="clock-close-button" id="clock-close-button" type="button" aria-label="关闭时钟" title="关闭时钟">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.4 5 12.6 12.6-1.4 1.4L5 6.4z" /><path d="M5 17.6 17.6 5l1.4 1.4L6.4 19z" /></svg>

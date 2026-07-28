@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="How to view, navigate and control DailyFlora." />
+    <title>How to Use — DailyFlora</title>
+    <link rel="stylesheet" href="../src/marketing.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="../" aria-label="DailyFlora home"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA</a>
+        <nav class="site-nav" aria-label="Site navigation">
+          <a href="../">Today</a><a href="./" aria-current="page">How to Use</a><a href="../about/">About</a><a class="nav-cta" href="../member/">My Garden</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="how-hero wrap">
+          <div class="how-hero-inner">
+            <p class="eyebrow">DailyFlora guide</p>
+            <h1>HOW TO USE</h1>
+            <p>DailyFlora is made for quiet looking. Open VIEW when you want more control; leave it closed when you simply want the bouquet to remain.</p>
+          </div>
+        </section>
+
+        <section class="how-main wrap">
+          <div class="how-grid">
+            <article class="how-card"><h2>Choose a day</h2><p>Use the calendar to open a date, return to today, or select a random day. The left and right arrow keys move one day at a time.</p></article>
+            <article class="how-card"><h2>Shape the view</h2><p>Zoom in or out, restore the default framing, change bouquet density and rendering precision, or adjust the automatic camera route.</p></article>
+            <article class="how-card"><h2>Fullscreen controls</h2><p>Press <strong>Esc</strong> to leave fullscreen, <strong>R</strong> for a random date, <strong>+ / −</strong> to zoom, <strong>0</strong> to reset, <strong>Space</strong> to pause, <strong>H</strong> to hide the interface, and <strong>?</strong> for help.</p><a class="button" href="../?tutorial=fullscreen">Open fullscreen controls</a></article>
+            <article class="how-card"><h2>Gesture control</h2><p>Camera permission is requested only after you actively enable hand control. MediaPipe processes the live image in the browser; DailyFlora does not upload, save or transmit camera frames.</p><a class="button" href="../?tutorial=hand">Find the gesture control</a></article>
+          </div>
+
+          <section class="tutorial-settings" id="tutorial-settings">
+            <p class="eyebrow">Tutorial settings</p>
+            <h2 class="section-title">教程设置</h2>
+            <p>重新打开某项提示，或恢复所有已关闭的教程。这里只会清除教程相关的本机状态，不会清除账户、收藏、私人花束、设置或生成记录。</p>
+            <div class="tutorial-grid">
+              <article class="tutorial-card"><h3>游客教程</h3><p>重新从首页开始游客引导。</p><button class="button" type="button" data-tutorial="visitor">重新查看游客教程</button></article>
+              <article class="tutorial-card"><h3>VIEW 图标教程</h3><p>展开 VIEW，并通过焦点提示逐项查看按钮说明。</p><button class="button" type="button" data-tutorial="view">重新查看 VIEW 图标教程</button></article>
+              <article class="tutorial-card"><h3>全屏快捷键</h3><p>重新打开可用快捷键说明。</p><button class="button" type="button" data-tutorial="fullscreen">重新查看全屏快捷键</button></article>
+              <article class="tutorial-card"><h3>手势控制教程</h3><p>返回首页并定位手势控制入口；不会自动请求摄像头权限。</p><button class="button" type="button" data-tutorial="hand">重新查看手势控制教程</button></article>
+            </div>
+            <button class="button primary" type="button" data-reset-tutorials>恢复所有教程提示</button>
+            <p class="tutorial-status" role="status" aria-live="polite" data-tutorial-status></p>
+          </section>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-main wrap">
+          <p class="footer-statement">DailyFlora is created and directed by CALFN LAU.</p>
+          <nav class="footer-col" aria-label="DailyFlora"><strong>DailyFlora</strong><a href="../">Today</a><a href="../member/">My Garden</a><a href="./">How to Use</a><a href="../about/">About</a></nav>
+          <nav class="footer-col" aria-label="Explore"><strong>Explore</strong><a href="../scifi/">SciFi Flora</a><a href="../downloads/">Platforms</a><a href="../bouquet-shop/">Objects &amp; Collaborations</a></nav>
+          <nav class="footer-col" aria-label="Legal"><strong>Legal</strong><a href="../legal/terms/">Terms of Use</a><a href="../legal/privacy/">Privacy Policy</a><a href="../legal/credits/">Credits &amp; Attributions</a><a href="../legal/copyright/">Copyright</a></nav>
+          <div class="footer-contact"><strong>Contact</strong><br />CALFN LAU<br /><a href="mailto:find@calfn.com">find@calfn.com</a></div>
+        </div>
+        <div class="footer-bottom wrap"><span>© 2026 CALFN LAU. All rights reserved.</span><span>DailyFlora is created and directed by CALFN LAU.</span></div>
+      </footer>
+    </div>
+    <script type="module" src="../src/site.ts"></script>
+  </body>
+</html>

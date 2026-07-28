@@ -42,6 +42,7 @@ const maxRotationSpeed = 0.13;
 const accountStorageKey = 'dailyflora.account.v1';
 const favoritesStorageKey = 'dailyflora.favorites.v1';
 const interfaceLanguageStorageKey = 'dailyflora.interface-language.v1';
+const fullscreenHelpDismissedStorageKey = 'dailyflora.fullscreenHelpDismissed.v1';
 const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record<string, string>> = {
   zh: {
     documentLang: 'zh-CN',
@@ -49,6 +50,7 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     view: 'VIEW',
     hideView: 'CLOSE',
     about: '关于',
+    howToUse: '使用方法',
     favorite: '收藏今日花束',
     custom: '生成我的专属花束',
     objects: '周边与线下',
@@ -61,15 +63,18 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     viewingControls: '观看设置',
     showView: '展开观看设置',
     pickDate: '选择花束日期',
-    randomDate: '随机跳到某一天',
-    fullscreen: '全屏观看',
+    today: '返回今日花束',
+    randomDate: '随机查看另一个日期',
+    fullscreen: '进入全屏',
     exitFullscreen: '退出全屏',
-    handControl: '手势控制',
-    handOn: '开启手势控制',
+    handControl: '使用手势控制',
+    handOn: '使用手势控制',
     handOff: '关闭手势控制',
     zoomControls: '缩放控制',
     zoomOut: '拉远',
     zoomIn: '拉近',
+    resetView: '恢复默认视角',
+    help: '查看使用方法',
     densityGroup: '花束密度',
     densityLow: '花材少一点',
     densityMedium: '花材中等',
@@ -105,6 +110,20 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     previousMonth: '上个月',
     nextMonth: '下个月',
     weekdays: '日,一,二,三,四,五,六'
+    ,
+    fullscreenHelpTitle: '全屏观看快捷键',
+    fullscreenHelpIntro: '这些按键在每日花束页面中均可使用。',
+    fullscreenHelpDismiss: '以后不再提示',
+    fullscreenHelpClose: '关闭',
+    fullscreenHelpMore: '完整使用方法',
+    shortcutEscape: '退出全屏或关闭当前浮层',
+    shortcutDates: '切换前一天与后一天',
+    shortcutRandom: '随机查看一个日期',
+    shortcutZoom: '拉近或拉远花束',
+    shortcutReset: '恢复默认视角',
+    shortcutRotation: '暂停或继续自动旋转',
+    shortcutInterface: '显示或隐藏界面',
+    shortcutHelp: '重新打开快捷键说明'
   },
   en: {
     documentLang: 'en',
@@ -112,6 +131,7 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     view: 'VIEW',
     hideView: 'CLOSE',
     about: 'About',
+    howToUse: 'How to use',
     favorite: "Save today's bouquet",
     custom: 'Generate my bouquet',
     objects: 'Objects & offline',
@@ -124,8 +144,9 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     viewingControls: 'Viewing controls',
     showView: 'Show viewing controls',
     pickDate: 'Pick bouquet date',
+    today: "Return to today's bouquet",
     randomDate: 'Open a random date',
-    fullscreen: 'Fullscreen',
+    fullscreen: 'Enter fullscreen',
     exitFullscreen: 'Exit fullscreen',
     handControl: 'Hand control',
     handOn: 'Enable hand control',
@@ -133,6 +154,8 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     zoomControls: 'Zoom controls',
     zoomOut: 'Zoom out',
     zoomIn: 'Zoom in',
+    resetView: 'Restore default view',
+    help: 'View instructions',
     densityGroup: 'Bouquet density',
     densityLow: 'Sparse bouquet',
     densityMedium: 'Medium bouquet',
@@ -167,7 +190,20 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     buildInfo: 'Open current build information',
     previousMonth: 'Previous month',
     nextMonth: 'Next month',
-    weekdays: 'S,M,T,W,T,F,S'
+    weekdays: 'S,M,T,W,T,F,S',
+    fullscreenHelpTitle: 'FULLSCREEN CONTROLS',
+    fullscreenHelpIntro: 'These keys work throughout the daily bouquet view.',
+    fullscreenHelpDismiss: "Don't show automatically again",
+    fullscreenHelpClose: 'CLOSE',
+    fullscreenHelpMore: 'Full instructions',
+    shortcutEscape: 'Exit fullscreen or close this panel',
+    shortcutDates: 'Move to the previous or next day',
+    shortcutRandom: 'Open a random date',
+    shortcutZoom: 'Move closer to or farther from the bouquet',
+    shortcutReset: 'Restore the default view',
+    shortcutRotation: 'Pause or resume automatic rotation',
+    shortcutInterface: 'Show or hide the interface',
+    shortcutHelp: 'Open these instructions again'
   },
   es: {
     documentLang: 'es',
@@ -175,6 +211,7 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     view: 'VISTA',
     hideView: 'CERRAR',
     about: 'Acerca de',
+    howToUse: 'Cómo usar',
     favorite: 'Guardar ramo de hoy',
     custom: 'Generar mi ramo',
     objects: 'Objetos y offline',
@@ -187,6 +224,7 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     viewingControls: 'Controles de vista',
     showView: 'Mostrar controles',
     pickDate: 'Elegir fecha del ramo',
+    today: 'Volver al ramo de hoy',
     randomDate: 'Abrir una fecha al azar',
     fullscreen: 'Pantalla completa',
     exitFullscreen: 'Salir de pantalla completa',
@@ -196,6 +234,8 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     zoomControls: 'Controles de zoom',
     zoomOut: 'Alejar',
     zoomIn: 'Acercar',
+    resetView: 'Restaurar vista predeterminada',
+    help: 'Ver instrucciones',
     densityGroup: 'Densidad del ramo',
     densityLow: 'Ramo ligero',
     densityMedium: 'Ramo medio',
@@ -238,6 +278,7 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     view: 'VUE',
     hideView: 'FERMER',
     about: 'À propos',
+    howToUse: 'Mode d’emploi',
     favorite: 'Enregistrer le bouquet',
     custom: 'Générer mon bouquet',
     objects: 'Objets et hors ligne',
@@ -250,6 +291,7 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     viewingControls: 'Commandes de vue',
     showView: 'Afficher les commandes',
     pickDate: 'Choisir la date du bouquet',
+    today: 'Revenir au bouquet du jour',
     randomDate: 'Ouvrir une date aléatoire',
     fullscreen: 'Plein écran',
     exitFullscreen: 'Quitter le plein écran',
@@ -259,6 +301,8 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     zoomControls: 'Commandes de zoom',
     zoomOut: 'Éloigner',
     zoomIn: 'Rapprocher',
+    resetView: 'Rétablir la vue par défaut',
+    help: 'Voir le mode d’emploi',
     densityGroup: 'Densité du bouquet',
     densityLow: 'Bouquet léger',
     densityMedium: 'Bouquet moyen',
@@ -301,6 +345,7 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     view: 'VISTA',
     hideView: 'FECHAR',
     about: 'Sobre',
+    howToUse: 'Como usar',
     favorite: 'Salvar buquê de hoje',
     custom: 'Gerar meu buquê',
     objects: 'Objetos e offline',
@@ -313,6 +358,7 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     viewingControls: 'Controles de visualização',
     showView: 'Mostrar controles',
     pickDate: 'Escolher data do buquê',
+    today: 'Voltar ao buquê de hoje',
     randomDate: 'Abrir uma data aleatória',
     fullscreen: 'Tela cheia',
     exitFullscreen: 'Sair da tela cheia',
@@ -322,6 +368,8 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     zoomControls: 'Controles de zoom',
     zoomOut: 'Afastar',
     zoomIn: 'Aproximar',
+    resetView: 'Restaurar visualização padrão',
+    help: 'Ver instruções',
     densityGroup: 'Densidade do buquê',
     densityLow: 'Buquê leve',
     densityMedium: 'Buquê médio',
@@ -364,6 +412,7 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     view: 'VISTA',
     hideView: 'CHIUDI',
     about: 'Informazioni',
+    howToUse: 'Come si usa',
     favorite: 'Salva il bouquet',
     custom: 'Genera il mio bouquet',
     objects: 'Oggetti e offline',
@@ -376,6 +425,7 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     viewingControls: 'Controlli di visualizzazione',
     showView: 'Mostra controlli',
     pickDate: 'Scegli la data del bouquet',
+    today: 'Torna al bouquet di oggi',
     randomDate: 'Apri una data casuale',
     fullscreen: 'Schermo intero',
     exitFullscreen: 'Esci da schermo intero',
@@ -385,6 +435,8 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     zoomControls: 'Controlli zoom',
     zoomOut: 'Allontana',
     zoomIn: 'Avvicina',
+    resetView: 'Ripristina vista predefinita',
+    help: 'Visualizza istruzioni',
     densityGroup: 'Densità del bouquet',
     densityLow: 'Bouquet leggero',
     densityMedium: 'Bouquet medio',
@@ -427,6 +479,7 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     view: '表示',
     hideView: '閉じる',
     about: '概要',
+    howToUse: '使い方',
     favorite: '今日の花束を保存',
     custom: '自分の花束を生成',
     objects: 'グッズとオフライン',
@@ -439,6 +492,7 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     viewingControls: '表示設定',
     showView: '表示設定を開く',
     pickDate: '花束の日付を選択',
+    today: '今日の花束に戻る',
     randomDate: 'ランダムな日付を開く',
     fullscreen: '全画面表示',
     exitFullscreen: '全画面表示を終了',
@@ -448,6 +502,8 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     zoomControls: 'ズーム操作',
     zoomOut: '縮小',
     zoomIn: '拡大',
+    resetView: '既定の表示に戻す',
+    help: '使い方を見る',
     densityGroup: '花束の密度',
     densityLow: '花材を少なく',
     densityMedium: '花材を標準に',
@@ -587,12 +643,23 @@ const reviewDashboardLink = document.querySelector<HTMLAnchorElement>('#review-d
 const debugPanel = document.querySelector<HTMLElement>('#debug-panel');
 const pauseButton = document.querySelector<HTMLButtonElement>('#pause-button');
 const todayButton = document.querySelector<HTMLButtonElement>('#today-button');
+const todayResetButton = document.querySelector<HTMLButtonElement>('#today-reset-button');
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker');
 const calendarPanel = document.createElement('div');
 const shuffleButton = document.querySelector<HTMLButtonElement>('#shuffle-button');
 const fullscreenButton = document.querySelector<HTMLButtonElement>('#fullscreen-button');
 const zoomInButton = document.querySelector<HTMLButtonElement>('#zoom-in-button');
 const zoomOutButton = document.querySelector<HTMLButtonElement>('#zoom-out-button');
+const resetViewButton = document.querySelector<HTMLButtonElement>('#reset-view-button');
+const helpButton = document.querySelector<HTMLButtonElement>('#help-button');
+const shortcutHelp = document.querySelector<HTMLElement>('#shortcut-help');
+const shortcutHelpTitle = document.querySelector<HTMLElement>('#shortcut-help-title');
+const shortcutHelpIntro = document.querySelector<HTMLElement>('#shortcut-help-intro');
+const shortcutHelpDismiss = document.querySelector<HTMLInputElement>('#shortcut-help-dismiss');
+const shortcutHelpDismissLabel = document.querySelector<HTMLElement>('#shortcut-help-dismiss-label');
+const shortcutHelpClose = document.querySelector<HTMLButtonElement>('#shortcut-help-close');
+const shortcutHelpX = document.querySelector<HTMLButtonElement>('#shortcut-help-x');
+const shortcutHelpMore = document.querySelector<HTMLAnchorElement>('#shortcut-help-more');
 const densityButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-density-choice]'));
 const renderButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-render-choice]'));
 const rotationSpeedInput = document.querySelector<HTMLInputElement>('#rotation-speed');
@@ -1214,12 +1281,16 @@ function updateInterfaceLanguage(language: InterfaceLanguage) {
   setAttributes('#controls', 'viewingControls', ['aria-label']);
   setAttributes('#review-dashboard-link', 'review', ['title', 'aria-label', 'data-tooltip']);
   setAttributes('#today-button', 'pickDate', ['data-tooltip']);
+  setAttributes('#today-button', 'pickDate', ['title', 'aria-label', 'data-tooltip']);
+  setAttributes('#today-reset-button', 'today', ['title', 'aria-label', 'data-tooltip']);
   setAttributes('#date-picker', 'pickDate', ['aria-label']);
   setAttributes('#shuffle-button', 'randomDate', ['title', 'aria-label', 'data-tooltip']);
   setAttributes('#fullscreen-button', 'fullscreen', ['title', 'aria-label', 'data-tooltip']);
   setAttributes('.zoom-control', 'zoomControls', ['aria-label']);
   setAttributes('#zoom-out-button', 'zoomOut', ['title', 'aria-label', 'data-tooltip']);
   setAttributes('#zoom-in-button', 'zoomIn', ['title', 'aria-label', 'data-tooltip']);
+  setAttributes('#reset-view-button', 'resetView', ['title', 'aria-label', 'data-tooltip']);
+  setAttributes('#help-button', 'help', ['title', 'aria-label', 'data-tooltip']);
   setAttributes('.density-control', 'densityGroup', ['aria-label']);
   setAttributes('.render-control', 'renderGroup', ['aria-label']);
   setAttributes('.rotation-control', 'routeGroup', ['aria-label']);
@@ -1237,6 +1308,25 @@ function updateInterfaceLanguage(language: InterfaceLanguage) {
   setAttributes('#clock-close-button', 'closeClock', ['title', 'aria-label']);
   setAttributes('#release-mark', 'buildInfo', ['aria-label']);
   calendarPanel.setAttribute('aria-label', interfaceText('pickDate', language));
+  if (shortcutHelpTitle) shortcutHelpTitle.textContent = interfaceText('fullscreenHelpTitle', language);
+  if (shortcutHelpIntro) shortcutHelpIntro.textContent = interfaceText('fullscreenHelpIntro', language);
+  if (shortcutHelpDismissLabel) shortcutHelpDismissLabel.textContent = interfaceText('fullscreenHelpDismiss', language);
+  if (shortcutHelpClose) shortcutHelpClose.textContent = interfaceText('fullscreenHelpClose', language);
+  if (shortcutHelpMore) shortcutHelpMore.textContent = interfaceText('fullscreenHelpMore', language);
+  const shortcutCopy = {
+    escape: 'shortcutEscape',
+    dates: 'shortcutDates',
+    random: 'shortcutRandom',
+    zoom: 'shortcutZoom',
+    reset: 'shortcutReset',
+    rotation: 'shortcutRotation',
+    interface: 'shortcutInterface',
+    help: 'shortcutHelp'
+  } as const;
+  document.querySelectorAll<HTMLElement>('[data-shortcut-copy]').forEach((element) => {
+    const key = element.dataset.shortcutCopy as keyof typeof shortcutCopy | undefined;
+    if (key) element.textContent = interfaceText(shortcutCopy[key], language);
+  });
 
   densityButtons.forEach((button) => {
     const choice = button.dataset.densityChoice;
@@ -1355,12 +1445,14 @@ function setLabels() {
   if (datePicker) datePicker.value = spec.dateLabel;
   ui.themeLabel.title = bouquetHoverTitle();
   ui.dateLabel.title = bouquetHoverTitle();
-  const pickDateLabel = `${interfaceText('pickDate')} · ${bouquetHoverTitle()}`;
-  const randomDateLabel = `${interfaceText('randomDate')} · ${bouquetHoverTitle()}`;
+  const pickDateLabel = interfaceText('pickDate');
+  const randomDateLabel = interfaceText('randomDate');
   todayButton?.setAttribute('title', pickDateLabel);
   todayButton?.setAttribute('aria-label', pickDateLabel);
+  todayButton?.setAttribute('data-tooltip', pickDateLabel);
   shuffleButton?.setAttribute('title', randomDateLabel);
   shuffleButton?.setAttribute('aria-label', randomDateLabel);
+  shuffleButton?.setAttribute('data-tooltip', randomDateLabel);
   const densitySuffix = `${quality.densityName[0].toUpperCase()}${quality.densityName.slice(1)}`;
   const renderSuffix = `${quality.renderName[0].toUpperCase()}${quality.renderName.slice(1)}`;
   const renderLabel = selectedRender === 'auto'
@@ -1461,6 +1553,48 @@ function hideUiNow() {
   ui.controls.classList.add('is-hidden');
 }
 
+function showShortcutHelp() {
+  if (!shortcutHelp) return;
+  shortcutHelp.hidden = false;
+  shortcutHelp.classList.remove('is-visible');
+  if (shortcutHelpDismiss) shortcutHelpDismiss.checked = false;
+  requestAnimationFrame(() => shortcutHelp.classList.add('is-visible'));
+  shortcutHelpClose?.focus();
+}
+
+function closeShortcutHelp() {
+  if (!shortcutHelp || shortcutHelp.hidden) return;
+  if (shortcutHelpDismiss?.checked) {
+    window.localStorage.setItem(fullscreenHelpDismissedStorageKey, 'true');
+  }
+  shortcutHelp.classList.remove('is-visible');
+  window.setTimeout(() => {
+    if (!shortcutHelp.classList.contains('is-visible')) shortcutHelp.hidden = true;
+  }, 180);
+  helpButton?.focus();
+}
+
+function maybeShowFullscreenHelp() {
+  if (window.localStorage.getItem(fullscreenHelpDismissedStorageKey) === 'true') return;
+  showShortcutHelp();
+}
+
+function resetView() {
+  manualZoom = scene.resetView();
+  cameraRouteMode = 'orbit';
+  pitchAmplitude = 0;
+  yawAmplitude = 0;
+  distanceAmplitude = 0;
+  targetYAmplitude = 0;
+  rotationSpeed = THREEClamp(spec.rotationSpeed, minRotationSpeed, maxRotationSpeed);
+  rotationDirection = 1;
+  rotationPaused = false;
+  scene.setAutomaticCameraEnabled(true);
+  applyRotationSettings();
+  syncPauseButton(rotationPaused);
+  revealUi();
+}
+
 function setControlsExpanded(expanded: boolean, reveal = true) {
   ui.controls.classList.toggle('is-expanded', expanded);
   ui.controls.classList.toggle('is-collapsed', !expanded);
@@ -1539,6 +1673,19 @@ function dateKeyFromParts(year: number, month: number, day: number) {
 
 function clampDateKeyToToday(dateKey: string) {
   return dateKey > maxSelectableDate ? maxSelectableDate : dateKey;
+}
+
+function dateKeyWithOffset(dateKey: string, offsetDays: number) {
+  const { year, month, day } = parseDateKey(dateKey);
+  const next = new Date(Date.UTC(year, month, day + offsetDays));
+  return clampDateKeyToToday(dateKeyFromParts(next.getUTCFullYear(), next.getUTCMonth(), next.getUTCDate()));
+}
+
+function openDate(dateKey: string) {
+  previewCount = 0;
+  closeCalendar();
+  rebuild(dateKey, dateKey);
+  syncTodayMode(dateKey, dateKey);
 }
 
 function daysInMonth(year: number, month: number) {
@@ -1973,6 +2120,11 @@ todayButton?.addEventListener('click', () => {
   revealUi();
 });
 
+todayResetButton?.addEventListener('click', () => {
+  openDate(todayKey());
+  revealUi();
+});
+
 datePicker?.addEventListener('change', () => {
   if (!datePicker.value) return;
   const selectedDate = clampDateKeyToToday(datePicker.value);
@@ -2036,11 +2188,23 @@ shuffleButton?.addEventListener('click', () => {
   syncTodayMode(date, date);
 });
 
+resetViewButton?.addEventListener('click', resetView);
+helpButton?.addEventListener('click', showShortcutHelp);
+shortcutHelpClose?.addEventListener('click', closeShortcutHelp);
+shortcutHelpX?.addEventListener('click', closeShortcutHelp);
+shortcutHelp?.addEventListener('pointerdown', (event) => {
+  if (event.target === shortcutHelp) closeShortcutHelp();
+});
+
 fullscreenButton?.addEventListener('click', async () => {
-  if (!document.fullscreenElement) {
-    await document.documentElement.requestFullscreen();
-  } else {
-    await document.exitFullscreen();
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch (error) {
+    console.warn('Fullscreen request was not completed.', error);
   }
   revealUi();
 });
@@ -2051,6 +2215,11 @@ document.addEventListener('fullscreenchange', () => {
   fullscreenButton.setAttribute('aria-label', label);
   fullscreenButton.setAttribute('data-tooltip', label);
   fullscreenButton.title = label;
+  if (document.fullscreenElement) {
+    maybeShowFullscreenHelp();
+  } else if (shortcutHelp && !shortcutHelp.hidden) {
+    closeShortcutHelp();
+  }
 });
 
 zoomInButton?.addEventListener('click', () => {
@@ -2221,6 +2390,79 @@ handControlToggle?.addEventListener('click', () => {
   else void enableHandControl();
 });
 
+window.addEventListener('keydown', (event) => {
+  const target = event.target;
+  if (
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement ||
+    (target instanceof HTMLElement && target.isContentEditable)
+  ) {
+    return;
+  }
+
+  if (event.key === 'Escape' && shortcutHelp && !shortcutHelp.hidden) {
+    event.preventDefault();
+    closeShortcutHelp();
+    return;
+  }
+  if (event.key === '?') {
+    event.preventDefault();
+    showShortcutHelp();
+    return;
+  }
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+    event.preventDefault();
+    openDate(dateKeyWithOffset(spec.dateLabel, event.key === 'ArrowLeft' ? -1 : 1));
+    return;
+  }
+  if (event.key.toLowerCase() === 'r') {
+    event.preventDefault();
+    openDate(randomDateKey());
+    return;
+  }
+  if (event.key === '+' || event.key === '=') {
+    event.preventDefault();
+    zoomBy(-0.28);
+    return;
+  }
+  if (event.key === '-') {
+    event.preventDefault();
+    zoomBy(0.28);
+    return;
+  }
+  if (event.key === '0') {
+    event.preventDefault();
+    resetView();
+    return;
+  }
+  if (event.code === 'Space') {
+    event.preventDefault();
+    pauseButton?.click();
+    return;
+  }
+  if (event.key.toLowerCase() === 'h') {
+    event.preventDefault();
+    document.body.classList.toggle('is-interface-hidden');
+  }
+});
+
+document.querySelectorAll<HTMLElement>('.controls [data-tooltip]').forEach((element) => {
+  let longPressTimer = 0;
+  const hideTouchTooltip = () => {
+    window.clearTimeout(longPressTimer);
+    element.classList.remove('is-tooltip-visible');
+  };
+  element.addEventListener('pointerdown', (event) => {
+    if (event.pointerType !== 'touch') return;
+    window.clearTimeout(longPressTimer);
+    longPressTimer = window.setTimeout(() => element.classList.add('is-tooltip-visible'), 480);
+  });
+  element.addEventListener('pointerup', hideTouchTooltip);
+  element.addEventListener('pointercancel', hideTouchTooltip);
+  element.addEventListener('pointerleave', hideTouchTooltip);
+});
+
 window.addEventListener('resize', () => {
   const nextQuality = resolveQuality(selectedDensity, selectedRender);
   const qualityChanged = nextQuality.densityName !== quality.densityName || nextQuality.renderName !== quality.renderName;
@@ -2259,6 +2501,20 @@ window.addEventListener('beforeunload', () => idleClock.stop());
 window.addEventListener('beforeunload', () => stopHandControl?.(), { once: true });
 
 updateInterfaceLanguage(readInterfaceLanguage());
+if (searchParams.get('tutorial') === 'fullscreen') {
+  window.localStorage.removeItem(fullscreenHelpDismissedStorageKey);
+  window.setTimeout(showShortcutHelp, 0);
+} else if (searchParams.get('tutorial') === 'view') {
+  window.setTimeout(() => {
+    setControlsExpanded(true);
+    controlsToggleButton.focus();
+  }, 0);
+} else if (searchParams.get('tutorial') === 'hand') {
+  window.setTimeout(() => {
+    setControlsExpanded(true);
+    handControlToggle?.focus();
+  }, 0);
+}
 renderAccountState();
 setupDebugMode();
 if (specialReference) {

@@ -75,6 +75,31 @@ h1, h2, h3, p { margin: 0; }
   background: rgba(255,255,255,.04);
 }
 
+.language-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,255,255,.025);
+}
+
+.language-toggle button {
+  min-width: 38px;
+  min-height: 30px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--quiet);
+  background: transparent;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.language-toggle button[aria-pressed="true"] {
+  color: var(--paper);
+  background: var(--sun);
+}
+
 .page-shell { overflow: hidden; }
 .wrap { width: min(1280px, 100%); margin: 0 auto; padding-inline: clamp(20px, 4vw, 64px); }
 .eyebrow {
@@ -223,9 +248,207 @@ h1, h2, h3, p { margin: 0; }
 .site-footer { border-top: 1px solid var(--line); }
 .footer-main {
   display: grid;
-  grid-template-columns: 1.5fr repeat(2, .7fr);
+  grid-template-columns: 1.4fr repeat(4, minmax(0, .65fr));
   gap: 36px;
   padding-block: 58px;
+}
+
+.footer-contact {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.footer-contact a {
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.legal-shell {
+  overflow: visible;
+}
+
+.legal-hero,
+.how-hero {
+  padding-block: clamp(70px, 10vw, 145px) clamp(48px, 7vw, 90px);
+  border-bottom: 1px solid var(--line);
+}
+
+.legal-hero-inner,
+.how-hero-inner {
+  width: min(800px, 100%);
+}
+
+.legal-hero h1,
+.how-hero h1 {
+  margin-top: 16px;
+  font-family: var(--serif);
+  font-size: clamp(52px, 8vw, 96px);
+  font-weight: 400;
+  line-height: .94;
+  letter-spacing: -.045em;
+}
+
+.legal-hero p,
+.how-hero p {
+  margin-top: 22px;
+  max-width: 650px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.legal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 24px;
+  color: var(--quiet);
+  font-size: 11px;
+}
+
+.legal-layout {
+  width: min(1080px, 100%);
+  margin: 0 auto;
+  padding: clamp(48px, 8vw, 100px) clamp(20px, 4vw, 64px) 120px;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 760px);
+  gap: clamp(30px, 6vw, 90px);
+  justify-content: center;
+}
+
+.legal-toc {
+  position: sticky;
+  top: 28px;
+  align-self: start;
+  display: grid;
+  gap: 12px;
+  padding-top: 5px;
+}
+
+.legal-toc strong {
+  margin-bottom: 4px;
+  color: var(--quiet);
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.legal-toc a {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.legal-copy-long {
+  width: min(760px, 100%);
+}
+
+.legal-copy-long section + section {
+  margin-top: 56px;
+  padding-top: 56px;
+  border-top: 1px solid var(--line);
+}
+
+.legal-copy-long h2 {
+  font-family: var(--serif);
+  font-size: clamp(30px, 4vw, 46px);
+  font-weight: 400;
+}
+
+.legal-copy-long h3 {
+  margin-top: 28px;
+  font-size: 16px;
+}
+
+.legal-copy-long p,
+.legal-copy-long li {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+.legal-copy-long p {
+  margin-top: 16px;
+}
+
+.legal-copy-long ul {
+  margin: 16px 0 0;
+  padding-left: 20px;
+}
+
+.legal-contact {
+  margin-top: 64px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255,255,255,.025);
+}
+
+.how-grid,
+.tutorial-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.how-main {
+  padding-block: 80px 120px;
+}
+
+.how-card,
+.tutorial-card {
+  min-height: 220px;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255,255,255,.025);
+}
+
+.how-card h2,
+.tutorial-card h3 {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 400;
+}
+
+.how-card p,
+.tutorial-card p {
+  margin-top: 12px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.tutorial-settings {
+  margin-top: 90px;
+  padding-top: 60px;
+  border-top: 1px solid var(--line);
+}
+
+.tutorial-settings > p {
+  margin-top: 14px;
+  max-width: 720px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.tutorial-grid {
+  margin-top: 30px;
+}
+
+.tutorial-card {
+  min-height: 170px;
+}
+
+.tutorial-card .button {
+  margin-top: 20px;
+}
+
+.tutorial-status {
+  min-height: 24px;
+  margin-top: 16px;
+  color: var(--leaf);
+  font-size: 13px;
 }
 .footer-statement { max-width: 22rem; font-family: var(--serif); font-size: 24px; line-height: 1.35; }
 .footer-col { display: grid; align-content: start; gap: 12px; }
@@ -870,6 +1093,9 @@ h1, h2, h3, p { margin: 0; }
   .step, .step + .step { padding: 25px 0; border-right: 0; border-bottom: 1px solid var(--line); }
   .step:last-child { border-bottom: 0; }
   .step h3 { margin-top: 20px; }
+  .legal-layout { grid-template-columns: 1fr; }
+  .legal-toc { position: static; padding-bottom: 30px; border-bottom: 1px solid var(--line); }
+  .how-grid, .tutorial-grid { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
