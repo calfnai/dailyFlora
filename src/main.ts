@@ -39,16 +39,6 @@ type InterfaceLanguage = 'en' | 'zh' | 'es' | 'fr' | 'pt' | 'it' | 'ja';
 
 const minRotationSpeed = 0.012;
 const maxRotationSpeed = 0.13;
-const densityLabels: Record<DensityName, string> = {
-  low: '疏',
-  medium: '中',
-  high: '密'
-};
-const renderLabels: Record<Exclude<RenderQualityName, 'auto'>, string> = {
-  low: '省',
-  medium: '清',
-  high: '精'
-};
 const accountStorageKey = 'dailyflora.account.v1';
 const favoritesStorageKey = 'dailyflora.favorites.v1';
 const interfaceLanguageStorageKey = 'dailyflora.interface-language.v1';
@@ -65,7 +55,56 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     sync: '多端同步',
     scifi: 'scifi',
     garden: '我的花园',
-    review: '审美审核'
+    review: '审美审核',
+    siteMenuLabel: 'DailyFlora 网站菜单',
+    interfaceLanguage: '界面语言',
+    viewingControls: '观看设置',
+    showView: '展开观看设置',
+    pickDate: '选择花束日期',
+    randomDate: '随机跳到某一天',
+    fullscreen: '全屏观看',
+    exitFullscreen: '退出全屏',
+    handControl: '手势控制',
+    handOn: '开启手势控制',
+    handOff: '关闭手势控制',
+    zoomControls: '缩放控制',
+    zoomOut: '拉远',
+    zoomIn: '拉近',
+    densityGroup: '花束密度',
+    densityLow: '花材少一点',
+    densityMedium: '花材中等',
+    densityHigh: '花材密一点',
+    densityLowShort: '疏',
+    densityMediumShort: '中',
+    densityHighShort: '密',
+    renderGroup: '渲染精度',
+    renderAuto: '自动选择清晰度',
+    renderLow: '省电模式',
+    renderMedium: '清晰模式',
+    renderHigh: '精细模式',
+    renderAutoShort: '自',
+    renderLowShort: '省',
+    renderMediumShort: '清',
+    renderHighShort: '精',
+    routeGroup: '镜头路线',
+    pause: '暂停旋转',
+    resume: '继续旋转',
+    reverse: '反转当前镜头路线',
+    speed: '镜头速度',
+    randomPreset: '随机镜头预设',
+    clockSettings: '待机时钟设置',
+    showClock: '显示时钟',
+    hideClock: '关闭时钟',
+    clockAfterPrefix: '',
+    clockAfterSuffix: '分后',
+    automatic: '自动',
+    intervalBefore: '自动显示时钟前等待分钟数',
+    automaticAria: '启用自动待机时钟',
+    closeClock: '关闭时钟',
+    buildInfo: '打开当前构建信息',
+    previousMonth: '上个月',
+    nextMonth: '下个月',
+    weekdays: '日,一,二,三,四,五,六'
   },
   en: {
     documentLang: 'en',
@@ -79,7 +118,56 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     sync: 'Multi-device sync',
     scifi: 'scifi',
     garden: 'My garden',
-    review: 'Aesthetic review'
+    review: 'Aesthetic review',
+    siteMenuLabel: 'DailyFlora site menu',
+    interfaceLanguage: 'Interface language',
+    viewingControls: 'Viewing controls',
+    showView: 'Show viewing controls',
+    pickDate: 'Pick bouquet date',
+    randomDate: 'Open a random date',
+    fullscreen: 'Fullscreen',
+    exitFullscreen: 'Exit fullscreen',
+    handControl: 'Hand control',
+    handOn: 'Enable hand control',
+    handOff: 'Disable hand control',
+    zoomControls: 'Zoom controls',
+    zoomOut: 'Zoom out',
+    zoomIn: 'Zoom in',
+    densityGroup: 'Bouquet density',
+    densityLow: 'Sparse bouquet',
+    densityMedium: 'Medium bouquet',
+    densityHigh: 'Dense bouquet',
+    densityLowShort: 'S',
+    densityMediumShort: 'M',
+    densityHighShort: 'D',
+    renderGroup: 'Render precision',
+    renderAuto: 'Automatic quality',
+    renderLow: 'Low power mode',
+    renderMedium: 'Clear mode',
+    renderHigh: 'Fine mode',
+    renderAutoShort: 'A',
+    renderLowShort: 'L',
+    renderMediumShort: 'M',
+    renderHighShort: 'H',
+    routeGroup: 'Camera route',
+    pause: 'Pause rotation',
+    resume: 'Resume rotation',
+    reverse: 'Reverse current camera route',
+    speed: 'Camera route speed',
+    randomPreset: 'Random camera route preset',
+    clockSettings: 'Idle clock settings',
+    showClock: 'Show clock',
+    hideClock: 'Hide clock',
+    clockAfterPrefix: 'After',
+    clockAfterSuffix: 'min',
+    automatic: 'Auto',
+    intervalBefore: 'Minutes before automatic clock',
+    automaticAria: 'Enable automatic idle clock',
+    closeClock: 'Close clock',
+    buildInfo: 'Open current build information',
+    previousMonth: 'Previous month',
+    nextMonth: 'Next month',
+    weekdays: 'S,M,T,W,T,F,S'
   },
   es: {
     documentLang: 'es',
@@ -93,7 +181,56 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     sync: 'Sincronización multi-dispositivo',
     scifi: 'scifi',
     garden: 'Mi jardín',
-    review: 'Revisión estética'
+    review: 'Revisión estética',
+    siteMenuLabel: 'Menú del sitio DailyFlora',
+    interfaceLanguage: 'Idioma de la interfaz',
+    viewingControls: 'Controles de vista',
+    showView: 'Mostrar controles',
+    pickDate: 'Elegir fecha del ramo',
+    randomDate: 'Abrir una fecha al azar',
+    fullscreen: 'Pantalla completa',
+    exitFullscreen: 'Salir de pantalla completa',
+    handControl: 'Control gestual',
+    handOn: 'Activar control gestual',
+    handOff: 'Desactivar control gestual',
+    zoomControls: 'Controles de zoom',
+    zoomOut: 'Alejar',
+    zoomIn: 'Acercar',
+    densityGroup: 'Densidad del ramo',
+    densityLow: 'Ramo ligero',
+    densityMedium: 'Ramo medio',
+    densityHigh: 'Ramo denso',
+    densityLowShort: 'L',
+    densityMediumShort: 'M',
+    densityHighShort: 'D',
+    renderGroup: 'Precisión de renderizado',
+    renderAuto: 'Calidad automática',
+    renderLow: 'Modo ahorro',
+    renderMedium: 'Modo claro',
+    renderHigh: 'Modo fino',
+    renderAutoShort: 'A',
+    renderLowShort: 'B',
+    renderMediumShort: 'M',
+    renderHighShort: 'A',
+    routeGroup: 'Ruta de cámara',
+    pause: 'Pausar rotación',
+    resume: 'Reanudar rotación',
+    reverse: 'Invertir ruta de cámara',
+    speed: 'Velocidad de cámara',
+    randomPreset: 'Ruta de cámara aleatoria',
+    clockSettings: 'Ajustes del reloj',
+    showClock: 'Mostrar reloj',
+    hideClock: 'Ocultar reloj',
+    clockAfterPrefix: 'Tras',
+    clockAfterSuffix: 'min',
+    automatic: 'Auto',
+    intervalBefore: 'Minutos antes del reloj automático',
+    automaticAria: 'Activar reloj automático',
+    closeClock: 'Cerrar reloj',
+    buildInfo: 'Abrir información de compilación',
+    previousMonth: 'Mes anterior',
+    nextMonth: 'Mes siguiente',
+    weekdays: 'D,L,M,X,J,V,S'
   },
   fr: {
     documentLang: 'fr',
@@ -107,7 +244,56 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     sync: 'Synchronisation multi-écrans',
     scifi: 'scifi',
     garden: 'Mon jardin',
-    review: 'Revue esthétique'
+    review: 'Revue esthétique',
+    siteMenuLabel: 'Menu du site DailyFlora',
+    interfaceLanguage: 'Langue de l’interface',
+    viewingControls: 'Commandes de vue',
+    showView: 'Afficher les commandes',
+    pickDate: 'Choisir la date du bouquet',
+    randomDate: 'Ouvrir une date aléatoire',
+    fullscreen: 'Plein écran',
+    exitFullscreen: 'Quitter le plein écran',
+    handControl: 'Commande gestuelle',
+    handOn: 'Activer la commande gestuelle',
+    handOff: 'Désactiver la commande gestuelle',
+    zoomControls: 'Commandes de zoom',
+    zoomOut: 'Éloigner',
+    zoomIn: 'Rapprocher',
+    densityGroup: 'Densité du bouquet',
+    densityLow: 'Bouquet léger',
+    densityMedium: 'Bouquet moyen',
+    densityHigh: 'Bouquet dense',
+    densityLowShort: 'L',
+    densityMediumShort: 'M',
+    densityHighShort: 'D',
+    renderGroup: 'Précision du rendu',
+    renderAuto: 'Qualité automatique',
+    renderLow: 'Mode économie',
+    renderMedium: 'Mode clair',
+    renderHigh: 'Mode précis',
+    renderAutoShort: 'A',
+    renderLowShort: 'B',
+    renderMediumShort: 'M',
+    renderHighShort: 'H',
+    routeGroup: 'Parcours caméra',
+    pause: 'Mettre en pause',
+    resume: 'Reprendre la rotation',
+    reverse: 'Inverser le parcours caméra',
+    speed: 'Vitesse de la caméra',
+    randomPreset: 'Parcours caméra aléatoire',
+    clockSettings: 'Réglages de l’horloge',
+    showClock: 'Afficher l’horloge',
+    hideClock: 'Masquer l’horloge',
+    clockAfterPrefix: 'Après',
+    clockAfterSuffix: 'min',
+    automatic: 'Auto',
+    intervalBefore: 'Minutes avant l’horloge automatique',
+    automaticAria: 'Activer l’horloge automatique',
+    closeClock: 'Fermer l’horloge',
+    buildInfo: 'Ouvrir les informations de version',
+    previousMonth: 'Mois précédent',
+    nextMonth: 'Mois suivant',
+    weekdays: 'D,L,M,M,J,V,S'
   },
   pt: {
     documentLang: 'pt',
@@ -121,7 +307,56 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     sync: 'Sincronização multidispositivo',
     scifi: 'scifi',
     garden: 'Meu jardim',
-    review: 'Revisão estética'
+    review: 'Revisão estética',
+    siteMenuLabel: 'Menu do site DailyFlora',
+    interfaceLanguage: 'Idioma da interface',
+    viewingControls: 'Controles de visualização',
+    showView: 'Mostrar controles',
+    pickDate: 'Escolher data do buquê',
+    randomDate: 'Abrir uma data aleatória',
+    fullscreen: 'Tela cheia',
+    exitFullscreen: 'Sair da tela cheia',
+    handControl: 'Controle por gestos',
+    handOn: 'Ativar controle por gestos',
+    handOff: 'Desativar controle por gestos',
+    zoomControls: 'Controles de zoom',
+    zoomOut: 'Afastar',
+    zoomIn: 'Aproximar',
+    densityGroup: 'Densidade do buquê',
+    densityLow: 'Buquê leve',
+    densityMedium: 'Buquê médio',
+    densityHigh: 'Buquê denso',
+    densityLowShort: 'L',
+    densityMediumShort: 'M',
+    densityHighShort: 'D',
+    renderGroup: 'Precisão de renderização',
+    renderAuto: 'Qualidade automática',
+    renderLow: 'Modo econômico',
+    renderMedium: 'Modo claro',
+    renderHigh: 'Modo fino',
+    renderAutoShort: 'A',
+    renderLowShort: 'B',
+    renderMediumShort: 'M',
+    renderHighShort: 'A',
+    routeGroup: 'Rota da câmera',
+    pause: 'Pausar rotação',
+    resume: 'Retomar rotação',
+    reverse: 'Inverter rota da câmera',
+    speed: 'Velocidade da câmera',
+    randomPreset: 'Rota de câmera aleatória',
+    clockSettings: 'Configurações do relógio',
+    showClock: 'Mostrar relógio',
+    hideClock: 'Ocultar relógio',
+    clockAfterPrefix: 'Após',
+    clockAfterSuffix: 'min',
+    automatic: 'Auto',
+    intervalBefore: 'Minutos antes do relógio automático',
+    automaticAria: 'Ativar relógio automático',
+    closeClock: 'Fechar relógio',
+    buildInfo: 'Abrir informações da versão',
+    previousMonth: 'Mês anterior',
+    nextMonth: 'Próximo mês',
+    weekdays: 'D,S,T,Q,Q,S,S'
   },
   it: {
     documentLang: 'it',
@@ -135,7 +370,56 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     sync: 'Sincronizzazione multi-dispositivo',
     scifi: 'scifi',
     garden: 'Il mio giardino',
-    review: 'Revisione estetica'
+    review: 'Revisione estetica',
+    siteMenuLabel: 'Menu del sito DailyFlora',
+    interfaceLanguage: 'Lingua dell’interfaccia',
+    viewingControls: 'Controlli di visualizzazione',
+    showView: 'Mostra controlli',
+    pickDate: 'Scegli la data del bouquet',
+    randomDate: 'Apri una data casuale',
+    fullscreen: 'Schermo intero',
+    exitFullscreen: 'Esci da schermo intero',
+    handControl: 'Controllo gestuale',
+    handOn: 'Attiva controllo gestuale',
+    handOff: 'Disattiva controllo gestuale',
+    zoomControls: 'Controlli zoom',
+    zoomOut: 'Allontana',
+    zoomIn: 'Avvicina',
+    densityGroup: 'Densità del bouquet',
+    densityLow: 'Bouquet leggero',
+    densityMedium: 'Bouquet medio',
+    densityHigh: 'Bouquet denso',
+    densityLowShort: 'L',
+    densityMediumShort: 'M',
+    densityHighShort: 'D',
+    renderGroup: 'Precisione di rendering',
+    renderAuto: 'Qualità automatica',
+    renderLow: 'Modalità risparmio',
+    renderMedium: 'Modalità nitida',
+    renderHigh: 'Modalità fine',
+    renderAutoShort: 'A',
+    renderLowShort: 'B',
+    renderMediumShort: 'M',
+    renderHighShort: 'A',
+    routeGroup: 'Percorso camera',
+    pause: 'Pausa rotazione',
+    resume: 'Riprendi rotazione',
+    reverse: 'Inverti percorso camera',
+    speed: 'Velocità camera',
+    randomPreset: 'Percorso camera casuale',
+    clockSettings: 'Impostazioni orologio',
+    showClock: 'Mostra orologio',
+    hideClock: 'Nascondi orologio',
+    clockAfterPrefix: 'Dopo',
+    clockAfterSuffix: 'min',
+    automatic: 'Auto',
+    intervalBefore: 'Minuti prima dell’orologio automatico',
+    automaticAria: 'Attiva orologio automatico',
+    closeClock: 'Chiudi orologio',
+    buildInfo: 'Apri informazioni sulla build',
+    previousMonth: 'Mese precedente',
+    nextMonth: 'Mese successivo',
+    weekdays: 'D,L,M,M,G,V,S'
   },
   ja: {
     documentLang: 'ja',
@@ -149,7 +433,56 @@ const interfaceCopy: Record<InterfaceLanguage, { documentLang: string } & Record
     sync: 'マルチデバイス同期',
     scifi: 'scifi',
     garden: '私の庭',
-    review: '美的レビュー'
+    review: '美的レビュー',
+    siteMenuLabel: 'DailyFlora サイトメニュー',
+    interfaceLanguage: '表示言語',
+    viewingControls: '表示設定',
+    showView: '表示設定を開く',
+    pickDate: '花束の日付を選択',
+    randomDate: 'ランダムな日付を開く',
+    fullscreen: '全画面表示',
+    exitFullscreen: '全画面表示を終了',
+    handControl: 'ジェスチャー操作',
+    handOn: 'ジェスチャー操作を開始',
+    handOff: 'ジェスチャー操作を終了',
+    zoomControls: 'ズーム操作',
+    zoomOut: '縮小',
+    zoomIn: '拡大',
+    densityGroup: '花束の密度',
+    densityLow: '花材を少なく',
+    densityMedium: '花材を標準に',
+    densityHigh: '花材を多く',
+    densityLowShort: '疎',
+    densityMediumShort: '中',
+    densityHighShort: '密',
+    renderGroup: '描画精度',
+    renderAuto: '自動品質',
+    renderLow: '省電力',
+    renderMedium: '標準画質',
+    renderHigh: '高精細',
+    renderAutoShort: '自',
+    renderLowShort: '省',
+    renderMediumShort: '標',
+    renderHighShort: '精',
+    routeGroup: 'カメラ経路',
+    pause: '回転を一時停止',
+    resume: '回転を再開',
+    reverse: 'カメラ経路を反転',
+    speed: 'カメラ速度',
+    randomPreset: 'カメラ経路をランダム化',
+    clockSettings: '待機時計の設定',
+    showClock: '時計を表示',
+    hideClock: '時計を閉じる',
+    clockAfterPrefix: '',
+    clockAfterSuffix: '分後',
+    automatic: '自動',
+    intervalBefore: '自動時計までの分数',
+    automaticAria: '自動待機時計を有効化',
+    closeClock: '時計を閉じる',
+    buildInfo: '現在のビルド情報を開く',
+    previousMonth: '前の月',
+    nextMonth: '次の月',
+    weekdays: '日,月,火,水,木,金,土'
   }
 };
 const themeEnglishNames: Record<string, string> = {
@@ -403,6 +736,7 @@ let distanceAmplitude = 0;
 let targetYAmplitude = 0;
 let manualRotation = false;
 let manualZoom = 0;
+let rotationPaused = false;
 let specialAudio: HTMLAudioElement | null = null;
 let specialAudioMuted = false;
 let debugTimer = 0;
@@ -413,15 +747,38 @@ let favoriteBouquets = readFavoriteBouquets();
 let referenceState: ReferenceState | null = null;
 let clockTickTimer = 0;
 let clockDisplaySource: ClockDisplaySource | null = null;
+let clockQuoteIndex = 0;
 const clockSettingsStorageKey = 'dailyflora.idle-clock.v1';
-const clockQuotes = [
-  ['Nothing can bring you peace but yourself.', 'Ralph Waldo Emerson'],
-  ['Nature does not hurry, yet everything is accomplished.', 'Lao Tzu'],
-  ['Each day provides its own gifts.', 'Marcus Aurelius'],
-  ['The quieter you become, the more you can hear.', 'Ram Dass'],
-  ['Adopt the pace of nature: her secret is patience.', 'Ralph Waldo Emerson'],
-  ['There is a calmness to a life lived in gratitude.', 'Ralph Blum']
-] as const;
+const clockQuotes: Record<InterfaceLanguage, readonly (readonly [string, string])[]> = {
+  zh: [
+    ['自然从不匆忙，却完成一切。', '老子'],
+    ['越安静，越能听见。', '拉姆·达斯']
+  ],
+  en: [
+    ['Nature does not hurry, yet everything is accomplished.', 'Lao Tzu'],
+    ['The quieter you become, the more you can hear.', 'Ram Dass']
+  ],
+  es: [
+    ['La naturaleza no se apresura y, aun así, todo se cumple.', 'Lao Tse'],
+    ['Cuanto más silencio guardas, más puedes oír.', 'Ram Dass']
+  ],
+  fr: [
+    ['La nature ne se presse pas, pourtant tout s’accomplit.', 'Lao Tseu'],
+    ['Plus vous devenez silencieux, plus vous pouvez entendre.', 'Ram Dass']
+  ],
+  pt: [
+    ['A natureza não tem pressa e, ainda assim, tudo se realiza.', 'Lao Tsé'],
+    ['Quanto mais silêncio, mais se pode ouvir.', 'Ram Dass']
+  ],
+  it: [
+    ['La natura non ha fretta, eppure tutto si compie.', 'Lao Tzu'],
+    ['Più diventi silenzioso, più riesci ad ascoltare.', 'Ram Dass']
+  ],
+  ja: [
+    ['自然は急がない。それでも、すべては成し遂げられる。', '老子'],
+    ['静かになるほど、より多くが聞こえてくる。', 'ラム・ダス']
+  ]
+};
 
 function readClockSettings(): IdleClockSettings {
   const stored = safeJsonParse<Partial<IdleClockSettings>>(window.localStorage.getItem(clockSettingsStorageKey), {});
@@ -513,11 +870,12 @@ function safeJsonParse<T>(value: string | null, fallback: T): T {
 }
 
 function formatClockDate(now: Date) {
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const weekday = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(now);
-  return `${year}年${month}月${day}日 · ${weekday}`;
+  return new Intl.DateTimeFormat(interfaceCopy[readInterfaceLanguage()].documentLang, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    weekday: 'short'
+  }).format(now);
 }
 
 function updateClockTime() {
@@ -526,6 +884,13 @@ function updateClockTime() {
     clockTime.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
   }
   if (clockDate) clockDate.textContent = formatClockDate(now);
+}
+
+function updateClockQuote(language = readInterfaceLanguage()) {
+  const quotes = clockQuotes[language];
+  const quote = quotes[clockQuoteIndex % quotes.length];
+  if (clockQuoteText) clockQuoteText.textContent = quote[0];
+  if (clockQuoteAuthor) clockQuoteAuthor.textContent = quote[1];
 }
 
 function syncClockControls() {
@@ -538,10 +903,12 @@ function syncClockControls() {
   });
   if (clockToggleButton) {
     const isManual = clockDisplaySource === 'manual';
+    const label = interfaceText(isManual ? 'hideClock' : 'showClock');
     clockToggleButton.classList.toggle('is-active', isManual);
     clockToggleButton.setAttribute('aria-pressed', String(isManual));
-    clockToggleButton.setAttribute('aria-label', isManual ? 'Hide clock' : 'Show clock');
-    clockToggleButton.title = isManual ? 'Hide clock' : 'Show clock';
+    clockToggleButton.setAttribute('aria-label', label);
+    clockToggleButton.setAttribute('data-tooltip', label);
+    clockToggleButton.title = label;
   }
 }
 
@@ -560,9 +927,8 @@ function showClock(source: ClockDisplaySource) {
   clockDisplaySource = source;
   setControlsExpanded(false, false);
   hideUiNow();
-  const quote = clockQuotes[Math.floor(Math.random() * clockQuotes.length)];
-  if (clockQuoteText) clockQuoteText.textContent = quote[0];
-  if (clockQuoteAuthor) clockQuoteAuthor.textContent = quote[1];
+  clockQuoteIndex = Math.floor(Math.random() * clockQuotes.en.length);
+  updateClockQuote();
   updateClockTime();
   window.clearInterval(clockTickTimer);
   clockTickTimer = window.setInterval(updateClockTime, 1000);
@@ -815,12 +1181,23 @@ function readInterfaceLanguage(): InterfaceLanguage {
   return stored && stored in interfaceCopy ? (stored as InterfaceLanguage) : 'zh';
 }
 
+function interfaceText(key: string, language = readInterfaceLanguage()) {
+  return interfaceCopy[language][key] ?? interfaceCopy.en[key] ?? key;
+}
+
 function updateInterfaceLanguage(language: InterfaceLanguage) {
   const copy = interfaceCopy[language];
+  const setAttributes = (selector: string, key: string, attributes: string[]) => {
+    const element = document.querySelector<HTMLElement>(selector);
+    if (!element) return;
+    const value = interfaceText(key, language);
+    attributes.forEach((attribute) => element.setAttribute(attribute, value));
+  };
+
   document.documentElement.lang = copy.documentLang;
   document.querySelectorAll<HTMLElement>('[data-i18n-key]').forEach((element) => {
     const key = element.dataset.i18nKey;
-    if (key && copy[key]) element.textContent = copy[key];
+    if (key && key in copy) element.textContent = copy[key];
   });
   document.querySelectorAll<HTMLElement>('[data-interface-copy]').forEach((element) => {
     const key = element.dataset.interfaceCopy;
@@ -829,10 +1206,70 @@ function updateInterfaceLanguage(language: InterfaceLanguage) {
       ? copy.hideView
       : copy[key];
   });
+
+  setAttributes('#site-menu', 'siteMenuLabel', ['aria-label']);
+  setAttributes('#site-menu-toggle', 'siteMenuLabel', ['aria-label']);
+  setAttributes('#site-menu-toggle', 'index', ['title', 'data-tooltip']);
+  setAttributes('#site-language-switcher', 'interfaceLanguage', ['aria-label']);
+  setAttributes('#controls', 'viewingControls', ['aria-label']);
+  setAttributes('#review-dashboard-link', 'review', ['title', 'aria-label', 'data-tooltip']);
+  setAttributes('#today-button', 'pickDate', ['data-tooltip']);
+  setAttributes('#date-picker', 'pickDate', ['aria-label']);
+  setAttributes('#shuffle-button', 'randomDate', ['title', 'aria-label', 'data-tooltip']);
+  setAttributes('#fullscreen-button', 'fullscreen', ['title', 'aria-label', 'data-tooltip']);
+  setAttributes('.zoom-control', 'zoomControls', ['aria-label']);
+  setAttributes('#zoom-out-button', 'zoomOut', ['title', 'aria-label', 'data-tooltip']);
+  setAttributes('#zoom-in-button', 'zoomIn', ['title', 'aria-label', 'data-tooltip']);
+  setAttributes('.density-control', 'densityGroup', ['aria-label']);
+  setAttributes('.render-control', 'renderGroup', ['aria-label']);
+  setAttributes('.rotation-control', 'routeGroup', ['aria-label']);
+  setAttributes('#rotation-direction-button', 'reverse', ['title', 'aria-label', 'data-tooltip']);
+  setAttributes('.slider-shell', 'speed', ['data-tooltip']);
+  setAttributes('#rotation-speed', 'speed', ['aria-label']);
+  setAttributes('.slider-shell .sr-only', 'speed', []);
+  const speedReaderLabel = document.querySelector<HTMLElement>('.slider-shell .sr-only');
+  if (speedReaderLabel) speedReaderLabel.textContent = interfaceText('speed', language);
+  setAttributes('#rotation-preset-button', 'randomPreset', ['title', 'aria-label', 'data-tooltip']);
+  setAttributes('.clock-control', 'clockSettings', ['aria-label']);
+  setAttributes('.clock-interval-label', 'intervalBefore', ['title']);
+  setAttributes('#clock-interval', 'intervalBefore', ['aria-label']);
+  setAttributes('#clock-auto-enabled', 'automaticAria', ['aria-label']);
+  setAttributes('#clock-close-button', 'closeClock', ['title', 'aria-label']);
+  setAttributes('#release-mark', 'buildInfo', ['aria-label']);
+  calendarPanel.setAttribute('aria-label', interfaceText('pickDate', language));
+
+  densityButtons.forEach((button) => {
+    const choice = button.dataset.densityChoice;
+    if (!choice) return;
+    const suffix = `${choice[0].toUpperCase()}${choice.slice(1)}`;
+    button.textContent = interfaceText(`density${suffix}Short`, language);
+    const label = interfaceText(`density${suffix}`, language);
+    button.title = label;
+    button.dataset.tooltip = label;
+  });
+  renderButtons.forEach((button) => {
+    const choice = button.dataset.renderChoice;
+    if (!choice) return;
+    const suffix = `${choice[0].toUpperCase()}${choice.slice(1)}`;
+    button.textContent = interfaceText(`render${suffix}Short`, language);
+    const label = interfaceText(`render${suffix}`, language);
+    button.title = label;
+    button.dataset.tooltip = label;
+  });
+
   siteLanguageSwitcher?.querySelectorAll<HTMLButtonElement>('[data-language]').forEach((button) => {
     button.setAttribute('aria-pressed', String(button.dataset.language === language));
   });
   window.localStorage.setItem(interfaceLanguageStorageKey, language);
+  setControlsExpanded(ui.controls.classList.contains('is-expanded'), false);
+  syncClockControls();
+  syncControls();
+  syncPauseButton(rotationPaused);
+  syncHandControlToggle();
+  setLabels();
+  updateClockTime();
+  updateClockQuote(language);
+  if (!calendarPanel.hidden) renderCalendar();
 }
 
 function toggleFavorite() {
@@ -908,22 +1345,28 @@ function setLabels() {
   const name = bouquetDisplayName(spec);
   const displayDates = formatDisplayDates(spec.dateLabel);
   ui.dateLabel.textContent = 'DAILY COMPOSITION';
-  ui.themeEnLabel.textContent = `${displayNameWithoutDate(name.en).toUpperCase()} ·`;
-  ui.dateEnLabel.textContent = displayDates.en;
-  ui.themeCnLabel.textContent = `${displayNameWithoutDate(name.cn)} ·`;
-  ui.dateCnLabel.textContent = displayDates.cn;
+  ui.dateCnLabel.hidden = true;
+  ui.dateEnLabel.hidden = true;
+  ui.themeCnLabel.textContent = `${displayDates.cn}·${displayNameWithoutDate(name.cn)}`;
+  ui.themeEnLabel.textContent = `${displayDates.en} ·${displayNameWithoutDate(name.en).toUpperCase()}·`;
   ui.flowerPlanEnLabel.textContent = `${themeEnglishName()} · ${spec.flowerPlan.enName} · ${flowerPlanTextEn()}`;
   ui.flowerPlanLabel.textContent = `${spec.theme.name} · ${spec.flowerPlan.cnName} · ${flowerPlanText()}`;
   ui.flowerPlanLabel.title = `${spec.flowerPlan.reference}\n${spec.flowerPlan.silhouette}\n避免：${spec.flowerPlan.avoid}`;
   if (datePicker) datePicker.value = spec.dateLabel;
   ui.themeLabel.title = bouquetHoverTitle();
   ui.dateLabel.title = bouquetHoverTitle();
-  todayButton?.setAttribute('title', `选择日期 · ${bouquetHoverTitle()}`);
-  todayButton?.setAttribute('aria-label', `Pick bouquet date: ${bouquetHoverTitle()}`);
-  shuffleButton?.setAttribute('title', `随机日期花束 · ${bouquetHoverTitle()}`);
-  const renderLabel =
-    selectedRender === 'auto' ? `自/${renderLabels[quality.renderName]}` : renderLabels[quality.renderName];
-  ui.qualityLabel.textContent = `${densityLabels[quality.densityName]} · ${renderLabel}`;
+  const pickDateLabel = `${interfaceText('pickDate')} · ${bouquetHoverTitle()}`;
+  const randomDateLabel = `${interfaceText('randomDate')} · ${bouquetHoverTitle()}`;
+  todayButton?.setAttribute('title', pickDateLabel);
+  todayButton?.setAttribute('aria-label', pickDateLabel);
+  shuffleButton?.setAttribute('title', randomDateLabel);
+  shuffleButton?.setAttribute('aria-label', randomDateLabel);
+  const densitySuffix = `${quality.densityName[0].toUpperCase()}${quality.densityName.slice(1)}`;
+  const renderSuffix = `${quality.renderName[0].toUpperCase()}${quality.renderName.slice(1)}`;
+  const renderLabel = selectedRender === 'auto'
+    ? `${interfaceText('renderAutoShort')}/${interfaceText(`render${renderSuffix}Short`)}`
+    : interfaceText(`render${renderSuffix}Short`);
+  ui.qualityLabel.textContent = `${interfaceText(`density${densitySuffix}Short`)} · ${renderLabel}`;
   document.title = `DailyFlora - ${name.cn} / ${name.en}`;
   if (!calendarPanel.hidden) {
     renderCalendar();
@@ -995,9 +1438,11 @@ function syncControls() {
   }
 
   if (rotationDirectionButton) {
+    const label = interfaceText('reverse');
     rotationDirectionButton.classList.toggle('is-reverse', rotationDirection === -1);
-    rotationDirectionButton.setAttribute('aria-label', 'Reverse current camera route');
-    rotationDirectionButton.title = 'Reverse current camera route';
+    rotationDirectionButton.setAttribute('aria-label', label);
+    rotationDirectionButton.setAttribute('data-tooltip', label);
+    rotationDirectionButton.title = label;
   }
 }
 
@@ -1021,8 +1466,10 @@ function setControlsExpanded(expanded: boolean, reveal = true) {
   ui.controls.classList.toggle('is-collapsed', !expanded);
   ui.controlsPanel.hidden = !expanded;
   ui.controlsToggleButton.setAttribute('aria-expanded', String(expanded));
-  ui.controlsToggleButton.setAttribute('aria-label', expanded ? 'Hide viewing controls' : 'Show viewing controls');
-  ui.controlsToggleButton.title = expanded ? 'Hide viewing controls' : 'Show viewing controls';
+  const label = interfaceText(expanded ? 'hideView' : 'showView');
+  ui.controlsToggleButton.setAttribute('aria-label', label);
+  ui.controlsToggleButton.setAttribute('data-tooltip', label);
+  ui.controlsToggleButton.title = label;
   const language = readInterfaceLanguage();
   const interfaceLabel = ui.controlsToggleButton.querySelector<HTMLElement>('[data-interface-copy="view"]');
   if (interfaceLabel) interfaceLabel.textContent = expanded ? interfaceCopy[language].hideView : interfaceCopy[language].view;
@@ -1172,15 +1619,16 @@ function renderCalendar() {
     1
   );
   const canGoNext = nextMonthDateKey <= maxSelectableDate;
+  const weekdays = interfaceText('weekdays').split(',');
 
   calendarPanel.innerHTML = `
     <div class="calendar-header">
-      <button class="calendar-nav-button" type="button" data-calendar-nav="-1" aria-label="Previous month">‹</button>
+      <button class="calendar-nav-button" type="button" data-calendar-nav="-1" aria-label="${interfaceText('previousMonth')}">‹</button>
       <strong>${monthLabel}</strong>
-      <button class="calendar-nav-button" type="button" data-calendar-nav="1" aria-label="Next month" ${canGoNext ? '' : 'disabled aria-disabled="true"'}>›</button>
+      <button class="calendar-nav-button" type="button" data-calendar-nav="1" aria-label="${interfaceText('nextMonth')}" ${canGoNext ? '' : 'disabled aria-disabled="true"'}>›</button>
     </div>
     <div class="calendar-weekdays" aria-hidden="true">
-      <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+      ${weekdays.map((weekday) => `<span>${weekday}</span>`).join('')}
     </div>
     <div class="calendar-grid">${dayButtons.join('')}</div>
   `;
@@ -1462,6 +1910,7 @@ referenceFileInput?.addEventListener('change', async () => {
 referenceGenerateButton?.addEventListener('click', generateFromReference);
 
 siteMenuToggle?.addEventListener('click', () => {
+  if (siteMenuPanel?.hidden) setControlsExpanded(false, false);
   toggleSiteMenu();
   revealUi();
 });
@@ -1498,21 +1947,24 @@ document.addEventListener('keydown', (event) => {
 });
 
 controlsToggleButton?.addEventListener('click', () => {
+  toggleSiteMenu(false);
   setControlsExpanded(!controls.classList.contains('is-expanded'));
 });
 
 function syncPauseButton(paused: boolean) {
   if (!pauseButton) return;
-  pauseButton.setAttribute('aria-label', paused ? 'Resume rotation' : 'Pause rotation');
-  pauseButton.title = paused ? 'Resume rotation' : 'Pause rotation';
+  const label = interfaceText(paused ? 'resume' : 'pause');
+  pauseButton.setAttribute('aria-label', label);
+  pauseButton.setAttribute('data-tooltip', label);
+  pauseButton.title = label;
   pauseButton.innerHTML = paused
     ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>'
     : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" /></svg>';
 }
 
 pauseButton?.addEventListener('click', () => {
-  const paused = scene.togglePause();
-  syncPauseButton(paused);
+  rotationPaused = scene.togglePause();
+  syncPauseButton(rotationPaused);
   revealUi();
 });
 
@@ -1591,6 +2043,14 @@ fullscreenButton?.addEventListener('click', async () => {
     await document.exitFullscreen();
   }
   revealUi();
+});
+
+document.addEventListener('fullscreenchange', () => {
+  if (!fullscreenButton) return;
+  const label = interfaceText(document.fullscreenElement ? 'exitFullscreen' : 'fullscreen');
+  fullscreenButton.setAttribute('aria-label', label);
+  fullscreenButton.setAttribute('data-tooltip', label);
+  fullscreenButton.title = label;
 });
 
 zoomInButton?.addEventListener('click', () => {
@@ -1696,7 +2156,8 @@ async function startHandControl() {
     },
     setAutomaticCameraEnabled: (enabled) => {
       scene.setAutomaticCameraEnabled(enabled);
-      syncPauseButton(!enabled);
+      rotationPaused = !enabled;
+      syncPauseButton(rotationPaused);
       revealUi();
     },
     toggleImmersive: () => {
@@ -1729,8 +2190,10 @@ function syncHandControlToggle() {
   handControlToggle.classList.toggle('is-loading', handControlLoading);
   handControlToggle.disabled = handControlLoading;
   handControlToggle.setAttribute('aria-pressed', String(active));
-  handControlToggle.setAttribute('aria-label', active ? '关闭手势控制' : '开启手势控制');
-  handControlToggle.title = active ? '关闭手势控制' : '开启手势控制';
+  const label = interfaceText(active ? 'handOff' : 'handOn');
+  handControlToggle.setAttribute('aria-label', label);
+  handControlToggle.setAttribute('data-tooltip', label);
+  handControlToggle.title = label;
 }
 
 async function enableHandControl() {
@@ -1796,7 +2259,6 @@ window.addEventListener('beforeunload', () => idleClock.stop());
 window.addEventListener('beforeunload', () => stopHandControl?.(), { once: true });
 
 updateInterfaceLanguage(readInterfaceLanguage());
-setLabels();
 renderAccountState();
 setupDebugMode();
 if (specialReference) {
