@@ -627,7 +627,6 @@ const controlsPanel = document.querySelector<HTMLElement>('#controls-panel');
 const siteMenu = document.querySelector<HTMLElement>('#site-menu');
 const siteMenuToggle = document.querySelector<HTMLButtonElement>('#site-menu-toggle');
 const siteMenuPanel = document.querySelector<HTMLElement>('#site-menu-panel');
-const siteMenuDebugLink = document.querySelector<HTMLAnchorElement>('#site-menu-debug-link');
 const siteLanguageSwitcher = document.querySelector<HTMLElement>('#site-language-switcher');
 const handControlToggle = document.querySelector<HTMLButtonElement>('#hand-control-toggle');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
@@ -639,7 +638,6 @@ const themeEnLabel = document.querySelector<HTMLElement>('#daily-theme-en');
 const flowerPlanLabel = document.querySelector<HTMLElement>('#flower-plan-mark');
 const flowerPlanEnLabel = document.querySelector<HTMLElement>('#flower-plan-mark-en');
 const qualityLabel = document.querySelector<HTMLElement>('#quality-mark');
-const reviewDashboardLink = document.querySelector<HTMLAnchorElement>('#review-dashboard-link');
 const debugPanel = document.querySelector<HTMLElement>('#debug-panel');
 const pauseButton = document.querySelector<HTMLButtonElement>('#pause-button');
 const todayButton = document.querySelector<HTMLButtonElement>('#today-button');
@@ -772,7 +770,6 @@ let selectedDensity = requestedDensity
       ? 'medium'
       : normalizeDensity(params.density);
 document.body.classList.toggle('is-preview', previewMode);
-siteMenuDebugLink && (siteMenuDebugLink.hidden = !debugMode);
 let selectedRender = requestedRender
   ? normalizeRender(requestedRender)
   : internalPreviewMode || specialReference
@@ -808,6 +805,7 @@ let specialAudio: HTMLAudioElement | null = null;
 let specialAudioMuted = false;
 let debugTimer = 0;
 let dateRolloverTimer = 0;
+let fullscreenHelpClosedThisEntry = false;
 let calendarView = parseDateKey(spec.dateLabel);
 let accountState = readAccountState();
 let favoriteBouquets = readFavoriteBouquets();
@@ -1279,7 +1277,6 @@ function updateInterfaceLanguage(language: InterfaceLanguage) {
   setAttributes('#site-menu-toggle', 'index', ['title', 'data-tooltip']);
   setAttributes('#site-language-switcher', 'interfaceLanguage', ['aria-label']);
   setAttributes('#controls', 'viewingControls', ['aria-label']);
-  setAttributes('#review-dashboard-link', 'review', ['title', 'aria-label', 'data-tooltip']);
   setAttributes('#today-button', 'pickDate', ['data-tooltip']);
   setAttributes('#today-button', 'pickDate', ['title', 'aria-label', 'data-tooltip']);
   setAttributes('#today-reset-button', 'today', ['title', 'aria-label', 'data-tooltip']);
@@ -1499,14 +1496,29 @@ function updateDebugPanel() {
 
 function setupDebugMode() {
   document.body.classList.toggle('is-debug', debugMode);
-  if (reviewDashboardLink) {
-    reviewDashboardLink.hidden = !debugMode;
-    reviewDashboardLink.href = withBasePath('docs/aesthetic-review-dashboard.html?debug=1');
-  }
   if (debugPanel) {
     debugPanel.hidden = !debugMode;
   }
   if (!debugMode) return;
+  const debugLink = document.createElement('a');
+  debugLink.className = 'site-menu-debug-link';
+  debugLink.href = withBasePath('docs/aesthetic-review-dashboard.html?debug=1');
+  debugLink.target = '_blank';
+  debugLink.rel = 'noopener';
+  debugLink.dataset.i18nKey = 'review';
+  debugLink.textContent = interfaceText('review');
+  siteMenuPanel?.insertBefore(debugLink, siteLanguageSwitcher);
+
+  const reviewLink = document.createElement('a');
+  reviewLink.className = 'icon-button review-dashboard-button';
+  reviewLink.href = withBasePath('docs/aesthetic-review-dashboard.html?debug=1');
+  reviewLink.target = '_blank';
+  reviewLink.rel = 'noopener';
+  reviewLink.title = interfaceText('review');
+  reviewLink.setAttribute('aria-label', interfaceText('review'));
+  reviewLink.dataset.tooltip = interfaceText('review');
+  reviewLink.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 2v14h14V5z" /><path d="M7 8h10v2H7zM7 12h6v2H7zM15.4 13.6l1.4 1.4-3.6 3.6-2.2-2.2 1.4-1.4.8.8z" /></svg>';
+  ui.controls.insertBefore(reviewLink, controlsPanel);
   updateDebugPanel();
   debugTimer = window.setInterval(updateDebugPanel, 650);
 }
@@ -1564,8 +1576,9 @@ function showShortcutHelp() {
 
 function closeShortcutHelp() {
   if (!shortcutHelp || shortcutHelp.hidden) return;
+  fullscreenHelpClosedThisEntry = true;
   if (shortcutHelpDismiss?.checked) {
-    window.localStorage.setItem(fullscreenHelpDismissedStorageKey, 'true');
+    window.localStorage.setItem(fullscreenHelpDismissedStorageKey, JSON.stringify({ permanent: true }));
   }
   shortcutHelp.classList.remove('is-visible');
   window.setTimeout(() => {
@@ -1575,7 +1588,12 @@ function closeShortcutHelp() {
 }
 
 function maybeShowFullscreenHelp() {
-  if (window.localStorage.getItem(fullscreenHelpDismissedStorageKey) === 'true') return;
+  if (fullscreenHelpClosedThisEntry) return;
+  const dismissed = safeJsonParse<{ permanent?: boolean }>(
+    window.localStorage.getItem(fullscreenHelpDismissedStorageKey),
+    {}
+  );
+  if (dismissed.permanent || window.localStorage.getItem(fullscreenHelpDismissedStorageKey) === 'true') return;
   showShortcutHelp();
 }
 
@@ -2216,9 +2234,13 @@ document.addEventListener('fullscreenchange', () => {
   fullscreenButton.setAttribute('data-tooltip', label);
   fullscreenButton.title = label;
   if (document.fullscreenElement) {
+    fullscreenHelpClosedThisEntry = false;
     maybeShowFullscreenHelp();
   } else if (shortcutHelp && !shortcutHelp.hidden) {
     closeShortcutHelp();
+    fullscreenHelpClosedThisEntry = false;
+  } else {
+    fullscreenHelpClosedThisEntry = false;
   }
 });
 
@@ -2449,18 +2471,28 @@ window.addEventListener('keydown', (event) => {
 
 document.querySelectorAll<HTMLElement>('.controls [data-tooltip]').forEach((element) => {
   let longPressTimer = 0;
+  let touchTooltipHideTimer = 0;
   const hideTouchTooltip = () => {
     window.clearTimeout(longPressTimer);
+    window.clearTimeout(touchTooltipHideTimer);
     element.classList.remove('is-tooltip-visible');
   };
   element.addEventListener('pointerdown', (event) => {
     if (event.pointerType !== 'touch') return;
     window.clearTimeout(longPressTimer);
-    longPressTimer = window.setTimeout(() => element.classList.add('is-tooltip-visible'), 480);
+    window.clearTimeout(touchTooltipHideTimer);
+    longPressTimer = window.setTimeout(() => {
+      element.classList.add('is-tooltip-visible');
+      touchTooltipHideTimer = window.setTimeout(() => element.classList.remove('is-tooltip-visible'), 2400);
+    }, 480);
   });
-  element.addEventListener('pointerup', hideTouchTooltip);
+  element.addEventListener('pointerup', () => {
+    window.clearTimeout(longPressTimer);
+  });
   element.addEventListener('pointercancel', hideTouchTooltip);
-  element.addEventListener('pointerleave', hideTouchTooltip);
+  element.addEventListener('pointerleave', () => {
+    window.clearTimeout(longPressTimer);
+  });
 });
 
 window.addEventListener('resize', () => {
@@ -2502,7 +2534,7 @@ window.addEventListener('beforeunload', () => stopHandControl?.(), { once: true 
 
 updateInterfaceLanguage(readInterfaceLanguage());
 if (searchParams.get('tutorial') === 'fullscreen') {
-  window.localStorage.removeItem(fullscreenHelpDismissedStorageKey);
+  fullscreenHelpClosedThisEntry = false;
   window.setTimeout(showShortcutHelp, 0);
 } else if (searchParams.get('tutorial') === 'view') {
   window.setTimeout(() => {

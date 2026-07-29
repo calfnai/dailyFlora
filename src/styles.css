@@ -1229,11 +1229,11 @@ body.is-preview .daily-theme {
 
 .controls [data-tooltip]::after {
   position: absolute;
-  right: 50%;
+  left: 50%;
   bottom: calc(100% + 10px);
   z-index: 4;
   width: max-content;
-  max-width: 180px;
+  max-width: min(180px, calc(100vw - 24px));
   padding: 7px 10px 8px;
   border: 1px solid rgb(255 246 220 / 16%);
   border-radius: 999px;
@@ -1247,7 +1247,7 @@ body.is-preview .daily-theme {
   content: attr(data-tooltip);
   opacity: 0;
   pointer-events: none;
-  transform: translate(50%, 4px);
+  transform: translate(-50%, 4px);
   transition:
     opacity 160ms ease,
     transform 160ms ease;
@@ -1259,7 +1259,7 @@ body.is-preview .daily-theme {
 .controls [data-tooltip]:focus-within::after,
 .controls [data-tooltip].is-tooltip-visible::after {
   opacity: 1;
-  transform: translate(50%, 0);
+  transform: translate(-50%, 0);
 }
 
 body.is-interface-hidden .hud,
