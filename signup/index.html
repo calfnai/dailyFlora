@@ -1,23 +1,23 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="refresh" content="0; url=../member/#signup" />
-    <meta name="description" content="DailyFlora 注册入口已合并到个人花园。" />
-    <title>DailyFlora 注册入口</title>
+    <meta name="description" content="DailyFlora signup now lives inside the member garden." />
+    <title>DailyFlora Signup</title>
     <link rel="stylesheet" href="../src/marketing.css" />
   </head>
-  <body>
+  <body data-page="member">
     <div class="page-shell product-shell">
       <header class="site-header">
-        <a class="brand" href="../" aria-label="DailyFlora 首页"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA</a>
+        <a class="brand" href="../" aria-label="DailyFlora home" data-i18n-aria="common.brandHome"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA</a>
         <nav class="site-nav" aria-label="站点导航">
-          <a href="../">今日花束</a>
-          <a href="../member/" aria-current="page">我的花园</a>
-          <a href="../about/">关于</a>
-          <a href="../bouquet-shop/">周边与线下</a>
-          <a href="../downloads/">多端入口</a>
+          <a href="../" data-i18n="common.today">Today's bouquet</a>
+          <a href="../member/" aria-current="page" data-i18n="common.member">My garden</a>
+          <a href="../about/" data-i18n="common.about">About</a>
+          <a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a>
+          <a href="../downloads/" data-i18n="common.platforms">Platforms</a>
         </nav>
       </header>
       <main class="product-hero wrap">
@@ -33,5 +33,6 @@
     <script>
       window.location.replace('../member/#signup');
     </script>
+    <script type="module" src="../src/staticI18n.ts"></script>
   </body>
 </html>

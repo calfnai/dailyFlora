@@ -2329,6 +2329,9 @@ body.is-clock-visible:not(.is-special) .controls:not(.is-expanded) {
     top: max(24px, calc(env(safe-area-inset-top) + 12px));
     right: auto;
     left: max(28px, calc(env(safe-area-inset-left) + 16px));
+    max-width: calc(100vw - 128px);
+    overflow-x: auto;
+    padding-bottom: 4px;
     gap: 6px;
   }
 

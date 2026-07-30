@@ -9,6 +9,17 @@ import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, w
 import { themes } from './themes';
 import { IdleClockController, normalizeClockInterval, type ClockDisplaySource, type IdleClockSettings } from './idleClock';
 import type { DailyFloraHandActions } from './dailyFloraHandControl';
+import {
+  configureDocument,
+  detectInitialLocale,
+  formatTranslation,
+  getTranslation,
+  localeStorageKey,
+  normalizeLocale,
+  saveLocale,
+  setupLocaleSwitcher,
+  type Locale
+} from './i18n/index';
 
 type RotationDirection = 1 | -1;
 type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-eight';
@@ -196,31 +207,20 @@ const clockQuoteText = document.querySelector<HTMLElement>('#clock-quote-text');
 const clockQuoteAuthor = document.querySelector<HTMLElement>('#clock-quote-author');
 const releaseMark = document.querySelector<HTMLAnchorElement>('#release-mark');
 const languageSwitcher = document.querySelector<HTMLElement>('#language-switcher');
-
-type InterfaceLanguage = 'en' | 'zh' | 'es' | 'fr' | 'pt' | 'it' | 'ja';
-
-const interfaceLanguageStorageKey = 'dailyflora.interface-language.v1';
-const interfaceCopy: Record<InterfaceLanguage, { index: string; view: string; hideView: string; documentLang: string }> = {
-  en: { index: 'INDEX', view: 'VIEW', hideView: 'CLOSE', documentLang: 'en' },
-  zh: { index: '索引', view: '视图', hideView: '收起', documentLang: 'zh-CN' },
-  es: { index: 'ÍNDICE', view: 'VISTA', hideView: 'CERRAR', documentLang: 'es' },
-  fr: { index: 'INDEX', view: 'VUE', hideView: 'FERMER', documentLang: 'fr' },
-  pt: { index: 'ÍNDICE', view: 'VISTA', hideView: 'FECHAR', documentLang: 'pt' },
-  it: { index: 'INDICE', view: 'VISTA', hideView: 'CHIUDI', documentLang: 'it' },
-  ja: { index: '索引', view: '表示', hideView: '閉じる', documentLang: 'ja' }
-};
-
-function readInterfaceLanguage(): InterfaceLanguage {
-  try {
-    const stored = window.localStorage.getItem(interfaceLanguageStorageKey);
-    if (stored && stored in interfaceCopy) return stored as InterfaceLanguage;
-  } catch {
-    // The selector remains usable even when storage is unavailable.
+let interfaceLanguage: Locale = detectInitialLocale();
+const legacyInterfaceLanguageKey = 'dailyflora.interface-language.v1';
+try {
+  const legacy = normalizeLocale(window.localStorage.getItem(legacyInterfaceLanguageKey));
+  if (legacy && !window.localStorage.getItem(localeStorageKey)) {
+    interfaceLanguage = legacy;
+    saveLocale(legacy);
   }
-  return 'en';
+} catch {
+  // The selector remains usable even when storage is unavailable.
 }
 
-let interfaceLanguage = readInterfaceLanguage();
+const t = (key: string, values?: Record<string, string | number>) =>
+  values ? formatTranslation(interfaceLanguage, key, values) : getTranslation(interfaceLanguage, key);
 
 if (
   !canvas ||
@@ -422,8 +422,10 @@ function formatClockDate(now: Date) {
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
-  const weekday = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(now);
-  return `${year}年${month}月${day}日 · ${weekday}`;
+  const weekday = new Intl.DateTimeFormat(interfaceLanguage, { weekday: 'short' }).format(now);
+  return interfaceLanguage === 'zh-CN' || interfaceLanguage === 'ja'
+    ? `${year}年${month}月${day}日 · ${weekday}`
+    : new Intl.DateTimeFormat(interfaceLanguage, { year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' }).format(now);
 }
 
 function updateClockTime() {
@@ -446,8 +448,8 @@ function syncClockControls() {
     const isManual = clockDisplaySource === 'manual';
     clockToggleButton.classList.toggle('is-active', isManual);
     clockToggleButton.setAttribute('aria-pressed', String(isManual));
-    clockToggleButton.setAttribute('aria-label', isManual ? 'Hide clock' : 'Show clock');
-    clockToggleButton.title = isManual ? 'Hide clock' : 'Show clock';
+    clockToggleButton.setAttribute('aria-label', isManual ? t('view.hideClock') : t('view.showClock'));
+    clockToggleButton.title = isManual ? t('view.hideClock') : t('view.showClock');
   }
 }
 
@@ -666,12 +668,12 @@ async function handleReferenceFile(file: File) {
   if (!file.type.startsWith('image/')) return;
   if (referenceResult) {
     referenceResult.hidden = false;
-    referenceResult.textContent = '正在读取参考图...';
+    referenceResult.textContent = t('index.referenceReading');
   }
   referenceState = await analyzeReferenceImage(file);
   renderReferenceState();
   if (referenceResult) {
-    referenceResult.textContent = `已匹配到 ${referenceState.themeName}，可以生成。`;
+    referenceResult.textContent = t('index.referenceReady', { theme: referenceState.themeName });
   }
 }
 
@@ -687,7 +689,7 @@ function generateFromReference() {
   syncTodayMode(date, seed);
   if (referenceResult) {
     referenceResult.hidden = false;
-    referenceResult.textContent = `已按 ${referenceState.themeName} 生成，可点爱心收藏。`;
+    referenceResult.textContent = t('index.referenceDone', { theme: referenceState.themeName });
   }
 }
 
@@ -738,7 +740,8 @@ function renderFavoriteButton() {
   const saved = Boolean(currentFavorite());
   favoriteButton.classList.toggle('is-saved', saved);
   favoriteButton.setAttribute('aria-pressed', String(saved));
-  favoriteButton.title = saved ? '已收藏今日花束' : '收藏今日花束';
+  favoriteButton.title = saved ? t('index.savedToday') : t('index.favoriteToday');
+  favoriteButton.setAttribute('aria-label', saved ? t('index.savedToday') : t('index.favoriteToday'));
 }
 
 function renderCollectionList() {
@@ -747,8 +750,8 @@ function renderCollectionList() {
   if (favoriteBouquets.length === 0) {
     collectionList.innerHTML = `
       <div class="empty-collection">
-        <strong>还没有收藏</strong>
-        <span>点亮爱心后，这束花会留在这里。</span>
+        <strong>${t('index.emptyTitle')}</strong>
+        <span>${t('index.emptyBody')}</span>
       </div>
     `;
     return;
@@ -773,15 +776,15 @@ function renderAccountState() {
   if (accountOpenTitle) accountOpenTitle.textContent = signedIn ? accountState?.name || '个人花园' : '个人花园';
   if (accountOpenStatus) {
     accountOpenStatus.textContent = signedIn
-      ? `${favoriteBouquets.length} 个收藏`
-      : '登录后同步收藏';
+      ? t('index.gardenStatusSigned', { count: favoriteBouquets.length })
+      : t('index.gardenStatusGuest');
   }
   if (accountAvatar) accountAvatar.textContent = signedIn ? initials(accountState?.name || '', '花') : '访';
-  if (accountPanelTitle) accountPanelTitle.textContent = signedIn ? '你的 DailyFlora 收藏' : '把今天的花束收进个人花园';
+  if (accountPanelTitle) accountPanelTitle.textContent = signedIn ? t('index.accountPanelTitleSigned') : t('index.accountPanelTitleGuest');
   if (loginForm) loginForm.hidden = signedIn;
   if (accountProfile) accountProfile.hidden = !signedIn;
   if (profileAvatar) profileAvatar.textContent = initials(accountState?.name || '', '花');
-  if (profileName) profileName.textContent = accountState?.name || 'DailyFlora 用户';
+  if (profileName) profileName.textContent = accountState?.name || 'DailyFlora';
   if (profileEmail) profileEmail.textContent = accountState?.email || '';
   renderFavoriteButton();
   renderCollectionList();
@@ -798,12 +801,13 @@ function setLabels() {
   ui.themeLabel.title = bouquetHoverTitle();
   ui.dateLabel.title = bouquetHoverTitle();
   todayButton?.setAttribute('title', `选择日期 · ${bouquetHoverTitle()}`);
-  todayButton?.setAttribute('aria-label', `Pick bouquet date: ${bouquetHoverTitle()}`);
-  shuffleButton?.setAttribute('title', `随机日期花束 · ${bouquetHoverTitle()}`);
+  todayButton?.setAttribute('aria-label', t('view.dateWithName', { name: bouquetHoverTitle() }));
+  shuffleButton?.setAttribute('title', `${t('view.random')} · ${bouquetHoverTitle()}`);
   const renderLabel =
     selectedRender === 'auto' ? `自/${renderLabels[quality.renderName]}` : renderLabels[quality.renderName];
   ui.qualityLabel.textContent = `${densityLabels[quality.densityName]} · ${renderLabel}`;
-  document.title = `DailyFlora - ${name.cn} / ${name.en}`;
+  configureDocument(interfaceLanguage, 'home', '');
+  document.title = `DailyFlora - ${interfaceLanguage === 'zh-CN' ? name.cn : name.en}`;
   if (!calendarPanel.hidden) {
     renderCalendar();
     positionCalendarPanel();
@@ -875,8 +879,8 @@ function syncControls() {
 
   if (rotationDirectionButton) {
     rotationDirectionButton.classList.toggle('is-reverse', rotationDirection === -1);
-    rotationDirectionButton.setAttribute('aria-label', 'Reverse current camera route');
-    rotationDirectionButton.title = 'Reverse current camera route';
+    rotationDirectionButton.setAttribute('aria-label', t('view.reverse'));
+    rotationDirectionButton.title = t('view.reverse');
   }
 }
 
@@ -897,8 +901,8 @@ function revealUi() {
     ui.controls.classList.add('is-collapsed');
     ui.controlsPanel.hidden = true;
     ui.controlsToggleButton.setAttribute('aria-expanded', 'false');
-    ui.controlsToggleButton.setAttribute('aria-label', 'Show viewing controls');
-    ui.controlsToggleButton.title = 'Show viewing controls';
+    ui.controlsToggleButton.setAttribute('aria-label', t('view.show'));
+    ui.controlsToggleButton.title = t('view.show');
     updateInterfaceLanguage(interfaceLanguage);
   }, 7000);
 }
@@ -908,28 +912,95 @@ function setControlsExpanded(expanded: boolean) {
   ui.controls.classList.toggle('is-collapsed', !expanded);
   ui.controlsPanel.hidden = !expanded;
   ui.controlsToggleButton.setAttribute('aria-expanded', String(expanded));
-  ui.controlsToggleButton.setAttribute('aria-label', expanded ? 'Hide viewing controls' : 'Show viewing controls');
-  ui.controlsToggleButton.title = expanded ? 'Hide viewing controls' : 'Show viewing controls';
+  ui.controlsToggleButton.setAttribute('aria-label', expanded ? t('view.hide') : t('view.show'));
+  ui.controlsToggleButton.title = expanded ? t('view.hide') : t('view.show');
   if (!specialReference) updateInterfaceLanguage(interfaceLanguage);
   revealUi();
 }
 
-function updateInterfaceLanguage(language: InterfaceLanguage) {
+function updateInterfaceLanguage(language: Locale) {
   interfaceLanguage = language;
-  const copy = interfaceCopy[language];
-  document.documentElement.lang = copy.documentLang;
+  saveLocale(language);
+  configureDocument(language, 'home', '');
   document.querySelectorAll<HTMLElement>('[data-interface-copy]').forEach((element) => {
     const key = element.dataset.interfaceCopy as 'index' | 'view';
-    element.textContent = key === 'view' && ui.controls.classList.contains('is-expanded') ? copy.hideView : copy[key];
+    element.textContent = key === 'view' && ui.controls.classList.contains('is-expanded') ? t('index.hideView') : t(`index.${key}`);
   });
-  languageSwitcher?.querySelectorAll<HTMLButtonElement>('[data-language]').forEach((button) => {
-    button.setAttribute('aria-pressed', String(button.dataset.language === language));
+  setupLocaleSwitcher(languageSwitcher, language, (nextLocale) => {
+    updateInterfaceLanguage(nextLocale);
+    revealUi();
   });
-  try {
-    window.localStorage.setItem(interfaceLanguageStorageKey, language);
-  } catch {
-    // Keep the in-memory preference when storage is unavailable.
-  }
+  applyStaticCopy();
+}
+
+function applyStaticCopy() {
+  const textBySelector: Array<[string, string]> = [
+    ['#site-menu', 'index.siteMenu'],
+    ['#site-menu-panel a[href="./"]', 'index.currentBouquet'],
+    ['#site-menu-panel a[href="./member/"]', 'index.myGarden'],
+    ['#site-menu-panel a[href="./about/"]', 'index.about'],
+    ['#site-menu-panel a[href="./bouquet-shop/"]', 'index.objects'],
+    ['#site-menu-panel a[href="./downloads/"]', 'index.platforms'],
+    ['#site-menu-panel .site-menu-primary', 'index.favorite'],
+    ['#site-menu-debug-link', 'index.debug'],
+    ['#account-open-title', 'index.gardenTitle'],
+    ['#account-panel-title', accountState ? 'index.accountPanelTitleSigned' : 'index.accountPanelTitleGuest'],
+    ['.collection-header h3', 'index.collection'],
+    ['.reference-copy h3', 'index.referenceTitle'],
+    ['.reference-copy p', 'index.referenceBody'],
+    ['.reference-upload-zone span:last-of-type', 'index.referenceChoose'],
+    ['.reference-note-label span', 'index.referenceNote'],
+    ['#reference-generate-button', 'index.referenceGenerate']
+  ];
+  textBySelector.forEach(([selector, key]) => {
+    const element = document.querySelector<HTMLElement>(selector);
+    if (element) element.textContent = t(key);
+  });
+
+  const tooltipBySelector: Array<[string, string]> = [
+    ['#site-menu-toggle', 'index.siteMenu'],
+    ['#controls-toggle', ui.controls.classList.contains('is-expanded') ? 'view.hide' : 'view.show'],
+    ['#review-dashboard-link', 'index.debug'],
+    ['#today-button', 'view.date'],
+    ['#shuffle-button', 'view.random'],
+    ['#fullscreen-button', 'view.fullscreen'],
+    ['#hand-control-toggle', stopHandControl ? 'view.handOff' : 'view.handOn'],
+    ['#zoom-out-button', 'view.zoomOut'],
+    ['#zoom-in-button', 'view.zoomIn'],
+    ['[data-density-choice="low"]', 'view.densityLow'],
+    ['[data-density-choice="medium"]', 'view.densityMedium'],
+    ['[data-density-choice="high"]', 'view.densityHigh'],
+    ['[data-render-choice="auto"]', 'view.renderAuto'],
+    ['[data-render-choice="low"]', 'view.renderLow'],
+    ['[data-render-choice="medium"]', 'view.renderMedium'],
+    ['[data-render-choice="high"]', 'view.renderHigh'],
+    ['#pause-button', 'view.pause'],
+    ['#rotation-direction-button', 'view.reverse'],
+    ['.slider-shell', 'view.speed'],
+    ['#rotation-preset-button', 'view.preset'],
+    ['#clock-toggle', clockDisplaySource === 'manual' ? 'view.hideClock' : 'view.showClock']
+  ];
+  tooltipBySelector.forEach(([selector, key]) => {
+    const element = document.querySelector<HTMLElement>(selector);
+    if (!element) return;
+    const value = t(key);
+    element.dataset.tooltip = value;
+    element.setAttribute('title', value);
+    if (element instanceof HTMLButtonElement || element instanceof HTMLAnchorElement) {
+      element.setAttribute('aria-label', value);
+    }
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-density-choice]').forEach((button) => {
+    const choice = button.dataset.densityChoice;
+    button.textContent = choice === 'low' ? '疏' : choice === 'high' ? '密' : '中';
+  });
+  document.querySelectorAll<HTMLElement>('[data-render-choice]').forEach((button) => {
+    const choice = button.dataset.renderChoice;
+    button.textContent = choice === 'auto' ? '自' : choice === 'low' ? '省' : choice === 'medium' ? '清' : '精';
+  });
+  if (referenceNoteInput) referenceNoteInput.placeholder = t('index.referencePlaceholder');
+  if (loginNameInput) loginNameInput.placeholder = t('index.loginNamePlaceholder');
 }
 
 function updateUrl(date: string, seed: string) {
@@ -1094,12 +1165,12 @@ function renderCalendar() {
 
   calendarPanel.innerHTML = `
     <div class="calendar-header">
-      <button class="calendar-nav-button" type="button" data-calendar-nav="-1" aria-label="Previous month">‹</button>
+      <button class="calendar-nav-button" type="button" data-calendar-nav="-1" aria-label="${t('view.previousMonth')}">‹</button>
       <strong>${monthLabel}</strong>
-      <button class="calendar-nav-button" type="button" data-calendar-nav="1" aria-label="Next month" ${canGoNext ? '' : 'disabled aria-disabled="true"'}>›</button>
+      <button class="calendar-nav-button" type="button" data-calendar-nav="1" aria-label="${t('view.nextMonth')}" ${canGoNext ? '' : 'disabled aria-disabled="true"'}>›</button>
     </div>
     <div class="calendar-weekdays" aria-hidden="true">
-      <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+      ${t('view.weekdays').split(',').map((day) => `<span>${day}</span>`).join('')}
     </div>
     <div class="calendar-grid">${dayButtons.join('')}</div>
   `;
@@ -1415,9 +1486,9 @@ controlsToggleButton?.addEventListener('click', () => {
 languageSwitcher?.addEventListener('click', (event) => {
   const target = event.target;
   if (!(target instanceof HTMLButtonElement)) return;
-  const language = target.dataset.language;
-  if (!language || !(language in interfaceCopy)) return;
-  updateInterfaceLanguage(language as InterfaceLanguage);
+  const language = normalizeLocale(target.dataset.language);
+  if (!language) return;
+  updateInterfaceLanguage(language);
   revealUi();
 });
 
@@ -1429,8 +1500,8 @@ pauseButton?.addEventListener('click', () => {
 
 function syncPauseButton(paused: boolean) {
   if (!pauseButton) return;
-  pauseButton.setAttribute('aria-label', paused ? 'Resume rotation' : 'Pause rotation');
-  pauseButton.title = paused ? 'Resume rotation' : 'Pause rotation';
+  pauseButton.setAttribute('aria-label', paused ? t('view.resume') : t('view.pause'));
+  pauseButton.title = paused ? t('view.resume') : t('view.pause');
   pauseButton.innerHTML = paused
     ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>'
     : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" /></svg>';
@@ -1676,8 +1747,8 @@ function syncHandControlToggle() {
   handControlToggle.classList.toggle('is-loading', handControlLoading);
   handControlToggle.disabled = handControlLoading;
   handControlToggle.setAttribute('aria-pressed', String(active));
-  handControlToggle.setAttribute('aria-label', active ? '关闭手势控制' : '开启手势控制');
-  handControlToggle.title = active ? '关闭手势控制' : '开启手势控制';
+  handControlToggle.setAttribute('aria-label', active ? t('view.handOff') : t('view.handOn'));
+  handControlToggle.title = active ? t('view.handOff') : t('view.handOn');
 }
 
 async function enableHandControl() {

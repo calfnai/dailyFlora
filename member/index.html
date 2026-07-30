@@ -1,42 +1,42 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="DailyFlora 个人花园：注册、收藏、上传参考图、生成私人花束记录。" />
-    <title>DailyFlora 个人花园</title>
+    <meta name="description" content="Register, sign in, save bouquets, and create private DailyFlora records on this device." />
+    <title>DailyFlora Member Garden</title>
     <link rel="stylesheet" href="../src/marketing.css" />
   </head>
-  <body>
+  <body data-page="member">
     <div class="page-shell product-shell member-shell">
       <header class="site-header">
-        <a class="brand" href="../" aria-label="DailyFlora 首页"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA</a>
+        <a class="brand" href="../" aria-label="DailyFlora home" data-i18n-aria="common.brandHome"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA</a>
         <nav class="site-nav" aria-label="站点导航">
-          <a href="../">今日花束</a>
-          <a href="./" aria-current="page">我的花园</a>
-          <a href="../about/">关于</a>
-          <a href="../bouquet-shop/">周边与线下</a>
-          <a href="../downloads/">多端入口</a>
+          <a href="../" data-i18n="common.today">Today's bouquet</a>
+          <a href="./" aria-current="page" data-i18n="common.member">My garden</a>
+          <a href="../about/" data-i18n="common.about">About</a>
+          <a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a>
+          <a href="../downloads/" data-i18n="common.platforms">Platforms</a>
         </nav>
       </header>
 
       <main class="garden-app wrap">
         <section class="garden-hero member-hero">
           <div>
-            <p class="eyebrow">DailyFlora ID / Local MVP</p>
-            <h1>我的花园</h1>
+            <p class="eyebrow" data-i18n="member.eyebrow">DailyFlora ID / Local MVP</p>
+            <h1 data-i18n="member.title">My garden</h1>
           </div>
-          <p>这里是注册入口，也是登录后的工作台。现在所有账户、收藏、上传识别和生成记录都只保存在本机；真实 Supabase 账号与跨设备同步未上线前，不伪装成已经完成。</p>
+          <p data-i18n="member.lead">This is the registration entry and the signed-in workspace. For now, accounts and records stay on this device.</p>
         </section>
 
         <section class="garden-grid" aria-label="账户与今日花束">
           <article class="garden-panel garden-panel-main">
             <div class="panel-row">
               <div>
-                <p class="eyebrow">Today’s bouquet</p>
-                <h2>先把今天这束花留下。</h2>
+                <p class="eyebrow" data-i18n="member.todayEyebrow">Today's bouquet</p>
+                <h2 data-i18n="member.todayTitle">Keep today’s bouquet first.</h2>
               </div>
-              <span class="state-pill" id="account-state">未建立</span>
+              <span class="state-pill" id="account-state" data-i18n="member.stateNone">Not created</span>
             </div>
             <div class="member-flower-preview" aria-hidden="true">
               <iframe src="../?preview=1&amp;embed=flower&amp;render=high" title="今日花束纯预览" loading="lazy"></iframe>
@@ -49,68 +49,68 @@
           </article>
 
           <aside class="garden-panel garden-side" id="signup">
-            <span class="state-pill warm">Signup inside member</span>
-            <h2 id="member-name">建立你的花园</h2>
-            <p id="member-email">没有账户时，这里就是注册；有账户时，这里就是身份与状态。</p>
+            <span class="state-pill warm" data-i18n="member.signupPill">Signup inside member</span>
+            <h2 id="member-name" data-i18n="member.signupTitle">Create your garden</h2>
+            <p id="member-email" data-i18n="member.signupBody">Without an account, this is signup.</p>
             <form class="signup-form compact-signup" id="member-signup-form">
-              <div class="field"><label for="member-signup-name">怎么称呼你</label><input id="member-signup-name" name="name" type="text" autocomplete="name" placeholder="例如：小花" required /></div>
-              <div class="field"><label for="member-signup-email">邮箱</label><input id="member-signup-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" required /></div>
-              <button class="button primary" type="submit">建立本机花园 <span class="arrow" aria-hidden="true">→</span></button>
-              <p class="form-note">当前不会保存密码，不会上传资料，不会写入真实数据库。</p>
+              <div class="field"><label for="member-signup-name" data-i18n="member.name">Your name</label><input id="member-signup-name" name="name" type="text" autocomplete="name" placeholder="For example: Flora" data-i18n-placeholder="index.loginNamePlaceholder" required /></div>
+              <div class="field"><label for="member-signup-email" data-i18n="member.email">Email</label><input id="member-signup-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" required /></div>
+              <button class="button primary" type="submit"><span data-i18n="member.create">Create local garden</span> <span class="arrow" aria-hidden="true">→</span></button>
+              <p class="form-note" data-i18n="member.note">No password is stored. Nothing is uploaded.</p>
             </form>
             <div class="member-actions" id="member-actions" hidden>
-              <a class="button primary" href="../">收藏今日花束</a>
-              <button class="button" id="member-logout" type="button">退出本机账户</button>
+              <a class="button primary" href="../" data-i18n="member.favoriteAction">Save today's bouquet</a>
+              <button class="button" id="member-logout" type="button" data-i18n="member.logout">Sign out of local account</button>
             </div>
           </aside>
         </section>
 
         <section class="product-section" aria-labelledby="saved-title">
           <div class="product-section-head">
-            <div><p class="eyebrow">My collection</p><h2 id="saved-title">我的收藏</h2></div>
-            <p>每张收藏都保留日期、seed、flowerPlan 与唯一代码。没有收藏时不虚构数据。</p>
+            <div><p class="eyebrow">My collection</p><h2 id="saved-title" data-i18n="member.collectionTitle">My collection</h2></div>
+            <p data-i18n="member.collectionBody">Each saved bouquet keeps date, seed, flowerPlan, and a unique code.</p>
           </div>
           <div class="saved-list" id="saved-list"></div>
         </section>
 
         <section class="product-section" aria-labelledby="studio-title">
           <div class="product-section-head">
-            <div><p class="eyebrow">Upload to bouquet</p><h2 id="studio-title">上传参考图，生成一份可追踪的私人花束记录。</h2></div>
-            <span class="state-pill">仅本机保存</span>
+            <div><p class="eyebrow" data-i18n="member.studioEyebrow">Upload to bouquet</p><h2 id="studio-title" data-i18n="member.studioTitle">Upload a reference image and create a traceable private bouquet record.</h2></div>
+            <span class="state-pill" data-i18n="member.studioPill">Local only</span>
           </div>
           <div class="member-workbench">
             <article class="garden-panel">
-              <h3>新建定制花束</h3>
-              <p>读取图片平均色与文字偏好，生成一份 mock 方案。旧记录不热修改，点击生成会新增一条带代码的记录。</p>
+              <h3 data-i18n="member.createTitle">Create a custom bouquet</h3>
+              <p data-i18n="member.createBody">Reads average image color and preference text to create a mock plan.</p>
               <label class="member-upload-zone" id="upload-zone">
                 <input id="reference-file" type="file" accept="image/*" />
-                <img id="preview-image" alt="上传参考图预览" />
-                <span><strong>选择一张参考图</strong><small>花束、色彩氛围、局部花材都可以。本机读取，不上传。</small></span>
+                <img id="preview-image" alt="Reference image preview" />
+                <span><strong data-i18n="member.chooseImage">Choose a reference image</strong><small data-i18n="member.chooseHint">Read locally, not uploaded.</small></span>
               </label>
               <div class="form-grid">
-                <label>花束名称<input id="bouquet-name" value="我的清晨花花" maxlength="28" /></label>
-                <label>方向<select id="style-select"><option value="auto">自动判断</option><option value="air">空气感</option><option value="rainbow">彩虹多色</option><option value="fruit">果材/莓果</option><option value="warm">暖色饱满</option></select></label>
+                <label><span data-i18n="member.bouquetName">Bouquet name</span><input id="bouquet-name" value="My morning bouquet" maxlength="28" /></label>
+                <label><span data-i18n="member.direction">Direction</span><select id="style-select"><option value="auto" data-i18n-option="member.auto">Auto</option><option value="air" data-i18n-option="member.air">Airy</option><option value="rainbow" data-i18n-option="member.rainbow">Rainbow color</option><option value="fruit" data-i18n-option="member.fruit">Fruit / berries</option><option value="warm" data-i18n-option="member.warm">Warm and full</option></select></label>
               </div>
-              <label>文字偏好<textarea id="preference-input" maxlength="140">更清透，枝条外扩，不要太满，要有小花和一点果点。</textarea></label>
+              <label><span data-i18n="member.preference">Preference note</span><textarea id="preference-input" maxlength="140">lighter, airy branches, not too full, with small flowers and a few fruit dots.</textarea></label>
               <div class="button-row">
-                <button class="button primary" id="recognize-button" type="button" disabled>识别成方案</button>
-                <button class="button" id="sample-button" type="button">使用示例图感</button>
-                <button class="button" id="reset-button" type="button">清空</button>
+                <button class="button primary" id="recognize-button" type="button" disabled data-i18n="member.recognize">Recognize as plan</button>
+                <button class="button" id="sample-button" type="button" data-i18n="member.sample">Use sample mood</button>
+                <button class="button" id="reset-button" type="button" data-i18n="member.reset">Clear</button>
               </div>
             </article>
 
             <aside class="garden-panel recognition-panel" aria-live="polite">
               <div class="panel-row">
-                <div><p class="eyebrow">Recognition</p><h3 id="result-title">等待上传</h3></div>
-                <span class="state-pill quiet" id="result-status">not ready</span>
+                <div><p class="eyebrow" data-i18n="member.resultEyebrow">Recognition</p><h3 id="result-title" data-i18n="member.waiting">Waiting for upload</h3></div>
+                <span class="state-pill quiet" id="result-status" data-i18n="member.notReady">not ready</span>
               </div>
               <div class="generated-flower" id="generated-flower"></div>
-              <p id="result-summary">上传参考图后，这里会显示主色、花材角色、空间结构、seed 和唯一记录代码。</p>
+              <p id="result-summary" data-i18n="member.resultBody">After upload, color, floral roles, structure, seed, and record code appear here.</p>
               <div class="swatches" id="swatches"></div>
               <div class="chip-list" id="primitive-chips"></div>
               <div class="button-row">
-                <button class="button primary" id="generate-button" type="button" disabled>生成并保存记录</button>
-                <a class="button" id="open-live-link" href="../?theme=dewberry-morning&amp;render=high&amp;density=high" target="_blank" rel="noopener">打开相近花束</a>
+                <button class="button primary" id="generate-button" type="button" disabled data-i18n="member.saveRecord">Generate and save record</button>
+                <a class="button" id="open-live-link" href="../?theme=dewberry-morning&amp;render=high&amp;density=high" target="_blank" rel="noopener" data-i18n="member.openSimilar">Open similar bouquet</a>
               </div>
             </aside>
           </div>
@@ -118,16 +118,16 @@
 
         <section class="product-section" aria-labelledby="history-title">
           <div class="product-section-head">
-            <div><p class="eyebrow">Private records</p><h2 id="history-title">我的已生成花束</h2></div>
-            <p>这组记录是本机 MVP 账本：代码、seed、来源、积分消耗和状态一起保存。</p>
+            <div><p class="eyebrow">Private records</p><h2 id="history-title" data-i18n="member.historyTitle">My generated bouquets</h2></div>
+            <p data-i18n="member.historyBody">This is a local MVP ledger.</p>
           </div>
           <div class="record-grid" id="record-grid"></div>
         </section>
 
         <section class="product-section" aria-labelledby="credit-title">
           <div class="product-section-head">
-            <div><p class="eyebrow">Credits</p><h2 id="credit-title">积分记录先做成账本，不做成噱头。</h2></div>
-            <span class="state-pill quiet">模拟数据</span>
+            <div><p class="eyebrow">Credits</p><h2 id="credit-title" data-i18n="member.creditsTitle">Credits are a ledger first, not a gimmick.</h2></div>
+            <span class="state-pill quiet" data-i18n="member.creditsPill">Mock data</span>
           </div>
           <div class="ledger-list" id="ledger-list"></div>
         </section>
@@ -135,9 +135,9 @@
 
       <footer class="site-footer">
         <div class="footer-main wrap">
-          <p class="footer-statement">喜欢过的花，应该有地方留下。</p>
-          <nav class="footer-col" aria-label="探索"><strong>探索</strong><a href="../">今日花束</a><a href="./">我的花园</a><a href="../about/">关于</a><a href="../bouquet-shop/">周边与线下</a><a href="../downloads/">多端入口</a></nav>
-          <nav class="footer-col" aria-label="系统"><strong>系统</strong><a href="../version.json" data-release-code>读取版本代码…</a><a href="../docs/member-test.html">旧测试页</a><a href="../docs/dev-index.html">开发记录</a></nav>
+          <p class="footer-statement" data-i18n="footer.memberStatement">A flower you loved should have somewhere to stay.</p>
+          <nav class="footer-col" aria-label="Explore"><strong data-i18n="common.explore">Explore</strong><a href="../" data-i18n="common.today">Today's bouquet</a><a href="./" data-i18n="common.member">My garden</a><a href="../about/" data-i18n="common.about">About</a><a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a><a href="../downloads/" data-i18n="common.platforms">Platforms</a></nav>
+          <nav class="footer-col" aria-label="System"><strong data-i18n="common.system">System</strong><a href="../version.json" data-release-code data-i18n="common.version">Read release code...</a><a href="../legal/terms/" data-i18n="legal.termsTitle">Terms of Use</a><a href="../legal/privacy/" data-i18n="legal.privacyTitle">Privacy Policy</a></nav>
         </div>
       </footer>
     </div>
@@ -251,7 +251,7 @@
         $('#member-favorite-count').textContent = String(Array.isArray(favorites) ? favorites.length : 0);
         const list = $('#saved-list');
         if (!Array.isArray(favorites) || favorites.length === 0) {
-          list.innerHTML = '<article class="saved-empty"><strong>还没有收藏</strong><span>回到今日花束，点右上角爱心。第一束花会带着唯一代码出现在这里。</span></article>';
+          list.innerHTML = `<article class="saved-empty"><strong>${window.dailyfloraT?.('member.emptySavedTitle') || 'No saved bouquets yet'}</strong><span>${window.dailyfloraT?.('member.emptySavedBody') || 'Return to today’s bouquet and light the heart.'}</span></article>`;
           return;
         }
         list.innerHTML = favorites.map((favorite) => `<a class="saved-card" href="../?date=${favorite.date || ''}&seed=${encodeURIComponent(favorite.seed || '')}"><span>${favoriteId(favorite)}</span><strong>${favorite.themeName || 'DailyFlora Bouquet'}</strong><small>${favorite.date || '未知日期'} · seed=${favorite.seed || 'unknown'} · ${favorite.flowerPlanName || '生成花束'}</small></a>`).join('');
@@ -273,9 +273,9 @@
         const data = new FormData(event.currentTarget);
         saveJson(accountKey, { name: String(data.get('name')).trim(), email: String(data.get('email')).trim() });
         renderAccount();
-        flash('本机花园已建立。');
+        flash(window.dailyfloraT?.('member.toastCreated') || 'Local garden created.');
       });
-      $('#member-logout').addEventListener('click', () => { localStorage.removeItem(accountKey); renderAccount(); flash('已退出本机账户。'); });
+      $('#member-logout').addEventListener('click', () => { localStorage.removeItem(accountKey); renderAccount(); flash(window.dailyfloraT?.('member.toastLogout') || 'Signed out locally.'); });
       fileInput.addEventListener('change', () => {
         const file = fileInput.files?.[0];
         if (!file) return;
@@ -299,13 +299,15 @@
         records = [next, ...records];
         saveJson(recordsKey, records);
         renderRecords();
-        flash(`已保存 ${next.id}`);
+        flash((window.dailyfloraT?.('member.toastSaved') || 'Saved {id}').replace('{id}', next.id));
       });
+      window.addEventListener('dailyflora:localechange', () => { renderAccount(); renderFavorites(); });
       fetch('../version.json').then((response) => response.ok ? response.json() : null).then((info) => { if (info?.releaseId) document.querySelectorAll('[data-release-code]').forEach((node) => { node.textContent = info.releaseId; }); }).catch(() => {});
       renderMockFlower(['#f2cb62', '#87d486', '#9fc6ff']);
       renderAccount();
       renderFavorites();
       renderRecords();
     </script>
+    <script type="module" src="../src/staticI18n.ts"></script>
   </body>
 </html>
