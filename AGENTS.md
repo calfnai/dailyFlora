@@ -1,5 +1,17 @@
 # DailyFlora collaboration contract
 
+## Repository boundary
+
+- DailyFlora code belongs in `/Users/ziqing/Documents/dailyFlora` or in an
+  explicitly named worktree registered to this repository, such as
+  `/Users/ziqing/.codex/worktrees/*/dailyFlora`.
+- Before any mutation, verify `pwd`, `git rev-parse --show-toplevel`, and
+  `git branch --show-current`; the resolved root must be DailyFlora.
+- Never edit, build, commit, deploy, or create worktrees under PANYAN from a
+  DailyFlora task. PANYAN is a separate project family.
+- If the cwd is a parent container or the Git root is not DailyFlora, keep the
+  task read-only until the exact DailyFlora root is selected.
+
 ## Concurrent tasks
 
 - Every Codex task works in its own `codex/<topic>` branch and its own Git worktree.
