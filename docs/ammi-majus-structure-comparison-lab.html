@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ammi majus 结构对照 LAB</title>
+    <style>
+      :root{color-scheme:dark;--bg:#070806;--panel:#10140d;--line:rgb(246 235 211 / 15%);--text:#f7eddb;--muted:rgb(247 237 219 / 68%);--gold:#f2d98a;--green:#8fc87f;--cyan:#9fd7c7;--blue:#a8c8ff;--bad:#e38b76}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(circle at 15% 0%,rgb(242 217 138 / 10%),transparent 30%),#070806}.shell{width:min(1900px,100%);margin:0 auto;padding:22px}.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:end;margin-bottom:18px;padding:22px;border:1px solid var(--line);border-radius:12px;background:rgb(10 13 8 / 86%)}.eyebrow{margin:0 0 8px;color:var(--gold);font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}h1{margin:0 0 10px;font-size:clamp(32px,5vw,60px);line-height:1;letter-spacing:-.04em}.copy{max-width:112ch;margin:0;color:var(--muted);font-size:14px;line-height:1.65}.stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.stat{padding:8px 11px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px;white-space:nowrap}.references{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}.reference{position:relative;margin:0;min-height:250px;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#0c100a}.reference img{display:block;width:100%;height:300px;object-fit:cover}.reference:nth-child(2) img{object-position:center 34%}.reference figcaption{position:absolute;left:10px;bottom:10px;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:rgb(7 8 6 / 82%);color:var(--text);font-size:11px;line-height:1.4;backdrop-filter:blur(10px)}.stage{position:relative;height:1180px;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,rgb(16 20 13 / 92%),rgb(7 8 6 / 94%))}.stage canvas{position:absolute;inset:0;display:block;width:100%;height:100%}.grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));pointer-events:none}.cell{position:relative;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.cell:nth-child(4n){border-right:0}.cell:nth-child(n+9){border-bottom:0}.label{position:absolute;left:10px;top:9px;z-index:2;max-width:280px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:rgb(7 8 6 / 82%);backdrop-filter:blur(12px)}.label strong{display:block;margin-bottom:3px;font-size:12px}.label span{display:block;color:var(--muted);font-size:10px;line-height:1.4}.bad strong{color:var(--bad)}.good strong{color:var(--green)}.candidate strong{color:var(--cyan)}.density strong{color:var(--blue)}.notes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}.note{padding:12px;border:1px solid var(--line);border-radius:8px;background:rgb(7 8 6 / 62%);color:var(--muted);font-size:12px;line-height:1.55}.note strong{display:block;margin-bottom:4px;color:var(--gold)}@media(max-width:1099px){.hero{grid-template-columns:1fr}.stats{justify-content:flex-start}.references{grid-template-columns:1fr}.reference img{height:auto;max-height:420px;object-fit:contain}.stage{height:4000px}.grid{grid-template-columns:1fr;grid-template-rows:repeat(12,1fr)}.cell{border-right:0}.cell:nth-child(n){border-bottom:1px solid var(--line)}.cell:last-child{border-bottom:0}.notes{grid-template-columns:1fr}}
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">DailyFlora Ammi majus structural comparison</p>
+          <h1>Ammi majus 复伞形结构对照 LAB</h1>
+          <p class="copy">A、B、C 均保留为未通过过程版本。D 不再强调骨架或方向组：72 个更小的小伞簇在中央、中层和外围局部交叠，花与花簇均缩小，白色蕾丝花面成为第一阅读层级。下方同时保留用户提供的三张真实参考图；不接回 25 花总览，不修改其他花型。</p>
+        </div>
+        <div class="stats">
+          <span class="stat">A · 16 thick rays</span>
+          <span class="stat">B · 30 fine rays</span>
+          <span class="stat">C · 30 staggered rays / 5 groups</span>
+          <span class="stat">D · 72 micro umbels / continuous lace</span>
+          <span class="stat">shared canvas</span>
+        </div>
+      </header>
+
+      <section class="references" aria-label="用户提供的 Ammi majus 真实参考图">
+        <figure class="reference"><img src="/docs/assets/ammi-majus-user-reference/reference-top-oblique.png" alt="Ammi majus 顶部斜视真实参考"><figcaption>真实参考 1 · 大量细碎小伞簇组成连续花面</figcaption></figure>
+        <figure class="reference"><img src="/docs/assets/ammi-majus-user-reference/reference-side.png" alt="Ammi majus 侧面真实参考"><figcaption>真实参考 2 · 近平顶至浅拱，伞梗退到花面之后</figcaption></figure>
+        <figure class="reference"><img src="/docs/assets/ammi-majus-user-reference/reference-front-side.png" alt="Ammi majus 正侧面真实参考"><figcaption>真实参考 3 · 细密白色蕾丝层与自然缺口</figcaption></figure>
+      </section>
+
+      <section class="stage" aria-label="Ammi majus current versus rebuilt comparison">
+        <canvas id="ammi-comparison-canvas"></canvas>
+        <div class="grid" aria-hidden="true">
+          <div class="cell bad"><div class="label"><strong>A · 当前错误版 · 正面</strong><span>粗杆先读、花簇彼此孤立</span></div></div>
+          <div class="cell good"><div class="label"><strong>B · 未通过版 · 正面</strong><span>更多细杆，但仍形成大盘边缘</span></div></div>
+          <div class="cell candidate"><div class="label"><strong>C · 未通过版 · 正面</strong><span>方向组与独立大簇仍先读</span></div></div>
+          <div class="cell density"><div class="label"><strong>D · 连续蕾丝版 · 正面</strong><span>微型簇局部交叠，白色花面先读</span></div></div>
+          <div class="cell bad"><div class="label"><strong>A · 当前错误版 · 侧面</strong><span>裸露骨架形成张伞感</span></div></div>
+          <div class="cell good"><div class="label"><strong>B · 未通过版 · 侧面</strong><span>单层花面仍有清楚盘沿</span></div></div>
+          <div class="cell candidate"><div class="label"><strong>C · 未通过版 · 侧面</strong><span>分组冠层仍像结构模型</span></div></div>
+          <div class="cell density"><div class="label"><strong>D · 连续蕾丝版 · 侧面</strong><span>花面具有连续厚度，细杆隐约可见</span></div></div>
+          <div class="cell bad"><div class="label"><strong>A · 当前错误版 · 顶视</strong><span>中心空、外围孤岛与数学放射</span></div></div>
+          <div class="cell good"><div class="label"><strong>B · 未通过版 · 顶视</strong><span>仍能看见单点轮毂与平均射线</span></div></div>
+          <div class="cell candidate"><div class="label"><strong>C · 未通过版 · 顶视</strong><span>仍可读出方向组和独立大簇</span></div></div>
+          <div class="cell density"><div class="label"><strong>D · 连续蕾丝版 · 顶视</strong><span>中心自然填满，微型簇不可逐一数清</span></div></div>
+        </div>
+      </section>
+
+      <div class="notes">
+        <div class="note"><strong>A · 错误假设</strong>16 根半等角粗伞梗承担第一视觉层级；中央空轮毂，外围小伞簇像独立圆环。</div>
+        <div class="note"><strong>B · 未通过假设</strong>虽有 30 根细伞梗和中心覆盖，但仍从近似单点发出，并把小簇安放在近似单层盘面。</div>
+        <div class="note"><strong>C · 未通过假设</strong>30 根伞梗分成 5 个方向组，仍让分组结构和独立大簇承担主要视觉层级。</div>
+        <div class="note"><strong>D · 本轮结构</strong>72 个微型小伞簇，为 C 的 2.4 倍；单簇缩小约 40%–50%，中央和中层重叠更强，一级伞梗进一步弱化。</div>
+      </div>
+    </main>
+    <script type="module" src="/src/ammiMajusStructureComparisonLab.ts"></script>
+  </body>
+</html>

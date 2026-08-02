@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ammi majus E 版参考叠加验收 LAB</title>
+    <style>
+      :root{color-scheme:dark;--bg:#070806;--line:rgb(246 235 211 / 15%);--text:#f7eddb;--muted:rgb(247 237 219 / 68%);--gold:#f2d98a;--green:#94ca83;--cyan:#78e1d1}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(circle at 15% 0%,rgb(242 217 138 / 10%),transparent 30%),#070806}.shell{width:min(1500px,100%);margin:0 auto;padding:22px}.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:end;margin-bottom:16px;padding:22px;border:1px solid var(--line);border-radius:12px;background:rgb(10 13 8 / 88%)}.eyebrow{margin:0 0 8px;color:var(--gold);font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}h1{margin:0 0 10px;font-size:clamp(32px,5vw,58px);line-height:1;letter-spacing:-.04em}.copy{max-width:100ch;margin:0;color:var(--muted);font-size:14px;line-height:1.65}.stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.stat{padding:8px 11px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px;white-space:nowrap}.references{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}.reference{position:relative;margin:0;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#0c100a}.reference img{display:block;width:100%;height:270px;object-fit:cover}.reference:nth-child(2) img{object-position:center 36%}.reference figcaption{position:absolute;left:10px;bottom:10px;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:rgb(7 8 6 / 84%);font-size:11px;line-height:1.4;backdrop-filter:blur(10px)}.stage{position:relative;height:1260px;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,rgb(16 20 13 / 94%),rgb(7 8 6 / 96%))}.stage canvas{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100%;pointer-events:none}.background-grid,.label-grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr))}.background-grid{z-index:0}.label-grid{z-index:2;pointer-events:none}.cell{position:relative;border-right:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}.cell:nth-child(3n){border-right:0}.cell:nth-child(n+7){border-bottom:0}.target-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 38%}.overlay-target{opacity:.5}.difference-target{opacity:.32;filter:grayscale(1) contrast(1.7) brightness(.55)}.label{position:absolute;left:10px;top:9px;max-width:300px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:rgb(7 8 6 / 84%);backdrop-filter:blur(12px)}.label strong{display:block;margin-bottom:3px;color:var(--green);font-size:12px}.label span{display:block;color:var(--muted);font-size:10px;line-height:1.45}.label.reference-label strong{color:var(--gold)}.label.difference-label strong{color:var(--cyan)}.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}.note{padding:12px;border:1px solid var(--line);border-radius:8px;background:rgb(7 8 6 / 64%);color:var(--muted);font-size:12px;line-height:1.55}.note strong{display:block;margin-bottom:4px;color:var(--gold)}@media(max-width:899px){.hero{grid-template-columns:1fr}.stats{justify-content:flex-start}.references{grid-template-columns:1fr}.reference img{height:auto;max-height:420px;object-fit:contain}.stage{height:3780px}.background-grid,.label-grid{grid-template-columns:1fr;grid-template-rows:repeat(9,1fr)}.cell{border-right:0}.cell:nth-child(n){border-bottom:1px solid var(--line)}.cell:last-child{border-bottom:0}.notes{grid-template-columns:1fr}}
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">DailyFlora Ammi majus E reference overlay</p>
+          <h1>Ammi majus E 版参考叠加验收 LAB</h1>
+          <p class="copy">恢复完整植物层级：主茎 → 共同节点 → 38 根细一级伞梗 → 38 个小伞簇 → 不等长二级短梗 → 极小五瓣花。加入 11 条分裂状总苞片。整体使用 InstancedMesh 与 LOD：中远距离读取连续蕾丝花面，close-up 才显示五瓣结构。本页不接回 25 花总览，不修改其他花型。</p>
+        </div>
+        <div class="stats">
+          <span class="stat">E · common node</span>
+          <span class="stat">38 primary rays</span>
+          <span class="stat">12–24 florets / umbel</span>
+          <span class="stat">11 divided bracts</span>
+          <span class="stat">InstancedMesh + LOD</span>
+        </div>
+      </header>
+
+      <section class="references" aria-label="用户锁定的 Ammi majus 参考图">
+        <figure class="reference"><img src="/docs/assets/ammi-majus-user-reference/reference-side.png" alt="单枝侧视参考"><figcaption>主参考 · 单枝侧视：共同节点、细伞梗、浅拱花面与总苞片</figcaption></figure>
+        <figure class="reference"><img src="/docs/assets/ammi-majus-user-reference/reference-top-oblique.png" alt="花序近景参考"><figcaption>主参考 · 花序近景：小伞簇尺寸、密度、重叠与连续花面</figcaption></figure>
+        <figure class="reference"><img src="/docs/assets/ammi-majus-user-reference/reference-front-side.png" alt="松散野外参考"><figcaption>辅助参考 · 松散野外轮廓：自然缺口，不作为主轮廓</figcaption></figure>
+      </section>
+
+      <section class="stage" aria-label="Ammi majus E reference overlay and inspection views">
+        <div class="background-grid" aria-hidden="true">
+          <div class="cell"><img class="target-image" src="/docs/assets/ammi-majus-user-reference/reference-side.png" alt=""></div>
+          <div class="cell"></div>
+          <div class="cell"><img class="target-image overlay-target" src="/docs/assets/ammi-majus-user-reference/reference-side.png" alt=""></div>
+          <div class="cell"><img class="target-image difference-target" src="/docs/assets/ammi-majus-user-reference/reference-side.png" alt=""></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+          <div class="cell"></div>
+        </div>
+        <canvas id="ammi-e-canvas"></canvas>
+        <div class="label-grid" aria-hidden="true">
+          <div class="cell"><div class="label reference-label"><strong>参考图 · 单枝侧视</strong><span>锁定主茎中心、共同节点、花序宽度和浅拱高度</span></div></div>
+          <div class="cell"><div class="label"><strong>E 版 · 同占比侧视</strong><span>与参考图使用相同画面占比和中心对齐</span></div></div>
+          <div class="cell"><div class="label"><strong>50% 透明叠加</strong><span>参考图在下，E 版半透明模型在上</span></div></div>
+          <div class="cell"><div class="label difference-label"><strong>轮廓差异</strong><span>灰色参考图 + 青色 E 版轮廓，检查宽度和花面高度</span></div></div>
+          <div class="cell"><div class="label"><strong>正面</strong><span>连续蕾丝花面先读，边缘细碎但主体连贯</span></div></div>
+          <div class="cell"><div class="label"><strong>侧面</strong><span>共同节点和细伞梗解释花面支撑来源</span></div></div>
+          <div class="cell"><div class="label"><strong>顶视</strong><span>中央无环状空洞，小伞簇局部重叠</span></div></div>
+          <div class="cell"><div class="label"><strong>小伞簇 close-up</strong><span>不等长二级短梗、浅拱面、12–24 朵极小花与花蕾</span></div></div>
+          <div class="cell"><div class="label"><strong>节点与总苞片 close-up</strong><span>自然共同节点、连续一级伞梗基部、11 条分裂状总苞片</span></div></div>
+        </div>
+      </section>
+
+      <div class="notes">
+        <div class="note"><strong>层级恢复</strong>不再使用随机多起点花云。全部 38 根一级伞梗从同一植物性茎顶节点连续发出，每根末端仍保留一个明确小伞簇。</div>
+        <div class="note"><strong>阅读顺序</strong>整体距离使用 LOD 微小花点隐藏花瓣细节；小伞簇局部重叠形成连续花面，伞梗退到侧面与空隙中的第二、第三层级。</div>
+        <div class="note"><strong>验收边界</strong>本页只用于 E 版与用户参考图叠加验收。通过前不接回 realistic-flower-lab，不修改 Hydrangea、Foxtail Lily 或其他花型。</div>
+      </div>
+    </main>
+    <script type="module" src="/src/ammiMajusEApprovalLab.ts"></script>
+  </body>
+</html>
