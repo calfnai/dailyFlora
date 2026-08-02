@@ -144,6 +144,7 @@ const rotationPresets: Array<{
 
 const canvas = document.querySelector<HTMLCanvasElement>('#flora-canvas');
 const hud = document.querySelector<HTMLElement>('#hud');
+const dailyMark = document.querySelector<HTMLElement>('.daily-mark');
 const controls = document.querySelector<HTMLElement>('#controls');
 const controlsToggleButton = document.querySelector<HTMLButtonElement>('#controls-toggle');
 const controlsPanel = document.querySelector<HTMLElement>('#controls-panel');
@@ -265,6 +266,18 @@ const ui = {
   flowerPlanLabel,
   qualityLabel
 };
+
+function syncInterfaceButtonAlignment() {
+  if (document.body.classList.contains('is-special') || window.innerWidth <= 680 || !dailyMark) {
+    ui.controls.style.removeProperty('top');
+    ui.controls.style.removeProperty('bottom');
+    return;
+  }
+  ui.controls.style.top = `${dailyMark.getBoundingClientRect().top}px`;
+  ui.controls.style.bottom = 'auto';
+}
+
+window.requestAnimationFrame(syncInterfaceButtonAlignment);
 
 if (releaseMark) {
   releaseMark.textContent = buildInfo.releaseId;
@@ -1506,7 +1519,7 @@ loginForm?.addEventListener('submit', (event) => {
   }
   const name = loginNameInput?.value.trim() || 'DailyFlora 用户';
   const email = loginEmailInput?.value.trim() || `${name.replace(/\s+/g, '').toLowerCase()}@dailyflora.local`;
-  saveAccountState({ name, email, termsAccepted: true, termsVersion: '0.16.1', termsAcceptedAt: new Date().toISOString() });
+  saveAccountState({ name, email, termsAccepted: true, termsVersion: '0.70', termsAcceptedAt: new Date().toISOString() });
   if (!currentFavorite()) {
     saveFavoriteBouquets([createFavorite(), ...favoriteBouquets]);
   }
@@ -1852,6 +1865,7 @@ window.addEventListener('resize', () => {
     setLabels();
   }
   if (!calendarPanel.hidden) positionCalendarPanel();
+  syncInterfaceButtonAlignment();
 });
 
 ['pointerdown', 'touchstart', 'keydown'].forEach((eventName) => {

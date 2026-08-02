@@ -10,6 +10,7 @@ import {
   setupLocaleSwitcher,
   type Locale
 } from './i18n/index';
+import { legalPageTranslations, privacyJapanRights, type LegalPageName } from './i18n/legalPages';
 
 declare global {
   interface Window {
@@ -86,8 +87,38 @@ function applyLocale(locale: Locale) {
     element.textContent = getTranslation(locale, element.dataset.i18nOption || '');
   });
   setupLocaleSwitcher(document.querySelector<HTMLElement>('.language-switcher'), locale, applyLocale);
+  applyLegalPageLocale(locale);
 
   window.dispatchEvent(new CustomEvent('dailyflora:localechange', { detail: { locale } }));
+}
+
+function applyLegalPageLocale(locale: Locale) {
+  if (!['terms', 'privacy', 'copyright', 'credits'].includes(page)) return;
+  const documentRoot = document.querySelector<HTMLElement>('.legal-document');
+  if (!documentRoot) return;
+  documentRoot.querySelectorAll<HTMLElement>('.legal-language[data-generated-legal-language]').forEach((node) => node.remove());
+  const nativeArticle = Array.from(documentRoot.querySelectorAll<HTMLElement>('.legal-language')).find((node) => node.lang === locale);
+  documentRoot.querySelectorAll<HTMLElement>('.legal-language').forEach((node) => { node.hidden = node !== nativeArticle; });
+  if (nativeArticle) return;
+  const translated = legalPageTranslations[locale]?.[page as LegalPageName];
+  if (!translated) return;
+  const article = document.createElement('article');
+  article.className = 'legal-language';
+  article.lang = locale;
+  article.dataset.generatedLegalLanguage = 'true';
+  article.innerHTML = translated;
+  if (page === 'privacy') {
+    const japan = privacyJapanRights[locale];
+    const rightsSection = Array.from(article.querySelectorAll<HTMLElement>('.legal-section')).find((section) => section.querySelector('h3')?.textContent?.startsWith('5.'));
+    if (japan && rightsSection) {
+      const heading = document.createElement('h4');
+      heading.textContent = japan.title;
+      const body = document.createElement('p');
+      body.textContent = japan.body;
+      rightsSection.append(heading, body);
+    }
+  }
+  documentRoot.append(article);
 }
 
 function markDevLinksHidden() {

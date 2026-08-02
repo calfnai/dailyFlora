@@ -1939,8 +1939,8 @@ body:not(.is-special) .app-shell {
 }
 
 body:not(.is-special) .site-menu {
-  top: max(78px, calc(env(safe-area-inset-top) + 62px));
-  right: max(28px, calc(env(safe-area-inset-right) + 16px));
+  top: max(18px, env(safe-area-inset-top));
+  right: max(18px, env(safe-area-inset-right));
   z-index: 19;
   gap: 8px;
 }
@@ -2706,8 +2706,8 @@ body.is-clock-visible:not(.is-special) .controls.is-expanded .controls-toggle {
   }
 
   body:not(.is-special) .site-menu {
-    top: max(76px, calc(env(safe-area-inset-top) + 60px));
-    right: max(20px, calc(env(safe-area-inset-right) + 8px));
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
   }
 
   body:not(.is-special) .site-menu-toggle {

@@ -2,9 +2,11 @@
 
 > 自 `0.14.10` 起，新增版本记录使用中英文双语。 / Starting with `0.14.10`, all new release notes are written in both Chinese and English.
 
-## 0.16.1 - 2026-08-03 (Acceptance candidate)
+## 0.70 - 2026-08-03 (Major release · Owner accepted)
 
-重写注册版法律文件与第三方署名。 / Rewrote the registered-version legal documents and third-party attributions.
+重大更新定稿：产品已接近正式上线状态。 / Major release finalized: the product is now close to production launch readiness.
+
+- 纳入完整用户端花园与 Admin 管理演示页，并通过同一套本地 mock 数据联动用户、收藏、生成、积分、订单、商品与管理状态。 / Included the complete member garden and Admin management demos, connected through one local mock-data layer for users, favorites, generations, credits, orders, products, and administration states.
 
 - 以账户、收藏、照片本地读取、摄像头手势和未来云端上传边界为事实基础，重写 Terms、Privacy、Copyright 与 Credits。 / Rewrote Terms, Privacy, Copyright, and Credits around the actual account, favorites, local photo reading, camera gesture, and future cloud-upload boundaries.
 - 按中国 PIPL、欧盟 GDPR、美国 FTC/COPPA 与适用州法、日本 APPI 的共同要求补齐目的限制、数据最小化、未成年人、跨境、保存、安全与用户权利说明。 / Added purpose limitation, data minimization, minors, cross-border processing, retention, security, and user-rights language aligned with shared requirements under China PIPL, EU GDPR, U.S. FTC/COPPA and applicable state laws, and Japan APPI.
@@ -13,6 +15,9 @@
 - 将 Privacy 与 Terms 的照片边界改为正式注册版服务器上传口径，补充 Cookie、跨境处理、广告及商业伙伴共享类别，同时保留法定同意与退出机制。 / Revised the Terms and Privacy photo boundary for production registered server uploads, adding cookies, international processing, advertising, and commercial-partner disclosure categories while preserving legally required consent and opt-out controls.
 - 在摄像头手势面板中加入直达 Privacy 摄像头章节的七语言链接。 / Added a seven-language link from the camera-gesture panel directly to the camera section of the Privacy Policy.
 - 在首页与 Member 的实际注册入口加入必须主动勾选的 Terms/Privacy 同意步骤，并记录同意版本与时间；正式页 footer 同步加入 Terms、Privacy、Copyright 与 Credits。 / Added required affirmative Terms/Privacy consent to the actual Home and Member registration entries, recording the accepted version and time; synchronized formal-page footers with Terms, Privacy, Copyright, and Credits.
+- 将四个法律页面改为随站内语言切换显示单一对应正文，并补充西班牙语、法语、葡萄牙语、意大利语与日语版本；Privacy 新增中国、美国、英国、欧盟/欧洲经济区、加拿大及巴西/葡语南美地区权利说明。 / Made all four legal pages display one localized body with the site language switcher, adding Spanish, French, Portuguese, Italian, and Japanese versions; Privacy now includes rights guidance for China, the United States, the United Kingdom, the EU/EEA, Canada, and Brazil/Portuguese-speaking South America.
+- 修复新增 Privacy 译文遗漏日本 APPI 权利段落的问题，确保西、法、葡、意、日版本均包含日本地区权利，日语正文明确列出本国行权范围。 / Fixed the missing Japan APPI rights paragraph in the added Privacy translations, ensuring Spanish, French, Portuguese, Italian, and Japanese versions all include Japan-specific rights and the Japanese text states its domestic rights explicitly.
+- `/how-to-use/` 移除错误的旧 Member UI 截图，并直接补回 Fullscreen 快捷键、完整手势表与 Clock mode 真实功能说明；首页 INDEX 对齐右下与左上框角，折叠 VIEW 的上缘动态对齐左下标题框上缘。 / Removed the incorrect old Member UI screenshot from `/how-to-use/` and restored the Fullscreen shortcut list, full gesture table, and factual Clock mode guide; aligned INDEX with the upper-left and lower-right frame edges and dynamically aligned collapsed VIEW with the top of the lower-left title block.
 
 ## 0.16 - 2026-08-03 (Owner accepted)
 

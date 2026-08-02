@@ -264,7 +264,7 @@
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         if (data.get('termsAccepted') !== 'on') { event.currentTarget.reportValidity(); return; }
-        saveJson(accountKey, { name: String(data.get('name')).trim(), email: String(data.get('email')).trim(), termsAccepted: true, termsVersion: '0.16.1', termsAcceptedAt: new Date().toISOString() });
+        saveJson(accountKey, { name: String(data.get('name')).trim(), email: String(data.get('email')).trim(), termsAccepted: true, termsVersion: '0.70', termsAcceptedAt: new Date().toISOString() });
         renderAccount();
         flash(window.dailyfloraT?.('member.toastCreated') || 'Local garden created.');
       });

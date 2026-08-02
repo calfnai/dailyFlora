@@ -217,6 +217,7 @@ h1, h2, h3, p { margin: 0; }
 }
 .legal-document { display: grid; gap: 56px; max-width: 980px; }
 .legal-language { display: grid; gap: 34px; }
+.legal-language[hidden] { display: none; }
 .legal-language + .legal-language { padding-top: 56px; border-top: 1px solid var(--line); }
 .legal-language > header { display: grid; gap: 10px; }
 .legal-language > header h2 { font-family: var(--serif); font-size: clamp(30px, 4vw, 48px); font-weight: 400; }
