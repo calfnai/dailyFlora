@@ -15,16 +15,6 @@
         <span class="interface-corner interface-corner-bottom"></span>
       </div>
 
-      <nav class="language-switcher" id="language-switcher" aria-label="Language">
-        <button type="button" data-language="en" aria-pressed="true">EN</button>
-        <button type="button" data-language="zh-CN" aria-pressed="false">中</button>
-        <button type="button" data-language="es" aria-pressed="false">ES</button>
-        <button type="button" data-language="fr" aria-pressed="false">FR</button>
-        <button type="button" data-language="pt" aria-pressed="false">PT</button>
-        <button type="button" data-language="it" aria-pressed="false">IT</button>
-        <button type="button" data-language="ja" aria-pressed="false">日</button>
-      </nav>
-
       <section class="hud" id="hud" aria-live="polite">
         <div class="daily-mark">
           <span class="daily-date" id="daily-date"></span>
@@ -38,19 +28,27 @@
       </section>
 
       <nav class="site-menu" id="site-menu" aria-label="DailyFlora site menu">
-        <button class="site-menu-toggle" id="site-menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu-panel" data-tooltip="菜单">
+        <button class="site-menu-toggle" id="site-menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu-panel">
           <svg class="special-legacy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" /></svg>
           <span data-interface-copy="index">INDEX</span>
         </button>
         <div class="site-menu-panel" id="site-menu-panel" hidden>
-          <a href="./">今日花束</a>
+          <a class="site-menu-primary" id="site-menu-favorite-link" href="./member/#signup">收藏这束花</a>
           <a href="./member/">我的花园</a>
           <a href="./about/">关于 DailyFlora</a>
           <a href="./bouquet-shop/">周边与线下</a>
           <a href="./downloads/">多端入口</a>
-          <a class="site-menu-primary" href="./member/#signup">收藏这束花</a>
           <a href="./scifi/">SciFi Flora</a>
           <a id="site-menu-debug-link" href="./docs/aesthetic-review-dashboard.html?debug=1" hidden>审美审核</a>
+          <nav class="language-switcher site-menu-language-switcher" id="language-switcher" aria-label="Language">
+            <button type="button" data-language="en" aria-pressed="true">EN</button>
+            <button type="button" data-language="zh-CN" aria-pressed="false">中</button>
+            <button type="button" data-language="es" aria-pressed="false">ES</button>
+            <button type="button" data-language="fr" aria-pressed="false">FR</button>
+            <button type="button" data-language="pt" aria-pressed="false">PT</button>
+            <button type="button" data-language="it" aria-pressed="false">IT</button>
+            <button type="button" data-language="ja" aria-pressed="false">日</button>
+          </nav>
         </div>
       </nav>
 
@@ -77,6 +75,7 @@
         <form class="login-card" id="login-form">
           <label>怎么称呼你<input id="login-name-input" name="name" type="text" autocomplete="name" placeholder="例如：小花" required /></label>
           <label>邮箱<input id="login-email-input" name="email" type="email" autocomplete="email" placeholder="name@example.com" required /></label>
+          <label class="registration-consent"><input id="login-consent-input" name="termsAccepted" type="checkbox" required /><span><span data-i18n="member.consentPrefix">我已阅读并同意</span> <a href="./legal/terms/" target="_blank" rel="noopener" data-i18n="legal.termsTitle">使用条款</a> <span data-i18n="member.consentAnd">和</span> <a href="./legal/privacy/" target="_blank" rel="noopener" data-i18n="legal.privacyTitle">隐私政策</a>。</span></label>
           <button class="primary-action" type="submit">建立本机花园并收藏</button>
         </form>
         <section class="account-profile profile-card" id="account-profile" hidden>
@@ -173,17 +172,63 @@
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 10.4 3.1 1.8-1 1.7-4.1-2.4V6h2Z" /></svg>
             </button>
             <label class="clock-interval-label" title="Minutes before the clock appears">
-              <span>钟</span>
+              <span data-clock-copy="clockLabel">钟</span>
               <input id="clock-interval" type="number" min="1" max="120" step="1" inputmode="numeric" aria-label="Minutes before automatic clock" />
-              <span>分</span>
+              <span data-clock-copy="clockMinutes">分</span>
             </label>
             <label class="clock-auto-label">
               <input id="clock-auto-enabled" type="checkbox" aria-label="Enable automatic clock" />
-              <span>自动</span>
+              <span data-clock-copy="clockAuto">自动</span>
             </label>
           </div>
+          <button class="view-tutorial-link" id="view-help-button" type="button" data-tutorial-entry="help">?</button>
         </div>
       </nav>
+      <dialog class="inline-tutorial-dialog" id="inline-tutorial-dialog" aria-labelledby="inline-tutorial-title">
+        <button class="inline-tutorial-close" id="inline-tutorial-close" type="button" aria-label="Close">×</button>
+        <p class="eyebrow" id="inline-tutorial-kicker">HOW TO USE</p>
+        <h2 id="inline-tutorial-title"></h2>
+        <nav class="tutorial-mode-switcher" aria-label="Tutorials">
+          <button type="button" data-tutorial-select="fullscreen"></button>
+          <button type="button" data-tutorial-select="gesture"></button>
+          <button type="button" data-tutorial-select="clock"></button>
+        </nav>
+        <p id="inline-tutorial-body"></p>
+        <div class="fullscreen-shortcut-content" id="fullscreen-shortcut-content" hidden>
+          <dl class="shortcut-list">
+            <div><dt><kbd>←</kbd><kbd>→</kbd></dt><dd data-shortcut-copy="dates"></dd></div>
+            <div><dt><kbd>↑</kbd><kbd>↓</kbd></dt><dd data-shortcut-copy="arrowZoom"></dd></div>
+            <div><dt><kbd>+</kbd><kbd>−</kbd></dt><dd data-shortcut-copy="zoom"></dd></div>
+            <div><dt><kbd>R</kbd></dt><dd data-shortcut-copy="random"></dd></div>
+            <div><dt><kbd>0</kbd></dt><dd data-shortcut-copy="reset"></dd></div>
+            <div><dt><kbd>P</kbd></dt><dd data-shortcut-copy="preset"></dd></div>
+            <div><dt><kbd>Space</kbd></dt><dd data-shortcut-copy="rotation"></dd></div>
+            <div><dt><kbd>H</kbd></dt><dd data-shortcut-copy="interface"></dd></div>
+            <div><dt><kbd>F</kbd></dt><dd data-shortcut-copy="fullscreen"></dd></div>
+            <div><dt><kbd>O</kbd></dt><dd data-shortcut-copy="view"></dd></div>
+            <div><dt><kbd>?</kbd></dt><dd data-shortcut-copy="help"></dd></div>
+            <div><dt><kbd>Esc</kbd></dt><dd data-shortcut-copy="escape"></dd></div>
+          </dl>
+          <div class="shortcut-help-actions">
+            <a href="./how-to-use/?tutorial=fullscreen" id="fullscreen-help-more"></a>
+          </div>
+        </div>
+        <div class="gesture-guide-content" id="gesture-guide-content" hidden>
+          <dl class="shortcut-list gesture-guide-list">
+            <div><dt data-gesture-label="index"></dt><dd data-gesture-action="index"></dd></div>
+            <div><dt data-gesture-label="victory"></dt><dd data-gesture-action="victory"></dd></div>
+            <div><dt data-gesture-label="three"></dt><dd data-gesture-action="three"></dd></div>
+            <div><dt data-gesture-label="thumb"></dt><dd data-gesture-action="thumb"></dd></div>
+            <div><dt data-gesture-label="four"></dt><dd data-gesture-action="four"></dd></div>
+            <div><dt data-gesture-label="fist"></dt><dd data-gesture-action="fist"></dd></div>
+            <div><dt data-gesture-label="pinch"></dt><dd data-gesture-action="pinch"></dd></div>
+            <div><dt data-gesture-label="open"></dt><dd data-gesture-action="open"></dd></div>
+            <div><dt data-gesture-label="curled"></dt><dd data-gesture-action="curled"></dd></div>
+            <div><dt data-gesture-label="twoHands"></dt><dd data-gesture-action="twoHands"></dd></div>
+          </dl>
+        </div>
+        <button class="tutorial-acknowledge" id="fullscreen-help-close" type="button"></button>
+      </dialog>
       <aside class="clock-overlay" id="clock-overlay" aria-live="polite" aria-hidden="true">
         <div class="clock-content">
           <p class="clock-time" id="clock-time"></p>
@@ -194,8 +239,8 @@
           </blockquote>
         </div>
       </aside>
+      <p class="clock-exit-hint" id="clock-exit-hint" role="status">press esc to exit clock mode</p>
       <aside class="debug-panel" id="debug-panel" aria-label="Debug rendering stats" hidden></aside>
-      <a class="release-mark" id="release-mark" href="./version.json" target="_blank" rel="noopener" aria-label="Open exact build version"></a>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>

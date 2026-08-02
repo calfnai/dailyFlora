@@ -17,65 +17,138 @@
           <a href="./" aria-current="page" data-i18n="common.about">About</a>
           <a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a>
           <a href="../downloads/" data-i18n="common.platforms">Platforms</a>
+          <a href="../scifi/" data-i18n="common.scifi">SciFi Flora</a>
         </nav>
       </header>
 
-      <main>
+      <main class="about-story about-page">
         <section class="about-hero wrap">
           <div class="hero-copy">
-            <p class="eyebrow" data-i18n="about.eyebrow">A BOUQUET FOR EVERY DAY</p>
-            <h1 class="display" data-i18n="about.title">Where dates meet flowers.</h1>
-            <p class="lead" data-i18n="about.lead">In the dark, a bouquet slowly takes form. DailyFlora lets each date become a seed.</p>
-            <div class="button-row">
-              <a class="button primary" href="../"><span data-i18n="about.primary">See today's flower</span><span class="arrow" aria-hidden="true">↗</span></a>
-              <a class="button" href="../member/#signup" data-i18n="about.secondary">Keep a day in bloom</a>
-            </div>
+            <p class="eyebrow"><span data-i18n="aboutStory.hero.about">About</span><span data-i18n="aboutStory.hero.meta">DailyFlora · 2026</span></p>
+            <h1 class="display" data-i18n-html="aboutStory.hero.title">A BOUQUET<br />FOR EVERY <em>DAY</em></h1>
+            <p class="lead" data-i18n="aboutStory.hero.tagline">Where dates meet flowers.</p>
+            <a class="story-link" href="#bouquet"><span data-i18n="aboutStory.hero.read">Read the story</span> <span aria-hidden="true">↓</span></a>
           </div>
-          <figure class="live-frame" aria-label="今日 DailyFlora 实时花束">
-            <iframe src="../?preview=1&amp;embed=flower&amp;render=high" title="今日生成花束纯预览" loading="eager"></iframe>
-            <figcaption class="frame-caption"><strong data-i18n="about.captionTitle">Growing today</strong><span data-i18n="about.captionBody">A live bouquet shaped by date and floral rules</span></figcaption>
+          <figure class="live-frame" aria-label="Today's DailyFlora bouquet" data-i18n-aria="aboutStory.aria.todayBouquet">
+            <iframe src="../?preview=1&amp;render=high&amp;lang=en" title="Today's generated bouquet" data-i18n-aria="aboutStory.aria.todayFrame" data-about-frame loading="eager"></iframe>
+            <figcaption class="frame-caption"><strong data-i18n="aboutStory.hero.today">Today</strong><span data-i18n="aboutStory.hero.caption">A bouquet, growing in real time</span></figcaption>
           </figure>
+          <p class="hero-date" aria-hidden="true">EVERY<br />DAY</p>
         </section>
 
-        <section class="manifesto wrap">
-          <div class="manifesto-grid">
-            <div><p class="eyebrow" data-i18n="about.manifestoEyebrow">Why it exists</p></div>
-            <div class="prose">
-              <h2 data-i18n="about.manifestoTitle">A screen can hold a sign of life, not only a task.</h2>
-              <p data-i18n="about.manifestoP1">DailyFlora began with a simple wish.</p>
-              <p data-i18n="about.manifestoP2">It turns floral color, outline, density, branch lines, and air into evolving rules.</p>
-              <p class="pullquote" data-i18n="about.quote">This is not an image you need to finish.</p>
+        <section class="about-opening wrap" id="bouquet">
+          <header class="chapter-head">
+            <span class="chapter-number">01</span>
+            <p class="eyebrow" data-i18n="aboutStory.opening.label">A bouquet for every day</p>
+          </header>
+          <div class="opening-copy">
+            <p class="opening-line" data-i18n="aboutStory.opening.line">Out of the dark, a bouquet slowly takes shape.</p>
+            <div class="opening-stanza">
+              <p data-i18n-html="aboutStory.opening.watch">It does not ask what you are doing.<br />It does not ask to be watched.</p>
+              <p class="arrival" data-i18n="aboutStory.opening.arrives">It simply arrives.</p>
+            </div>
+            <p class="colour-line" data-i18n-html="aboutStory.opening.colour">Every day carries its own <em>colour.</em></p>
+            <div class="day-notes" aria-label="Three atmospheres of a day" data-i18n-aria="aboutStory.aria.atmospheres">
+              <p><span class="day-dot day-dot-sun" aria-hidden="true"></span><span data-i18n-html="aboutStory.opening.bright">Some open brightly,<br />like a morning greeting.</span></p>
+              <p><span class="day-dot day-dot-leaf" aria-hidden="true"></span><span data-i18n-html="aboutStory.opening.quiet">Some lean quietly,<br />like the air after rain.</span></p>
+              <p><span class="day-dot day-dot-white" aria-hidden="true"></span><span data-i18n-html="aboutStory.opening.white">Some remain almost white,<br />as though nothing needs to be said.</span></p>
+            </div>
+            <div class="depth-note">
+              <p data-i18n="aboutStory.opening.depth">They emerge from the depth of black.</p>
+              <p data-i18n-html="aboutStory.opening.light">Light rests upon the petals.<br />A trace of wind remains between the leaves.</p>
             </div>
           </div>
         </section>
 
-        <section class="principles wrap">
-          <p class="eyebrow" data-i18n="about.principlesEyebrow">What guides it</p>
-          <h2 class="section-title" data-i18n="about.principlesTitle">The work is not about having more flowers.</h2>
-          <div class="principle-list">
-            <article class="principle"><span class="principle-index">01</span><h3 data-i18n="about.p1Title">Different each day, still recognizable</h3><p data-i18n="about.p1Body">Generation brings surprise; aesthetic rules keep the edges.</p></article>
-            <article class="principle"><span class="principle-index">02</span><h3 data-i18n="about.p2Title">Let air become part of the bouquet</h3><p data-i18n="about.p2Body">Color lives through small rhythms and room between stems.</p></article>
-            <article class="principle"><span class="principle-index">03</span><h3 data-i18n="about.p3Title">Lighter, then longer</h3><p data-i18n="about.p3Body">The project starts in the browser.</p></article>
+        <section class="about-window" id="window">
+          <div class="window-visual" aria-hidden="true"><span class="window-orbit"></span><span class="window-seed">24H</span></div>
+          <div class="window-copy">
+            <header class="chapter-head">
+              <span class="chapter-number">02</span>
+              <p class="eyebrow" data-i18n="aboutStory.window.label">A window within the day</p>
+            </header>
+            <h2 data-i18n="aboutStory.window.title">This is not an image that needs to be finished.</h2>
+            <p data-i18n="aboutStory.window.calendar">It is a window opened onto one page of the calendar.</p>
+            <p data-i18n-html="aboutStory.window.remains">When you pass by, it is there.<br />When you turn away, it remains.</p>
+            <div class="window-time">
+              <p data-i18n="aboutStory.window.mac">On Mac, the bouquet can continue to move gently with the passing hours.</p>
+              <p class="time-statement" data-i18n-html="aboutStory.window.time">Time no longer sits apart from the flowers.<br /><em>It flows quietly through them.</em></p>
+            </div>
           </div>
         </section>
 
-        <section class="team wrap">
-          <div class="team-head">
-            <div><p class="eyebrow" data-i18n="about.teamEyebrow">Made by a small studio</p><h2 class="section-title" data-i18n="about.teamTitle">Human-led, AI-assisted.</h2></div>
-            <p data-i18n="about.teamBody">DailyFlora is an independent project in progress.</p>
+        <section class="about-keep wrap" id="keep">
+          <header class="chapter-head">
+            <span class="chapter-number">03</span>
+            <p class="eyebrow" data-i18n="aboutStory.keep.label">Keep a day in bloom</p>
+          </header>
+          <div class="keep-grid">
+            <h2 data-i18n-html="aboutStory.keep.title">Some flowers ask to be seen <em>again.</em></h2>
+            <div class="keep-copy">
+              <p class="keep-intro" data-i18n="aboutStory.keep.intro">So you keep them.</p>
+              <p data-i18n-html="aboutStory.keep.garden">Your personal garden is not made for display.<br />It grows from the moments that made you pause.</p>
+              <p data-i18n-html="aboutStory.keep.date">One bouquet belongs to one date.<br />One date carries one atmosphere.</p>
+              <p data-i18n="aboutStory.keep.return">When you return, something of that day is still there.</p>
+            </div>
           </div>
-          <div class="team-grid">
-            <article class="person-card"><div><div class="person-monogram" aria-hidden="true">DF</div><h3 data-i18n="about.founderTitle">Founder</h3><p class="person-role" data-i18n="about.founderRole">CALFN LAU · Creative Direction</p><p data-i18n="about.founderBody">Defines the product concept and final expression.</p></div><span class="person-meta">Human authored · Human approved</span></article>
-            <article class="person-card"><div><div class="person-monogram" aria-hidden="true">CX</div><h3 data-i18n="about.codexTitle">Codex collaboration</h3><p class="person-role" data-i18n="about.codexRole">AI Development Collaborator</p><p data-i18n="about.codexBody">Helps turn ideas into working web interfaces.</p></div><span class="person-meta">AI assisted · Transparently credited</span></article>
+          <div class="memory-notes" aria-label="What remains from a day" data-i18n-aria="aboutStory.aria.memories">
+            <p><span>01</span><b data-i18n="aboutStory.keep.colour">The colour.</b></p>
+            <p><span>02</span><b data-i18n="aboutStory.keep.stillness">The stillness.</b></p>
+            <p><span>03</span><b data-i18n-html="aboutStory.keep.temperature">The temperature<br />of the moment.</b></p>
           </div>
         </section>
 
-        <section class="legal-strip">
-          <div class="legal-grid wrap">
-            <h2 data-i18n="about.legalTitle">Code and references</h2>
-            <div class="legal-copy">
-              <p data-i18n="about.legalP1">DailyFlora is an independent creative project.</p>
-              <p data-i18n="about.legalP2">The project uses open-source software such as Three.js under their original licenses.</p>
+        <section class="about-grow wrap" id="grow">
+          <header class="chapter-head">
+            <span class="chapter-number">04</span>
+            <p class="eyebrow" data-i18n="aboutStory.grow.label">Grow one of your own</p>
+          </header>
+          <div class="grow-intro">
+            <h2 data-i18n="aboutStory.grow.title">You may also create a bouquet for a day, a person, or a memory that has not yet found its name.</h2>
+            <p data-i18n="aboutStory.grow.begin">Begin with</p>
+          </div>
+          <div class="seed-words" aria-label="The seeds of a bouquet" data-i18n-aria="aboutStory.aria.seeds">
+            <span data-i18n="aboutStory.grow.image">An image.</span>
+            <span data-i18n="aboutStory.grow.feeling">A feeling.</span>
+            <span data-i18n="aboutStory.grow.sentence">A sentence.</span>
+          </div>
+          <p class="seed-line" data-i18n="aboutStory.grow.seed">Let them become the seed.</p>
+          <div class="grow-ending">
+            <p data-i18n="aboutStory.grow.form">The bouquet grows from there, taking on its own form, rhythm and character.</p>
+            <p data-i18n="aboutStory.grow.share">You can keep it, shape it, return to it and share it with someone else.</p>
+          </div>
+        </section>
+
+        <section class="about-bloom" id="bloom">
+          <div class="bloom-inner wrap">
+            <header class="chapter-head">
+              <span class="chapter-number">05</span>
+              <p class="eyebrow" data-i18n="aboutStory.bloom.label">A daily digital bloom</p>
+            </header>
+            <h2 data-i18n-html="aboutStory.bloom.title">Made to live <em>quietly</em><br />within everyday space.</h2>
+            <div class="bloom-copy">
+              <p data-i18n="aboutStory.bloom.experience">DailyFlora is a digital art experience made to live quietly within everyday space.</p>
+              <p data-i18n="aboutStory.bloom.attention">Not as another object asking for attention.</p>
+              <p class="remains" data-i18n="aboutStory.bloom.remains">As a bouquet that remains.</p>
+              <p data-i18n="aboutStory.bloom.presence">A small presence beside your books, your music, your work and the things you have chosen to keep close.</p>
+            </div>
+            <p class="bloom-final" data-i18n-html="aboutStory.bloom.final">Every day brings a new flower.<br /><em>Some days, however,<br />you may want to leave in bloom.</em></p>
+          </div>
+        </section>
+
+        <section class="about-creator wrap" id="creator">
+          <header class="chapter-head">
+            <span class="chapter-number">06</span>
+            <p class="eyebrow" data-i18n="aboutStory.creator.label">Created by Calfn Lau</p>
+          </header>
+          <div class="creator-grid">
+            <h2>CALFN<br /><em>LAU</em></h2>
+            <div class="creator-copy">
+              <p data-i18n-html="aboutStory.creator.body">DailyFlora is created and directed by <strong>CALFN LAU</strong>.</p>
+              <p data-i18n="aboutStory.creator.contact">For collaborations, exhibitions, licensing, media enquiries or related conversations:</p>
+              <a class="creator-email" href="mailto:find@calfn.com">find@calfn.com <span aria-hidden="true">↗</span></a>
+              <p class="creator-legal" data-i18n-html="aboutStory.creator.legal">Terms of Use · Privacy Policy<br />Credits &amp; Attributions · Copyright Notice</p>
+              <p class="creator-rights" data-i18n="aboutStory.creator.rights">© 2026 CALFN LAU. All rights reserved.</p>
             </div>
           </div>
         </section>
@@ -84,8 +157,8 @@
       <footer class="site-footer">
         <div class="footer-main wrap">
           <p class="footer-statement"><span data-i18n="footer.statement">One bouquet a day. No need to possess it.</span><br /><span data-i18n="footer.aboutStatement">Come back tomorrow and see how the flower changes.</span></p>
-          <nav class="footer-col" aria-label="Explore"><strong data-i18n="common.explore">Explore</strong><a href="../" data-i18n="common.today">Today's bouquet</a><a href="../member/" data-i18n="common.member">My garden</a><a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a><a href="../downloads/" data-i18n="common.platforms">Platforms</a></nav>
-          <nav class="footer-col" aria-label="System"><strong data-i18n="common.system">System</strong><a href="../version.json" data-release-code data-i18n="common.version">Read release code...</a><a href="../legal/terms/" data-i18n="legal.termsTitle">Terms of Use</a><a href="../legal/privacy/" data-i18n="legal.privacyTitle">Privacy Policy</a><a href="../legal/credits/" data-i18n="legal.creditsTitle">Credits & Attributions</a></nav>
+          <nav class="footer-col" aria-label="Explore"><strong data-i18n="common.explore">Explore</strong><a href="../" data-i18n="common.today">Today's bouquet</a><a href="../member/" data-i18n="common.member">My garden</a><a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a><a href="../downloads/" data-i18n="common.platforms">Platforms</a><a href="../scifi/" data-i18n="common.scifi">SciFi Flora</a><a href="../how-to-use/" data-i18n="tutorial.title">How to use</a></nav>
+          <nav class="footer-col" aria-label="System"><strong data-i18n="common.system">System</strong><a href="../version.json" data-release-code data-i18n="common.version">Read release code...</a><a href="../legal/terms/" data-i18n="legal.termsTitle">Terms of Use</a><a href="../legal/privacy/" data-i18n="legal.privacyTitle">Privacy Policy</a><a href="../legal/copyright/" data-i18n="legal.copyrightTitle">Copyright</a><a href="../legal/credits/" data-i18n="legal.creditsTitle">Credits & Attributions</a></nav>
         </div>
         <div class="footer-bottom wrap"><span data-i18n="common.copyright">© 2026 CALFN LAU. All rights reserved.</span><span>DailyFlora</span></div>
       </footer>

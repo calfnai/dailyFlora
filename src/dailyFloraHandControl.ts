@@ -17,6 +17,8 @@ export type DailyFloraHandActions = {
   zoomBy: (delta: number) => void;
 };
 
+const handT = (key: string, fallback: string) => typeof window !== 'undefined' ? window.dailyfloraT?.(`hand.${key}`) || fallback : fallback;
+
 export function createDailyFloraActionRouter(
   actions: DailyFloraHandActions,
   onOutput: (message: string) => void = () => undefined
@@ -31,7 +33,7 @@ export function createDailyFloraActionRouter(
       else if (action.pose === 'thumb_up') {
         automaticCameraEnabled = !automaticCameraEnabled;
         actions.setAutomaticCameraEnabled(automaticCameraEnabled);
-        onOutput(`AUTO CAMERA · ${automaticCameraEnabled ? 'ON' : 'OFF'}`);
+        onOutput(`${handT('autoCamera', 'Automatic camera')} · ${handT(automaticCameraEnabled ? 'on' : 'off', automaticCameraEnabled ? 'ON' : 'OFF')}`);
       } else if (action.pose === 'four_up') actions.toggleImmersive();
       return;
     }
@@ -49,16 +51,16 @@ export function createDailyFloraActionRouter(
 
 const outputLabel = (action: HandControlAction) => {
   if (action.type === 'pose') {
-    const label = action.pose === 'thumb_up' ? '👍 THUMB UP'
-      : action.pose === 'fist' ? '✊ BRAKE'
-        : action.pose === 'pointing_up' ? '☝ POINTING'
-          : action.pose === 'victory' ? '✌ VICTORY'
-            : action.pose === 'three_up' ? '3F THREE UP' : '4F FOUR UP';
-    return `${action.hand.toUpperCase()} · ${label}`;
+    const label = action.pose === 'thumb_up' ? `👍 ${handT('poseThumb', 'Thumb up')}`
+      : action.pose === 'fist' ? `✊ ${handT('brake', 'Brake')}`
+        : action.pose === 'pointing_up' ? `☝ ${handT('posePoint', 'Pointing')}`
+          : action.pose === 'victory' ? `✌ ${handT('poseVictory', 'Victory')}`
+            : action.pose === 'three_up' ? handT('poseThree', 'Three fingers') : handT('poseFour', 'Four fingers');
+    return `${handT(action.hand === 'right' ? 'rightHand' : 'leftHand', action.hand.toUpperCase())} · ${label}`;
   }
-  if (action.type === 'move_xy') return `XY · ${action.deltaX.toFixed(3)}, ${action.deltaY.toFixed(3)}`;
-  if (action.type === 'rotate') return `ROTATE · ${action.deltaYaw.toFixed(3)}, ${action.deltaPitch.toFixed(3)}`;
-  return `${action.source.toUpperCase()} ZOOM · ${action.delta.toFixed(3)}`;
+  if (action.type === 'move_xy') return `${handT('move', 'Move')} XY · ${action.deltaX.toFixed(3)}, ${action.deltaY.toFixed(3)}`;
+  if (action.type === 'rotate') return `${handT('rotate', 'Rotate')} · ${action.deltaYaw.toFixed(3)}, ${action.deltaPitch.toFixed(3)}`;
+  return `${handT(action.source, action.source.toUpperCase())} ${handT('zoom', 'Zoom')} · ${action.delta.toFixed(3)}`;
 };
 
 export function bindHandControlKeyboard(actions: DailyFloraHandActions) {
@@ -103,7 +105,7 @@ export function startDailyFloraHandControl(actions: DailyFloraHandActions) {
     setSwapHandedness: (enabled) => {
       tracker.setSwapHandedness(enabled);
       interpreter.reset();
-      monitor.setOutput(`左右手校正 · ${enabled ? 'ON' : 'OFF'}`);
+      monitor.setOutput(`${handT('swapLabel', 'Left/right correction')} · ${handT(enabled ? 'on' : 'off', enabled ? 'ON' : 'OFF')}`);
     }
   });
   const unbindKeyboard = bindHandControlKeyboard(actions);

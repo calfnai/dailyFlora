@@ -9,6 +9,13 @@ import {
   sciFiPaletteOrder,
   sciFiPalettePresets
 } from './scifiBouquets';
+import {
+  detectInitialLocale,
+  formatTranslation,
+  saveLocale,
+  setupLocaleSwitcher,
+  type Locale
+} from './i18n/index';
 
 function required<T extends Element>(selector: string) {
   const element = document.querySelector<T>(selector);
@@ -32,6 +39,36 @@ const fullscreenButton = required<HTMLButtonElement>('#fullscreen-button');
 const paletteToggle = required<HTMLButtonElement>('#palette-toggle');
 const palettePanel = required<HTMLElement>('#palette-panel');
 const paletteOptions = required<HTMLElement>('#palette-options');
+const indexMenu = required<HTMLElement>('#scifi-index-menu');
+const indexToggle = required<HTMLButtonElement>('#scifi-index-toggle');
+const indexPanel = required<HTMLElement>('#scifi-index-panel');
+const viewToggle = required<HTMLButtonElement>('#scifi-view-toggle');
+const viewPanel = required<HTMLElement>('#scifi-view-panel');
+const zoomOutButton = required<HTMLButtonElement>('#zoom-out-button');
+const zoomInButton = required<HTMLButtonElement>('#zoom-in-button');
+const languageSwitcher = required<HTMLElement>('#scifi-language-switcher');
+
+const sciFiCopy: Record<Locale, {
+  index: string;
+  view: string;
+  close: string;
+  palette: string;
+  rotate: string;
+  stopRotate: string;
+  fullscreen: string;
+  zoomOut: string;
+  zoomIn: string;
+  random: string;
+}> = {
+  en: { index: 'INDEX', view: 'VIEW', close: 'CLOSE', palette: 'PALETTE', rotate: 'ROTATE', stopRotate: 'STOP', fullscreen: 'FULLSCREEN', zoomOut: 'Zoom out', zoomIn: 'Zoom in', random: 'ANOTHER' },
+  'zh-CN': { index: '索引', view: '观看', close: '收起', palette: '调色', rotate: '旋转', stopRotate: '停止', fullscreen: '全屏', zoomOut: '拉远', zoomIn: '拉近', random: '换一束' },
+  es: { index: 'ÍNDICE', view: 'VISTA', close: 'CERRAR', palette: 'PALETA', rotate: 'GIRAR', stopRotate: 'PARAR', fullscreen: 'PANTALLA', zoomOut: 'Alejar', zoomIn: 'Acercar', random: 'OTRO' },
+  fr: { index: 'INDEX', view: 'VUE', close: 'FERMER', palette: 'PALETTE', rotate: 'TOURNER', stopRotate: 'ARRÊTER', fullscreen: 'PLEIN ÉCRAN', zoomOut: 'Éloigner', zoomIn: 'Rapprocher', random: 'AUTRE' },
+  pt: { index: 'ÍNDICE', view: 'VISTA', close: 'FECHAR', palette: 'PALETA', rotate: 'GIRAR', stopRotate: 'PARAR', fullscreen: 'TELA CHEIA', zoomOut: 'Afastar', zoomIn: 'Aproximar', random: 'OUTRO' },
+  it: { index: 'INDICE', view: 'VISTA', close: 'CHIUDI', palette: 'PALETTE', rotate: 'RUOTA', stopRotate: 'FERMA', fullscreen: 'SCHERMO', zoomOut: 'Allontana', zoomIn: 'Avvicina', random: 'ALTRO' },
+  ja: { index: 'INDEX', view: 'VIEW', close: '閉じる', palette: '配色', rotate: '回転', stopRotate: '停止', fullscreen: '全画面', zoomOut: '引く', zoomIn: '寄る', random: '別の花' }
+};
+let activeLocale = detectInitialLocale();
 
 const params = new URLSearchParams(window.location.search);
 const initialBouquetId = params.get('bouquet');
@@ -156,10 +193,47 @@ function togglePalettePanel(force?: boolean) {
   revealChrome();
 }
 
+function toggleIndexPanel(force?: boolean) {
+  const open = force ?? indexPanel.hidden;
+  indexPanel.hidden = !open;
+  indexToggle.setAttribute('aria-expanded', String(open));
+  if (open) toggleViewPanel(false);
+  applySciFiLocale();
+  revealChrome();
+}
+
+function toggleViewPanel(force?: boolean) {
+  const open = force ?? viewPanel.hidden;
+  viewPanel.hidden = !open;
+  viewToggle.setAttribute('aria-expanded', String(open));
+  if (open) toggleIndexPanel(false);
+  applySciFiLocale();
+  revealChrome();
+}
+
+function applySciFiLocale() {
+  const copy = sciFiCopy[activeLocale];
+  document.documentElement.lang = activeLocale;
+  indexToggle.textContent = copy.index;
+  viewToggle.textContent = viewPanel.hidden ? copy.view : copy.close;
+  paletteToggle.textContent = copy.palette;
+  rotateButton.textContent = autoRotate ? copy.stopRotate : copy.rotate;
+  fullscreenButton.textContent = copy.fullscreen;
+  randomButton.textContent = copy.random;
+  zoomOutButton.setAttribute('aria-label', copy.zoomOut);
+  zoomOutButton.title = copy.zoomOut;
+  zoomInButton.setAttribute('aria-label', copy.zoomIn);
+  zoomInButton.title = copy.zoomIn;
+  document.querySelectorAll<HTMLElement>('[data-scifi-nav]').forEach((link) => {
+    const key = link.dataset.scifiNav;
+    if (key) link.textContent = formatTranslation(activeLocale, `common.${key}`);
+  });
+}
+
 function revealChrome() {
   viewer.classList.remove('is-idle');
   window.clearTimeout(idleTimer);
-  if (!palettePanel.hidden || dragging) return;
+  if (!palettePanel.hidden || !indexPanel.hidden || !viewPanel.hidden || dragging) return;
   idleTimer = window.setTimeout(() => viewer.classList.add('is-idle'), 4200);
 }
 
@@ -200,9 +274,20 @@ randomButton.addEventListener('click', () => {
 rotateButton.addEventListener('click', () => {
   autoRotate = !autoRotate;
   rotateButton.setAttribute('aria-pressed', String(autoRotate));
+  applySciFiLocale();
   revealChrome();
 });
 paletteToggle.addEventListener('click', () => togglePalettePanel());
+indexToggle.addEventListener('click', () => toggleIndexPanel());
+viewToggle.addEventListener('click', () => toggleViewPanel());
+zoomOutButton.addEventListener('click', () => {
+  zoom = THREE.MathUtils.clamp(zoom + 0.3, 3.35, 6.2);
+  revealChrome();
+});
+zoomInButton.addEventListener('click', () => {
+  zoom = THREE.MathUtils.clamp(zoom - 0.3, 3.35, 6.2);
+  revealChrome();
+});
 fullscreenButton.addEventListener('click', async () => {
   if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
   else await document.exitFullscreen();
@@ -244,7 +329,17 @@ window.addEventListener('keydown', (event) => {
     rotateButton.click();
   }
   if (event.key.toLowerCase() === 'f') fullscreenButton.click();
-  if (event.key === 'Escape' && !palettePanel.hidden) togglePalettePanel(false);
+  if (event.key.toLowerCase() === 'o') toggleViewPanel();
+  if (event.key === 'Escape') {
+    if (!palettePanel.hidden) togglePalettePanel(false);
+    if (!indexPanel.hidden) toggleIndexPanel(false);
+    if (!viewPanel.hidden) toggleViewPanel(false);
+  }
+});
+document.addEventListener('pointerdown', (event) => {
+  const target = event.target;
+  if (!(target instanceof Node)) return;
+  if (!indexPanel.hidden && !indexMenu.contains(target)) toggleIndexPanel(false);
 });
 ['pointermove', 'touchstart', 'focusin'].forEach((eventName) => window.addEventListener(eventName, revealChrome, { passive: true }));
 window.addEventListener('resize', () => { resize(); revealChrome(); });
@@ -252,6 +347,12 @@ window.addEventListener('beforeunload', () => disposeSciFiBouquet(model));
 
 renderPaletteOptions();
 rotateButton.setAttribute('aria-pressed', String(autoRotate));
+setupLocaleSwitcher(languageSwitcher, activeLocale, (locale) => {
+  activeLocale = locale;
+  saveLocale(locale);
+  applySciFiLocale();
+});
+applySciFiLocale();
 resize();
 rebuildModel();
 revealChrome();

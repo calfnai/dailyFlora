@@ -12,6 +12,7 @@ type IdleClockCallbacks = {
 
 const minIntervalMinutes = 1;
 const maxIntervalMinutes = 120;
+const pointerDismissDistance = 28;
 
 export function normalizeClockInterval(value: number) {
   if (!Number.isFinite(value)) return 5;
@@ -22,6 +23,7 @@ export class IdleClockController {
   private settings: IdleClockSettings;
   private timer = 0;
   private visibleSource: ClockDisplaySource | null = null;
+  private pointerReference: { x: number; y: number } | null = null;
 
   constructor(initialSettings: IdleClockSettings, private readonly callbacks: IdleClockCallbacks) {
     this.settings = { ...initialSettings, intervalMinutes: normalizeClockInterval(initialSettings.intervalMinutes) };
@@ -53,6 +55,24 @@ export class IdleClockController {
     this.schedule();
   }
 
+  notePointerMove(x: number, y: number) {
+    if (this.visibleSource !== 'auto') {
+      this.pointerReference = { x, y };
+      this.schedule();
+      return;
+    }
+    if (!this.pointerReference) {
+      this.pointerReference = { x, y };
+      return;
+    }
+    const distance = Math.hypot(x - this.pointerReference.x, y - this.pointerReference.y);
+    if (distance >= pointerDismissDistance) this.hide();
+  }
+
+  resetPointerReference() {
+    this.pointerReference = null;
+  }
+
   toggleManual() {
     if (this.visibleSource === 'manual') {
       this.hide();
@@ -78,6 +98,7 @@ export class IdleClockController {
   private hide() {
     if (!this.visibleSource) return;
     this.visibleSource = null;
+    this.pointerReference = null;
     this.callbacks.onHide();
   }
 }
