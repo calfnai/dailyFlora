@@ -55,6 +55,7 @@
             <form class="signup-form compact-signup" id="member-signup-form">
               <div class="field"><label for="member-signup-name" data-i18n="member.name">Your name</label><input id="member-signup-name" name="name" type="text" autocomplete="name" placeholder="For example: Flora" data-i18n-placeholder="index.loginNamePlaceholder" required /></div>
               <div class="field"><label for="member-signup-email" data-i18n="member.email">Email</label><input id="member-signup-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" required /></div>
+              <div class="field"><label for="member-signup-password">Password</label><input id="member-signup-password" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" /></div>
               <label class="consent registration-consent"><input name="termsAccepted" type="checkbox" required /><span><span data-i18n="member.consentPrefix">I have read and agree to the</span> <a href="../legal/terms/" target="_blank" rel="noopener" data-i18n="legal.termsTitle">Terms of Use</a> <span data-i18n="member.consentAnd">and</span> <a href="../legal/privacy/" target="_blank" rel="noopener" data-i18n="legal.privacyTitle">Privacy Policy</a>.</span></label>
               <button class="button primary" type="submit"><span data-i18n="member.create">Create local garden</span> <span class="arrow" aria-hidden="true">→</span></button>
             </form>
@@ -293,5 +294,6 @@
       renderRecords();
     </script>
     <script type="module" src="../src/staticI18n.ts"></script>
+    <script type="module" src="../src/memberCloud.ts"></script>
   </body>
 </html>

@@ -1,0 +1,18 @@
+{
+  "bsonType": "object",
+  "required": ["email", "passwordHash", "passwordSalt"],
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "properties": {
+    "email": { "bsonType": "string" },
+    "nickname": { "bsonType": "string" },
+    "passwordHash": { "bsonType": "string" },
+    "passwordSalt": { "bsonType": "string" },
+    "termsVersion": { "bsonType": "string" },
+    "termsAcceptedAt": { "bsonType": "date" },
+    "createdAt": { "bsonType": "date" },
+    "updatedAt": { "bsonType": "date" }
+  },
+  "indexes": [
+    { "name": "email_unique", "key": { "email": 1 }, "unique": true }
+  ]
+}

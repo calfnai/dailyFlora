@@ -1,0 +1,6 @@
+{
+  "name": "dailyflora-api",
+  "version": "0.71.1",
+  "main": "index.js",
+  "description": "DailyFlora authentication and private garden API"
+}

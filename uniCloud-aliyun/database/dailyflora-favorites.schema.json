@@ -1,0 +1,23 @@
+{
+  "title": "DailyFlora favorites",
+  "description": "Private bouquet favorites owned by one authenticated user.",
+  "properties": {
+    "userId": { "bsonType": "string", "description": "Owner ID" },
+    "id": { "bsonType": "string", "description": "Stable bouquet favorite ID" },
+    "date": { "bsonType": "string" },
+    "seed": { "bsonType": "string" },
+    "themeId": { "bsonType": "string" },
+    "themeName": { "bsonType": "string" },
+    "themeEnglishName": { "bsonType": "string" },
+    "flowerPlanName": { "bsonType": "string" },
+    "flowers": { "bsonType": "string" },
+    "savedAt": { "bsonType": "string" },
+    "createdAt": { "bsonType": "date" },
+    "updatedAt": { "bsonType": "date" }
+  },
+  "required": ["userId", "id", "date", "seed", "savedAt"],
+  "indexes": [
+    { "name": "userId_savedAt", "keys": { "userId": 1, "savedAt": -1 } },
+    { "name": "userId_id_unique", "keys": { "userId": 1, "id": 1 }, "unique": true }
+  ]
+}

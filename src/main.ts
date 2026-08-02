@@ -10,6 +10,17 @@ import { themes } from './themes';
 import { IdleClockController, normalizeClockInterval, type ClockDisplaySource, type IdleClockSettings } from './idleClock';
 import type { DailyFloraHandActions } from './dailyFloraHandControl';
 import {
+  dailyfloraCloudEnabled,
+  listCloudFavorites,
+  loginAccount,
+  logoutAccount,
+  registerAccount,
+  removeCloudFavorite,
+  restoreAccount,
+  saveCloudFavorite,
+  type CloudFavorite
+} from './dailyfloraCloud';
+import {
   configureDocument,
   detectInitialLocale,
   formatTranslation,
@@ -187,6 +198,7 @@ const accountPanelTitle = document.querySelector<HTMLElement>('#account-panel-ti
 const loginForm = document.querySelector<HTMLFormElement>('#login-form');
 const loginNameInput = document.querySelector<HTMLInputElement>('#login-name-input');
 const loginEmailInput = document.querySelector<HTMLInputElement>('#login-email-input');
+const loginPasswordInput = document.querySelector<HTMLInputElement>('#login-password-input');
 const accountProfile = document.querySelector<HTMLElement>('#account-profile');
 const profileAvatar = document.querySelector<HTMLElement>('#profile-avatar');
 const profileName = document.querySelector<HTMLElement>('#profile-name');
@@ -366,6 +378,24 @@ let dateRolloverTimer = 0;
 let calendarView = parseDateKey(spec.dateLabel);
 let accountState = readAccountState();
 let favoriteBouquets = readFavoriteBouquets();
+
+function cloudFavoriteToLocal(favorite: CloudFavorite): FavoriteBouquet {
+  return favorite;
+}
+
+async function restoreCloudState() {
+  if (!dailyfloraCloudEnabled) return;
+  try {
+    const account = await restoreAccount();
+    if (!account) return;
+    accountState = account;
+    const favorites = await listCloudFavorites();
+    favoriteBouquets = favorites.map(cloudFavoriteToLocal).slice(0, 24);
+    renderAccountState();
+  } catch (error) {
+    console.warn('[DailyFlora] cloud session restore failed', error);
+  }
+}
 let referenceState: ReferenceState | null = null;
 let clockTickTimer = 0;
 let clockExitHintTimer = 0;
@@ -760,7 +790,7 @@ function toggleSiteMenu(forceOpen?: boolean) {
   siteMenuToggle.setAttribute('aria-expanded', String(open));
 }
 
-function toggleFavorite() {
+async function toggleFavorite() {
   if (!accountState) {
     openAccountPanel();
     return;
@@ -768,11 +798,28 @@ function toggleFavorite() {
 
   const favorite = currentFavorite();
   if (favorite) {
+    if (dailyfloraCloudEnabled) {
+      try {
+        await removeCloudFavorite(favorite.id);
+      } catch (error) {
+        console.warn('[DailyFlora] cloud favorite removal failed', error);
+        return;
+      }
+    }
     saveFavoriteBouquets(favoriteBouquets.filter((item) => item.id !== favorite.id));
     return;
   }
 
-  saveFavoriteBouquets([createFavorite(), ...favoriteBouquets.filter((item) => item.id !== currentFavoriteId())]);
+  const nextFavorite = createFavorite();
+  if (dailyfloraCloudEnabled) {
+    try {
+      await saveCloudFavorite(nextFavorite);
+    } catch (error) {
+      console.warn('[DailyFlora] cloud favorite save failed', error);
+      return;
+    }
+  }
+  saveFavoriteBouquets([nextFavorite, ...favoriteBouquets.filter((item) => item.id !== currentFavoriteId())]);
 }
 
 function renderFavoriteButton() {
@@ -1520,7 +1567,7 @@ favoriteButton?.addEventListener('click', () => {
   revealUi();
 });
 
-loginForm?.addEventListener('submit', (event) => {
+loginForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
   const data = new FormData(loginForm);
   if (data.get('termsAccepted') !== 'on') {
@@ -1529,13 +1576,45 @@ loginForm?.addEventListener('submit', (event) => {
   }
   const name = loginNameInput?.value.trim() || 'DailyFlora 用户';
   const email = loginEmailInput?.value.trim() || `${name.replace(/\s+/g, '').toLowerCase()}@dailyflora.local`;
+  const password = loginPasswordInput?.value || '';
+  if (dailyfloraCloudEnabled && password.length < 8) {
+    loginPasswordInput?.setCustomValidity('云端账户密码至少 8 位。');
+    loginPasswordInput?.reportValidity();
+    return;
+  }
+  if (loginPasswordInput) loginPasswordInput.setCustomValidity('');
+  if (dailyfloraCloudEnabled) {
+    try {
+      let account;
+      try {
+        account = await registerAccount({ name, email, password, termsVersion: '0.71' });
+      } catch (error) {
+        if (!(error instanceof Error) || !error.message.includes('已经注册')) throw error;
+        account = await loginAccount({ email, password });
+      }
+      saveAccountState(account);
+      favoriteBouquets = await listCloudFavorites();
+      renderAccountState();
+      if (!currentFavorite()) {
+        const favorite = createFavorite();
+        await saveCloudFavorite(favorite);
+        saveFavoriteBouquets([favorite, ...favoriteBouquets]);
+      }
+      loginForm.reset();
+      return;
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : '云端注册失败，请稍后重试。');
+      return;
+    }
+  }
   saveAccountState({ name, email, termsAccepted: true, termsVersion: '0.71', termsAcceptedAt: new Date().toISOString() });
   if (!currentFavorite()) {
     saveFavoriteBouquets([createFavorite(), ...favoriteBouquets]);
   }
 });
 
-logoutButton?.addEventListener('click', () => {
+logoutButton?.addEventListener('click', async () => {
+  await logoutAccount();
   saveAccountState(null);
 });
 
@@ -1986,6 +2065,7 @@ window.addEventListener('beforeunload', () => stopHandControl?.(), { once: true 
 setLabels();
 if (!specialReference) updateInterfaceLanguage(interfaceLanguage);
 renderAccountState();
+void restoreCloudState();
 setupDebugMode();
 if (specialReference) {
   rotationSpeed = 0.024;

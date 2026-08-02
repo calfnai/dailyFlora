@@ -2,6 +2,14 @@
 
 > 自 `0.14.10` 起，新增版本记录使用中英文双语。 / Starting with `0.14.10`, all new release notes are written in both Chinese and English.
 
+## 0.71.1 - 2026-08-03 (uniCloud preparation)
+
+新增阿里云 uniCloud 账户、会话与用户私有收藏后端，并为前端保留未登录本地体验与云端登录后的收藏同步。/ Added the Alibaba Cloud uniCloud account, session, and private-favorites backend while preserving the local guest experience and cloud favorite sync after login.
+
+- 绑定服务空间 `dailyflora`（`mp-7937f272-ccea-46ee-ac33-3e23abb1fa49`）的部署说明与数据库 schema。
+- 云端密码仅保存 scrypt 哈希，前端只保存不透明会话 token；不把 `clientSecret` 或管理凭证写入仓库。
+- 0.71.0 GitHub Pages 线上版本保持不变；0.71.1 待云函数上传、网页托管和线上登录验收完成后再发布。
+
 ## 0.71 - 2026-08-03 (Acceptance release · Owner accepted)
 
 重大更新定稿：产品已接近正式上线状态。 / Major release finalized: the product is now close to production launch readiness.
