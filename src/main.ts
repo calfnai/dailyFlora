@@ -26,6 +26,9 @@ type CameraRouteMode = 'orbit' | 'high-arc' | 'low-arc' | 'near-far' | 'figure-e
 type AccountState = {
   name: string;
   email: string;
+  termsAccepted?: boolean;
+  termsVersion?: string;
+  termsAcceptedAt?: string;
 };
 type FavoriteBouquet = {
   id: string;
@@ -59,7 +62,7 @@ const renderLabels: Record<Exclude<RenderQualityName, 'auto'>, string> = {
   medium: '清',
   high: '精'
 };
-const accountStorageKey = 'dailyflora.account.v1';
+const accountStorageKey = 'dailyflora.account.v2';
 const favoritesStorageKey = 'dailyflora.favorites.v1';
 const themeEnglishNames: Record<string, string> = {
   'tropical-forest': 'Tropical Forest',
@@ -147,6 +150,7 @@ const controlsPanel = document.querySelector<HTMLElement>('#controls-panel');
 const siteMenu = document.querySelector<HTMLElement>('#site-menu');
 const siteMenuToggle = document.querySelector<HTMLButtonElement>('#site-menu-toggle');
 const siteMenuPanel = document.querySelector<HTMLElement>('#site-menu-panel');
+const siteMenuFavoriteLink = document.querySelector<HTMLAnchorElement>('#site-menu-favorite-link');
 const siteMenuDebugLink = document.querySelector<HTMLAnchorElement>('#site-menu-debug-link');
 const handControlToggle = document.querySelector<HTMLButtonElement>('#hand-control-toggle');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
@@ -205,7 +209,17 @@ const clockTime = document.querySelector<HTMLElement>('#clock-time');
 const clockDate = document.querySelector<HTMLElement>('#clock-date');
 const clockQuoteText = document.querySelector<HTMLElement>('#clock-quote-text');
 const clockQuoteAuthor = document.querySelector<HTMLElement>('#clock-quote-author');
+const inlineTutorialDialog = document.querySelector<HTMLDialogElement>('#inline-tutorial-dialog');
+const inlineTutorialKicker = document.querySelector<HTMLElement>('#inline-tutorial-kicker');
+const inlineTutorialTitle = document.querySelector<HTMLElement>('#inline-tutorial-title');
+const inlineTutorialBody = document.querySelector<HTMLElement>('#inline-tutorial-body');
+const inlineTutorialClose = document.querySelector<HTMLButtonElement>('#inline-tutorial-close');
+const fullscreenShortcutContent = document.querySelector<HTMLElement>('#fullscreen-shortcut-content');
+const gestureGuideContent = document.querySelector<HTMLElement>('#gesture-guide-content');
+const fullscreenHelpMore = document.querySelector<HTMLAnchorElement>('#fullscreen-help-more');
+const fullscreenHelpClose = document.querySelector<HTMLButtonElement>('#fullscreen-help-close');
 const releaseMark = document.querySelector<HTMLAnchorElement>('#release-mark');
+const clockExitHint = document.querySelector<HTMLElement>('#clock-exit-hint');
 const languageSwitcher = document.querySelector<HTMLElement>('#language-switcher');
 let interfaceLanguage: Locale = detectInitialLocale();
 const legacyInterfaceLanguageKey = 'dailyflora.interface-language.v1';
@@ -268,6 +282,7 @@ const specialId = readSpecialId();
 const specialReference = specialId ? specialReferences[specialId] : null;
 document.body.classList.toggle('is-special', Boolean(specialReference));
 const searchParams = new URLSearchParams(window.location.search);
+const tutorialValue = searchParams.get('tutorial');
 let params = readParams();
 const debugValue = searchParams.get('debug');
 const debugMode = searchParams.has('debug') && debugValue !== '0' && debugValue !== 'false';
@@ -340,6 +355,7 @@ let accountState = readAccountState();
 let favoriteBouquets = readFavoriteBouquets();
 let referenceState: ReferenceState | null = null;
 let clockTickTimer = 0;
+let clockExitHintTimer = 0;
 let clockDisplaySource: ClockDisplaySource | null = null;
 const clockSettingsStorageKey = 'dailyflora.idle-clock.v1';
 const clockQuotes = [
@@ -355,7 +371,7 @@ function readClockSettings(): IdleClockSettings {
   const stored = safeJsonParse<Partial<IdleClockSettings>>(window.localStorage.getItem(clockSettingsStorageKey), {});
   return {
     autoEnabled: stored.autoEnabled ?? true,
-    intervalMinutes: normalizeClockInterval(stored.intervalMinutes ?? 5)
+    intervalMinutes: normalizeClockInterval(stored.intervalMinutes ?? 2)
   };
 }
 
@@ -466,6 +482,7 @@ function updateClockSettings(next: Partial<IdleClockSettings>) {
 
 function showClock(source: ClockDisplaySource) {
   clockDisplaySource = source;
+  idleClock.resetPointerReference();
   const quote = clockQuotes[Math.floor(Math.random() * clockQuotes.length)];
   if (clockQuoteText) clockQuoteText.textContent = quote[0];
   if (clockQuoteAuthor) clockQuoteAuthor.textContent = quote[1];
@@ -481,6 +498,14 @@ function showClock(source: ClockDisplaySource) {
     if (source === 'manual') clockOverlay.classList.add('is-manual');
     requestAnimationFrame(() => clockOverlay.classList.add('is-visible'));
   }
+  window.clearTimeout(clockExitHintTimer);
+  if (clockExitHint) {
+    clockExitHint.classList.remove('is-visible');
+    requestAnimationFrame(() => {
+      clockExitHint.classList.add('is-visible');
+      clockExitHintTimer = window.setTimeout(() => clockExitHint.classList.remove('is-visible'), 2000);
+    });
+  }
   window.setTimeout(() => scene.resize(), 0);
   syncClockControls();
 }
@@ -493,6 +518,8 @@ function hideClock() {
     clockOverlay.setAttribute('aria-hidden', 'true');
   }
   document.body.classList.remove('is-clock-visible');
+  window.clearTimeout(clockExitHintTimer);
+  clockExitHint?.classList.remove('is-visible');
   scene.setClockLayout(false);
   window.setTimeout(() => scene.resize(), 380);
   syncClockControls();
@@ -892,7 +919,7 @@ function revealUi() {
     hideTimer = window.setTimeout(() => {
       ui.hud.classList.add('is-hidden');
       ui.controls.classList.add('is-hidden');
-    }, ui.controls.classList.contains('is-expanded') ? 7000 : 3200);
+    }, ui.controls.classList.contains('is-expanded') ? 3600 : 2600);
     return;
   }
   if (!ui.controls.classList.contains('is-expanded')) return;
@@ -904,7 +931,7 @@ function revealUi() {
     ui.controlsToggleButton.setAttribute('aria-label', t('view.show'));
     ui.controlsToggleButton.title = t('view.show');
     updateInterfaceLanguage(interfaceLanguage);
-  }, 7000);
+  }, 3600);
 }
 
 function setControlsExpanded(expanded: boolean) {
@@ -921,6 +948,7 @@ function setControlsExpanded(expanded: boolean) {
 function updateInterfaceLanguage(language: Locale) {
   interfaceLanguage = language;
   saveLocale(language);
+  window.dailyfloraT = (key, values) => formatTranslation(interfaceLanguage, key, values);
   configureDocument(language, 'home', '');
   document.querySelectorAll<HTMLElement>('[data-interface-copy]').forEach((element) => {
     const key = element.dataset.interfaceCopy as 'index' | 'view';
@@ -928,14 +956,15 @@ function updateInterfaceLanguage(language: Locale) {
   });
   setupLocaleSwitcher(languageSwitcher, language, (nextLocale) => {
     updateInterfaceLanguage(nextLocale);
+    if (activeTutorialKind) showInlineTutorial(activeTutorialKind);
     revealUi();
   });
   applyStaticCopy();
+  window.dispatchEvent(new CustomEvent('dailyflora:localechange', { detail: { locale: language } }));
 }
 
 function applyStaticCopy() {
   const textBySelector: Array<[string, string]> = [
-    ['#site-menu', 'index.siteMenu'],
     ['#site-menu-panel a[href="./"]', 'index.currentBouquet'],
     ['#site-menu-panel a[href="./member/"]', 'index.myGarden'],
     ['#site-menu-panel a[href="./about/"]', 'index.about'],
@@ -956,9 +985,9 @@ function applyStaticCopy() {
     const element = document.querySelector<HTMLElement>(selector);
     if (element) element.textContent = t(key);
   });
+  siteMenu?.setAttribute('aria-label', t('index.siteMenu'));
 
   const tooltipBySelector: Array<[string, string]> = [
-    ['#site-menu-toggle', 'index.siteMenu'],
     ['#controls-toggle', ui.controls.classList.contains('is-expanded') ? 'view.hide' : 'view.show'],
     ['#review-dashboard-link', 'index.debug'],
     ['#today-button', 'view.date'],
@@ -984,21 +1013,56 @@ function applyStaticCopy() {
     const element = document.querySelector<HTMLElement>(selector);
     if (!element) return;
     const value = t(key);
-    element.dataset.tooltip = value;
-    element.setAttribute('title', value);
+    if (selector === '#controls-toggle' && ui.controls.classList.contains('is-expanded')) {
+      delete element.dataset.tooltip;
+      element.removeAttribute('title');
+    } else {
+      element.dataset.tooltip = value;
+      element.setAttribute('title', value);
+    }
     if (element instanceof HTMLButtonElement || element instanceof HTMLAnchorElement) {
       element.setAttribute('aria-label', value);
     }
   });
 
+  const densityShortCopy: Record<string, string> = {
+    low: t('view.densityLowShort'),
+    medium: t('view.densityMediumShort'),
+    high: t('view.densityHighShort')
+  };
   document.querySelectorAll<HTMLElement>('[data-density-choice]').forEach((button) => {
     const choice = button.dataset.densityChoice;
-    button.textContent = choice === 'low' ? '疏' : choice === 'high' ? '密' : '中';
+    button.textContent = choice ? densityShortCopy[choice] || choice : '';
   });
+  const renderShortCopy: Record<string, string> = {
+    auto: t('view.renderAutoShort'),
+    low: t('view.renderLowShort'),
+    medium: t('view.renderMediumShort'),
+    high: t('view.renderHighShort')
+  };
   document.querySelectorAll<HTMLElement>('[data-render-choice]').forEach((button) => {
     const choice = button.dataset.renderChoice;
-    button.textContent = choice === 'auto' ? '自' : choice === 'low' ? '省' : choice === 'medium' ? '清' : '精';
+    button.textContent = choice ? renderShortCopy[choice] || choice : '';
   });
+  document.querySelectorAll<HTMLElement>('[data-clock-copy]').forEach((element) => {
+    element.textContent = t(`view.${element.dataset.clockCopy}`);
+  });
+  const tutorialCopy: Record<string, string> = {
+    fullscreen: t('tutorial.fullscreenTitle'),
+    gesture: t('tutorial.gestureTitle'),
+    clock: t('tutorial.clockTitle')
+  };
+  document.querySelectorAll<HTMLElement>('[data-tutorial-entry]').forEach((link) => {
+    const label = link.dataset.tutorialEntry === 'help'
+      ? t('view.howToUse')
+      : tutorialCopy[link.dataset.tutorialEntry || ''] || t('tutorial.title');
+    link.dataset.tooltip = label;
+    link.title = label;
+    link.setAttribute('aria-label', label);
+  });
+  document.querySelector<HTMLElement>('.clock-control')?.setAttribute('aria-label', t('view.clockSettings'));
+  document.querySelector<HTMLElement>('.density-control')?.setAttribute('aria-label', t('view.density'));
+  document.querySelector<HTMLElement>('.render-control')?.setAttribute('aria-label', t('view.render'));
   if (referenceNoteInput) referenceNoteInput.placeholder = t('index.referencePlaceholder');
   if (loginNameInput) loginNameInput.placeholder = t('index.loginNamePlaceholder');
 }
@@ -1216,6 +1280,20 @@ function zoomBy(delta: number) {
   revealUi();
 }
 
+function resetView() {
+  manualZoom = scene.setZoomOffset(0);
+  manualRotation = false;
+  rotationDirection = 1;
+  cameraRouteMode = 'orbit';
+  pitchAmplitude = 0;
+  yawAmplitude = 0;
+  distanceAmplitude = 0;
+  targetYAmplitude = 0;
+  rotationSpeed = THREEClamp(spec.rotationSpeed, minRotationSpeed, maxRotationSpeed);
+  applyRotationSettings();
+  revealUi();
+}
+
 function applyRoutePreset(preset: (typeof rotationPresets)[number]) {
   manualRotation = true;
   rotationSpeed = preset.speed;
@@ -1235,6 +1313,19 @@ function randomDateKey() {
   const days = Math.floor((end.getTime() - start.getTime()) / dayMs);
   const date = new Date(start.getTime() + Math.floor(Math.random() * (days + 1)) * dayMs);
   return date.toISOString().slice(0, 10);
+}
+
+function dateKeyWithOffset(dateKey: string, offsetDays: number) {
+  const { year, month, day } = parseDateKey(dateKey);
+  const next = new Date(Date.UTC(year, month, day + offsetDays));
+  return clampDateKeyToToday(dateKeyFromParts(next.getUTCFullYear(), next.getUTCMonth(), next.getUTCDate()));
+}
+
+function openDate(dateKey: string) {
+  previewCount = 0;
+  closeCalendar();
+  rebuild(dateKey, dateKey);
+  syncTodayMode(dateKey, dateKey);
 }
 
 function rebuild(date: string, seed: string) {
@@ -1408,9 +1499,14 @@ favoriteButton?.addEventListener('click', () => {
 
 loginForm?.addEventListener('submit', (event) => {
   event.preventDefault();
+  const data = new FormData(loginForm);
+  if (data.get('termsAccepted') !== 'on') {
+    loginForm.reportValidity();
+    return;
+  }
   const name = loginNameInput?.value.trim() || 'DailyFlora 用户';
   const email = loginEmailInput?.value.trim() || `${name.replace(/\s+/g, '').toLowerCase()}@dailyflora.local`;
-  saveAccountState({ name, email });
+  saveAccountState({ name, email, termsAccepted: true, termsVersion: '0.16.1', termsAcceptedAt: new Date().toISOString() });
   if (!currentFavorite()) {
     saveFavoriteBouquets([createFavorite(), ...favoriteBouquets]);
   }
@@ -1456,6 +1552,13 @@ siteMenuToggle?.addEventListener('click', () => {
   revealUi();
 });
 
+siteMenuFavoriteLink?.addEventListener('click', (event) => {
+  if (!accountState) return;
+  event.preventDefault();
+  if (!currentFavorite()) saveFavoriteBouquets([createFavorite(), ...favoriteBouquets]);
+  window.location.href = './member/#saved-title';
+});
+
 document.addEventListener('pointerdown', (event) => {
   const target = event.target;
   if (siteMenuPanel && siteMenu && !siteMenuPanel.hidden && target instanceof Node && !siteMenu.contains(target)) {
@@ -1476,20 +1579,12 @@ document.addEventListener('pointerdown', (event) => {
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     toggleSiteMenu(false);
+    if (clockDisplaySource) hideClock();
   }
 });
 
 controlsToggleButton?.addEventListener('click', () => {
   setControlsExpanded(!controls.classList.contains('is-expanded'));
-});
-
-languageSwitcher?.addEventListener('click', (event) => {
-  const target = event.target;
-  if (!(target instanceof HTMLButtonElement)) return;
-  const language = normalizeLocale(target.dataset.language);
-  if (!language) return;
-  updateInterfaceLanguage(language);
-  revealUi();
 });
 
 pauseButton?.addEventListener('click', () => {
@@ -1568,9 +1663,78 @@ document.addEventListener('pointerdown', (event) => {
 });
 
 document.addEventListener('keydown', (event) => {
+  if (isTextInputTarget(event.target)) return;
+  if (event.key === 'Escape' && inlineTutorialDialog?.open) {
+    event.preventDefault();
+    closeInlineTutorial();
+    return;
+  }
   if (event.key === 'Escape') {
     closeCalendar();
     closeAccountPanel();
+    if (clockDisplaySource) hideClock();
+    if (document.fullscreenElement) void document.exitFullscreen();
+  }
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+    event.preventDefault();
+    openDate(dateKeyWithOffset(spec.dateLabel, event.key === 'ArrowLeft' ? -1 : 1));
+    return;
+  }
+  if (event.key === '?') {
+    event.preventDefault();
+    showInlineTutorial('fullscreen');
+    return;
+  }
+  if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+    event.preventDefault();
+    zoomBy(event.key === 'ArrowUp' ? -0.28 : 0.28);
+    return;
+  }
+  if (event.key.toLowerCase() === 'r') {
+    event.preventDefault();
+    openDate(randomDateKey());
+    return;
+  }
+  if (event.key === '+' || event.key === '=') {
+    event.preventDefault();
+    zoomBy(-0.28);
+    return;
+  }
+  if (event.key === '-') {
+    event.preventDefault();
+    zoomBy(0.28);
+    return;
+  }
+  if (event.key === '0') {
+    event.preventDefault();
+    resetView();
+    return;
+  }
+  if (event.code === 'Space') {
+    event.preventDefault();
+    pauseButton?.click();
+    return;
+  }
+  if (event.key.toLowerCase() === 'h') {
+    event.preventDefault();
+    window.clearTimeout(hideTimer);
+    const hidden = ui.controls.classList.contains('is-hidden');
+    if (hidden) {
+      revealUi();
+    } else {
+      window.setTimeout(() => {
+        ui.hud.classList.add('is-hidden');
+        ui.controls.classList.add('is-hidden');
+      }, 0);
+    }
+    return;
+  }
+  if (event.key.toLowerCase() === 'o' && !isTextInputTarget(event.target)) {
+    setControlsExpanded(!controls.classList.contains('is-expanded'));
+  }
+  if (event.key.toLowerCase() === 'f' && !isTextInputTarget(event.target)) {
+    event.preventDefault();
+    void toggleFullscreen();
   }
 });
 
@@ -1582,13 +1746,27 @@ shuffleButton?.addEventListener('click', () => {
   syncTodayMode(date, date);
 });
 
-fullscreenButton?.addEventListener('click', async () => {
-  if (!document.fullscreenElement) {
-    await document.documentElement.requestFullscreen();
-  } else {
-    await document.exitFullscreen();
+async function toggleFullscreen() {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch {
+    // Fullscreen can be refused by an embedded or file-based browser context.
   }
   revealUi();
+}
+
+fullscreenButton?.addEventListener('click', () => {
+  void toggleFullscreen();
+});
+
+document.addEventListener('fullscreenchange', () => {
+  if (document.fullscreenElement) {
+    maybeShowFullscreenTutorial();
+  }
 });
 
 zoomInButton?.addEventListener('click', () => {
@@ -1676,7 +1854,7 @@ window.addEventListener('resize', () => {
   if (!calendarPanel.hidden) positionCalendarPanel();
 });
 
-['pointermove', 'pointerdown', 'touchstart', 'keydown'].forEach((eventName) => {
+['pointerdown', 'touchstart', 'keydown'].forEach((eventName) => {
   window.addEventListener(eventName, (event) => {
     revealUi();
     const target = event.target;
@@ -1684,6 +1862,11 @@ window.addEventListener('resize', () => {
     idleClock.noteActivity();
   }, { passive: true });
 });
+
+window.addEventListener('pointermove', (event) => {
+  revealUi();
+  idleClock.notePointerMove(event.clientX, event.clientY);
+}, { passive: true });
 
 window.addEventListener('focus', () => idleClock.noteActivity());
 
@@ -1757,6 +1940,7 @@ async function enableHandControl() {
   syncHandControlToggle();
   try {
     stopHandControl = await startHandControl();
+    showInlineTutorial('gesture');
   } catch (error) {
     console.error('Unable to start hand control', error);
   } finally {
@@ -1801,3 +1985,106 @@ scene.start();
 
 syncHandControlToggle();
 if (handControlInitiallyEnabled) void enableHandControl();
+
+function isTextInputTarget(target: EventTarget | null) {
+  return target instanceof HTMLElement && Boolean(target.closest('input, textarea, select, [contenteditable="true"]'));
+}
+
+let activeTutorialKind: 'fullscreen' | 'gesture' | 'clock' | null = null;
+
+function syncFullscreenShortcutCopy() {
+  const shortcutKeys = ['fullscreen', 'escape', 'dates', 'arrowZoom', 'zoom', 'random', 'reset', 'rotation', 'interface', 'view', 'help'];
+  document.querySelectorAll<HTMLElement>('[data-shortcut-copy]').forEach((element) => {
+    const key = element.dataset.shortcutCopy;
+    if (key && shortcutKeys.includes(key)) element.textContent = t(`shortcuts.${key}`);
+  });
+  if (fullscreenHelpMore) fullscreenHelpMore.textContent = t('shortcuts.more');
+  if (fullscreenHelpClose) fullscreenHelpClose.textContent = t('tutorial.acknowledge');
+}
+
+function syncGestureGuideCopy() {
+  const gestureKeys = ['index', 'victory', 'three', 'thumb', 'four', 'fist', 'pinch', 'open', 'curled', 'twoHands'];
+  gestureKeys.forEach((key) => {
+    const label = document.querySelector<HTMLElement>(`[data-gesture-label="${key}"]`);
+    const action = document.querySelector<HTMLElement>(`[data-gesture-action="${key}"]`);
+    if (label) label.textContent = t(`hand.${key}Label`);
+    if (action) action.textContent = t(`hand.${key}Action`);
+  });
+}
+
+function syncTutorialModeCopy(activeKind: 'fullscreen' | 'gesture' | 'clock') {
+  document.querySelectorAll<HTMLButtonElement>('[data-tutorial-select]').forEach((button) => {
+    const kind = button.dataset.tutorialSelect as 'fullscreen' | 'gesture' | 'clock';
+    button.textContent = t(`tutorial.${kind}Title`);
+    button.setAttribute('aria-pressed', String(kind === activeKind));
+  });
+}
+
+function closeInlineTutorial() {
+  if (!inlineTutorialDialog?.open) return;
+  inlineTutorialDialog.close();
+  activeTutorialKind = null;
+}
+
+function maybeShowFullscreenTutorial() {
+  showInlineTutorial('fullscreen');
+}
+
+function showInlineTutorial(kind: 'fullscreen' | 'gesture' | 'clock') {
+  const copy = {
+    fullscreen: ['tutorial.fullscreenTitle', 'tutorial.fullscreenBody'],
+    gesture: ['tutorial.gestureTitle', 'tutorial.gestureBody'],
+    clock: ['tutorial.clockTitle', 'tutorial.clockBody']
+  }[kind];
+  if (!inlineTutorialDialog || !inlineTutorialTitle || !inlineTutorialBody) return;
+  activeTutorialKind = kind;
+  inlineTutorialKicker && (inlineTutorialKicker.textContent = t('tutorial.title'));
+  inlineTutorialTitle.textContent = kind === 'fullscreen'
+    ? t('shortcuts.title')
+    : kind === 'gesture' ? t('hand.gestureTableTitle') : t(copy[0]);
+  inlineTutorialBody.textContent = kind === 'fullscreen' ? t('shortcuts.intro') : t(copy[1]);
+  inlineTutorialClose?.setAttribute('aria-label', t('common.close'));
+  if (fullscreenShortcutContent) fullscreenShortcutContent.hidden = kind !== 'fullscreen';
+  if (gestureGuideContent) gestureGuideContent.hidden = kind !== 'gesture';
+  if (kind === 'fullscreen') syncFullscreenShortcutCopy();
+  if (kind === 'gesture') syncGestureGuideCopy();
+  if (fullscreenHelpClose) fullscreenHelpClose.textContent = t('tutorial.acknowledge');
+  syncTutorialModeCopy(kind);
+  if (!inlineTutorialDialog.open) inlineTutorialDialog.showModal();
+}
+
+document.querySelectorAll<HTMLElement>('[data-tutorial-entry]').forEach((link) => {
+  link.addEventListener('click', (event) => {
+    event.preventDefault();
+    const kind = link.dataset.tutorialEntry;
+    if (kind === 'help') showInlineTutorial('fullscreen');
+    else if (kind === 'fullscreen' || kind === 'gesture' || kind === 'clock') showInlineTutorial(kind);
+  });
+});
+document.querySelectorAll<HTMLButtonElement>('[data-tutorial-select]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const kind = button.dataset.tutorialSelect;
+    if (kind === 'fullscreen' || kind === 'gesture' || kind === 'clock') showInlineTutorial(kind);
+  });
+});
+window.addEventListener('dailyflora:opentutorial', (event) => {
+  const kind = (event as CustomEvent<{ kind?: string }>).detail?.kind;
+  if (kind === 'fullscreen' || kind === 'gesture' || kind === 'clock') showInlineTutorial(kind);
+});
+inlineTutorialClose?.addEventListener('click', closeInlineTutorial);
+fullscreenHelpClose?.addEventListener('click', closeInlineTutorial);
+inlineTutorialDialog?.addEventListener('cancel', (event) => {
+  event.preventDefault();
+  closeInlineTutorial();
+});
+
+if (tutorialValue === 'gesture') {
+  setControlsExpanded(true);
+  window.setTimeout(() => showInlineTutorial('gesture'), 0);
+} else if (tutorialValue === 'fullscreen') {
+  setControlsExpanded(true);
+  window.setTimeout(() => showInlineTutorial('fullscreen'), 0);
+} else if (tutorialValue === 'clock') {
+  setControlsExpanded(true);
+  window.setTimeout(() => showInlineTutorial('clock'), 0);
+}

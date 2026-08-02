@@ -2,6 +2,22 @@
 
 > 自 `0.14.10` 起，新增版本记录使用中英文双语。 / Starting with `0.14.10`, all new release notes are written in both Chinese and English.
 
+## 0.16.1 - 2026-08-03 (Acceptance candidate)
+
+重写注册版法律文件与第三方署名。 / Rewrote the registered-version legal documents and third-party attributions.
+
+- 以账户、收藏、照片本地读取、摄像头手势和未来云端上传边界为事实基础，重写 Terms、Privacy、Copyright 与 Credits。 / Rewrote Terms, Privacy, Copyright, and Credits around the actual account, favorites, local photo reading, camera gesture, and future cloud-upload boundaries.
+- 按中国 PIPL、欧盟 GDPR、美国 FTC/COPPA 与适用州法、日本 APPI 的共同要求补齐目的限制、数据最小化、未成年人、跨境、保存、安全与用户权利说明。 / Added purpose limitation, data minimization, minors, cross-border processing, retention, security, and user-rights language aligned with shared requirements under China PIPL, EU GDPR, U.S. FTC/COPPA and applicable state laws, and Japan APPI.
+- 明确所有原创创意、艺术指导与产品方向来自 CALFN LAU；AI 仅作为执行辅助，开源代码和第三方素材保留原权利人与许可证。 / Clarified that all original creative concepts, art direction, and product direction originate with CALFN LAU; AI is implementation support only, while open-source code and third-party media retain their original rights and licenses.
+- 为 Three.js、MediaPipe 与构建工具补全作者、来源和许可证说明；不面向普通用户展示的专项素材记录保留在内部发布检查文档。 / Added authors, sources, and license notices for Three.js, MediaPipe, and build tools; specialized asset records not intended for ordinary users remain in the internal release-readiness documentation.
+- 将 Privacy 与 Terms 的照片边界改为正式注册版服务器上传口径，补充 Cookie、跨境处理、广告及商业伙伴共享类别，同时保留法定同意与退出机制。 / Revised the Terms and Privacy photo boundary for production registered server uploads, adding cookies, international processing, advertising, and commercial-partner disclosure categories while preserving legally required consent and opt-out controls.
+- 在摄像头手势面板中加入直达 Privacy 摄像头章节的七语言链接。 / Added a seven-language link from the camera-gesture panel directly to the camera section of the Privacy Policy.
+- 在首页与 Member 的实际注册入口加入必须主动勾选的 Terms/Privacy 同意步骤，并记录同意版本与时间；正式页 footer 同步加入 Terms、Privacy、Copyright 与 Credits。 / Added required affirmative Terms/Privacy consent to the actual Home and Member registration entries, recording the accepted version and time; synchronized formal-page footers with Terms, Privacy, Copyright, and Credits.
+
+## 0.16 - 2026-08-03 (Owner accepted)
+
+Owner 已确认 `0.15.1` 验收通过并升级为 `0.16`。 / The owner accepted the `0.15.1` candidate and promoted it to `0.16`.
+
 ## Unreleased - 2026-07-20
 
 记录 GUI v1、空闲时钟与近期默认花束修正。 / Recorded GUI v1, the idle clock, and recent default-bouquet corrections.

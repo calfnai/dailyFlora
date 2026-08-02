@@ -11,18 +11,70 @@
     <div class="page-shell product-shell legal-page">
       <header class="site-header">
         <a class="brand" href="../../" aria-label="DailyFlora home" data-i18n-aria="common.brandHome"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA</a>
-        <nav class="site-nav" aria-label="Site navigation"><a href="../../" data-i18n="common.today">Today's bouquet</a><a href="../../member/" data-i18n="common.member">My garden</a><a href="../../about/" data-i18n="common.about">About</a><a href="../../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a><a href="../../downloads/" data-i18n="common.platforms">Platforms</a></nav>
+        <nav class="site-nav" aria-label="Site navigation"><a href="../../" data-i18n="common.today">Today's bouquet</a><a href="../../member/" data-i18n="common.member">My garden</a><a href="../../about/" data-i18n="common.about">About DailyFlora</a><a href="../../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a><a href="../../downloads/" data-i18n="common.platforms">Platforms</a><a href="../../scifi/" data-i18n="common.scifi">SciFi Flora</a></nav>
       </header>
       <main class="product-section wrap">
         <p class="eyebrow">DailyFlora Legal</p>
         <h1 class="section-title" data-i18n="legal.creditsTitle">Credits & Attributions</h1>
-        <div class="prose">
-          <p data-i18n="legal.creditsBody">DailyFlora is created by CALFN LAU with AI-assisted development support.</p>
-          <p>DailyFlora · CALFN LAU · SciFi Flora · find@calfn.com</p>
-          <p data-i18n="common.copyright">© 2026 CALFN LAU. All rights reserved.</p>
+        <div class="legal-meta"><span>Version 0.16.1</span><span>Audited: 3 August 2026</span><span>Source of truth: package-lock.json + repository assets</span></div>
+        <div class="legal-document">
+          <article class="legal-language">
+            <header>
+              <h2>Creator / 创作者</h2>
+              <p class="legal-note"><strong>Created and directed by CALFN LAU.</strong><br />DailyFlora 的全部原创创意、艺术指导、视觉体系、产品概念、交互方向与最终审美决策来自 CALFN LAU。</p>
+              <p>AI-assisted implementation tools, including OpenAI Codex where used, supported coding, debugging, draft translation, and production under CALFN LAU's direction and review. They are credited as tools, not as the origin of DailyFlora's creative authorship.</p>
+            </header>
+
+            <section class="legal-section">
+              <h3>Runtime open source / 运行时开源软件</h3>
+              <div class="credit-list">
+                <div class="credit-item"><strong><a href="https://threejs.org/" target="_blank" rel="noopener">Three.js 0.171.0</a></strong><p>3D rendering library by mrdoob and the three.js authors. Copyright © 2010–2024 three.js authors. <a href="https://github.com/mrdoob/three.js/blob/dev/LICENSE" target="_blank" rel="noopener">MIT License</a>.</p><small>DailyFlora uses Three.js for WebGL scenes, geometry, materials, cameras, lights, and animation. DailyFlora's bouquet system and art direction are original project work built with this library.</small></div>
+                <div class="credit-item"><strong><a href="https://github.com/google-ai-edge/mediapipe" target="_blank" rel="noopener">MediaPipe Tasks Vision 0.10.35</a></strong><p>By Google / the MediaPipe Authors. Copyright © the MediaPipe Authors. <a href="https://github.com/google-ai-edge/mediapipe/blob/master/LICENSE" target="_blank" rel="noopener">Apache License 2.0</a>.</p><small>Used on demand for browser hand landmarks and gesture recognition. The bundled WASM files and gesture-recognizer model remain governed by their upstream terms. Google and MediaPipe do not sponsor or endorse DailyFlora.</small></div>
+              </div>
+            </section>
+
+            <section class="legal-section">
+              <h3>Build and development toolchain / 构建与开发工具</h3>
+              <p>These tools help build or type-check DailyFlora and are not claimed as CALFN LAU's code. Exact installed versions are recorded in <code>package-lock.json</code>.</p>
+              <table class="legal-table"><thead><tr><th>Project</th><th>Credited author(s)</th><th>License</th></tr></thead><tbody>
+                <tr><td><a href="https://vite.dev/" target="_blank" rel="noopener">Vite 6.4.3</a></td><td>VoidZero Inc. and Vite contributors; created by Evan You</td><td>MIT</td></tr>
+                <tr><td><a href="https://rollupjs.org/" target="_blank" rel="noopener">Rollup 4.62.0</a></td><td>Rollup contributors, © 2017</td><td>MIT</td></tr>
+                <tr><td><a href="https://esbuild.github.io/" target="_blank" rel="noopener">esbuild 0.25.12</a></td><td>Evan Wallace, © 2020</td><td>MIT</td></tr>
+                <tr><td><a href="https://www.typescriptlang.org/" target="_blank" rel="noopener">TypeScript 5.9.3</a></td><td>Microsoft Corporation</td><td>Apache-2.0</td></tr>
+                <tr><td><a href="https://postcss.org/" target="_blank" rel="noopener">PostCSS 8.5.23</a></td><td>Andrey Sitnik, © 2013</td><td>MIT</td></tr>
+                <tr><td><a href="https://github.com/ai/nanoid" target="_blank" rel="noopener">Nano ID 3.3.16</a></td><td>Andrey Sitnik, © 2017</td><td>MIT</td></tr>
+                <tr><td><a href="https://github.com/alexeyraspopov/picocolors" target="_blank" rel="noopener">picocolors 1.1.1</a></td><td>Oleksii Raspopov, Kostiantyn Denysov, Anton Verinov, © 2021–2024</td><td>ISC</td></tr>
+                <tr><td><a href="https://github.com/micromatch/picomatch" target="_blank" rel="noopener">picomatch 4.0.4</a></td><td>Jon Schlinkert, © 2017–present</td><td>MIT</td></tr>
+                <tr><td><a href="https://github.com/thecodrr/fdir" target="_blank" rel="noopener">fdir 6.5.0</a></td><td>Abdullah Atta, © 2023</td><td>MIT</td></tr>
+                <tr><td><a href="https://github.com/SuperchupuDev/tinyglobby" target="_blank" rel="noopener">tinyglobby 0.2.17</a></td><td>Madeline Gurriarán, © 2024</td><td>MIT</td></tr>
+                <tr><td><a href="https://github.com/101arrowz/fflate" target="_blank" rel="noopener">fflate 0.8.3</a></td><td>Arjun Barrett, © 2026</td><td>MIT</td></tr>
+                <tr><td><a href="https://github.com/zeux/meshoptimizer" target="_blank" rel="noopener">meshoptimizer 1.1.1</a></td><td>Arseny Kapoulkine, © 2016–2026</td><td>MIT</td></tr>
+                <tr><td><a href="https://github.com/7rulnik/source-map-js" target="_blank" rel="noopener">source-map-js 1.2.1</a></td><td>Mozilla Foundation and contributors, © 2009–2011</td><td>BSD-3-Clause</td></tr>
+                <tr><td><a href="https://github.com/tweenjs/tween.js" target="_blank" rel="noopener">Tween.js 23.1.3</a></td><td>Tween.js authors; easing equations © Robert Penner</td><td>MIT</td></tr>
+                <tr><td><a href="https://rapier.rs/" target="_blank" rel="noopener">Rapier.js compat 0.12.0</a></td><td>Dimforge</td><td>Apache-2.0</td></tr>
+                <tr><td><a href="https://github.com/DefinitelyTyped/DefinitelyTyped" target="_blank" rel="noopener">DefinitelyTyped declarations</a></td><td>Microsoft Corporation and contributors</td><td>MIT</td></tr>
+              </tbody></table>
+              <p>Platform-specific Rollup and esbuild binary packages in the lockfile are distributions of their parent projects under the same stated licenses. Other small transitive build dependencies remain under the license recorded in the lockfile; source distributions in <code>node_modules</code> contain their full notices.</p>
+            </section>
+
+            <section class="legal-section">
+              <h3>Images and visual references / 图片与视觉参考</h3>
+              <div class="credit-list">
+                <div class="credit-item"><strong>Owner-provided special bouquet references</strong><p>Private or owner-provided bouquet photographs remain owned by their photographer/rightsholder and are not licensed for public reuse merely because they appear in a DailyFlora project asset.</p></div>
+              </div>
+            </section>
+
+            <section class="legal-section">
+              <h3>License notices / 许可证说明</h3>
+              <p>MIT-licensed software is provided with permission to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies, provided its copyright and permission notices are retained; it is provided without warranty. Apache-2.0 software is used under the Apache License 2.0, including its attribution, notice, patent, and disclaimer terms. ISC and BSD-3-Clause material remain subject to their respective full terms.</p>
+              <p>No third-party project listed here sponsors, endorses, or is responsible for DailyFlora. Attribution corrections may be sent to <a href="mailto:find@calfn.com?subject=DailyFlora%20Attribution%20Correction">find@calfn.com</a>.</p>
+            </section>
+
+            <section class="legal-section"><h3>DailyFlora copyright</h3><p>© 2026 CALFN LAU. All rights reserved in DailyFlora's original material. Open-source and third-party rights are expressly excluded from that claim. See the <a href="../copyright/">Copyright Notice</a>.</p></section>
+          </article>
         </div>
       </main>
-      <footer class="site-footer"><div class="footer-main wrap"><p class="footer-statement" data-i18n="footer.statement">One bouquet a day. No need to possess it.</p><nav class="footer-col"><strong data-i18n="common.system">System</strong><a href="../terms/" data-i18n="legal.termsTitle">Terms of Use</a><a href="../privacy/" data-i18n="legal.privacyTitle">Privacy Policy</a><a href="../copyright/" data-i18n="legal.copyrightTitle">Copyright Notice</a></nav></div></footer>
+      <footer class="site-footer"><div class="footer-main wrap"><p class="footer-statement" data-i18n="footer.statement">One bouquet a day. No need to possess it.</p><nav class="footer-col"><strong data-i18n="common.system">System</strong><a href="../../how-to-use/" data-i18n="tutorial.title">How to use</a><a href="../terms/" data-i18n="legal.termsTitle">Terms of Use</a><a href="../privacy/" data-i18n="legal.privacyTitle">Privacy Policy</a><a href="../copyright/" data-i18n="legal.copyrightTitle">Copyright Notice</a></nav></div></footer>
     </div>
     <script type="module" src="../../src/staticI18n.ts"></script>
   </body>

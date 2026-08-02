@@ -26,6 +26,7 @@ const pagePath: Record<string, string> = {
   member: 'member',
   objects: 'bouquet-shop',
   platforms: 'downloads',
+  tutorial: 'how-to-use',
   terms: 'legal/terms',
   privacy: 'legal/privacy',
   credits: 'legal/credits',
@@ -35,6 +36,10 @@ const pagePath: Record<string, string> = {
 function makeRelativePrefix() {
   const depth = Math.max(0, window.location.pathname.split('/').filter(Boolean).length - 1);
   return depth === 0 ? './' : '../'.repeat(depth);
+}
+
+function makeRootRelativePrefix() {
+  return '../'.repeat(window.location.pathname.split('/').filter(Boolean).length);
 }
 
 function ensureLanguageSwitcher() {
@@ -92,6 +97,32 @@ function markDevLinksHidden() {
   });
 }
 
+function ensureTutorialFooterLink() {
+  const footer = document.querySelector<HTMLElement>('.site-footer .footer-main');
+  if (!footer || footer.querySelector('.footer-tutorial-link, a[data-i18n="tutorial.title"]')) return;
+  const link = document.createElement('a');
+  link.className = 'footer-tutorial-link';
+  link.href = `${makeRootRelativePrefix()}how-to-use/?tutorial=fullscreen`;
+  link.dataset.i18n = 'tutorial.title';
+  link.textContent = 'How to use';
+  const column = footer.querySelector('.footer-col');
+  if (column) column.append(link);
+  else footer.append(link);
+}
+
+function ensureSciFiNavLink() {
+  const prefix = makeRootRelativePrefix();
+  document.querySelectorAll<HTMLElement>('.site-nav').forEach((nav) => {
+    if (nav.querySelector('a[data-generated-sci-fi], a[data-i18n="common.scifi"]')) return;
+    const link = document.createElement('a');
+    link.dataset.generatedSciFi = 'true';
+    link.href = `${prefix}scifi/`;
+    link.dataset.i18n = 'common.scifi';
+    link.textContent = 'SciFi Flora';
+    nav.append(link);
+  });
+}
+
 const prefix = makeRelativePrefix();
 document.querySelectorAll<HTMLAnchorElement>('[data-link-root]').forEach((link) => {
   const target = link.dataset.linkRoot || '';
@@ -103,4 +134,6 @@ if (pathLocale) currentLocale = pathLocale;
 
 ensureLanguageSwitcher();
 markDevLinksHidden();
+ensureTutorialFooterLink();
+ensureSciFiNavLink();
 applyLocale(currentLocale);

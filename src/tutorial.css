@@ -1,0 +1,28 @@
+.tutorial-hero { padding-block: clamp(74px, 12vw, 150px) 70px; }
+.tutorial-hero .display { max-width: 10ch; }
+.tutorial-actions { margin-top: 34px; }
+.tutorial-screenshot { margin: 54px 0 0; max-width: 920px; }
+.tutorial-screenshot img { display: block; width: 100%; border: 1px solid var(--line); filter: saturate(.85); }
+.tutorial-screenshot figcaption { margin-top: 12px; color: var(--muted); font-size: 12px; letter-spacing: .04em; }
+.tutorial-list { display: grid; gap: 12px; padding-bottom: 140px; }
+.tutorial-card {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 28px;
+  min-height: 164px;
+  padding: 28px 30px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.025);
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+.tutorial-card.is-active { border-color: rgba(245,217,118,.68); background: rgba(245,217,118,.08); transform: translateX(8px); }
+.tutorial-card-index { color: var(--sun); font-family: var(--serif); font-size: 27px; }
+.tutorial-card h2 { font-family: var(--serif); font-size: clamp(28px, 3vw, 44px); font-weight: 400; }
+.tutorial-card p { max-width: 48rem; margin-top: 10px; color: var(--muted); line-height: 1.75; }
+.tutorial-card .button { white-space: nowrap; }
+@media (max-width: 760px) {
+  .tutorial-card { grid-template-columns: 42px minmax(0, 1fr); gap: 16px; }
+  .tutorial-card .button { grid-column: 2; justify-self: start; }
+  .tutorial-card.is-active { transform: none; }
+}

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A quiet guide to viewing, saving, and living with a DailyFlora bouquet." />
+    <title>DailyFlora How to Use</title>
+    <link rel="stylesheet" href="../src/marketing.css" />
+    <link rel="stylesheet" href="../src/tutorial.css" />
+  </head>
+  <body data-page="tutorial">
+    <div class="page-shell tutorial-shell">
+      <header class="site-header">
+        <a class="brand" href="../" aria-label="DailyFlora home" data-i18n-aria="common.brandHome"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA</a>
+        <nav class="site-nav" aria-label="Site navigation">
+          <a href="../" data-i18n="common.today">Today's bouquet</a>
+          <a href="../member/" data-i18n="common.member">My garden</a>
+          <a href="../about/" data-i18n="common.about">About DailyFlora</a>
+          <a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a>
+          <a href="../downloads/" data-i18n="common.platforms">Platforms</a>
+          <a href="../scifi/" data-i18n="common.scifi">SciFi Flora</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="tutorial-hero wrap">
+          <p class="eyebrow" data-i18n="tutorial.title">HOW TO USE</p>
+          <h1 class="display" data-i18n="tutorial.lead">A quiet guide to keeping a flower on the screen.</h1>
+          <figure class="tutorial-screenshot">
+            <img src="../docs/assets/member-ui-direction/member-direction-desktop.png" alt="DailyFlora collection interface" />
+            <figcaption data-i18n="tutorial.screenshotCaption">A quiet place to return to a flower you kept.</figcaption>
+          </figure>
+          <div class="tutorial-actions button-row">
+            <a class="button primary" href="../" data-i18n="tutorial.openHome">Open today’s flower</a>
+          </div>
+        </section>
+
+        <section class="tutorial-list wrap" aria-label="DailyFlora tutorials">
+          <article class="tutorial-card" data-tutorial-section="fullscreen" id="fullscreen">
+            <div class="tutorial-card-index">01</div>
+            <div><h2 data-i18n="tutorial.fullscreenTitle">Fullscreen</h2><p data-i18n="tutorial.fullscreenBody">Use the fullscreen button for an uninterrupted room-like view.</p></div>
+            <a class="button" href="../?tutorial=fullscreen" data-i18n="tutorial.openFullscreen">Open fullscreen tutorial</a>
+          </article>
+          <article class="tutorial-card" data-tutorial-section="gesture" id="gesture">
+            <div class="tutorial-card-index">02</div>
+            <div><h2 data-i18n="tutorial.gestureTitle">Hand control</h2><p data-i18n="tutorial.gestureBody">Enable hand control from VIEW, then use an open hand to move through the bouquet.</p></div>
+            <a class="button" href="../?tutorial=gesture" data-i18n="tutorial.openGesture">Open hand-control tutorial</a>
+          </article>
+          <article class="tutorial-card" data-tutorial-section="clock" id="clock">
+            <div class="tutorial-card-index">03</div>
+            <div><h2 data-i18n="tutorial.clockTitle">Clock mode</h2><p data-i18n="tutorial.clockBody">Automatic clock mode begins after two quiet minutes.</p></div>
+            <a class="button" href="../?tutorial=clock" data-i18n="tutorial.openClock">Open clock tutorial</a>
+          </article>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-main wrap"><p class="footer-statement" data-i18n="footer.statement">One bouquet a day. No need to possess it.</p><nav class="footer-col" aria-label="System"><strong data-i18n="common.system">System</strong><a href="./" aria-current="page" data-i18n="tutorial.title">How to use</a><a href="../about/" data-i18n="common.about">About DailyFlora</a><a href="../legal/terms/" data-i18n="legal.termsTitle">Terms of Use</a><a href="../legal/privacy/" data-i18n="legal.privacyTitle">Privacy Policy</a></nav></div>
+        <div class="footer-bottom wrap"><span data-i18n="common.copyright">© 2026 CALFN LAU. All rights reserved.</span><span>DailyFlora</span></div>
+      </footer>
+    </div>
+    <script type="module" src="../src/staticI18n.ts"></script>
+    <script>
+      const requestedTutorial = new URLSearchParams(window.location.search).get('tutorial') || 'fullscreen';
+      const active = document.querySelector(`[data-tutorial-section="${requestedTutorial}"]`);
+      if (active) {
+        active.classList.add('is-active');
+        active.scrollIntoView({ block: 'center' });
+      }
+    </script>
+  </body>
+</html>
