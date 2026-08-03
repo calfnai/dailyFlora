@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="DailyFlora grows a collectible 3D digital bouquet from each date." />
+    <title>DailyFlora — A bouquet for every day</title>
+    <script type="module" crossorigin src="./assets/main-Ds3UCm8A.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="./assets/random-CVcU7mnd.js">
+    <link rel="modulepreload" crossorigin href="./assets/three.core-BPWrdVeF.js">
+    <link rel="modulepreload" crossorigin href="./assets/three.module-DzvgNsjM.js">
+    <link rel="modulepreload" crossorigin href="./assets/floraPrimitives-C5qL2vqc.js">
+    <link rel="modulepreload" crossorigin href="./assets/plantOwnership-CEDI0TWb.js">
+    <link rel="modulepreload" crossorigin href="./assets/palmateMajorStructure-BnoqbU6U.js">
+    <link rel="modulepreload" crossorigin href="./assets/realisticLeafForms-DPacDZTr.js">
+    <link rel="modulepreload" crossorigin href="./assets/dailyfloraCloud-BCd8w7nZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/index-C7h46SLH.js">
+    <link rel="stylesheet" crossorigin href="./assets/main-BKqezrO_.css">
+    <meta name="dailyflora-release" content="DF-20260803-0714-f0b44e2c">
+  </head>
+  <body>
+    <main class="app-shell" aria-label="DailyFlora 3D bouquet screensaver">
+      <canvas id="flora-canvas"></canvas>
+
+      <div class="interface-frame" aria-hidden="true">
+        <span class="interface-corner interface-corner-top"></span>
+        <span class="interface-corner interface-corner-bottom"></span>
+      </div>
+
+      <section class="hud" id="hud" aria-live="polite">
+        <div class="daily-mark">
+          <span class="daily-date" id="daily-date"></span>
+          <span class="daily-theme" id="daily-theme">
+            <span class="daily-theme-cn" id="daily-theme-cn"></span>
+            <span class="daily-theme-en" id="daily-theme-en" lang="en"></span>
+          </span>
+          <span class="flower-plan-mark" id="flower-plan-mark"></span>
+        </div>
+        <div class="quality-mark" id="quality-mark"></div>
+      </section>
+
+      <nav class="site-menu" id="site-menu" aria-label="DailyFlora site menu">
+        <button class="site-menu-toggle" id="site-menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu-panel">
+          <svg class="special-legacy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" /></svg>
+          <span data-interface-copy="index">INDEX</span>
+        </button>
+        <div class="site-menu-panel" id="site-menu-panel" hidden>
+          <a class="site-menu-primary" id="site-menu-favorite-link" href="./member/#signup">收藏这束花</a>
+          <a href="./member/">我的花园</a>
+          <a href="./about/">关于 DailyFlora</a>
+          <a href="./bouquet-shop/">周边与线下</a>
+          <a href="./downloads/">多端入口</a>
+          <a href="./scifi/">SciFi Flora</a>
+          <a id="site-menu-debug-link" href="./docs/aesthetic-review-dashboard.html?debug=1" hidden>审美审核</a>
+          <nav class="language-switcher site-menu-language-switcher" id="language-switcher" aria-label="Language">
+            <button type="button" data-language="en" aria-pressed="true">EN</button>
+            <button type="button" data-language="zh-CN" aria-pressed="false">中</button>
+            <button type="button" data-language="es" aria-pressed="false">ES</button>
+            <button type="button" data-language="fr" aria-pressed="false">FR</button>
+            <button type="button" data-language="pt" aria-pressed="false">PT</button>
+            <button type="button" data-language="it" aria-pressed="false">IT</button>
+            <button type="button" data-language="ja" aria-pressed="false">日</button>
+          </nav>
+        </div>
+      </nav>
+
+      <div class="account-dock" id="account-dock">
+        <button class="account-favorite-button" id="favorite-button" type="button" aria-label="收藏今日花束" aria-pressed="false" title="收藏今日花束">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 5.6 14A5.2 5.2 0 0 1 4 10.2 4.2 4.2 0 0 1 8.2 6c1.4 0 2.7.7 3.8 2 1.1-1.3 2.4-2 3.8-2A4.2 4.2 0 0 1 20 10.2c0 1.4-.5 2.7-1.6 3.8z" /></svg>
+        </button>
+        <button class="account-open-button" id="account-open-button" type="button" aria-label="打开个人花园" aria-expanded="false" aria-controls="account-panel">
+          <span class="account-avatar" id="account-avatar" aria-hidden="true">访</span>
+          <span class="account-open-copy"><span id="account-open-title">个人花园</span><span id="account-open-status">登录后同步收藏</span></span>
+        </button>
+      </div>
+
+      <aside class="account-panel" id="account-panel" aria-labelledby="account-panel-title" hidden>
+        <header class="account-panel-header">
+          <div>
+            <p class="account-eyebrow">DailyFlora Garden</p>
+            <h2 id="account-panel-title">把今天的花束收进个人花园</h2>
+          </div>
+          <button class="account-close-button" id="account-close-button" type="button" aria-label="关闭个人花园">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.4 5 12.6 12.6-1.4 1.4L5 6.4z" /><path d="M5 17.6 17.6 5l1.4 1.4L6.4 19z" /></svg>
+          </button>
+        </header>
+        <form class="login-card" id="login-form">
+          <label>怎么称呼你<input id="login-name-input" name="name" type="text" autocomplete="name" placeholder="例如：小花" required /></label>
+          <label>邮箱<input id="login-email-input" name="email" type="email" autocomplete="email" placeholder="name@example.com" required /></label>
+          <label>密码<input id="login-password-input" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="至少 8 位（云端账户）" /></label>
+          <label class="registration-consent"><input id="login-consent-input" name="termsAccepted" type="checkbox" required /><span><span data-i18n="member.consentPrefix">我已阅读并同意</span> <a href="./legal/terms/" target="_blank" rel="noopener" data-i18n="legal.termsTitle">使用条款</a> <span data-i18n="member.consentAnd">和</span> <a href="./legal/privacy/" target="_blank" rel="noopener" data-i18n="legal.privacyTitle">隐私政策</a>。</span></label>
+          <button class="primary-action" type="submit">建立本机花园并收藏</button>
+        </form>
+        <section class="account-profile profile-card" id="account-profile" hidden>
+          <span class="profile-avatar" id="profile-avatar" aria-hidden="true">花</span>
+          <div><strong id="profile-name">DailyFlora 用户</strong><span id="profile-email"></span></div>
+          <button class="ghost-action" id="logout-button" type="button">退出</button>
+        </section>
+        <section class="collection-section" aria-label="我的收藏">
+          <div class="collection-header"><h3>我的收藏</h3><span class="collection-count" id="collection-count">0</span></div>
+          <div class="collection-list" id="collection-list"></div>
+        </section>
+        <section class="reference-card" aria-label="参考图生成">
+          <div class="reference-copy">
+            <h3>从参考图出发</h3>
+            <p>只在本机读取颜色和文件名，用来预览一束新的花；不会上传图片。</p>
+          </div>
+          <label class="reference-upload-zone">
+            <span class="reference-upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M11 4h2v9l3.2-3.2 1.4 1.4L12 16.8l-5.6-5.6 1.4-1.4L11 13z" /><path d="M5 18h14v2H5z" /></svg></span>
+            <span>选择一张参考图</span>
+            <input id="reference-file-input" type="file" accept="image/*" />
+          </label>
+          <div class="reference-preview" id="reference-preview" hidden>
+            <img id="reference-preview-image" alt="" />
+            <div><strong id="reference-preview-title"></strong><span id="reference-preview-meta"></span></div>
+          </div>
+          <label class="reference-note-label"><span>偏好备注</span><textarea id="reference-note-input" placeholder="例如：更轻、更冷一点，保留枝条感"></textarea></label>
+          <button class="primary-action" id="reference-generate-button" type="button" disabled>按参考图生成</button>
+          <p class="reference-result" id="reference-result" hidden></p>
+        </section>
+      </aside>
+
+      <nav class="controls is-collapsed" id="controls" aria-label="Viewing controls">
+        <button class="icon-button controls-toggle" id="controls-toggle" type="button" title="Show viewing controls" aria-label="Show viewing controls" aria-expanded="false" aria-controls="controls-panel" data-tooltip="观看设置">
+          <svg class="special-legacy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9a3 3 0 0 0 5.83 1H20V6h-1.17A3 3 0 0 0 13 7H4zm0 11h3.17A3 3 0 0 0 13 17h7v-2h-7a3 3 0 0 0-5.83 1H4z" /></svg>
+          <span data-interface-copy="view">VIEW</span>
+        </button>
+        <a class="icon-button review-dashboard-button" id="review-dashboard-link" href="./docs/aesthetic-review-dashboard.html?debug=1" target="_blank" rel="noopener" title="Open aesthetic review dashboard" aria-label="Open aesthetic review dashboard" data-tooltip="审美审核" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 2v14h14V5z" /><path d="M7 8h10v2H7zM7 12h6v2H7zM15.4 13.6l1.4 1.4-3.6 3.6-2.2-2.2 1.4-1.4.8.8z" /></svg>
+        </a>
+        <div class="controls-panel" id="controls-panel" hidden>
+          <span class="date-control">
+            <button class="icon-button" id="today-button" type="button" title="Today" aria-label="Show today's bouquet" data-tooltip="选择日期">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h2v3H7zM15 2h2v3h-2z" /><path d="M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 6v9h14v-9z" /></svg>
+            </button>
+            <input class="date-picker" id="date-picker" type="date" aria-label="Pick bouquet date" />
+          </span>
+          <button class="icon-button" id="shuffle-button" type="button" title="Preview another seed" aria-label="Preview another seed" data-tooltip="随机跳到某一天">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h5v5h-2V6.5l-4.2 4.2-1.4-1.4L17.6 5H16zM4 7h3.4c1.6 0 3 .8 3.9 2.1l3.4 5c.5.7 1.3 1.1 2.1 1.1H21v2h-4.2c-1.6 0-3-.8-3.9-2.1l-3.4-5C9 9.4 8.2 9 7.4 9H4z" /><path d="M17.6 19l-4.2-4.3 1.4-1.4 4.2 4.2V16h2v5h-5v-2zM4 17h3.4c.8 0 1.6-.4 2.1-1.1l1-1.5 1.4 1.4-1 1.2c-.9 1.3-2.3 2-3.9 2H4z" /></svg>
+          </button>
+          <button class="icon-button" id="fullscreen-button" type="button" title="Fullscreen" aria-label="Fullscreen" data-tooltip="全屏观看">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v2H6v4H4zM14 4h6v6h-2V6h-4zM4 14h2v4h4v2H4zM18 18v-4h2v6h-6v-2z" /></svg>
+          </button>
+          <button class="icon-button compact-button hand-control-launcher" id="hand-control-toggle" type="button" aria-label="开启手势控制" aria-pressed="false" title="开启手势控制" data-tooltip="手势控制">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7.2 12V6.8a1.45 1.45 0 0 1 2.9 0v3.7-6.1a1.45 1.45 0 0 1 2.9 0v6.1-5a1.45 1.45 0 0 1 2.9 0v5.6-3.5a1.45 1.45 0 0 1 2.9 0v6.2c0 4.1-2.7 7.2-6.8 7.2h-.6c-2.3 0-4.1-1-5.5-2.8l-2.3-3a1.7 1.7 0 0 1 2.5-2.3L7.2 14Z" />
+            </svg>
+          </button>
+          <div class="zoom-control" aria-label="Zoom controls">
+            <button class="icon-button compact-button" id="zoom-out-button" type="button" title="Zoom out" aria-label="Zoom out" data-tooltip="拉远">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11h14v2H5z" /></svg>
+            </button>
+            <button class="icon-button compact-button" id="zoom-in-button" type="button" title="Zoom in" aria-label="Zoom in" data-tooltip="拉近">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z" /></svg>
+            </button>
+          </div>
+          <div class="segmented density-control" aria-label="Bouquet density">
+            <button class="segment-button" type="button" data-density-choice="low" aria-pressed="false" title="Sparse bouquet" data-tooltip="花材少一点">疏</button>
+            <button class="segment-button" type="button" data-density-choice="medium" aria-pressed="true" title="Medium bouquet" data-tooltip="花材中等">中</button>
+            <button class="segment-button" type="button" data-density-choice="high" aria-pressed="false" title="Dense bouquet" data-tooltip="花材密一点">密</button>
+          </div>
+          <div class="segmented render-control" aria-label="Render precision">
+            <button class="segment-button" type="button" data-render-choice="auto" aria-pressed="true" title="Auto render" data-tooltip="自动选择清晰度">自</button>
+            <button class="segment-button" type="button" data-render-choice="low" aria-pressed="false" title="Low render" data-tooltip="省电模式">省</button>
+            <button class="segment-button" type="button" data-render-choice="medium" aria-pressed="false" title="Medium render" data-tooltip="80%透明光滑球">清</button>
+            <button class="segment-button" type="button" data-render-choice="high" aria-pressed="false" title="High render" data-tooltip="精细模式">精</button>
+          </div>
+          <div class="rotation-control" aria-label="Camera route">
+            <button class="icon-button compact-button" id="pause-button" type="button" title="Pause rotation" aria-label="Pause rotation" data-tooltip="暂停 / 继续旋转">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" /></svg>
+            </button>
+            <button class="icon-button compact-button" id="rotation-direction-button" type="button" title="Reverse current camera route" aria-label="Reverse current camera route" data-tooltip="反转当前镜头路线">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a8 8 0 1 1-7.2 4.5l1.8.9A6 6 0 1 0 12 6H8.8l2.6 2.6L10 10 5 5l5-5 1.4 1.4L8.8 4z" /></svg>
+            </button>
+            <label class="slider-shell" data-tooltip="镜头速度">
+              <span class="sr-only">Camera route speed</span>
+              <input class="rotation-slider" id="rotation-speed" type="range" min="0" max="100" value="45" aria-label="Camera route speed" />
+            </label>
+            <button class="icon-button compact-button" id="rotation-preset-button" type="button" title="Random camera route preset" aria-label="Random camera route preset" data-tooltip="随机镜头预设">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l1.4 5.1L18 4.6l-2.4 4.7 5.1 1.4-5.1 1.4 2.4 4.7-4.6-2.5L12 19.4l-1.4-5.1L6 16.8l2.4-4.7-5.1-1.4 5.1-1.4L6 4.6l4.6 2.5z" /></svg>
+            </button>
+          </div>
+          <div class="clock-control" data-clock-interaction aria-label="Idle clock settings">
+            <button class="icon-button compact-button" id="clock-toggle" type="button" aria-pressed="false" title="Show clock" aria-label="Show clock" data-tooltip="时钟">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 10.4 3.1 1.8-1 1.7-4.1-2.4V6h2Z" /></svg>
+            </button>
+            <label class="clock-interval-label" title="Minutes before the clock appears">
+              <span data-clock-copy="clockLabel">钟</span>
+              <input id="clock-interval" type="number" min="1" max="120" step="1" inputmode="numeric" aria-label="Minutes before automatic clock" />
+              <span data-clock-copy="clockMinutes">分</span>
+            </label>
+            <label class="clock-auto-label">
+              <input id="clock-auto-enabled" type="checkbox" aria-label="Enable automatic clock" />
+              <span data-clock-copy="clockAuto">自动</span>
+            </label>
+          </div>
+          <button class="view-tutorial-link" id="view-help-button" type="button" data-tutorial-entry="help">?</button>
+        </div>
+      </nav>
+      <dialog class="inline-tutorial-dialog" id="inline-tutorial-dialog" aria-labelledby="inline-tutorial-title">
+        <button class="inline-tutorial-close" id="inline-tutorial-close" type="button" aria-label="Close">×</button>
+        <p class="eyebrow" id="inline-tutorial-kicker">HOW TO USE</p>
+        <h2 id="inline-tutorial-title"></h2>
+        <nav class="tutorial-mode-switcher" aria-label="Tutorials">
+          <button type="button" data-tutorial-select="fullscreen"></button>
+          <button type="button" data-tutorial-select="gesture"></button>
+          <button type="button" data-tutorial-select="clock"></button>
+        </nav>
+        <p id="inline-tutorial-body"></p>
+        <div class="fullscreen-shortcut-content" id="fullscreen-shortcut-content" hidden>
+          <dl class="shortcut-list">
+            <div><dt><kbd>←</kbd><kbd>→</kbd></dt><dd data-shortcut-copy="dates"></dd></div>
+            <div><dt><kbd>↑</kbd><kbd>↓</kbd></dt><dd data-shortcut-copy="arrowZoom"></dd></div>
+            <div><dt><kbd>+</kbd><kbd>−</kbd></dt><dd data-shortcut-copy="zoom"></dd></div>
+            <div><dt><kbd>R</kbd></dt><dd data-shortcut-copy="random"></dd></div>
+            <div><dt><kbd>0</kbd></dt><dd data-shortcut-copy="reset"></dd></div>
+            <div><dt><kbd>P</kbd></dt><dd data-shortcut-copy="preset"></dd></div>
+            <div><dt><kbd>Space</kbd></dt><dd data-shortcut-copy="rotation"></dd></div>
+            <div><dt><kbd>H</kbd></dt><dd data-shortcut-copy="interface"></dd></div>
+            <div><dt><kbd>F</kbd></dt><dd data-shortcut-copy="fullscreen"></dd></div>
+            <div><dt><kbd>O</kbd></dt><dd data-shortcut-copy="view"></dd></div>
+            <div><dt><kbd>?</kbd></dt><dd data-shortcut-copy="help"></dd></div>
+            <div><dt><kbd>Esc</kbd></dt><dd data-shortcut-copy="escape"></dd></div>
+          </dl>
+          <div class="shortcut-help-actions">
+            <a href="./how-to-use/?tutorial=fullscreen" id="fullscreen-help-more"></a>
+          </div>
+        </div>
+        <div class="gesture-guide-content" id="gesture-guide-content" hidden>
+          <dl class="shortcut-list gesture-guide-list">
+            <div><dt data-gesture-label="index"></dt><dd data-gesture-action="index"></dd></div>
+            <div><dt data-gesture-label="victory"></dt><dd data-gesture-action="victory"></dd></div>
+            <div><dt data-gesture-label="three"></dt><dd data-gesture-action="three"></dd></div>
+            <div><dt data-gesture-label="thumb"></dt><dd data-gesture-action="thumb"></dd></div>
+            <div><dt data-gesture-label="four"></dt><dd data-gesture-action="four"></dd></div>
+            <div><dt data-gesture-label="fist"></dt><dd data-gesture-action="fist"></dd></div>
+            <div><dt data-gesture-label="pinch"></dt><dd data-gesture-action="pinch"></dd></div>
+            <div><dt data-gesture-label="open"></dt><dd data-gesture-action="open"></dd></div>
+            <div><dt data-gesture-label="curled"></dt><dd data-gesture-action="curled"></dd></div>
+            <div><dt data-gesture-label="twoHands"></dt><dd data-gesture-action="twoHands"></dd></div>
+          </dl>
+        </div>
+        <button class="tutorial-acknowledge" id="fullscreen-help-close" type="button"></button>
+      </dialog>
+      <aside class="clock-overlay" id="clock-overlay" aria-live="polite" aria-hidden="true">
+        <div class="clock-content">
+          <p class="clock-time" id="clock-time"></p>
+          <p class="clock-date" id="clock-date"></p>
+          <blockquote class="clock-quote">
+            <p id="clock-quote-text"></p>
+            <footer id="clock-quote-author"></footer>
+          </blockquote>
+        </div>
+      </aside>
+      <p class="clock-exit-hint" id="clock-exit-hint" role="status">press esc to exit clock mode</p>
+      <aside class="debug-panel" id="debug-panel" aria-label="Debug rendering stats" hidden></aside>
+    </main>
+  </body>
+</html>

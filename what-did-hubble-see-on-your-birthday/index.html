@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>What Did Hubble See on Your Birthday?</title>
+  <style>
+    :root{
+      --black:#000;
+      --white:#fff;
+      --nasa-red:#e21b2d;
+      --nasa-blue:#105bd8;
+      --text:#1b1b1b;
+      --muted:#555;
+      --line:#d8d8d8;
+      --hubble-blue:#1d4ed8;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:#fff;
+      line-height:1.45;
+    }
+    a{color:inherit;text-decoration:none}
+
+    /* NASA-like global header */
+    .topbar{
+      background:#050505;
+      color:#fff;
+      height:86px;
+      display:grid;
+      grid-template-columns:1fr auto 1fr;
+      align-items:center;
+      padding:0 42px;
+      column-gap:28px;
+    }
+    .top-left,.top-right{display:flex;align-items:center;gap:30px;font-size:18px;font-weight:700}
+    .top-left{justify-content:flex-start}
+    .top-right{justify-content:flex-end}
+    .explore::after{content:"";display:inline-block;margin-left:8px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--nasa-red);vertical-align:middle}
+    .search{color:#aaa;font-weight:700}
+    .nasa-logo{
+      width:76px;height:64px;border-radius:50%;
+      background:radial-gradient(circle at 50% 50%, #2d6cdf 0 34px, #1246b8 35px 100%);
+      position:relative;
+      display:grid;place-items:center;
+      color:#fff;font-weight:900;font-size:20px;letter-spacing:-1px;
+      box-shadow:0 0 0 1px rgba(255,255,255,.12);
+      transform:rotate(-7deg);
+    }
+    .nasa-logo::before{
+      content:"";position:absolute;left:6px;right:6px;top:31px;height:2px;background:#fff;transform:rotate(-18deg);opacity:.95
+    }
+    .nasa-logo::after{
+      content:"";position:absolute;width:86px;height:12px;border-top:4px solid var(--nasa-red);border-radius:50%;transform:rotate(-34deg);opacity:.95
+    }
+    .nasa-logo span{position:relative;z-index:2;transform:rotate(7deg)}
+    .live-pill{border:1px solid #777;border-radius:2px;padding:2px 7px;font-size:13px;margin-left:4px;color:#eee}
+    .chev::after{content:"";display:inline-block;margin-left:8px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #aaa;vertical-align:middle}
+
+    /* Hubble local nav */
+    .hubble-nav{
+      max-width:1180px;
+      margin:0 auto;
+      padding:38px 28px 22px;
+    }
+    .breadcrumb{
+      color:#5b5b5b;
+      font-size:14px;
+      margin-bottom:26px;
+      display:flex;gap:10px;align-items:center;
+      white-space:nowrap;
+      overflow:hidden;
+    }
+    .breadcrumb span{color:#1b1b1b}
+    .hubble-title-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid var(--line);
+      padding-bottom:22px;
+      gap:24px;
+    }
+    .hubble-home{
+      font-size:28px;
+      font-weight:800;
+      letter-spacing:-.02em;
+    }
+    .section-menu{
+      display:flex;
+      gap:26px;
+      align-items:center;
+      font-size:16px;
+      font-weight:700;
+      color:#333;
+      flex-wrap:wrap;
+    }
+    .section-menu .active{border-bottom:4px solid #111;padding-bottom:18px;margin-bottom:-22px}
+    .section-menu .more::after{content:"";display:inline-block;margin-left:7px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #333;vertical-align:middle}
+
+    /* Main NASA-like content */
+    main{
+      max-width:1180px;
+      margin:0 auto;
+      padding:42px 28px 80px;
+    }
+    .article{
+      max-width:800px;
+    }
+    h1{
+      margin:0 0 28px;
+      font-size:64px;
+      line-height:.97;
+      letter-spacing:-.055em;
+      font-weight:900;
+      color:#111;
+    }
+    .lead{
+      font-size:22px;
+      line-height:1.55;
+      color:#333;
+      margin:0 0 36px;
+      max-width:740px;
+      font-weight:400;
+    }
+    figure{margin:0 0 28px}
+    .hero-img{
+      width:100%;
+      display:block;
+      aspect-ratio:1/1;
+      object-fit:cover;
+      background:#111;
+    }
+    figcaption{
+      font-size:14px;
+      color:#666;
+      margin-top:8px;
+    }
+    .body-p{
+      font-size:19px;
+      line-height:1.65;
+      margin:0 0 18px;
+      color:#333;
+    }
+
+    /* Rebuilt birthday embed: NASA-like, with GO instead of form submit */
+    .birthday-embed{
+      margin-top:34px;
+      width:100%;
+      min-height:560px;
+      background:#05070d;
+      color:#fff;
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #222;
+    }
+    .birthday-embed::before{
+      content:"";
+      position:absolute;inset:0;
+      background:
+        radial-gradient(circle at 18% 24%, rgba(255,255,255,.8) 0 1px, transparent 2px),
+        radial-gradient(circle at 73% 18%, rgba(255,255,255,.65) 0 1px, transparent 2px),
+        radial-gradient(circle at 88% 60%, rgba(255,255,255,.7) 0 1px, transparent 2px),
+        radial-gradient(circle at 32% 78%, rgba(255,255,255,.7) 0 1px, transparent 2px),
+        radial-gradient(circle at 58% 48%, rgba(255,255,255,.48) 0 1px, transparent 2px),
+        linear-gradient(180deg,#060813,#090b15 58%,#050509);
+      opacity:1;
+    }
+    .birthday-embed::after{
+      content:"";
+      position:absolute;inset:0;
+      background:url('https://science.nasa.gov/wp-content/uploads/2023/04/hubble-nebula-orion-nebula-display-jpg.webp?w=1800') center/cover no-repeat;
+      opacity:.23;
+      filter:saturate(1.05) contrast(1.05);
+    }
+    .embed-panel{
+      position:relative;
+      z-index:2;
+      width:min(650px, calc(100% - 56px));
+      padding:44px 42px 40px;
+      text-align:center;
+      background:rgba(0,0,0,.48);
+      border:1px solid rgba(255,255,255,.24);
+      box-shadow:0 24px 90px rgba(0,0,0,.55);
+    }
+    .embed-kicker{
+      margin:0 0 18px;
+      font-size:17px;
+      letter-spacing:.02em;
+      color:#e7e7e7;
+      font-weight:700;
+    }
+    .embed-title{
+      margin:0 0 26px;
+      font-size:36px;
+      line-height:1.08;
+      letter-spacing:-.025em;
+      font-weight:900;
+    }
+    .fake-form{
+      display:grid;
+      grid-template-columns:1fr 1fr auto;
+      gap:12px;
+      align-items:end;
+      margin-top:10px;
+    }
+    label{
+      display:block;text-align:left;font-size:13px;font-weight:800;color:#ddd;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;
+    }
+    select{
+      width:100%;
+      height:48px;
+      border:2px solid #fff;
+      background:#fff;
+      color:#111;
+      padding:0 12px;
+      font-size:16px;
+      border-radius:0;
+      appearance:none;
+      background-image:linear-gradient(45deg, transparent 50%, #111 50%),linear-gradient(135deg, #111 50%, transparent 50%);
+      background-position:calc(100% - 18px) 20px,calc(100% - 12px) 20px;
+      background-size:6px 6px,6px 6px;
+      background-repeat:no-repeat;
+    }
+    .go-btn{
+      height:48px;
+      min-width:112px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:#d83933;
+      color:#fff;
+      border:0;
+      padding:0 25px;
+      font-size:16px;
+      font-weight:900;
+      letter-spacing:.03em;
+      cursor:pointer;
+      text-transform:uppercase;
+    }
+    .go-btn:hover{background:#b82420}
+    .embed-bottom{
+      position:absolute;
+      left:0;right:0;bottom:0;
+      z-index:3;
+      height:42px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:16px;
+      padding:0 18px;
+      font-size:13px;
+      color:#ddd;
+      background:rgba(0,0,0,.6);
+      border-top:1px solid rgba(255,255,255,.16);
+    }
+    .embed-close{
+      position:absolute;
+      right:15px;
+      top:12px;
+      z-index:3;
+      color:#fff;
+      font-size:22px;
+      font-weight:300;
+      opacity:.8;
+    }
+    .screen-reader-note{
+      font-size:15px;
+      color:#555;
+      margin:14px 0 42px;
+    }
+    .screen-reader-note a{color:#245ebf;text-decoration:underline;text-underline-offset:2px}
+
+    .social-section{
+      border-top:1px solid var(--line);
+      padding-top:34px;
+      max-width:800px;
+    }
+    .social-section h2{
+      font-size:31px;line-height:1.1;letter-spacing:-.03em;margin:0 0 20px;font-weight:900;
+    }
+    .social-links{display:flex;gap:28px;flex-wrap:wrap;font-size:17px;font-weight:800}
+    .social-links a{border-bottom:2px solid #111;padding-bottom:2px}
+
+    @media (max-width:900px){
+      .topbar{height:auto;padding:20px 24px;grid-template-columns:1fr auto;row-gap:18px}
+      .top-right{grid-column:1/-1;justify-content:flex-start;font-size:15px;gap:18px;flex-wrap:wrap}
+      .top-left{font-size:16px;gap:20px}
+      .nasa-logo{width:64px;height:54px;font-size:17px}
+      .hubble-title-row{align-items:flex-start;flex-direction:column}
+      .section-menu{font-size:15px;gap:16px}
+      .section-menu .active{padding-bottom:0;margin-bottom:0;border-bottom:2px solid #111}
+      h1{font-size:45px}
+      .lead{font-size:20px}
+      .fake-form{grid-template-columns:1fr}
+      .go-btn{width:100%}
+      .birthday-embed{min-height:620px}
+      .embed-panel{padding:34px 26px}
+      .embed-title{font-size:30px}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar" aria-label="NASA global navigation mockup">
+    <div class="top-left">
+      <div class="explore">Explore</div>
+      <div class="search">Search</div>
+    </div>
+    <div class="nasa-logo" aria-label="NASA"><span>NASA</span></div>
+    <nav class="top-right">
+      <a href="#">News &amp; Events</a>
+      <a href="#">Multimedia</a>
+      <a href="#">NASA+ <span class="live-pill">LIVE</span></a>
+    </nav>
+  </header>
+
+  <section class="hubble-nav">
+    <div class="breadcrumb">
+      <a href="#">Explore Hubble</a>
+      <span>›</span>
+      <a href="#">Hubble Multimedia</a>
+      <span>›</span>
+      <span>What Did Hubble See on Your...</span>
+    </div>
+
+    <div class="hubble-title-row">
+      <a class="hubble-home" href="#">Hubble Home</a>
+      <nav class="section-menu" aria-label="Hubble section navigation">
+        <a href="#">Overview</a>
+        <a href="#">Impact &amp; Benefits</a>
+        <a href="#">Science</a>
+        <a href="#">Observatory</a>
+        <a href="#">Team</a>
+        <a href="#" class="active">Multimedia</a>
+        <a href="#">News</a>
+        <a href="#" class="more">More</a>
+      </nav>
+    </div>
+  </section>
+
+  <main>
+    <article class="article">
+      <h1>What Did Hubble See on Your Birthday?</h1>
+
+      <p class="lead">Hubble explores the universe 24 hours a day, 7 days a week. That means it has observed some fascinating cosmic wonder every day of the year, including on your birthday.</p>
+
+      <figure>
+        <img class="hero-img" src="https://science.nasa.gov/wp-content/uploads/2023/04/hubble-nebula-orion-nebula-display-jpg.webp?w=1800" alt="Hubble Nebula - Orion Nebula" />
+        <figcaption>Hubble Nebula - Orion Nebula</figcaption>
+      </figure>
+
+      <p class="body-p">What did Hubble look at on your birthday? Enter the month and date below to find out!</p>
+      <p class="body-p">Then share the results with your friends on social media using #Hubble.</p>
+      <p class="body-p">Firefox users: To easily share your birthday image on social media, you might need to turn off content blocking for this site in your browser’s privacy settings.</p>
+      <p class="body-p">If you are using a translation-from-English feature, you may need to turn this setting off before entering full-screen mode to avoid errors.</p>
+
+      <section class="birthday-embed" aria-label="Hubble birthday interactive demo">
+        <div class="embed-close">×</div>
+        <div class="embed-panel">
+          <p class="embed-kicker">Select Your Birth Date</p>
+          <h2 class="embed-title">What Did Hubble See on Your Birthday?</h2>
+          <div class="fake-form">
+            <div>
+              <label for="month">Month</label>
+              <select id="month" aria-label="Month">
+                <option selected>January</option>
+                <option>February</option><option>March</option><option>April</option><option>May</option><option>June</option>
+                <option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option>
+              </select>
+            </div>
+            <div>
+              <label for="day">Day</label>
+              <select id="day" aria-label="Day">
+                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option>
+                <option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option>
+                <option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option>
+                <option>22</option><option>23</option><option>24</option><option>25</option><option>26</option><option>27</option><option>28</option>
+                <option selected>29</option><option>30</option><option>31</option>
+              </select>
+            </div>
+            <a class="go-btn" href="../special0629-v4/">GO</a>
+          </div>
+        </div>
+        <div class="embed-bottom">
+          <span>Hide Info</span>
+          <span>Show Info</span>
+          <span>|</span>
+          <span>See Full Image</span>
+          <span>|</span>
+          <span>More info</span>
+        </div>
+      </section>
+
+      <p class="screen-reader-note"><a href="#">A text version</a> is available for screen readers. Some Hubble images use data acquired over several days of observations.</p>
+    </article>
+
+    <section class="social-section">
+      <h2>Follow Hubble for the Latest News and Images</h2>
+      <div class="social-links">
+        <a href="#">@NASAHubble</a>
+        <a href="#">@NASAHubble</a>
+        <a href="#">@NASAHubble</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

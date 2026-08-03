@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DailyFlora 参考卡片</title>
+    <style>
+      :root {
+        --bg: #0b0f0a;
+        --panel: rgba(18, 24, 17, 0.92);
+        --panel-2: rgba(28, 36, 25, 0.9);
+        --text: #f4f0e6;
+        --muted: rgba(244, 240, 230, 0.72);
+        --faint: rgba(244, 240, 230, 0.16);
+        --accent: #f5d65c;
+        --accent-2: #8ee39a;
+        --danger: #ff8f8f;
+        --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top, rgba(245, 214, 92, 0.14), transparent 24%),
+          radial-gradient(circle at 80% 10%, rgba(142, 227, 154, 0.1), transparent 18%),
+          linear-gradient(180deg, #081007 0%, #0b0f0a 100%);
+      }
+
+      .shell {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 32px 20px 56px;
+      }
+
+      .hero {
+        display: grid;
+        gap: 16px;
+        padding: 28px;
+        border: 1px solid var(--faint);
+        border-radius: 28px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+        box-shadow: var(--shadow);
+      }
+
+      .eyebrow {
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-size: 12px;
+        color: var(--accent);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(30px, 4vw, 50px);
+        line-height: 1.05;
+      }
+
+      .lead {
+        margin: 0;
+        max-width: 62ch;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.7;
+      }
+
+      .meta {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--faint);
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .sections {
+        display: grid;
+        gap: 22px;
+        margin-top: 26px;
+      }
+
+      .section {
+        border: 1px solid var(--faint);
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.025);
+        overflow: hidden;
+      }
+
+      .section header {
+        padding: 18px 22px;
+        background: linear-gradient(90deg, rgba(245, 214, 92, 0.12), rgba(142, 227, 154, 0.08));
+        border-bottom: 1px solid var(--faint);
+      }
+
+      .section h2 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .section p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        padding: 18px;
+      }
+
+      .card {
+        display: grid;
+        gap: 12px;
+        padding: 18px;
+        border-radius: 22px;
+        background: linear-gradient(180deg, var(--panel), var(--panel-2));
+        border: 1px solid var(--faint);
+        box-shadow: var(--shadow);
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.3;
+      }
+
+      .linkrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: 999px;
+        text-decoration: none;
+        color: #111;
+        background: var(--accent);
+        font-weight: 700;
+        font-size: 13px;
+      }
+
+      .btn.secondary {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--faint);
+        font-weight: 600;
+      }
+
+      .placeholder {
+        aspect-ratio: 16 / 9;
+        border-radius: 18px;
+        border: 1px dashed rgba(255, 255, 255, 0.18);
+        background:
+          radial-gradient(circle at 20% 30%, rgba(245, 214, 92, 0.16), transparent 18%),
+          radial-gradient(circle at 80% 40%, rgba(142, 227, 154, 0.12), transparent 16%),
+          rgba(255, 255, 255, 0.03);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+        font-size: 13px;
+        text-align: center;
+        padding: 18px;
+      }
+
+      .blocks {
+        display: grid;
+        gap: 10px;
+      }
+
+      .block-title {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--accent-2);
+      }
+
+      .copy {
+        margin: 0;
+        color: var(--text);
+        line-height: 1.7;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--text);
+        line-height: 1.7;
+      }
+
+      li + li {
+        margin-top: 6px;
+      }
+
+      .good {
+        border-left: 3px solid var(--accent-2);
+      }
+
+      .bad {
+        border-left: 3px solid var(--danger);
+      }
+
+      .note {
+        padding: 16px 18px;
+        margin-top: 18px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--faint);
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      @media (max-width: 860px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .shell {
+          padding-inline: 14px;
+        }
+
+        .hero {
+          padding: 22px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div class="eyebrow">DailyFlora reference deck</div>
+        <h1>把你给的参考，做成能直接看、能直接聊的卡片</h1>
+        <p class="lead">
+          这页不是抽象规范，而是给我们日常沟通用的。每条参考都保留原始链接，下面直接写“你要的感觉 / 要避免什么 / 参数上怎么动”。
+          现在先用链接版；如果你后面把图片文件发进来，我们再把占位块换成真正的图。
+        </p>
+        <div class="meta">
+          <span class="chip">可直接打开</span>
+          <span class="chip">带原始链接</span>
+          <span class="chip">适合边看边聊</span>
+          <span class="chip">不假装有本地图片</span>
+        </div>
+      </section>
+
+      <div class="sections">
+        <section class="section">
+          <header>
+            <h2>正向范例</h2>
+            <p>这些是“我想要什么”的样本。重点不是复读标题，而是把它翻成可执行的审美语言。</p>
+          </header>
+          <div class="grid">
+            <article class="card good">
+              <div class="placeholder">图片位 / 链接位<br />夏日多巴胺</div>
+              <h3>夏日多巴胺</h3>
+              <div class="linkrow">
+                <a class="btn" href="http://xhslink.com/o/1StOtyGow8u" target="_blank" rel="noreferrer">打开小红书链接</a>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="block-title">你要的感觉</div>
+                  <p class="copy">明亮、活泼、像夏天突然一下子打开了色彩。</p>
+                </div>
+                <div>
+                  <div class="block-title">要避免什么</div>
+                  <p class="copy">别做成艳俗堆色，也别太重太闷。</p>
+                </div>
+                <div>
+                  <div class="block-title">参数怎么动</div>
+                  <ul>
+                    <li>暖黄、桃粉、浅绿为主，少量蓝紫点缀。</li>
+                    <li>亮点多一点，但整体保持轻盈。</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+
+            <article class="card good">
+              <div class="placeholder">图片位 / 链接位<br />大花束看不出体积</div>
+              <h3>明明一束挺大的花束，拍出来咋就看不出来呢</h3>
+              <div class="linkrow">
+                <a class="btn" href="http://xhslink.com/o/6GwDP4zMrx3" target="_blank" rel="noreferrer">打开小红书链接</a>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="block-title">你要的感觉</div>
+                  <p class="copy">真实的大体量花束，但镜头里要显得有层次，不是一坨。</p>
+                </div>
+                <div>
+                  <div class="block-title">要避免什么</div>
+                  <p class="copy">别让画面塌成一团，也别只剩局部好看。</p>
+                </div>
+                <div>
+                  <div class="block-title">参数怎么动</div>
+                  <ul>
+                    <li>增加枝条和外轮廓。</li>
+                    <li>强化侧面和背面的可读性。</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+
+            <article class="card good">
+              <div class="placeholder">图片位 / 链接位<br />浆果森林</div>
+              <h3>邮寄 | 贝贝们订的浆果森林🍄 | 可爱发芽啦</h3>
+              <div class="linkrow">
+                <a class="btn" href="http://xhslink.com/o/5AiGKCXJM4B" target="_blank" rel="noreferrer">打开小红书链接</a>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="block-title">你要的感觉</div>
+                  <p class="copy">像森林里冒出来的果子和小花，有童话感。</p>
+                </div>
+                <div>
+                  <div class="block-title">要避免什么</div>
+                  <p class="copy">别做成太规整的礼盒花，也别太成熟端庄。</p>
+                </div>
+                <div>
+                  <div class="block-title">参数怎么动</div>
+                  <ul>
+                    <li>提高小颗粒、莓果感、枝叶感。</li>
+                    <li>减少单一大花比例。</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+
+            <article class="card good">
+              <div class="placeholder">图片位 / 链接位<br />卡布奇诺配色</div>
+              <h3>卡布奇诺的配色好可爱</h3>
+              <div class="linkrow">
+                <a class="btn" href="http://xhslink.com/o/2KAOhJ8nHzz" target="_blank" rel="noreferrer">打开小红书链接</a>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="block-title">你要的感觉</div>
+                  <p class="copy">温柔、奶感、带一点甜味的配色。</p>
+                </div>
+                <div>
+                  <div class="block-title">要避免什么</div>
+                  <p class="copy">别太荧光，别太硬。</p>
+                </div>
+                <div>
+                  <div class="block-title">参数怎么动</div>
+                  <ul>
+                    <li>奶咖、米白、浅橙、柔粉做底。</li>
+                    <li>整体对比收一点。</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+
+            <article class="card good">
+              <div class="placeholder">图片位 / 链接位<br />秋日果汁</div>
+              <h3>宁波花店｜秋日果汁</h3>
+              <div class="linkrow">
+                <a class="btn" href="http://xhslink.com/o/AobSfsVsDsO" target="_blank" rel="noreferrer">打开小红书链接</a>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="block-title">你要的感觉</div>
+                  <p class="copy">像秋天的果汁，偏暖、偏甜、偏多汁。</p>
+                </div>
+                <div>
+                  <div class="block-title">要避免什么</div>
+                  <p class="copy">别冷、别灰、别太素。</p>
+                </div>
+                <div>
+                  <div class="block-title">参数怎么动</div>
+                  <ul>
+                    <li>提高橙、黄、暖红权重。</li>
+                    <li>增加一点饱满的果感和温度。</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+
+            <article class="card good">
+              <div class="placeholder">图片位 / 链接位<br />浪漫的具象化</div>
+              <h3>花束是浪漫的具象化｜杭州花店</h3>
+              <div class="linkrow">
+                <a class="btn" href="http://xhslink.com/o/108RyWKecVH" target="_blank" rel="noreferrer">打开小红书链接</a>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="block-title">你要的感觉</div>
+                  <p class="copy">花束本身就像“浪漫”的实体化表达。</p>
+                </div>
+                <div>
+                  <div class="block-title">要避免什么</div>
+                  <p class="copy">别太功能型，别像随手扎的。</p>
+                </div>
+                <div>
+                  <div class="block-title">参数怎么动</div>
+                  <ul>
+                    <li>保留结构感和完成度。</li>
+                    <li>但别把花束做得太大太重。</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section">
+          <header>
+            <h2>反向范例</h2>
+            <p>这些是“别长成这样”的提醒。它们对生成器的价值很高，因为能直接变成约束。</p>
+          </header>
+          <div class="grid">
+            <article class="card bad">
+              <div class="placeholder">图片位 / 链接位<br />裸花束</div>
+              <h3>裸花束是最自然的表达🌿</h3>
+              <div class="linkrow">
+                <a class="btn" href="http://xhslink.com/o/75zpxFFqEPe" target="_blank" rel="noreferrer">打开小红书链接</a>
+              </div>
+              <div class="blocks">
+                <div>
+                  <div class="block-title">要避免什么</div>
+                  <p class="copy">太赤裸、太原生态、像没整理完。</p>
+                </div>
+                <div>
+                  <div class="block-title">参数提醒</div>
+                  <ul>
+                    <li>自然感要有，但不能牺牲可读性和精致度。</li>
+                    <li>不要过度省略包装、支撑、结构层次。</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+
+            <article class="card bad">
+              <div class="placeholder">图片位 / 链接位<br />大向日葵压场</div>
+              <h3>中间的大向日葵占据了太多空间</h3>
+              <div class="blocks">
+                <div>
+                  <div class="block-title">要避免什么</div>
+                  <p class="copy">单个大主花压住全局。</p>
+                </div>
+                <div>
+                  <div class="block-title">参数提醒</div>
+                  <ul>
+                    <li>不要让单朵花尺寸、权重、位置过于霸道。</li>
+                    <li>主花要有，但必须让位给整体结构和周边层次。</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+
+      <div class="note">
+        这页现在是“链接版参考卡”。如果你愿意，下一步我可以继续把它升级成两种形式之一：
+        <br />
+        1. 把它改成真正能预览图片的 HTML 版本，只要你提供本地图片文件路径。
+        <br />
+        2. 把它改成 Markdown 版本，适合你在聊天里直接贴和改。
+      </div>
+    </main>
+  </body>
+</html>

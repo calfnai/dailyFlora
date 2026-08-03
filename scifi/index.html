@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="DailyFlora SciFi：全屏观看结构科幻花束系列。" />
+    <title>SciFi Flora</title>
+    <script type="module" crossorigin src="../assets/scifi-DhTDXFXY.js"></script>
+    <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="../assets/three.core-BPWrdVeF.js">
+    <link rel="modulepreload" crossorigin href="../assets/three.module-DzvgNsjM.js">
+    <link rel="modulepreload" crossorigin href="../assets/random-CVcU7mnd.js">
+    <link rel="modulepreload" crossorigin href="../assets/floraPrimitives-C5qL2vqc.js">
+    <link rel="modulepreload" crossorigin href="../assets/scifiFlowerForms-BZEF-Ctm.js">
+    <link rel="modulepreload" crossorigin href="../assets/scifiBouquets-CV9NSUiB.js">
+    <link rel="modulepreload" crossorigin href="../assets/index-C7h46SLH.js">
+    <link rel="stylesheet" crossorigin href="../assets/scifi-dF5QAhBg.css">
+    <meta name="dailyflora-release" content="DF-20260803-0714-f0b44e2c">
+  </head>
+  <body>
+    <main class="scifi-viewer" id="scifi-viewer" aria-label="SciFi Flora 全屏花束查看器">
+      <div class="ambient" aria-hidden="true"></div>
+      <canvas id="scifi-canvas" aria-label="可旋转的结构科幻花束"></canvas>
+
+      <header class="viewer-header viewer-chrome" id="viewer-header">
+        <a class="brand" href="../" aria-label="返回 DailyFlora">
+          <span class="brand-orbit" aria-hidden="true"></span>
+          <span><strong>SCI-FI FLORA</strong><small>DailyFlora parallel garden</small></span>
+        </a>
+        <div class="quality-mark" aria-label="默认渲染品质">密 · 精</div>
+      </header>
+
+      <nav class="scifi-index-menu viewer-chrome" id="scifi-index-menu" aria-label="DailyFlora site menu">
+        <button class="chrome-toggle" id="scifi-index-toggle" type="button" aria-expanded="false" aria-controls="scifi-index-panel">INDEX</button>
+        <div class="scifi-index-panel" id="scifi-index-panel" hidden>
+          <a href="../" data-scifi-nav="today">今日花束</a>
+          <a href="../member/" data-scifi-nav="member">我的花园</a>
+          <a href="../about/" data-scifi-nav="about">关于 DailyFlora</a>
+          <a href="../bouquet-shop/" data-scifi-nav="objects">周边与线下</a>
+          <a href="../downloads/" data-scifi-nav="platforms">多端入口</a>
+          <nav class="scifi-language-switcher" id="scifi-language-switcher" aria-label="Language">
+            <button type="button" data-language="en">EN</button>
+            <button type="button" data-language="zh-CN">中</button>
+            <button type="button" data-language="es">ES</button>
+            <button type="button" data-language="fr">FR</button>
+            <button type="button" data-language="pt">PT</button>
+            <button type="button" data-language="it">IT</button>
+            <button type="button" data-language="ja">日</button>
+          </nav>
+        </div>
+      </nav>
+
+      <section class="bouquet-caption viewer-chrome" id="bouquet-caption" aria-live="polite">
+        <p class="series-mark"><span id="bouquet-index">08 / 08</span><span id="palette-name">晨雾异种</span></p>
+        <h1 id="bouquet-name">深空信标手捧花</h1>
+        <p class="english-name" id="bouquet-en">Deep-Space Beacon Handful</p>
+        <p class="bouquet-brief" id="bouquet-brief"></p>
+        <p class="structure-line" id="structure-line"></p>
+      </section>
+
+      <nav class="viewer-controls viewer-chrome" id="viewer-controls" aria-label="SciFi 花束观看控制">
+        <div class="transport-controls">
+          <button class="round-button" id="previous-button" type="button" aria-label="上一束" title="上一束">←</button>
+          <button class="primary-button" id="random-button" type="button">换一束</button>
+          <button class="round-button" id="next-button" type="button" aria-label="下一束" title="下一束">→</button>
+        </div>
+        <div class="scifi-view-dock">
+          <div class="view-controls" id="scifi-view-panel" hidden>
+            <button type="button" id="palette-toggle" aria-expanded="false" aria-controls="palette-panel">调色</button>
+            <button type="button" id="zoom-out-button" aria-label="拉远">−</button>
+            <button type="button" id="zoom-in-button" aria-label="拉近">＋</button>
+            <button type="button" id="rotate-button" aria-pressed="true">旋转</button>
+            <button type="button" id="fullscreen-button">全屏</button>
+          </div>
+          <button class="chrome-toggle" id="scifi-view-toggle" type="button" aria-expanded="false" aria-controls="scifi-view-panel">VIEW</button>
+        </div>
+      </nav>
+
+      <aside class="palette-panel viewer-chrome" id="palette-panel" aria-label="按偏好排序的科幻配色" hidden>
+        <div class="palette-panel-head"><strong>SCIFI PALETTE</strong><span>按喜欢程度排序</span></div>
+        <div class="palette-options" id="palette-options"></div>
+      </aside>
+
+      <p class="gesture-hint viewer-chrome" id="gesture-hint">拖动旋转 · 滚轮缩放 · ← → 换花</p>
+    </main>
+  </body>
+</html>
