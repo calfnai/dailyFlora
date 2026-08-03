@@ -3,13 +3,13 @@
     {
       "path": "pages/index/index",
       "style": {
-        "navigationBarTitleText": "DailyFlora"
+        "navigationBarTitleText": "DailyFlora Cloud"
       }
     }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "DailyFlora",
+    "navigationBarTitleText": "DailyFlora Cloud",
     "navigationBarBackgroundColor": "#ffffff",
     "backgroundColor": "#ffffff"
   }

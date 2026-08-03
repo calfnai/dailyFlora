@@ -1,6 +1,6 @@
 # DailyFlora uniCloud
 
-This repository remains a Vite Web project. `uniCloud-aliyun/` is the provider-specific server-side directory that HBuilderX uploads after the project is associated with the existing Aliyun service space.
+`dailyflora-cloud/` is the dedicated HBuilderX / uni-app cloud project. `uniCloud-aliyun/` is the provider-specific server-side directory that HBuilderX uploads after the project is associated with the existing Aliyun service space.
 
 ## Service-space binding
 

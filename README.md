@@ -129,6 +129,6 @@ phones as `low`, aiming for a screensaver that stays closer to an iPhone 13 Pro
 20-30% rendering budget than a benchmark demo.
 ## uni-app / uniCloud deployment shell
 
-The repository now includes the minimal standard uni-app shell files (`manifest.json`, `pages.json`, `App.vue`, `main.js`, and `pages/index/index.vue`) so HBuilderX recognizes DailyFlora as a uni-app project and exposes the `uniCloud-aliyun` service-space actions. The existing Vite web entry remains the production web frontend; the shell is for HBuilderX project recognition and cloud-resource deployment.
+The repository now includes the dedicated standard uni-app cloud project at `dailyflora-cloud/` (`manifest.json`, `pages.json`, `App.vue`, `main.js`, and `uniCloud-aliyun/`). Open that directory in HBuilderX to expose the service-space actions. The repository root remains the production Vite web frontend.
 
-The configured service space is Aliyun `dailyflora` (`mp-7937f272-ccea-46ee-ac33-3e23abb1fa49`). See [uniCloud-aliyun/README.md](./uniCloud-aliyun/README.md) for the upload order.
+The configured service space is Aliyun `dailyflora` (`mp-7937f272-ccea-46ee-ac33-3e23abb1fa49`). See [dailyflora-cloud/README.md](./dailyflora-cloud/README.md) for the upload order.
