@@ -20,9 +20,87 @@ export type CloudFavorite = {
   savedAt: string;
 };
 
-type CloudResponse<T> = { code: number; message?: string; token?: string; tokenExpired?: string; user?: CloudAccount; favorites?: T };
+export type CloudGeneration = {
+  id: string;
+  name: string;
+  seed: string;
+  source: string;
+  status: string;
+  colors: string[];
+  createdAt?: string;
+  updatedAt?: string;
+};
 
-const apiBase = (import.meta.env.VITE_DAILYFLORA_API_BASE || '').trim().replace(/\/$/, '');
+export type CloudGarden = {
+  entries: CloudGeneration[];
+  profile?: { displayName?: string; note?: string };
+  updatedAt?: string | null;
+};
+
+export type CloudTask = {
+  id: string;
+  referenceId: string;
+  status: 'queued' | 'processing' | 'completed' | 'failed' | string;
+  input: { bouquetName?: string; style?: string; preference?: string };
+  result?: {
+    title?: string;
+    summary?: string;
+    flowers?: string[];
+    colors?: string[];
+    composition?: string;
+    seed?: string;
+  } | null;
+  generationId?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  completedAt?: string | null;
+  errorMessage?: string | null;
+};
+
+export type CloudReference = {
+  id: string;
+  fileName: string;
+  contentType: string;
+  size: number;
+  status: string;
+  taskId: string;
+  createdAt?: string;
+  temporaryUrl?: string;
+  expiresIn?: number;
+};
+
+type CloudResponse<T> = {
+  code: number;
+  message?: string;
+  token?: string;
+  tokenExpired?: string;
+  user?: CloudAccount;
+  favorites?: T;
+  generations?: T;
+  garden?: T;
+  generation?: T;
+  task?: T;
+  tasks?: T;
+  reference?: T;
+  summary?: T;
+  users?: T;
+  points?: T;
+  orders?: T;
+  order?: T;
+  ok?: boolean;
+};
+
+declare global {
+  interface Window {
+    __DAILYFLORA_CONFIG__?: { apiUrl?: string };
+  }
+}
+
+const configuredApiBase =
+  import.meta.env.VITE_DAILYFLORA_API_BASE ||
+  (typeof window !== 'undefined' ? window.__DAILYFLORA_CONFIG__?.apiUrl : '') ||
+  '';
+const apiBase = configuredApiBase.trim().replace(/\/$/, '');
 const tokenKey = 'dailyflora.cloud.token.v1';
 const tokenExpiryKey = 'dailyflora.cloud.token-expired.v1';
 
@@ -48,6 +126,7 @@ async function request<T>(action: string, payload: Record<string, unknown> = {})
   const token = readToken();
   const response = await fetch(apiBase, {
     method: 'POST',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -89,15 +168,19 @@ export async function restoreAccount() {
 }
 
 export async function logoutAccount() {
+  let failure: unknown;
   if (dailyfloraCloudEnabled && readToken()) {
     try {
       await request<never>('logout');
+    } catch (error) {
+      failure = error;
     } finally {
       clearCloudSession();
     }
   } else {
     clearCloudSession();
   }
+  if (failure) throw failure;
 }
 
 export async function listCloudFavorites() {
@@ -111,4 +194,101 @@ export async function saveCloudFavorite(favorite: CloudFavorite) {
 
 export async function removeCloudFavorite(favoriteId: string) {
   await request<never>('removeFavorite', { favoriteId });
+}
+
+export async function listCloudGenerations() {
+  const result = await request<CloudGeneration[]>('listGenerations');
+  return result.generations || [];
+}
+
+export async function saveCloudGeneration(generation: CloudGeneration) {
+  const result = await request<CloudGeneration>('saveGeneration', { generation });
+  return result.generation || generation;
+}
+
+export async function getCloudGarden() {
+  const result = await request<CloudGarden>('getGarden');
+  return result.garden || { entries: [], profile: {} };
+}
+
+export async function saveCloudGarden(garden: CloudGarden) {
+  const result = await request<CloudGarden>('saveGarden', { garden });
+  return result.garden || garden;
+}
+
+export async function createCloudReferenceTask(input: {
+  dataUrl: string;
+  fileName: string;
+  bouquetName: string;
+  style: string;
+  preference: string;
+}) {
+  const result = await request<CloudTask>('createReferenceTask', input);
+  return { reference: result.reference, task: result.task };
+}
+
+export async function listCloudProcessingTasks() {
+  const result = await request<CloudTask[]>('listProcessingTasks');
+  return result.tasks || [];
+}
+
+export async function getCloudProcessingTask(taskId: string) {
+  const result = await request<CloudTask>('getProcessingTask', { taskId });
+  return result.task;
+}
+
+export async function listCloudDemoPoints() {
+  const result = await request<unknown[]>('listDemoPoints');
+  return result.points || [];
+}
+
+export async function listCloudDemoOrders() {
+  const result = await request<unknown[]>('listDemoOrders');
+  return result.orders || [];
+}
+
+export async function createCloudDemoOrder(input: { productId: string; label: string; amount?: string }) {
+  const result = await request<unknown>('createDemoOrder', input);
+  return result.order;
+}
+
+export async function getCloudAdminSummary() {
+  const result = await request<Record<string, unknown>>('adminSummary');
+  return result.summary || {};
+}
+
+export async function listCloudAdminUsers() {
+  const result = await request<CloudAccount[]>('adminListUsers');
+  return result.users || [];
+}
+
+export async function listCloudAdminTasks(status = '') {
+  const result = await request<CloudTask[]>('adminListTasks', status ? { status } : {});
+  return result.tasks || [];
+}
+
+export async function getCloudAdminReference(taskId: string) {
+  const result = await request<CloudReference>('adminGetReference', { taskId });
+  return result.reference;
+}
+
+export async function writeCloudProcessingResult(input: {
+  taskId: string;
+  status: 'processing' | 'completed' | 'failed';
+  result?: CloudTask['result'];
+  errorMessage?: string;
+}) {
+  const result = await request<CloudTask>('adminWriteProcessingResult', input);
+  return result.task;
+}
+
+export async function requestPasswordReset(email: string) {
+  return request<never>('requestPasswordReset', { email });
+}
+
+export async function resetPassword(input: { token: string; password: string }) {
+  const result = await request<never>('resetPassword', input);
+  saveToken(result.token, result.tokenExpired);
+  if (!result.user) throw new Error('密码重置响应缺少用户资料。');
+  return result.user;
 }

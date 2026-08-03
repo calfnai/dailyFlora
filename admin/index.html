@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="DailyFlora internal processing console." />
+    <title>DailyFlora Admin</title>
+    <link rel="stylesheet" href="../src/marketing.css" />
+    <link rel="stylesheet" href="../src/admin.css" />
+  </head>
+  <body data-page="admin">
+    <main class="admin-shell wrap">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow">DailyFlora / Internal</p>
+          <h1>处理任务后台</h1>
+          <p>只有 UniCloud 环境变量 <code>DAILYFLORA_ADMIN_EMAILS</code> 中的账户可以读取和回写任务。</p>
+        </div>
+        <a class="button" href="../member/">返回个人花园</a>
+      </header>
+
+      <section class="admin-state garden-panel" id="admin-state" aria-live="polite">正在检查后台权限…</section>
+      <section class="admin-content" id="admin-content" hidden>
+        <div class="admin-metrics" id="admin-metrics"></div>
+        <section class="garden-panel admin-panel">
+          <div class="panel-row"><div><p class="eyebrow">Accounts</p><h2>账户</h2></div><button class="button" id="admin-refresh" type="button">刷新</button></div>
+          <div class="admin-table-wrap"><table><thead><tr><th>昵称</th><th>邮箱</th><th>创建时间</th></tr></thead><tbody id="admin-users"></tbody></table></div>
+        </section>
+        <section class="garden-panel admin-panel">
+          <div class="panel-row"><div><p class="eyebrow">Codex queue</p><h2>参考图处理任务</h2></div><select id="admin-task-filter"><option value="">全部</option><option value="queued">queued</option><option value="processing">processing</option><option value="completed">completed</option><option value="failed">failed</option></select></div>
+          <div class="admin-task-list" id="admin-tasks"></div>
+        </section>
+      </section>
+    </main>
+    <script src="../dailyflora-config.js"></script>
+    <script type="module" src="../src/admin.ts"></script>
+  </body>
+</html>

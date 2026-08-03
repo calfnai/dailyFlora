@@ -1,0 +1,19 @@
+{
+  "title": "DailyFlora demo orders",
+  "description": "Demonstration-only order records; never treated as paid orders.",
+  "properties": {
+    "id": { "bsonType": "string" },
+    "userId": { "bsonType": "string" },
+    "productId": { "bsonType": "string" },
+    "label": { "bsonType": "string" },
+    "amount": { "bsonType": "string" },
+    "status": { "bsonType": "string" },
+    "createdAt": { "bsonType": "date" }
+  },
+  "required": ["id", "userId", "productId", "status", "createdAt"],
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "indexes": [
+    { "name": "id_unique", "keys": { "id": 1 }, "unique": true },
+    { "name": "userId_createdAt", "keys": { "userId": 1, "createdAt": -1 } }
+  ]
+}

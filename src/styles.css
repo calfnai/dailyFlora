@@ -798,6 +798,36 @@ body.is-preview .daily-theme {
 
 .registration-consent a { color: #f4e681; text-underline-offset: 2px; }
 
+.account-form-switch {
+  margin: 0;
+  color: rgb(255 250 235 / 58%);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.account-form-switch a {
+  color: #f4e681;
+  text-underline-offset: 2px;
+}
+
+.account-form-error {
+  margin: 0;
+  padding: 9px 11px;
+  border: 1px solid rgb(242 166 160 / 34%);
+  border-radius: 8px;
+  color: #ffd5cf;
+  background: rgb(111 42 35 / 20%);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.account-form-error[data-error="false"] {
+  border-color: rgb(184 210 139 / 24%);
+  color: #b8d28b;
+  background: rgb(79 111 63 / 14%);
+}
+
 .primary-action,
 .ghost-action {
   min-height: 38px;

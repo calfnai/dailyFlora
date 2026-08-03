@@ -35,6 +35,7 @@
         <div class="site-menu-panel" id="site-menu-panel" hidden>
           <a class="site-menu-primary" id="site-menu-favorite-link" href="./member/#signup">收藏这束花</a>
           <a href="./member/">我的花园</a>
+          <a href="./login/">登录已有账户</a>
           <a href="./about/">关于 DailyFlora</a>
           <a href="./bouquet-shop/">周边与线下</a>
           <a href="./downloads/">多端入口</a>
@@ -73,11 +74,13 @@
           </button>
         </header>
         <form class="login-card" id="login-form">
-          <label>怎么称呼你<input id="login-name-input" name="name" type="text" autocomplete="name" placeholder="例如：小花" required /></label>
+          <label id="login-name-field">怎么称呼你<input id="login-name-input" name="name" type="text" autocomplete="name" placeholder="例如：小花" required /></label>
           <label>邮箱<input id="login-email-input" name="email" type="email" autocomplete="email" placeholder="name@example.com" required /></label>
-          <label>密码<input id="login-password-input" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="至少 8 位（云端账户）" /></label>
-          <label class="registration-consent"><input id="login-consent-input" name="termsAccepted" type="checkbox" required /><span><span data-i18n="member.consentPrefix">我已阅读并同意</span> <a href="./legal/terms/" target="_blank" rel="noopener" data-i18n="legal.termsTitle">使用条款</a> <span data-i18n="member.consentAnd">和</span> <a href="./legal/privacy/" target="_blank" rel="noopener" data-i18n="legal.privacyTitle">隐私政策</a>。</span></label>
-          <button class="primary-action" type="submit">建立本机花园并收藏</button>
+          <label>密码<input id="login-password-input" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="至少 8 位（云端账户）" required /></label>
+          <label class="registration-consent" id="login-consent-field"><input id="login-consent-input" name="termsAccepted" type="checkbox" required /><span><span data-i18n="member.consentPrefix">我已阅读并同意</span> <a href="./legal/terms/" target="_blank" rel="noopener" data-i18n="legal.termsTitle">使用条款</a> <span data-i18n="member.consentAnd">和</span> <a href="./legal/privacy/" target="_blank" rel="noopener" data-i18n="legal.privacyTitle">隐私政策</a>。</span></label>
+          <button class="primary-action" id="login-submit-button" type="submit"><span id="login-submit-label">建立账户并收藏</span></button>
+          <p class="account-form-switch"><span id="account-form-switch-copy">已有账户？</span> <a href="#login" id="account-form-switch-link">直接登录</a></p>
+          <p class="account-form-error" id="account-form-error" role="alert" hidden></p>
         </form>
         <section class="account-profile profile-card" id="account-profile" hidden>
           <span class="profile-avatar" id="profile-avatar" aria-hidden="true">花</span>
@@ -243,6 +246,7 @@
       <p class="clock-exit-hint" id="clock-exit-hint" role="status">press esc to exit clock mode</p>
       <aside class="debug-panel" id="debug-panel" aria-label="Debug rendering stats" hidden></aside>
     </main>
+    <script src="./dailyflora-config.js"></script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

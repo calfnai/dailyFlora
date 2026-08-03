@@ -2,6 +2,7 @@ import {
   BrowserHandTracker,
   GestureInterpreter,
   createHandMonitor,
+  preloadHandRecognizer,
   type HandControlAction,
   type HandControlMode
 } from './hand-control/index.ts';
@@ -116,4 +117,8 @@ export function startDailyFloraHandControl(actions: DailyFloraHandActions) {
     interpreter.reset();
     monitor.destroy();
   };
+}
+
+export function warmupDailyFloraHandModel() {
+  return preloadHandRecognizer();
 }

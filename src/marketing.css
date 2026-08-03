@@ -357,6 +357,36 @@ h1, h2, h3, p { margin: 0; }
 .form-note { color: var(--quiet); font-size: 10px; line-height: 1.55; text-align: center; }
 .form-status { min-height: 18px; color: var(--leaf); font-size: 12px; text-align: center; }
 
+.account-form-switch {
+  margin: 0;
+  color: var(--quiet);
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.account-form-switch a {
+  color: var(--sun);
+  text-underline-offset: 3px;
+}
+
+.account-form-error {
+  margin: 0;
+  padding: 9px 11px;
+  border: 1px solid rgba(242, 166, 160, .34);
+  border-radius: 8px;
+  color: #ffd5cf;
+  background: rgba(111, 42, 35, .2);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.account-form-error[data-error="false"] {
+  border-color: rgba(184, 210, 139, .24);
+  color: var(--leaf);
+  background: rgba(79, 111, 63, .14);
+}
+
 .benefits { padding-block: 90px 150px; }
 .benefits-head { display: grid; grid-template-columns: 1fr 1fr; gap: 38px; align-items: end; }
 .benefits-head p { max-width: 36rem; color: var(--muted); line-height: 1.7; }

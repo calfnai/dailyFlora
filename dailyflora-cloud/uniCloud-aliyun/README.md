@@ -14,10 +14,14 @@ Do not put the Aliyun `clientSecret` in GitHub or in Vite environment variables.
 
 ## Upload order
 
-1. Create the three database collections described in `database/README.md`.
-2. Upload `cloudfunctions/dailyflora-api`.
-3. Configure the function URL path `/http/dailyflora-api` and CORS/custom request domain as needed.
-4. Set the frontend build variable from `.env.example` only in the local/DCloud build environment.
-5. Test `health`, registration, login, `me`, favorites isolation, and logout before enabling the cloud path for public users.
+1. Upload the database schemas in `database/`.
+2. Configure object storage permissions so `dailyflora/private/` is private.
+3. Upload `cloudfunctions/dailyflora-api`.
+4. Configure the function URL path `/http/dailyflora-api` and CORS/custom request domain as needed.
+5. Set `DAILYFLORA_ADMIN_EMAILS` and DirectMail credentials in the cloud-function environment only.
+6. Set the frontend runtime API configuration from `dailyflora-config.js` or a local build variable; never commit secrets.
+7. Test `health`, registration, login, `me`, favorites isolation, generation history, garden isolation, private upload, queued tasks, and logout before enabling the cloud path for public users.
+
+The Vite frontend exposes `/admin/` as a real route, but the route remains locked unless the authenticated email is in `DAILYFLORA_ADMIN_EMAILS`. It is not a replacement for cloud-side authorization.
 
 The current 0.71.0 release remains local/mock-only. Cloud integration is versioned separately so the already-published acceptance build remains reproducible.

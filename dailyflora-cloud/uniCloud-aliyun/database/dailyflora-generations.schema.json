@@ -1,0 +1,21 @@
+{
+  "title": "DailyFlora generations",
+  "description": "Private generated bouquet records owned by one authenticated user.",
+  "properties": {
+    "userId": { "bsonType": "string" },
+    "id": { "bsonType": "string" },
+    "name": { "bsonType": "string" },
+    "seed": { "bsonType": "string" },
+    "source": { "bsonType": "string" },
+    "status": { "bsonType": "string" },
+    "colors": { "bsonType": "array" },
+    "createdAt": { "bsonType": "date" },
+    "updatedAt": { "bsonType": "date" }
+  },
+  "required": ["userId", "id", "seed", "createdAt", "updatedAt"],
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "indexes": [
+    { "name": "userId_updatedAt", "keys": { "userId": 1, "updatedAt": -1 } },
+    { "name": "userId_id_unique", "keys": { "userId": 1, "id": 1 }, "unique": true }
+  ]
+}

@@ -8,7 +8,7 @@ import { BouquetScene } from './bouquetScene';
 import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
 import { themes } from './themes';
 import { IdleClockController, normalizeClockInterval, type ClockDisplaySource, type IdleClockSettings } from './idleClock';
-import type { DailyFloraHandActions } from './dailyFloraHandControl';
+import { warmupDailyFloraHandModel, type DailyFloraHandActions } from './dailyFloraHandControl';
 import {
   dailyfloraCloudEnabled,
   listCloudFavorites,
@@ -196,9 +196,15 @@ const accountOpenTitle = document.querySelector<HTMLElement>('#account-open-titl
 const accountOpenStatus = document.querySelector<HTMLElement>('#account-open-status');
 const accountPanelTitle = document.querySelector<HTMLElement>('#account-panel-title');
 const loginForm = document.querySelector<HTMLFormElement>('#login-form');
+const loginNameField = document.querySelector<HTMLElement>('#login-name-field');
 const loginNameInput = document.querySelector<HTMLInputElement>('#login-name-input');
 const loginEmailInput = document.querySelector<HTMLInputElement>('#login-email-input');
 const loginPasswordInput = document.querySelector<HTMLInputElement>('#login-password-input');
+const loginConsentField = document.querySelector<HTMLElement>('#login-consent-field');
+const loginSubmitLabel = document.querySelector<HTMLElement>('#login-submit-label');
+const accountFormSwitchCopy = document.querySelector<HTMLElement>('#account-form-switch-copy');
+const accountFormSwitchLink = document.querySelector<HTMLAnchorElement>('#account-form-switch-link');
+const accountFormError = document.querySelector<HTMLElement>('#account-form-error');
 const accountProfile = document.querySelector<HTMLElement>('#account-profile');
 const profileAvatar = document.querySelector<HTMLElement>('#profile-avatar');
 const profileName = document.querySelector<HTMLElement>('#profile-name');
@@ -378,6 +384,7 @@ let dateRolloverTimer = 0;
 let calendarView = parseDateKey(spec.dateLabel);
 let accountState = readAccountState();
 let favoriteBouquets = readFavoriteBouquets();
+let mainAuthMode: 'signup' | 'login' = 'signup';
 
 function cloudFavoriteToLocal(favorite: CloudFavorite): FavoriteBouquet {
   return favorite;
@@ -769,6 +776,7 @@ function openAccountPanel() {
   accountOpenButton.setAttribute('aria-expanded', 'true');
   window.setTimeout(() => accountPanel.classList.add('is-open'), 20);
   if (!accountState) {
+    setMainAuthMode(mainAuthMode);
     loginNameInput?.focus();
   }
   revealUi();
@@ -790,9 +798,34 @@ function toggleSiteMenu(forceOpen?: boolean) {
   siteMenuToggle.setAttribute('aria-expanded', String(open));
 }
 
+function setMainAuthError(message: string, isError = true) {
+  if (!accountFormError) return;
+  accountFormError.textContent = message;
+  accountFormError.hidden = !message;
+  accountFormError.dataset.error = String(isError);
+}
+
+function setMainAuthMode(nextMode: 'signup' | 'login') {
+  mainAuthMode = nextMode;
+  const login = nextMode === 'login';
+  if (loginNameField) loginNameField.hidden = login;
+  if (loginNameInput) loginNameInput.required = !login;
+  if (loginConsentField) loginConsentField.hidden = login;
+  const consent = loginConsentField?.querySelector<HTMLInputElement>('input[name="termsAccepted"]');
+  if (consent) consent.required = !login;
+  if (loginPasswordInput) loginPasswordInput.autocomplete = login ? 'current-password' : 'new-password';
+  if (loginSubmitLabel) loginSubmitLabel.textContent = login ? '登录并打开花园' : '建立账户并收藏';
+  if (accountFormSwitchCopy) accountFormSwitchCopy.textContent = login ? '还没有账户？' : '已有账户？';
+  if (accountFormSwitchLink) {
+    accountFormSwitchLink.textContent = login ? '立即注册' : '直接登录';
+    accountFormSwitchLink.href = login ? '#signup' : '#login';
+  }
+  setMainAuthError('');
+}
+
 async function toggleFavorite() {
   if (!accountState) {
-    openAccountPanel();
+    window.location.href = './member/#signup';
     return;
   }
 
@@ -1569,31 +1602,44 @@ favoriteButton?.addEventListener('click', () => {
 
 loginForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
+  if (!loginForm.checkValidity()) {
+    loginForm.reportValidity();
+    return;
+  }
   const data = new FormData(loginForm);
-  if (data.get('termsAccepted') !== 'on') {
+  if (mainAuthMode === 'signup' && data.get('termsAccepted') !== 'on') {
     loginForm.reportValidity();
     return;
   }
   const name = loginNameInput?.value.trim() || 'DailyFlora 用户';
-  const email = loginEmailInput?.value.trim() || `${name.replace(/\s+/g, '').toLowerCase()}@dailyflora.local`;
+  const email = loginEmailInput?.value.trim() || '';
   const password = loginPasswordInput?.value || '';
+  const hadLocalAccount = Boolean(accountState);
+  const localFavoritesBeforeAuth = [...favoriteBouquets];
   if (dailyfloraCloudEnabled && password.length < 8) {
     loginPasswordInput?.setCustomValidity('云端账户密码至少 8 位。');
     loginPasswordInput?.reportValidity();
     return;
   }
   if (loginPasswordInput) loginPasswordInput.setCustomValidity('');
+  const submitButton = loginForm.querySelector<HTMLButtonElement>('button[type="submit"]');
+  if (submitButton) submitButton.disabled = true;
+  setMainAuthError('');
   if (dailyfloraCloudEnabled) {
     try {
-      let account;
-      try {
-        account = await registerAccount({ name, email, password, termsVersion: '0.71' });
-      } catch (error) {
-        if (!(error instanceof Error) || !error.message.includes('已经注册')) throw error;
-        account = await loginAccount({ email, password });
-      }
+      const account = mainAuthMode === 'login'
+        ? await loginAccount({ email, password })
+        : await registerAccount({ name, email, password, termsVersion: '0.71.1' });
       saveAccountState(account);
       favoriteBouquets = await listCloudFavorites();
+      if (!hadLocalAccount && localFavoritesBeforeAuth.length > 0 && window.confirm(`发现本机有 ${localFavoritesBeforeAuth.length} 条未同步收藏，是否合并到 ${account.email}？`)) {
+        const remoteIds = new Set(favoriteBouquets.map((favorite) => favorite.id));
+        for (const favorite of localFavoritesBeforeAuth) {
+          if (!remoteIds.has(favorite.id)) await saveCloudFavorite(favorite);
+        }
+        favoriteBouquets = await listCloudFavorites();
+      }
+      window.localStorage.setItem(favoritesStorageKey, JSON.stringify(favoriteBouquets));
       renderAccountState();
       if (!currentFavorite()) {
         const favorite = createFavorite();
@@ -1601,21 +1647,43 @@ loginForm?.addEventListener('submit', async (event) => {
         saveFavoriteBouquets([favorite, ...favoriteBouquets]);
       }
       loginForm.reset();
+      setMainAuthMode('signup');
       return;
     } catch (error) {
-      window.alert(error instanceof Error ? error.message : '云端注册失败，请稍后重试。');
+      setMainAuthError(error instanceof Error ? error.message : '账户请求失败，请稍后重试。');
       return;
+    } finally {
+      if (submitButton) submitButton.disabled = false;
     }
   }
-  saveAccountState({ name, email, termsAccepted: true, termsVersion: '0.71', termsAcceptedAt: new Date().toISOString() });
+  if (mainAuthMode === 'login') {
+    setMainAuthError('当前是离线演示模式，无法验证云端密码。');
+    if (submitButton) submitButton.disabled = false;
+    return;
+  }
+  saveAccountState({ name, email, termsAccepted: true, termsVersion: '0.71.1', termsAcceptedAt: new Date().toISOString() });
   if (!currentFavorite()) {
     saveFavoriteBouquets([createFavorite(), ...favoriteBouquets]);
   }
+  if (submitButton) submitButton.disabled = false;
 });
 
 logoutButton?.addEventListener('click', async () => {
-  await logoutAccount();
-  saveAccountState(null);
+  try {
+    await logoutAccount();
+  } catch (error) {
+    console.warn('[DailyFlora] logout request failed; clearing local session', error);
+  } finally {
+    saveAccountState(null);
+    favoriteBouquets = [];
+    window.localStorage.removeItem(favoritesStorageKey);
+  }
+});
+
+accountFormSwitchLink?.addEventListener('click', (event) => {
+  event.preventDefault();
+  setMainAuthMode(mainAuthMode === 'login' ? 'signup' : 'login');
+  loginEmailInput?.focus();
 });
 
 collectionList?.addEventListener('click', (event) => {
@@ -2083,6 +2151,21 @@ syncClockControls();
 idleClock.start();
 revealUi();
 scene.start();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register(new URL('./gesture-cache-worker.js', document.baseURI), { scope: new URL('./', document.baseURI).pathname }).catch(() => undefined);
+}
+const warmupHandModel = () => {
+  void warmupDailyFloraHandModel().catch(() => undefined);
+};
+const requestIdle = (window as Window & {
+  requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+}).requestIdleCallback;
+if (requestIdle) {
+  requestIdle(warmupHandModel, { timeout: 5000 });
+} else {
+  window.setTimeout(warmupHandModel, 2500);
+}
 
 syncHandControlToggle();
 if (handControlInitiallyEnabled) void enableHandControl();

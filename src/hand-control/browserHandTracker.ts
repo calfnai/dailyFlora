@@ -28,6 +28,43 @@ const distance = (a: NormalizedLandmark, b: NormalizedLandmark) =>
   Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
 const pinchDistanceScale = 1.12;
 
+let recognizerPromise: Promise<GestureRecognizer> | null = null;
+
+async function createRecognizer() {
+  const wasmPath = new URL('mediapipe/wasm/', document.baseURI).toString();
+  const modelPath = new URL('models/gesture_recognizer.task', document.baseURI).toString();
+  const { FilesetResolver, GestureRecognizer } = await import('@mediapipe/tasks-vision');
+  const vision = await FilesetResolver.forVisionTasks(wasmPath);
+  const common = {
+    runningMode: 'VIDEO' as const,
+    numHands: 2,
+    minHandDetectionConfidence: 0.6,
+    minHandPresenceConfidence: 0.6,
+    minTrackingConfidence: 0.6
+  };
+  try {
+    return await GestureRecognizer.createFromOptions(vision, {
+      ...common,
+      baseOptions: { modelAssetPath: modelPath, delegate: 'GPU' }
+    });
+  } catch {
+    return GestureRecognizer.createFromOptions(vision, {
+      ...common,
+      baseOptions: { modelAssetPath: modelPath, delegate: 'CPU' }
+    });
+  }
+}
+
+export function preloadHandRecognizer() {
+  if (!recognizerPromise) {
+    recognizerPromise = createRecognizer().catch((error) => {
+      recognizerPromise = null;
+      throw error;
+    });
+  }
+  return recognizerPromise;
+}
+
 export function resolvePhysicalHand(categoryName: string | undefined, swapHandedness = true): HandName {
   const reported: HandName = categoryName?.toLowerCase() === 'left' ? 'left' : 'right';
   if (!swapHandedness) return reported;
@@ -221,28 +258,7 @@ export class BrowserHandTracker {
 
   private async loadRecognizer() {
     if (this.recognizer) return this.recognizer;
-    const wasmPath = new URL('mediapipe/wasm/', document.baseURI).toString();
-    const modelPath = new URL('models/gesture_recognizer.task', document.baseURI).toString();
-    const { FilesetResolver, GestureRecognizer } = await import('@mediapipe/tasks-vision');
-    const vision = await FilesetResolver.forVisionTasks(wasmPath);
-    const common = {
-      runningMode: 'VIDEO' as const,
-      numHands: 2,
-      minHandDetectionConfidence: 0.6,
-      minHandPresenceConfidence: 0.6,
-      minTrackingConfidence: 0.6
-    };
-    try {
-      this.recognizer = await GestureRecognizer.createFromOptions(vision, {
-        ...common,
-        baseOptions: { modelAssetPath: modelPath, delegate: 'GPU' }
-      });
-    } catch {
-      this.recognizer = await GestureRecognizer.createFromOptions(vision, {
-        ...common,
-        baseOptions: { modelAssetPath: modelPath, delegate: 'CPU' }
-      });
-    }
+    this.recognizer = await preloadHandRecognizer();
     return this.recognizer;
   }
 
@@ -251,7 +267,7 @@ export class BrowserHandTracker {
     const generation = this.generation;
     try {
       if (!navigator.mediaDevices?.getUserMedia) throw new Error('当前浏览器不支持摄像头访问');
-      this.options.onStatus('loading', '正在按需加载手部识别模型…');
+      this.options.onStatus('loading', '正在准备手势识别模型（首次可能需要一点时间）…');
       const recognizer = await this.loadRecognizer();
       if (generation !== this.generation) return;
       this.options.onStatus('requesting-camera', '请允许网页使用摄像头');

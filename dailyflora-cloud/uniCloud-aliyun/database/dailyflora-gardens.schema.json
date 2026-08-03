@@ -1,0 +1,17 @@
+{
+  "title": "DailyFlora gardens",
+  "description": "One private cross-device garden document per user.",
+  "properties": {
+    "userId": { "bsonType": "string" },
+    "entries": { "bsonType": "array" },
+    "profile": { "bsonType": "object" },
+    "createdAt": { "bsonType": "date" },
+    "updatedAt": { "bsonType": "date" }
+  },
+  "required": ["userId", "entries", "createdAt", "updatedAt"],
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "indexes": [
+    { "name": "userId_unique", "keys": { "userId": 1 }, "unique": true },
+    { "name": "updatedAt", "keys": { "updatedAt": -1 } }
+  ]
+}

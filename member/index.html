@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Register, sign in, save bouquets, and create private DailyFlora records on this device." />
+    <meta name="description" content="Register, sign in, save bouquets, and create private DailyFlora records with DailyFlora." />
     <title>DailyFlora Member Garden</title>
     <link rel="stylesheet" href="../src/marketing.css" />
   </head>
@@ -14,6 +14,7 @@
         <nav class="site-nav" aria-label="站点导航">
           <a href="../" data-i18n="common.today">Today's bouquet</a>
           <a href="./" aria-current="page" data-i18n="common.member">My garden</a>
+          <a href="../login/">登录已有账户</a>
           <a href="../about/" data-i18n="common.about">About</a>
           <a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a>
           <a href="../downloads/" data-i18n="common.platforms">Platforms</a>
@@ -24,10 +25,10 @@
       <main class="garden-app wrap">
         <section class="garden-hero member-hero">
           <div>
-            <p class="eyebrow" data-i18n="member.eyebrow">DailyFlora ID / Local MVP</p>
+            <p class="eyebrow" data-i18n="member.eyebrow">DailyFlora ID / MVP</p>
             <h1 data-i18n="member.title">My garden</h1>
           </div>
-          <p data-i18n="member.lead">This is the registration entry and the signed-in workspace. For now, accounts and records stay on this device.</p>
+          <p data-i18n="member.lead">This is the registration entry and the signed-in workspace. Your account and garden data sync after you sign in.</p>
         </section>
 
         <section class="garden-grid" aria-label="账户与今日花束">
@@ -49,19 +50,32 @@
           </article>
 
           <aside class="garden-panel garden-side" id="signup">
-            <span class="state-pill warm" data-i18n="member.signupPill">Signup inside member</span>
+            <span class="state-pill warm" id="member-auth-pill" data-i18n="member.signupPill">Create account</span>
             <h2 id="member-name" data-i18n="member.signupTitle">Create your garden</h2>
-            <p id="member-email" data-i18n="member.signupBody">Without an account, this is signup.</p>
+            <p id="member-email" data-i18n="member.signupBody">Create an account to sync your garden across devices.</p>
             <form class="signup-form compact-signup" id="member-signup-form">
-              <div class="field"><label for="member-signup-name" data-i18n="member.name">Your name</label><input id="member-signup-name" name="name" type="text" autocomplete="name" placeholder="For example: Flora" data-i18n-placeholder="index.loginNamePlaceholder" required /></div>
+              <div class="field" id="member-signup-name-field"><label for="member-signup-name" data-i18n="member.name">Your name</label><input id="member-signup-name" name="name" type="text" autocomplete="name" placeholder="For example: Flora" data-i18n-placeholder="index.loginNamePlaceholder" required /></div>
               <div class="field"><label for="member-signup-email" data-i18n="member.email">Email</label><input id="member-signup-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" required /></div>
-              <div class="field"><label for="member-signup-password">Password</label><input id="member-signup-password" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" /></div>
-              <label class="consent registration-consent"><input name="termsAccepted" type="checkbox" required /><span><span data-i18n="member.consentPrefix">I have read and agree to the</span> <a href="../legal/terms/" target="_blank" rel="noopener" data-i18n="legal.termsTitle">Terms of Use</a> <span data-i18n="member.consentAnd">and</span> <a href="../legal/privacy/" target="_blank" rel="noopener" data-i18n="legal.privacyTitle">Privacy Policy</a>.</span></label>
-              <button class="button primary" type="submit"><span data-i18n="member.create">Create local garden</span> <span class="arrow" aria-hidden="true">→</span></button>
+              <div class="field"><label for="member-signup-password">Password</label><input id="member-signup-password" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required /></div>
+              <label class="consent registration-consent" id="member-terms-field"><input name="termsAccepted" type="checkbox" required /><span><span data-i18n="member.consentPrefix">I have read and agree to the</span> <a href="../legal/terms/" target="_blank" rel="noopener" data-i18n="legal.termsTitle">Terms of Use</a> <span data-i18n="member.consentAnd">and</span> <a href="../legal/privacy/" target="_blank" rel="noopener" data-i18n="legal.privacyTitle">Privacy Policy</a>.</span></label>
+              <button class="button primary" id="member-auth-submit" type="submit"><span id="member-auth-submit-label" data-i18n="member.create">Create account</span> <span class="arrow" aria-hidden="true">→</span></button>
             </form>
+            <p class="account-form-switch"><span id="member-auth-switch-copy">已有账户？</span> <a href="#login" id="member-auth-switch">直接登录</a></p>
+            <p class="account-form-error" id="member-auth-error" role="alert" hidden></p>
+            <form class="signup-form compact-signup" id="member-reset-request-form" hidden>
+              <div class="field"><label for="member-reset-email">邮箱</label><input id="member-reset-email" name="email" type="email" autocomplete="email" required /></div>
+              <button class="button primary" type="submit">发送重置邮件</button>
+            </form>
+            <form class="signup-form compact-signup" id="member-reset-form" hidden>
+              <input id="member-reset-token" name="token" type="hidden" />
+              <div class="field"><label for="member-reset-password">新密码</label><input id="member-reset-password" name="password" type="password" minlength="8" autocomplete="new-password" required /></div>
+              <div class="field"><label for="member-reset-password-confirm">确认新密码</label><input id="member-reset-password-confirm" name="passwordConfirm" type="password" minlength="8" autocomplete="new-password" required /></div>
+              <button class="button primary" type="submit">保存新密码</button>
+            </form>
+            <p class="account-form-switch" id="member-forgot-row"><a href="#reset" id="member-forgot-link">忘记密码？</a></p>
             <div class="member-actions" id="member-actions" hidden>
               <a class="button primary" href="../" data-i18n="member.favoriteAction">Save today's bouquet</a>
-              <button class="button" id="member-logout" type="button" data-i18n="member.logout">Sign out of local account</button>
+              <button class="button" id="member-logout" type="button" data-i18n="member.logout">Sign out</button>
             </div>
           </aside>
         </section>
@@ -74,10 +88,19 @@
           <div class="saved-list" id="saved-list"></div>
         </section>
 
+        <section class="product-section" aria-labelledby="generation-title">
+          <div class="product-section-head">
+            <div><p class="eyebrow">Garden history</p><h2 id="generation-title">生成历史与处理任务</h2></div>
+            <p>云端记录会随账户同步；参考图任务由授权后台人工处理。</p>
+          </div>
+          <div class="saved-list" id="record-grid"></div>
+          <div class="saved-list" id="member-task-list" hidden></div>
+        </section>
+
         <section class="product-section" aria-labelledby="studio-title">
           <div class="product-section-head">
             <div><p class="eyebrow" data-i18n="member.studioEyebrow">Upload to bouquet</p><h2 id="studio-title" data-i18n="member.studioTitle">Upload a reference image and create a traceable private bouquet record.</h2></div>
-            <span class="state-pill" data-i18n="member.studioPill">Local only</span>
+            <span class="state-pill" data-i18n="member.studioPill">Private garden</span>
           </div>
           <div class="member-workbench" data-member-auth-only hidden>
             <article class="garden-panel">
@@ -86,7 +109,7 @@
               <label class="member-upload-zone" id="upload-zone">
                 <input id="reference-file" type="file" accept="image/*" />
                 <img id="preview-image" alt="Reference image preview" />
-                <span><strong data-i18n="member.chooseImage">Choose a reference image</strong><small data-i18n="member.chooseHint">Read locally, not uploaded.</small></span>
+                <span><strong data-i18n="member.chooseImage">Choose a reference image</strong><small data-i18n="member.chooseHint">Private upload is prepared after sign-in.</small></span>
               </label>
               <div class="form-grid">
                 <label><span data-i18n="member.bouquetName">Bouquet name</span><input id="bouquet-name" value="My morning bouquet" maxlength="28" /></label>
@@ -148,6 +171,7 @@
       const account = () => safeJson(accountKey, null);
       let records = safeJson(recordsKey, initialRecords);
       let detected = null;
+      let referenceDataUrl = '';
       const uploadZone = $('#upload-zone');
       const fileInput = $('#reference-file');
       const previewImage = $('#preview-image');
@@ -165,6 +189,7 @@
       const styleSelect = $('#style-select');
       const preferenceInput = $('#preference-input');
       const bouquetName = $('#bouquet-name');
+      const taskList = $('#member-task-list');
       const toast = $('#local-toast');
       function todayCompact() { return new Date().toISOString().slice(0, 10).split('-').join(''); }
       function memberId() { return `DF-MEMBER-${todayCompact()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`; }
@@ -245,7 +270,19 @@
       function renderRecords() {
         $('#member-generated-count').textContent = String(records.length);
         if (!recordGrid) return;
-        recordGrid.innerHTML = records.map((record) => `<article class="record"><div class="thumb" style="--thumb-a:${record.colors[0]};--thumb-b:${record.colors[1]};--thumb-c:${record.colors[2]}"></div><div class="meta"><span>${record.id}</span><h3>${record.name}</h3><p><code>seed=${record.seed}</code></p><p>${record.source}</p><span class="state-pill">${record.status}</span></div></article>`).join('');
+        recordGrid.innerHTML = records.map((record) => `<article class="saved-card"><span>${escapeHtml(record.id)}</span><strong>${escapeHtml(record.name || 'DailyFlora 生成记录')}</strong><small>seed=${escapeHtml(record.seed)} · ${escapeHtml(record.status || '已生成')} · ${escapeHtml(record.source || '')}</small></article>`).join('');
+      }
+      function escapeHtml(value) { return String(value ?? '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character]); }
+      function renderCloudWorkspace(detail) {
+        const nextGenerations = Array.isArray(detail?.generations) ? detail.generations : [];
+        const nextTasks = Array.isArray(detail?.tasks) ? detail.tasks : [];
+        if (nextGenerations.length || window.__DAILYFLORA_MEMBER_WORKSPACE__?.enabled) {
+          records = nextGenerations;
+          renderRecords();
+        }
+        if (!taskList) return;
+        taskList.hidden = nextTasks.length === 0;
+        taskList.innerHTML = nextTasks.map((task) => `<article class="saved-card"><span>${escapeHtml(task.status || 'queued')}</span><strong>${escapeHtml(task.input?.bouquetName || '参考图处理任务')}</strong><small>${escapeHtml(task.id)} · ${escapeHtml(task.result?.summary || task.errorMessage || '等待授权后台处理')}</small></article>`).join('');
       }
       function flash(message) {
         toast.textContent = message;
@@ -253,20 +290,11 @@
         clearTimeout(window.dailyfloraToastTimer);
         window.dailyfloraToastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2400);
       }
-      $('#member-signup-form').addEventListener('submit', (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        if (data.get('termsAccepted') !== 'on') { event.currentTarget.reportValidity(); return; }
-        saveJson(accountKey, { name: String(data.get('name')).trim(), email: String(data.get('email')).trim(), termsAccepted: true, termsVersion: '0.71', termsAcceptedAt: new Date().toISOString() });
-        renderAccount();
-        flash(window.dailyfloraT?.('member.toastCreated') || 'Local garden created.');
-      });
-      $('#member-logout').addEventListener('click', () => { localStorage.removeItem(accountKey); renderAccount(); flash(window.dailyfloraT?.('member.toastLogout') || 'Signed out locally.'); });
       fileInput.addEventListener('change', () => {
         const file = fileInput.files?.[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = () => { previewImage.src = String(reader.result); uploadZone.classList.add('has-image'); recognizeButton.disabled = false; };
+        reader.onload = () => { referenceDataUrl = String(reader.result || ''); previewImage.src = referenceDataUrl; uploadZone.classList.add('has-image'); recognizeButton.disabled = false; };
         reader.readAsDataURL(file);
       });
       recognizeButton.addEventListener('click', () => {
@@ -277,9 +305,45 @@
         applyDetection({ ...role, title: `${bouquetName.value || role.title} / ${role.title}`, colors: paletteFromColor(color) });
       });
       sampleButton.addEventListener('click', () => applyDetection({ ...roleMap.air, title: `${bouquetName.value || '我的清晨花花'} / 空气感小花束`, colors: ['#fff7df', '#bfe878', '#7dc9ff'] }));
-      resetButton.addEventListener('click', () => { fileInput.value = ''; previewImage.removeAttribute('src'); uploadZone.classList.remove('has-image'); recognizeButton.disabled = true; generateButton.disabled = true; detected = null; resultTitle.textContent = '等待上传'; resultStatus.textContent = 'not ready'; resultStatus.className = 'state-pill quiet'; resultSummary.textContent = '上传参考图后，这里会显示主色、花材角色、空间结构、seed 和唯一记录代码。'; primitiveChips.innerHTML = ''; swatches.innerHTML = ''; renderMockFlower(['#f2cb62', '#87d486', '#9fc6ff']); });
-      generateButton.addEventListener('click', () => {
+      resetButton.addEventListener('click', () => { fileInput.value = ''; referenceDataUrl = ''; previewImage.removeAttribute('src'); uploadZone.classList.remove('has-image'); recognizeButton.disabled = true; generateButton.disabled = true; detected = null; resultTitle.textContent = '等待上传'; resultStatus.textContent = 'not ready'; resultStatus.className = 'state-pill quiet'; resultSummary.textContent = '上传参考图后，这里会显示主色、花材角色、空间结构、seed 和唯一记录代码。'; primitiveChips.innerHTML = ''; swatches.innerHTML = ''; renderMockFlower(['#f2cb62', '#87d486', '#9fc6ff']); });
+      generateButton.addEventListener('click', async () => {
         if (!detected) return;
+        const workspace = window.__DAILYFLORA_MEMBER_WORKSPACE__;
+        if (workspace?.enabled) {
+          generateButton.disabled = true;
+          try {
+            if (referenceDataUrl) {
+              const task = await workspace.createReferenceTask({
+                dataUrl: referenceDataUrl,
+                fileName: fileInput.files?.[0]?.name || 'dailyflora-reference-image',
+                bouquetName: bouquetName.value || detected.title,
+                style: styleSelect.value,
+                preference: preferenceInput.value
+              });
+              resultTitle.textContent = '参考图任务已排队';
+              resultStatus.textContent = task.status || 'queued';
+              resultSummary.textContent = '图片已进入私有存储，等待授权后台读取并回写结果。';
+              flash(`已创建处理任务 ${task.id}`);
+            } else {
+              const saved = await workspace.saveGeneration({
+                id: memberId(),
+                name: detected.title.split(' / ')[0],
+                seed: detected.seed,
+                source: `示例生成 + ${preferenceInput.value.slice(0, 28)}`,
+                status: '已生成',
+                colors: detected.colors
+              });
+              records = [saved, ...records.filter((record) => record.id !== saved.id)];
+              renderRecords();
+              flash((window.dailyfloraT?.('member.toastSaved') || 'Saved {id}').replace('{id}', saved.id));
+            }
+          } catch (error) {
+            flash(error instanceof Error ? error.message : '云端记录暂时保存失败');
+          } finally {
+            generateButton.disabled = false;
+          }
+          return;
+        }
         const next = { id: memberId(), name: detected.title.split(' / ')[0], seed: detected.seed, source: `上传识别 + ${preferenceInput.value.slice(0, 28)}`, status: '新生成', colors: detected.colors };
         records = [next, ...records];
         saveJson(recordsKey, records);
@@ -287,12 +351,15 @@
         flash((window.dailyfloraT?.('member.toastSaved') || 'Saved {id}').replace('{id}', next.id));
       });
       window.addEventListener('dailyflora:localechange', () => { renderAccount(); renderFavorites(); });
+      window.addEventListener('dailyflora:accountchange', () => { renderAccount(); renderFavorites(); renderRecords(); });
+      window.addEventListener('dailyflora:cloudworkspace', (event) => renderCloudWorkspace(event.detail));
       fetch('../version.json').then((response) => response.ok ? response.json() : null).then((info) => { if (info?.releaseId) document.querySelectorAll('[data-release-code]').forEach((node) => { node.textContent = info.releaseId; }); }).catch(() => {});
       renderMockFlower(['#f2cb62', '#87d486', '#9fc6ff']);
       renderAccount();
       renderFavorites();
       renderRecords();
     </script>
+    <script src="../dailyflora-config.js"></script>
     <script type="module" src="../src/staticI18n.ts"></script>
     <script type="module" src="../src/memberCloud.ts"></script>
   </body>
