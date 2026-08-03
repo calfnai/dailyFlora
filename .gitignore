@@ -14,3 +14,4 @@ data/inbox/*/
 CrashAutoSave*.toe
 .vercel
 .env*
+!.env.example
