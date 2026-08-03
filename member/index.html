@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Register, sign in, save bouquets, and create private DailyFlora records on this device." />
     <title>DailyFlora Member Garden</title>
-    <script type="module" crossorigin src="../assets/member-W_JeMG3S.js"></script>
-    <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-B5Qt9EMX.js">
-    <link rel="modulepreload" crossorigin href="../assets/index-C7h46SLH.js">
-    <link rel="modulepreload" crossorigin href="../assets/staticI18n-CTjtxhv6.js">
-    <link rel="modulepreload" crossorigin href="../assets/dailyfloraCloud-BCd8w7nZ.js">
+    <script type="module" crossorigin src="../assets/modulepreload-polyfill-B5Qt9EMX.js"></script>
+    <script type="module" crossorigin src="../assets/index-DsiJOeOn.js"></script>
+    <script type="module" crossorigin src="../assets/staticI18n-BS3xLbn8.js"></script>
     <link rel="stylesheet" crossorigin href="../assets/staticI18n-BqWhLJEP.css">
-    <meta name="dailyflora-release" content="DF-20260803-0714-f0b44e2c">
+    <meta name="dailyflora-release" content="DF-20260803-0442-839e6c86">
   </head>
   <body data-page="member">
     <div class="page-shell product-shell member-shell">
@@ -61,7 +59,6 @@
             <form class="signup-form compact-signup" id="member-signup-form">
               <div class="field"><label for="member-signup-name" data-i18n="member.name">Your name</label><input id="member-signup-name" name="name" type="text" autocomplete="name" placeholder="For example: Flora" data-i18n-placeholder="index.loginNamePlaceholder" required /></div>
               <div class="field"><label for="member-signup-email" data-i18n="member.email">Email</label><input id="member-signup-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" required /></div>
-              <div class="field"><label for="member-signup-password">Password</label><input id="member-signup-password" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" /></div>
               <label class="consent registration-consent"><input name="termsAccepted" type="checkbox" required /><span><span data-i18n="member.consentPrefix">I have read and agree to the</span> <a href="../legal/terms/" target="_blank" rel="noopener" data-i18n="legal.termsTitle">Terms of Use</a> <span data-i18n="member.consentAnd">and</span> <a href="../legal/privacy/" target="_blank" rel="noopener" data-i18n="legal.privacyTitle">Privacy Policy</a>.</span></label>
               <button class="button primary" type="submit"><span data-i18n="member.create">Create local garden</span> <span class="arrow" aria-hidden="true">→</span></button>
             </form>
@@ -123,6 +120,14 @@
           </div>
         </section>
 
+        <section class="product-section" aria-labelledby="credit-title">
+          <div class="product-section-head">
+            <div><p class="eyebrow">Credits</p><h2 id="credit-title" data-i18n="member.creditsHeading">Credits</h2></div>
+          </div>
+          <figure class="member-simulation-shot">
+            <img src="../assets/member-direction-desktop-C6nN0CGx.png" alt="Simulated DailyFlora member collection" />
+          </figure>
+        </section>
       </main>
 
       <footer class="site-footer">
@@ -263,7 +268,7 @@
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         if (data.get('termsAccepted') !== 'on') { event.currentTarget.reportValidity(); return; }
-        saveJson(accountKey, { name: String(data.get('name')).trim(), email: String(data.get('email')).trim(), termsAccepted: true, termsVersion: '0.71', termsAcceptedAt: new Date().toISOString() });
+        saveJson(accountKey, { name: String(data.get('name')).trim(), email: String(data.get('email')).trim(), termsAccepted: true, termsVersion: '0.70', termsAcceptedAt: new Date().toISOString() });
         renderAccount();
         flash(window.dailyfloraT?.('member.toastCreated') || 'Local garden created.');
       });
