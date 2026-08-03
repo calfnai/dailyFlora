@@ -1,0 +1,23 @@
+{
+  "name": "DailyFlora",
+  "appid": "__UNI__DAILYFLORA",
+  "description": "DailyFlora flower garden and cloud account shell",
+  "versionName": "0.71.1",
+  "versionCode": 711,
+  "transformPx": false,
+  "uni-app": {
+    "renderer": "auto"
+  },
+  "h5": {
+    "title": "DailyFlora"
+  },
+  "uniCloud": {
+    "spaceList": [
+      {
+        "provider": "aliyun",
+        "spaceName": "dailyflora",
+        "spaceId": "mp-7937f272-ccea-46ee-ac33-3e23abb1fa49"
+      }
+    ]
+  }
+}
