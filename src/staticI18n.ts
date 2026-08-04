@@ -97,11 +97,19 @@ function applyLegalPageLocale(locale: Locale) {
   const documentRoot = document.querySelector<HTMLElement>('.legal-document');
   if (!documentRoot) return;
   documentRoot.querySelectorAll<HTMLElement>('.legal-language[data-generated-legal-language]').forEach((node) => node.remove());
-  const nativeArticle = Array.from(documentRoot.querySelectorAll<HTMLElement>('.legal-language')).find((node) => node.lang === locale);
-  documentRoot.querySelectorAll<HTMLElement>('.legal-language').forEach((node) => { node.hidden = node !== nativeArticle; });
-  if (nativeArticle) return;
+  const articles = Array.from(documentRoot.querySelectorAll<HTMLElement>('.legal-language'));
+  const nativeArticle = articles.find((node) => node.lang === locale);
+  if (nativeArticle) {
+    articles.forEach((node) => { node.hidden = node !== nativeArticle; });
+    return;
+  }
   const translated = legalPageTranslations[locale]?.[page as LegalPageName];
-  if (!translated) return;
+  if (!translated) {
+    const fallback = articles.find((node) => node.lang === 'en') || articles[0];
+    articles.forEach((node) => { node.hidden = node !== fallback; });
+    return;
+  }
+  articles.forEach((node) => { node.hidden = true; });
   const article = document.createElement('article');
   article.className = 'legal-language';
   article.lang = locale;
@@ -119,6 +127,17 @@ function applyLegalPageLocale(locale: Locale) {
     }
   }
   documentRoot.append(article);
+}
+
+function syncReleaseInfo() {
+  fetch(`${makeRelativePrefix()}version.json`)
+    .then((response) => response.ok ? response.json() : null)
+    .then((info) => {
+      if (!info) return;
+      document.querySelectorAll<HTMLElement>('[data-release-code]').forEach((node) => { node.textContent = info.releaseId || ''; });
+      document.querySelectorAll<HTMLElement>('[data-product-version]').forEach((node) => { node.textContent = info.productVersion || info.version || ''; });
+    })
+    .catch(() => {});
 }
 
 function markDevLinksHidden() {
@@ -168,3 +187,4 @@ markDevLinksHidden();
 ensureTutorialFooterLink();
 ensureSciFiNavLink();
 applyLocale(currentLocale);
+syncReleaseInfo();

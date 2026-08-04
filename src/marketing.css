@@ -337,6 +337,7 @@ h1, h2, h3, p { margin: 0; }
 .signup-card h2 { margin-top: 12px; font-family: var(--serif); font-size: 36px; font-weight: 400; }
 .signup-card > p { margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.65; }
 .signup-form { margin-top: 26px; display: grid; gap: 15px; }
+.signup-form[hidden] { display: none !important; }
 .field { display: grid; gap: 7px; }
 .field label { color: var(--muted); font-size: 11px; }
 .field input {
@@ -386,6 +387,12 @@ h1, h2, h3, p { margin: 0; }
   color: var(--leaf);
   background: rgba(79, 111, 63, .14);
 }
+
+.auth-page { min-height: calc(100vh - 220px); }
+.auth-page .signup-card a { color: var(--sun); text-underline-offset: 3px; }
+.member-auth-gate { display: grid; gap: 12px; }
+.member-auth-gate .button { width: 100%; }
+.member-auth-gate[hidden] { display: none !important; }
 
 .benefits { padding-block: 90px 150px; }
 .benefits-head { display: grid; grid-template-columns: 1fr 1fr; gap: 38px; align-items: end; }

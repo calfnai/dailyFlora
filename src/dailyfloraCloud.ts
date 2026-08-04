@@ -162,14 +162,14 @@ export async function loginAccount(input: { email: string; password: string }) {
 }
 
 export async function restoreAccount() {
-  if (!dailyfloraCloudEnabled || !readToken()) return null;
+  if (!dailyfloraCloudEnabled) return null;
   const result = await request<never>('me');
   return result.user || null;
 }
 
 export async function logoutAccount() {
   let failure: unknown;
-  if (dailyfloraCloudEnabled && readToken()) {
+  if (dailyfloraCloudEnabled) {
     try {
       await request<never>('logout');
     } catch (error) {

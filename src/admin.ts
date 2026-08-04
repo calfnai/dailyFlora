@@ -81,7 +81,7 @@ async function load() {
   if (!content) return;
   const account = await restoreAccount();
   if (!account) {
-    showState('请先在 /member/#login 登录，再访问后台。', true);
+    showState('请先在 /login/ 登录，再访问后台。', true);
     return;
   }
   try {

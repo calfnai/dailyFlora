@@ -50,29 +50,14 @@
           </article>
 
           <aside class="garden-panel garden-side" id="signup">
-            <span class="state-pill warm" id="member-auth-pill" data-i18n="member.signupPill">Create account</span>
-            <h2 id="member-name" data-i18n="member.signupTitle">Create your garden</h2>
-            <p id="member-email" data-i18n="member.signupBody">Create an account to sync your garden across devices.</p>
-            <form class="signup-form compact-signup" id="member-signup-form">
-              <div class="field" id="member-signup-name-field"><label for="member-signup-name" data-i18n="member.name">Your name</label><input id="member-signup-name" name="name" type="text" autocomplete="name" placeholder="For example: Flora" data-i18n-placeholder="index.loginNamePlaceholder" required /></div>
-              <div class="field"><label for="member-signup-email" data-i18n="member.email">Email</label><input id="member-signup-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" required /></div>
-              <div class="field"><label for="member-signup-password">Password</label><input id="member-signup-password" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required /></div>
-              <label class="consent registration-consent" id="member-terms-field"><input name="termsAccepted" type="checkbox" required /><span><span data-i18n="member.consentPrefix">I have read and agree to the</span> <a href="../legal/terms/" target="_blank" rel="noopener" data-i18n="legal.termsTitle">Terms of Use</a> <span data-i18n="member.consentAnd">and</span> <a href="../legal/privacy/" target="_blank" rel="noopener" data-i18n="legal.privacyTitle">Privacy Policy</a>.</span></label>
-              <button class="button primary" id="member-auth-submit" type="submit"><span id="member-auth-submit-label" data-i18n="member.create">Create account</span> <span class="arrow" aria-hidden="true">→</span></button>
-            </form>
-            <p class="account-form-switch"><span id="member-auth-switch-copy">已有账户？</span> <a href="#login" id="member-auth-switch">直接登录</a></p>
+            <span class="state-pill warm" id="member-auth-pill">Member garden</span>
+            <h2 id="member-name">个人花园</h2>
+            <p id="member-email">登录后查看你的收藏、生成历史和私有参考图任务。</p>
+            <div class="member-auth-gate" id="member-auth-gate">
+              <a class="button primary" href="../login/">登录已有账户 <span class="arrow" aria-hidden="true">→</span></a>
+              <a class="button" href="../signup/">创建新账户</a>
+            </div>
             <p class="account-form-error" id="member-auth-error" role="alert" hidden></p>
-            <form class="signup-form compact-signup" id="member-reset-request-form" hidden>
-              <div class="field"><label for="member-reset-email">邮箱</label><input id="member-reset-email" name="email" type="email" autocomplete="email" required /></div>
-              <button class="button primary" type="submit">发送重置邮件</button>
-            </form>
-            <form class="signup-form compact-signup" id="member-reset-form" hidden>
-              <input id="member-reset-token" name="token" type="hidden" />
-              <div class="field"><label for="member-reset-password">新密码</label><input id="member-reset-password" name="password" type="password" minlength="8" autocomplete="new-password" required /></div>
-              <div class="field"><label for="member-reset-password-confirm">确认新密码</label><input id="member-reset-password-confirm" name="passwordConfirm" type="password" minlength="8" autocomplete="new-password" required /></div>
-              <button class="button primary" type="submit">保存新密码</button>
-            </form>
-            <p class="account-form-switch" id="member-forgot-row"><a href="#reset" id="member-forgot-link">忘记密码？</a></p>
             <div class="member-actions" id="member-actions" hidden>
               <a class="button primary" href="../" data-i18n="member.favoriteAction">Save today's bouquet</a>
               <button class="button" id="member-logout" type="button" data-i18n="member.logout">Sign out</button>
@@ -241,18 +226,20 @@
       }
       function renderAccount() {
         const current = account();
-        const signupForm = $('#member-signup-form');
+        const authGate = $('#member-auth-gate');
         const actions = $('#member-actions');
         if (current) {
-          $('#account-state').textContent = '已建立';
+          $('#account-state').textContent = '已登录';
           $('#member-name').textContent = current.name || '个人花园';
-          $('#member-email').textContent = current.email || '本机账户';
-          signupForm.hidden = true;
+          $('#member-email').textContent = current.email || '';
+          authGate.hidden = true;
           actions.hidden = false;
           document.querySelector('[data-member-auth-only]').hidden = false;
         } else {
-          $('#account-state').textContent = '未建立';
-          signupForm.hidden = false;
+          $('#account-state').textContent = '未登录';
+          $('#member-name').textContent = '个人花园';
+          $('#member-email').textContent = '登录后查看你的收藏、生成历史和私有参考图任务。';
+          authGate.hidden = false;
           actions.hidden = true;
           document.querySelector('[data-member-auth-only]').hidden = true;
         }

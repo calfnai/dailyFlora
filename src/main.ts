@@ -205,6 +205,7 @@ const loginSubmitLabel = document.querySelector<HTMLElement>('#login-submit-labe
 const accountFormSwitchCopy = document.querySelector<HTMLElement>('#account-form-switch-copy');
 const accountFormSwitchLink = document.querySelector<HTMLAnchorElement>('#account-form-switch-link');
 const accountFormError = document.querySelector<HTMLElement>('#account-form-error');
+const accountGuestActions = document.querySelector<HTMLElement>('#account-guest-actions');
 const accountProfile = document.querySelector<HTMLElement>('#account-profile');
 const profileAvatar = document.querySelector<HTMLElement>('#profile-avatar');
 const profileName = document.querySelector<HTMLElement>('#profile-name');
@@ -401,6 +402,7 @@ async function restoreCloudState() {
     renderAccountState();
   } catch (error) {
     console.warn('[DailyFlora] cloud session restore failed', error);
+    if (error instanceof Error && /需要登录|登录已过期/.test(error.message)) saveAccountState(null);
   }
 }
 let referenceState: ReferenceState | null = null;
@@ -776,8 +778,7 @@ function openAccountPanel() {
   accountOpenButton.setAttribute('aria-expanded', 'true');
   window.setTimeout(() => accountPanel.classList.add('is-open'), 20);
   if (!accountState) {
-    setMainAuthMode(mainAuthMode);
-    loginNameInput?.focus();
+    accountGuestActions?.querySelector<HTMLAnchorElement>('a')?.focus();
   }
   revealUi();
 }
@@ -825,7 +826,7 @@ function setMainAuthMode(nextMode: 'signup' | 'login') {
 
 async function toggleFavorite() {
   if (!accountState) {
-    window.location.href = './member/#signup';
+    window.location.href = './signup/?intent=favorite';
     return;
   }
 
@@ -902,6 +903,7 @@ function renderAccountState() {
   if (accountAvatar) accountAvatar.textContent = signedIn ? initials(accountState?.name || '', '花') : '访';
   if (accountPanelTitle) accountPanelTitle.textContent = signedIn ? t('index.accountPanelTitleSigned') : t('index.accountPanelTitleGuest');
   if (loginForm) loginForm.hidden = signedIn;
+  if (accountGuestActions) accountGuestActions.hidden = signedIn;
   if (accountProfile) accountProfile.hidden = !signedIn;
   if (profileAvatar) profileAvatar.textContent = initials(accountState?.name || '', '花');
   if (profileName) profileName.textContent = accountState?.name || 'DailyFlora';

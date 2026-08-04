@@ -630,7 +630,7 @@ async function sendPasswordResetEmail(user, token) {
     Action: 'SingleSendMail',
     AddressType: '1',
     Format: 'JSON',
-    HtmlBody: `<p>你好，${String(user.nickname || 'DailyFlora 用户').replace(/[<>]/g, '')}：</p><p>请点击下面的链接，在 30 分钟内重置 DailyFlora 密码：</p><p><a href="${publicOrigin}/member/#reset?token=${encodeURIComponent(token)}">重置密码</a></p><p>如果不是你发起的请求，请忽略这封邮件。</p>`,
+    HtmlBody: `<p>你好，${String(user.nickname || 'DailyFlora 用户').replace(/[<>]/g, '')}：</p><p>请点击下面的链接，在 30 分钟内重置 DailyFlora 密码：</p><p><a href="${publicOrigin}/login/#reset?token=${encodeURIComponent(token)}">重置密码</a></p><p>如果不是你发起的请求，请忽略这封邮件。</p>`,
     ReplyToAddress: 'true',
     Subject: '重置你的 DailyFlora 密码',
     ToAddress: user.email,
