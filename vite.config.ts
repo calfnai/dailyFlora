@@ -30,6 +30,10 @@ function shanghaiStamp(date: Date) {
 }
 
 const builtAt = new Date();
+const packageMeta = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8')) as {
+  version?: string;
+  productVersion?: string;
+};
 const buildSource = process.env.VERCEL ? 'vercel' : 'local';
 const commitSha = process.env.VERCEL_GIT_COMMIT_SHA || readGitValue(['rev-parse', 'HEAD']) || 'uncommitted';
 const shortSha = commitSha === 'uncommitted' ? commitSha : commitSha.slice(0, 8);
@@ -40,6 +44,8 @@ const dirty = buildSource === 'local' && Boolean(readGitValue(['status', '--porc
 const releaseStamp = stampedId || shanghaiStamp(builtAt);
 const releaseId = `DF-${releaseStamp}-${shortSha}${dirty ? '-dirty' : ''}`;
 const buildInfo = Object.freeze({
+  version: packageMeta.version || 'unknown',
+  productVersion: packageMeta.productVersion || packageMeta.version || 'unknown',
   releaseId,
   builtAt: builtAt.toISOString(),
   timezone: 'Asia/Shanghai',
@@ -126,6 +132,7 @@ export default defineConfig({
         legalCopyright: resolve(__dirname, 'legal/copyright/index.html'),
         scifi: resolve(__dirname, 'scifi/index.html'),
         signup: resolve(__dirname, 'signup/index.html'),
+        howToUse: resolve(__dirname, 'how-to-use/index.html'),
         devIndex: resolve(__dirname, 'docs/dev-index.html'),
         developmentDocumentSummary: resolve(__dirname, 'docs/development-document-summary.html'),
         memberTest: resolve(__dirname, 'docs/member-test.html'),

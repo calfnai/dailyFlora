@@ -17,6 +17,7 @@
           <a href="../about/" data-i18n="common.about">About</a>
           <a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a>
           <a href="../downloads/" data-i18n="common.platforms">Platforms</a>
+          <a href="../scifi/" data-i18n="common.scifi">SciFi Flora</a>
         </nav>
       </header>
 
@@ -44,7 +45,6 @@
             <div class="garden-metrics">
               <span><strong id="member-favorite-count">0</strong>收藏</span>
               <span><strong id="member-generated-count">0</strong>生成</span>
-              <span><strong id="member-credit-count">128</strong>本机积分</span>
             </div>
           </article>
 
@@ -55,8 +55,8 @@
             <form class="signup-form compact-signup" id="member-signup-form">
               <div class="field"><label for="member-signup-name" data-i18n="member.name">Your name</label><input id="member-signup-name" name="name" type="text" autocomplete="name" placeholder="For example: Flora" data-i18n-placeholder="index.loginNamePlaceholder" required /></div>
               <div class="field"><label for="member-signup-email" data-i18n="member.email">Email</label><input id="member-signup-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" required /></div>
+              <label class="consent registration-consent"><input name="termsAccepted" type="checkbox" required /><span><span data-i18n="member.consentPrefix">I have read and agree to the</span> <a href="../legal/terms/" target="_blank" rel="noopener" data-i18n="legal.termsTitle">Terms of Use</a> <span data-i18n="member.consentAnd">and</span> <a href="../legal/privacy/" target="_blank" rel="noopener" data-i18n="legal.privacyTitle">Privacy Policy</a>.</span></label>
               <button class="button primary" type="submit"><span data-i18n="member.create">Create local garden</span> <span class="arrow" aria-hidden="true">→</span></button>
-              <p class="form-note" data-i18n="member.note">No password is stored. Nothing is uploaded.</p>
             </form>
             <div class="member-actions" id="member-actions" hidden>
               <a class="button primary" href="../" data-i18n="member.favoriteAction">Save today's bouquet</a>
@@ -78,7 +78,7 @@
             <div><p class="eyebrow" data-i18n="member.studioEyebrow">Upload to bouquet</p><h2 id="studio-title" data-i18n="member.studioTitle">Upload a reference image and create a traceable private bouquet record.</h2></div>
             <span class="state-pill" data-i18n="member.studioPill">Local only</span>
           </div>
-          <div class="member-workbench">
+          <div class="member-workbench" data-member-auth-only hidden>
             <article class="garden-panel">
               <h3 data-i18n="member.createTitle">Create a custom bouquet</h3>
               <p data-i18n="member.createBody">Reads average image color and preference text to create a mock plan.</p>
@@ -116,37 +116,29 @@
           </div>
         </section>
 
-        <section class="product-section" aria-labelledby="history-title">
-          <div class="product-section-head">
-            <div><p class="eyebrow">Private records</p><h2 id="history-title" data-i18n="member.historyTitle">My generated bouquets</h2></div>
-            <p data-i18n="member.historyBody">This is a local MVP ledger.</p>
-          </div>
-          <div class="record-grid" id="record-grid"></div>
-        </section>
-
         <section class="product-section" aria-labelledby="credit-title">
           <div class="product-section-head">
-            <div><p class="eyebrow">Credits</p><h2 id="credit-title" data-i18n="member.creditsTitle">Credits are a ledger first, not a gimmick.</h2></div>
-            <span class="state-pill quiet" data-i18n="member.creditsPill">Mock data</span>
+            <div><p class="eyebrow">Credits</p><h2 id="credit-title" data-i18n="member.creditsHeading">Credits</h2></div>
           </div>
-          <div class="ledger-list" id="ledger-list"></div>
+          <figure class="member-simulation-shot">
+            <img src="../docs/assets/member-ui-direction/member-direction-desktop.png" alt="Simulated DailyFlora member collection" />
+          </figure>
         </section>
       </main>
 
       <footer class="site-footer">
         <div class="footer-main wrap">
           <p class="footer-statement" data-i18n="footer.memberStatement">A flower you loved should have somewhere to stay.</p>
-          <nav class="footer-col" aria-label="Explore"><strong data-i18n="common.explore">Explore</strong><a href="../" data-i18n="common.today">Today's bouquet</a><a href="./" data-i18n="common.member">My garden</a><a href="../about/" data-i18n="common.about">About</a><a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a><a href="../downloads/" data-i18n="common.platforms">Platforms</a></nav>
-          <nav class="footer-col" aria-label="System"><strong data-i18n="common.system">System</strong><a href="../version.json" data-release-code data-i18n="common.version">Read release code...</a><a href="../legal/terms/" data-i18n="legal.termsTitle">Terms of Use</a><a href="../legal/privacy/" data-i18n="legal.privacyTitle">Privacy Policy</a></nav>
+          <nav class="footer-col" aria-label="Explore"><strong data-i18n="common.explore">Explore</strong><a href="../" data-i18n="common.today">Today's bouquet</a><a href="./" data-i18n="common.member">My garden</a><a href="../about/" data-i18n="common.about">About DailyFlora</a><a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a><a href="../downloads/" data-i18n="common.platforms">Platforms</a><a href="../scifi/" data-i18n="common.scifi">SciFi Flora</a><a href="../how-to-use/" data-i18n="tutorial.title">How to use</a></nav>
+          <nav class="footer-col" aria-label="System"><strong data-i18n="common.system">System</strong><a href="../version.json" data-release-code data-i18n="common.version">Read release code...</a><a href="../legal/terms/" data-i18n="legal.termsTitle">Terms of Use</a><a href="../legal/privacy/" data-i18n="legal.privacyTitle">Privacy Policy</a><a href="../legal/copyright/" data-i18n="legal.copyrightTitle">Copyright</a><a href="../legal/credits/" data-i18n="legal.creditsTitle">Credits &amp; Attributions</a></nav>
         </div>
       </footer>
     </div>
     <div class="local-toast" id="local-toast" role="status" aria-live="polite"></div>
     <script>
-      const accountKey = 'dailyflora.account.v1';
+      const accountKey = 'dailyflora.account.v2';
       const favoritesKey = 'dailyflora.favorites.v1';
       const recordsKey = 'dailyflora.member.records.v1';
-      const creditStart = 128;
       const roleMap = {
         air: { title: '空气感小花束', theme: 'dewberry-morning', seed: 'member-air-bouquet', primitives: ['CosmosOpenFlower', 'UmbelMiniCluster', 'FoliageGrassBranch'], summary: '识别为空气感方向：枝条外扩，小花分散，留白优先。' },
         rainbow: { title: '彩虹轻花束', theme: 'lychee-garden-rainbow', seed: 'member-rainbow-bouquet', primitives: ['CosmosOpenFlower', 'DiskFlower', 'StarPinwheelFlower', 'FruitPodCluster'], summary: '识别为多色彩虹方向：颜色按角色分配，用绿色和浅色空气缓冲。' },
@@ -154,7 +146,7 @@
         warm: { title: '秋日果汁束', theme: 'sea-salt-lemon', seed: 'member-warm-juice', primitives: ['LayeredDahliaFlower', 'RuffledRoseFlower', 'DiskFlower'], summary: '识别为暖色饱满方向：橙黄主花可更密，但保留白色小花和绿色边缘。' }
       };
       const initialRecords = [
-        { id: 'DF-MEMBER-20260703-AIR1', name: '晨露莓园空气束', seed: 'dewberry-morning-air', source: '上传参考图 + 更清透、枝条外扩', status: '已生成，消耗 12 积分', colors: ['#fff7df', '#bfe878', '#7dc9ff'] },
+        { id: 'DF-MEMBER-20260703-AIR1', name: '晨露莓园空气束', seed: 'dewberry-morning-air', source: '上传参考图 + 更清透、枝条外扩', status: '已生成', colors: ['#fff7df', '#bfe878', '#7dc9ff'] },
         { id: 'DF-MEMBER-20260703-RBW1', name: '荔枝花园彩虹束', seed: 'lychee-garden-rainbow', source: '参考图库 + 彩虹多色', status: '候选每日花束', colors: ['#fff6e7', '#ff9fbd', '#8ee9d0'] }
       ];
       const $ = (selector) => document.querySelector(selector);
@@ -163,7 +155,6 @@
       const account = () => safeJson(accountKey, null);
       let records = safeJson(recordsKey, initialRecords);
       let detected = null;
-      let credits = creditStart - Math.max(0, records.length - initialRecords.length) * 12;
       const uploadZone = $('#upload-zone');
       const fileInput = $('#reference-file');
       const previewImage = $('#preview-image');
@@ -240,10 +231,12 @@
           $('#member-email').textContent = current.email || '本机账户';
           signupForm.hidden = true;
           actions.hidden = false;
+          document.querySelector('[data-member-auth-only]').hidden = false;
         } else {
           $('#account-state').textContent = '未建立';
           signupForm.hidden = false;
           actions.hidden = true;
+          document.querySelector('[data-member-auth-only]').hidden = true;
         }
       }
       function renderFavorites() {
@@ -251,16 +244,15 @@
         $('#member-favorite-count').textContent = String(Array.isArray(favorites) ? favorites.length : 0);
         const list = $('#saved-list');
         if (!Array.isArray(favorites) || favorites.length === 0) {
-          list.innerHTML = `<article class="saved-empty"><strong>${window.dailyfloraT?.('member.emptySavedTitle') || 'No saved bouquets yet'}</strong><span>${window.dailyfloraT?.('member.emptySavedBody') || 'Return to today’s bouquet and light the heart.'}</span></article>`;
+          list.innerHTML = initialRecords.map((record) => `<article class="saved-card is-simulated"><span>SIMULATED COLLECTION</span><strong>${record.name}</strong><small>seed=${record.seed} · ${record.status}</small></article>`).join('');
           return;
         }
         list.innerHTML = favorites.map((favorite) => `<a class="saved-card" href="../?date=${favorite.date || ''}&seed=${encodeURIComponent(favorite.seed || '')}"><span>${favoriteId(favorite)}</span><strong>${favorite.themeName || 'DailyFlora Bouquet'}</strong><small>${favorite.date || '未知日期'} · seed=${favorite.seed || 'unknown'} · ${favorite.flowerPlanName || '生成花束'}</small></a>`).join('');
       }
       function renderRecords() {
-        recordGrid.innerHTML = records.map((record) => `<article class="record"><div class="thumb" style="--thumb-a:${record.colors[0]};--thumb-b:${record.colors[1]};--thumb-c:${record.colors[2]}"></div><div class="meta"><span>${record.id}</span><h3>${record.name}</h3><p><code>seed=${record.seed}</code></p><p>${record.source}</p><span class="state-pill">${record.status}</span></div></article>`).join('');
         $('#member-generated-count').textContent = String(records.length);
-        $('#member-credit-count').textContent = String(credits);
-        $('#ledger-list').innerHTML = `<div><strong>${new Date().toISOString().slice(0, 10)} · 本机账户余额</strong><span>${credits} credits</span></div><div><strong>生成记录</strong><span>${records.length} 条 · 每次 mock 生成消耗 12</span></div><div><strong>平台采用</strong><span>未接入真实审核与返还</span></div>`;
+        if (!recordGrid) return;
+        recordGrid.innerHTML = records.map((record) => `<article class="record"><div class="thumb" style="--thumb-a:${record.colors[0]};--thumb-b:${record.colors[1]};--thumb-c:${record.colors[2]}"></div><div class="meta"><span>${record.id}</span><h3>${record.name}</h3><p><code>seed=${record.seed}</code></p><p>${record.source}</p><span class="state-pill">${record.status}</span></div></article>`).join('');
       }
       function flash(message) {
         toast.textContent = message;
@@ -271,7 +263,8 @@
       $('#member-signup-form').addEventListener('submit', (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        saveJson(accountKey, { name: String(data.get('name')).trim(), email: String(data.get('email')).trim() });
+        if (data.get('termsAccepted') !== 'on') { event.currentTarget.reportValidity(); return; }
+        saveJson(accountKey, { name: String(data.get('name')).trim(), email: String(data.get('email')).trim(), termsAccepted: true, termsVersion: '0.70', termsAcceptedAt: new Date().toISOString() });
         renderAccount();
         flash(window.dailyfloraT?.('member.toastCreated') || 'Local garden created.');
       });
@@ -293,9 +286,8 @@
       sampleButton.addEventListener('click', () => applyDetection({ ...roleMap.air, title: `${bouquetName.value || '我的清晨花花'} / 空气感小花束`, colors: ['#fff7df', '#bfe878', '#7dc9ff'] }));
       resetButton.addEventListener('click', () => { fileInput.value = ''; previewImage.removeAttribute('src'); uploadZone.classList.remove('has-image'); recognizeButton.disabled = true; generateButton.disabled = true; detected = null; resultTitle.textContent = '等待上传'; resultStatus.textContent = 'not ready'; resultStatus.className = 'state-pill quiet'; resultSummary.textContent = '上传参考图后，这里会显示主色、花材角色、空间结构、seed 和唯一记录代码。'; primitiveChips.innerHTML = ''; swatches.innerHTML = ''; renderMockFlower(['#f2cb62', '#87d486', '#9fc6ff']); });
       generateButton.addEventListener('click', () => {
-        if (!detected || credits < 12) return;
-        credits -= 12;
-        const next = { id: memberId(), name: detected.title.split(' / ')[0], seed: detected.seed, source: `上传识别 + ${preferenceInput.value.slice(0, 28)}`, status: '新生成，消耗 12 积分', colors: detected.colors };
+        if (!detected) return;
+        const next = { id: memberId(), name: detected.title.split(' / ')[0], seed: detected.seed, source: `上传识别 + ${preferenceInput.value.slice(0, 28)}`, status: '新生成', colors: detected.colors };
         records = [next, ...records];
         saveJson(recordsKey, records);
         renderRecords();

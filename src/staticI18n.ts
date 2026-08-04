@@ -10,6 +10,7 @@ import {
   setupLocaleSwitcher,
   type Locale
 } from './i18n/index';
+import { legalPageTranslations, privacyJapanRights, type LegalPageName } from './i18n/legalPages';
 
 declare global {
   interface Window {
@@ -26,6 +27,7 @@ const pagePath: Record<string, string> = {
   member: 'member',
   objects: 'bouquet-shop',
   platforms: 'downloads',
+  tutorial: 'how-to-use',
   terms: 'legal/terms',
   privacy: 'legal/privacy',
   credits: 'legal/credits',
@@ -35,6 +37,10 @@ const pagePath: Record<string, string> = {
 function makeRelativePrefix() {
   const depth = Math.max(0, window.location.pathname.split('/').filter(Boolean).length - 1);
   return depth === 0 ? './' : '../'.repeat(depth);
+}
+
+function makeRootRelativePrefix() {
+  return '../'.repeat(window.location.pathname.split('/').filter(Boolean).length);
 }
 
 function ensureLanguageSwitcher() {
@@ -81,14 +87,70 @@ function applyLocale(locale: Locale) {
     element.textContent = getTranslation(locale, element.dataset.i18nOption || '');
   });
   setupLocaleSwitcher(document.querySelector<HTMLElement>('.language-switcher'), locale, applyLocale);
+  applyLegalPageLocale(locale);
 
   window.dispatchEvent(new CustomEvent('dailyflora:localechange', { detail: { locale } }));
+}
+
+function applyLegalPageLocale(locale: Locale) {
+  if (!['terms', 'privacy', 'copyright', 'credits'].includes(page)) return;
+  const documentRoot = document.querySelector<HTMLElement>('.legal-document');
+  if (!documentRoot) return;
+  documentRoot.querySelectorAll<HTMLElement>('.legal-language[data-generated-legal-language]').forEach((node) => node.remove());
+  const nativeArticle = Array.from(documentRoot.querySelectorAll<HTMLElement>('.legal-language')).find((node) => node.lang === locale);
+  documentRoot.querySelectorAll<HTMLElement>('.legal-language').forEach((node) => { node.hidden = node !== nativeArticle; });
+  if (nativeArticle) return;
+  const translated = legalPageTranslations[locale]?.[page as LegalPageName];
+  if (!translated) return;
+  const article = document.createElement('article');
+  article.className = 'legal-language';
+  article.lang = locale;
+  article.dataset.generatedLegalLanguage = 'true';
+  article.innerHTML = translated;
+  if (page === 'privacy') {
+    const japan = privacyJapanRights[locale];
+    const rightsSection = Array.from(article.querySelectorAll<HTMLElement>('.legal-section')).find((section) => section.querySelector('h3')?.textContent?.startsWith('5.'));
+    if (japan && rightsSection) {
+      const heading = document.createElement('h4');
+      heading.textContent = japan.title;
+      const body = document.createElement('p');
+      body.textContent = japan.body;
+      rightsSection.append(heading, body);
+    }
+  }
+  documentRoot.append(article);
 }
 
 function markDevLinksHidden() {
   document.querySelectorAll<HTMLAnchorElement>('a[href*="dev-index"], a[href*="development"], a[href*="member-test"]').forEach((link) => {
     link.hidden = true;
     link.setAttribute('aria-hidden', 'true');
+  });
+}
+
+function ensureTutorialFooterLink() {
+  const footer = document.querySelector<HTMLElement>('.site-footer .footer-main');
+  if (!footer || footer.querySelector('.footer-tutorial-link, a[data-i18n="tutorial.title"]')) return;
+  const link = document.createElement('a');
+  link.className = 'footer-tutorial-link';
+  link.href = `${makeRootRelativePrefix()}how-to-use/?tutorial=fullscreen`;
+  link.dataset.i18n = 'tutorial.title';
+  link.textContent = 'How to use';
+  const column = footer.querySelector('.footer-col');
+  if (column) column.append(link);
+  else footer.append(link);
+}
+
+function ensureSciFiNavLink() {
+  const prefix = makeRootRelativePrefix();
+  document.querySelectorAll<HTMLElement>('.site-nav').forEach((nav) => {
+    if (nav.querySelector('a[data-generated-sci-fi], a[data-i18n="common.scifi"]')) return;
+    const link = document.createElement('a');
+    link.dataset.generatedSciFi = 'true';
+    link.href = `${prefix}scifi/`;
+    link.dataset.i18n = 'common.scifi';
+    link.textContent = 'SciFi Flora';
+    nav.append(link);
   });
 }
 
@@ -103,4 +165,6 @@ if (pathLocale) currentLocale = pathLocale;
 
 ensureLanguageSwitcher();
 markDevLinksHidden();
+ensureTutorialFooterLink();
+ensureSciFiNavLink();
 applyLocale(currentLocale);
