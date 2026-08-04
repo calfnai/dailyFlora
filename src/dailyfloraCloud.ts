@@ -2,8 +2,7 @@ export type CloudAccount = {
   id: string;
   name: string;
   email: string;
-  termsAccepted?: boolean;
-  termsVersion?: string;
+  role?: string;
   createdAt?: string;
   lastSeenAt?: string;
 };
@@ -22,8 +21,11 @@ export type CloudFavorite = {
 
 export type CloudGeneration = {
   id: string;
+  publicId: string;
   name: string;
   seed: string;
+  themeId?: string;
+  date?: string;
   source: string;
   status: string;
   colors: string[];
@@ -31,16 +33,10 @@ export type CloudGeneration = {
   updatedAt?: string;
 };
 
-export type CloudGarden = {
-  entries: CloudGeneration[];
-  profile?: { displayName?: string; note?: string };
-  updatedAt?: string | null;
-};
-
 export type CloudTask = {
   id: string;
   referenceId: string;
-  status: 'queued' | 'processing' | 'completed' | 'failed' | string;
+  status: 'preparing' | 'queued' | 'processing' | 'completed' | 'failed' | string;
   input: { bouquetName?: string; style?: string; preference?: string };
   result?: {
     title?: string;
@@ -49,24 +45,37 @@ export type CloudTask = {
     colors?: string[];
     composition?: string;
     seed?: string;
+    themeId?: string;
+    renderParams?: Record<string, number | string | boolean>;
   } | null;
   generationId?: string | null;
+  publicId?: string | null;
+  cost?: number;
+  refunded?: boolean;
   createdAt?: string;
   updatedAt?: string;
   completedAt?: string | null;
   errorMessage?: string | null;
 };
 
-export type CloudReference = {
+export type PointAccount = { balance: number; updatedAt?: string | null };
+export type PointEntry = {
   id: string;
-  fileName: string;
-  contentType: string;
-  size: number;
-  status: string;
-  taskId: string;
-  createdAt?: string;
-  temporaryUrl?: string;
-  expiresIn?: number;
+  amount: number;
+  type: string;
+  reason: string;
+  taskId?: string;
+  balanceAfter: number;
+  createdAt: string;
+};
+
+export type AccountSnapshot = {
+  user: CloudAccount;
+  favorites: CloudFavorite[];
+  generations: CloudGeneration[];
+  tasks: CloudTask[];
+  pointAccount: PointAccount;
+  points: PointEntry[];
 };
 
 type CloudResponse<T> = {
@@ -75,24 +84,25 @@ type CloudResponse<T> = {
   token?: string;
   tokenExpired?: string;
   user?: CloudAccount;
-  favorites?: T;
-  generations?: T;
-  garden?: T;
-  generation?: T;
-  task?: T;
-  tasks?: T;
-  reference?: T;
-  summary?: T;
-  users?: T;
-  points?: T;
-  orders?: T;
-  order?: T;
+  favorite?: CloudFavorite;
+  favorites?: CloudFavorite[];
+  generations?: CloudGeneration[];
+  generation?: CloudGeneration;
+  tasks?: CloudTask[];
+  task?: CloudTask;
+  pointAccount?: PointAccount;
+  points?: PointEntry[];
+  snapshot?: AccountSnapshot;
+  summary?: Record<string, unknown>;
+  users?: Array<CloudAccount & { balance?: number }>;
+  reference?: Record<string, unknown>;
+  batch?: T;
   ok?: boolean;
 };
 
 declare global {
   interface Window {
-    __DAILYFLORA_CONFIG__?: { apiUrl?: string };
+    __DAILYFLORA_CONFIG__?: { apiUrl?: string; releaseChannel?: string; workerBridgeUrl?: string };
   }
 }
 
@@ -100,33 +110,56 @@ const configuredApiBase =
   import.meta.env.VITE_DAILYFLORA_API_BASE ||
   (typeof window !== 'undefined' ? window.__DAILYFLORA_CONFIG__?.apiUrl : '') ||
   '';
-const apiBase = configuredApiBase.trim().replace(/\/$/, '');
-const tokenKey = 'dailyflora.cloud.token.v1';
-const tokenExpiryKey = 'dailyflora.cloud.token-expired.v1';
+export const dailyfloraApiBase = configuredApiBase.trim().replace(/\/$/, '');
+export const dailyfloraCloudEnabled = Boolean(dailyfloraApiBase);
+export const workerBridgeUrl = (typeof window !== 'undefined' ? window.__DAILYFLORA_CONFIG__?.workerBridgeUrl : '') || 'http://127.0.0.1:43172';
 
-export const dailyfloraCloudEnabled = Boolean(apiBase);
+const tokenKey = 'dailyflora.beta072.cloud.token.v1';
+const tokenExpiryKey = 'dailyflora.beta072.cloud.token-expired.v1';
+export const accountMirrorKey = 'dailyflora.beta072.account.v1';
 
 function readToken() {
-  return window.localStorage.getItem(tokenKey) || '';
+  return typeof window === 'undefined' ? '' : window.localStorage.getItem(tokenKey) || '';
 }
 
 function saveToken(token?: string, tokenExpired?: string) {
-  if (!token) return;
+  if (!token || typeof window === 'undefined') return;
   window.localStorage.setItem(tokenKey, token);
   if (tokenExpired) window.localStorage.setItem(tokenExpiryKey, tokenExpired);
 }
 
 export function clearCloudSession() {
+  if (typeof window === 'undefined') return;
   window.localStorage.removeItem(tokenKey);
   window.localStorage.removeItem(tokenExpiryKey);
+  window.localStorage.removeItem(accountMirrorKey);
+  window.dispatchEvent(new CustomEvent('dailyflora:account-state', { detail: { status: 'guest', user: null } }));
 }
 
-async function request<T>(action: string, payload: Record<string, unknown> = {}): Promise<CloudResponse<T>> {
-  if (!apiBase) throw new Error('云端账户尚未配置。');
+export function saveAccountMirror(user: CloudAccount | null) {
+  if (typeof window === 'undefined') return;
+  if (user) window.localStorage.setItem(accountMirrorKey, JSON.stringify(user));
+  else window.localStorage.removeItem(accountMirrorKey);
+  window.dispatchEvent(new CustomEvent('dailyflora:account-state', {
+    detail: { status: user ? 'signed-in' : 'guest', user }
+  }));
+}
+
+export function readAccountMirror(): CloudAccount | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return JSON.parse(window.localStorage.getItem(accountMirrorKey) || 'null') as CloudAccount | null;
+  } catch {
+    return null;
+  }
+}
+
+export async function cloudRequest<T>(action: string, payload: Record<string, unknown> = {}): Promise<CloudResponse<T>> {
+  if (!dailyfloraApiBase) throw new Error('0.72 Beta 云端账户尚未配置。');
   const token = readToken();
-  const response = await fetch(apiBase, {
+  const response = await fetch(dailyfloraApiBase, {
     method: 'POST',
-    credentials: 'include',
+    credentials: 'omit',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -142,153 +175,131 @@ async function request<T>(action: string, payload: Record<string, unknown> = {})
 }
 
 export async function registerAccount(input: { name: string; email: string; password: string; termsVersion: string }) {
-  const result = await request<never>('register', {
-    name: input.name,
-    email: input.email,
-    password: input.password,
-    termsVersion: input.termsVersion,
-    termsAcceptedAt: new Date().toISOString()
-  });
+  const result = await cloudRequest<never>('register', input);
   saveToken(result.token, result.tokenExpired);
   if (!result.user) throw new Error('注册响应缺少用户资料。');
+  saveAccountMirror(result.user);
   return result.user;
 }
 
 export async function loginAccount(input: { email: string; password: string }) {
-  const result = await request<never>('login', input);
+  const result = await cloudRequest<never>('login', input);
   saveToken(result.token, result.tokenExpired);
   if (!result.user) throw new Error('登录响应缺少用户资料。');
+  saveAccountMirror(result.user);
   return result.user;
 }
 
 export async function restoreAccount() {
-  if (!dailyfloraCloudEnabled) return null;
-  const result = await request<never>('me');
-  return result.user || null;
+  if (!dailyfloraCloudEnabled || !readToken()) {
+    saveAccountMirror(null);
+    return null;
+  }
+  const result = await cloudRequest<never>('me');
+  const user = result.user || null;
+  saveAccountMirror(user);
+  return user;
 }
 
 export async function logoutAccount() {
-  let failure: unknown;
-  if (dailyfloraCloudEnabled) {
-    try {
-      await request<never>('logout');
-    } catch (error) {
-      failure = error;
-    } finally {
-      clearCloudSession();
-    }
-  } else {
+  try {
+    if (dailyfloraCloudEnabled && readToken()) await cloudRequest<never>('logout');
+  } finally {
     clearCloudSession();
   }
-  if (failure) throw failure;
+}
+
+export async function getMemberSnapshot() {
+  const result = await cloudRequest<AccountSnapshot>('memberDashboard');
+  if (!result.snapshot) throw new Error('个人中心响应不完整。');
+  saveAccountMirror(result.snapshot.user);
+  return result.snapshot;
 }
 
 export async function listCloudFavorites() {
-  const result = await request<CloudFavorite[]>('listFavorites');
+  const result = await cloudRequest<CloudFavorite[]>('listFavorites');
   return result.favorites || [];
 }
 
 export async function saveCloudFavorite(favorite: CloudFavorite) {
-  await request<never>('saveFavorite', { favorite });
+  const result = await cloudRequest<CloudFavorite>('saveFavorite', { favorite });
+  return result.favorite || favorite;
 }
 
 export async function removeCloudFavorite(favoriteId: string) {
-  await request<never>('removeFavorite', { favoriteId });
+  await cloudRequest<never>('removeFavorite', { favoriteId });
 }
 
-export async function listCloudGenerations() {
-  const result = await request<CloudGeneration[]>('listGenerations');
-  return result.generations || [];
-}
-
-export async function saveCloudGeneration(generation: CloudGeneration) {
-  const result = await request<CloudGeneration>('saveGeneration', { generation });
-  return result.generation || generation;
-}
-
-export async function getCloudGarden() {
-  const result = await request<CloudGarden>('getGarden');
-  return result.garden || { entries: [], profile: {} };
-}
-
-export async function saveCloudGarden(garden: CloudGarden) {
-  const result = await request<CloudGarden>('saveGarden', { garden });
-  return result.garden || garden;
-}
-
-export async function createCloudReferenceTask(input: {
-  dataUrl: string;
-  fileName: string;
+export async function createReferenceTask(input: {
+  idempotencyKey: string;
+  referenceDataUrl: string;
+  thumbnailDataUrl: string;
+  sourceFileName: string;
+  reference: { bytes: number; width: number; height: number };
+  thumbnail: { bytes: number; width: number; height: number };
   bouquetName: string;
   style: string;
   preference: string;
 }) {
-  const result = await request<CloudTask>('createReferenceTask', input);
-  return { reference: result.reference, task: result.task };
-}
-
-export async function listCloudProcessingTasks() {
-  const result = await request<CloudTask[]>('listProcessingTasks');
-  return result.tasks || [];
-}
-
-export async function getCloudProcessingTask(taskId: string) {
-  const result = await request<CloudTask>('getProcessingTask', { taskId });
+  const result = await cloudRequest<CloudTask>('createReferenceTask', input);
+  if (!result.task) throw new Error('任务创建响应不完整。');
   return result.task;
 }
 
-export async function listCloudDemoPoints() {
-  const result = await request<unknown[]>('listDemoPoints');
-  return result.points || [];
+export async function renameGeneration(generationId: string, name: string) {
+  const result = await cloudRequest<CloudGeneration>('renameGeneration', { generationId, name });
+  if (!result.generation) throw new Error('生成记录更新失败。');
+  return result.generation;
 }
 
-export async function listCloudDemoOrders() {
-  const result = await request<unknown[]>('listDemoOrders');
-  return result.orders || [];
+export async function deleteGeneration(generationId: string) {
+  await cloudRequest<never>('deleteGeneration', { generationId });
 }
 
-export async function createCloudDemoOrder(input: { productId: string; label: string; amount?: string }) {
-  const result = await request<unknown>('createDemoOrder', input);
-  return result.order;
-}
-
-export async function getCloudAdminSummary() {
-  const result = await request<Record<string, unknown>>('adminSummary');
-  return result.summary || {};
-}
-
-export async function listCloudAdminUsers() {
-  const result = await request<CloudAccount[]>('adminListUsers');
-  return result.users || [];
-}
-
-export async function listCloudAdminTasks(status = '') {
-  const result = await request<CloudTask[]>('adminListTasks', status ? { status } : {});
-  return result.tasks || [];
-}
-
-export async function getCloudAdminReference(taskId: string) {
-  const result = await request<CloudReference>('adminGetReference', { taskId });
-  return result.reference;
-}
-
-export async function writeCloudProcessingResult(input: {
-  taskId: string;
-  status: 'processing' | 'completed' | 'failed';
-  result?: CloudTask['result'];
-  errorMessage?: string;
-}) {
-  const result = await request<CloudTask>('adminWriteProcessingResult', input);
-  return result.task;
+export async function getPublicGeneration(publicId: string) {
+  const result = await cloudRequest<CloudGeneration>('getPublicGeneration', { publicId });
+  if (!result.generation) throw new Error('这个公开花束不存在。');
+  return result.generation;
 }
 
 export async function requestPasswordReset(email: string) {
-  return request<never>('requestPasswordReset', { email });
+  return cloudRequest<never>('requestPasswordReset', { email });
 }
 
 export async function resetPassword(input: { token: string; password: string }) {
-  const result = await request<never>('resetPassword', input);
+  const result = await cloudRequest<never>('resetPassword', input);
   saveToken(result.token, result.tokenExpired);
   if (!result.user) throw new Error('密码重置响应缺少用户资料。');
+  saveAccountMirror(result.user);
   return result.user;
+}
+
+export async function getAdminSummary() {
+  const result = await cloudRequest<Record<string, unknown>>('adminSummary');
+  return result.summary || {};
+}
+
+export async function listAdminUsers() {
+  const result = await cloudRequest<Array<CloudAccount & { balance?: number }>>('adminListUsers');
+  return result.users || [];
+}
+
+export async function listAdminTasks(status = '') {
+  const result = await cloudRequest<CloudTask[]>('adminListTasks', status ? { status } : {});
+  return result.tasks || [];
+}
+
+export async function grantPoints(userId: string, amount: number, reason: string, idempotencyKey: string) {
+  return cloudRequest<never>('adminGrantPoints', { userId, amount, reason, idempotencyKey });
+}
+
+export async function getAdminReference(taskId: string) {
+  const result = await cloudRequest<Record<string, unknown>>('adminGetReference', { taskId });
+  return result.reference || null;
+}
+
+export async function createWorkerBatch() {
+  const result = await cloudRequest<{ token: string; expiresAt: string; taskCount: number }>('adminCreateWorkerBatch');
+  if (!result.batch) throw new Error('批次创建响应不完整。');
+  return result.batch;
 }

@@ -1,0 +1,7 @@
+{
+  "title": "DailyFlora 0.72 Beta users",
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "required": ["email", "name", "passwordHash", "passwordSalt", "createdAt"],
+  "properties": { "email": { "bsonType": "string" }, "name": { "bsonType": "string" }, "nickname": { "bsonType": "string" }, "passwordHash": { "bsonType": "string" }, "passwordSalt": { "bsonType": "string" }, "role": { "bsonType": "string" }, "termsVersion": { "bsonType": "string" }, "termsAcceptedAt": { "bsonType": "date" }, "createdAt": { "bsonType": "date" }, "lastSeenAt": { "bsonType": "date" } },
+  "indexes": [{ "name": "email_unique", "keys": { "email": 1 }, "unique": true }]
+}

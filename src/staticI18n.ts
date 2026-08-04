@@ -11,6 +11,7 @@ import {
   type Locale
 } from './i18n/index';
 import { legalPageTranslations, privacyJapanRights, type LegalPageName } from './i18n/legalPages';
+import './accountHeader';
 
 declare global {
   interface Window {

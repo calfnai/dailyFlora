@@ -20,6 +20,7 @@ import {
   saveCloudFavorite,
   type CloudFavorite
 } from './dailyfloraCloud';
+import './accountHeader';
 import {
   configureDocument,
   detectInitialLocale,
@@ -73,8 +74,8 @@ const renderLabels: Record<Exclude<RenderQualityName, 'auto'>, string> = {
   medium: '清',
   high: '精'
 };
-const accountStorageKey = 'dailyflora.account.v2';
-const favoritesStorageKey = 'dailyflora.favorites.v1';
+const accountStorageKey = 'dailyflora.beta072.account.v1';
+const favoritesStorageKey = 'dailyflora.beta072.favorites.v1';
 const themeEnglishNames: Record<string, string> = {
   'tropical-forest': 'Tropical Forest',
   'moon-white': 'Moon White Hand-Tied',
@@ -162,7 +163,7 @@ const controlsPanel = document.querySelector<HTMLElement>('#controls-panel');
 const siteMenu = document.querySelector<HTMLElement>('#site-menu');
 const siteMenuToggle = document.querySelector<HTMLButtonElement>('#site-menu-toggle');
 const siteMenuPanel = document.querySelector<HTMLElement>('#site-menu-panel');
-const siteMenuFavoriteLink = document.querySelector<HTMLAnchorElement>('#site-menu-favorite-link');
+const siteMenuFavoriteLink = document.querySelector<HTMLButtonElement>('#site-menu-favorite-link');
 const siteMenuDebugLink = document.querySelector<HTMLAnchorElement>('#site-menu-debug-link');
 const handControlToggle = document.querySelector<HTMLButtonElement>('#hand-control-toggle');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
@@ -836,7 +837,7 @@ async function toggleFavorite() {
       try {
         await removeCloudFavorite(favorite.id);
       } catch (error) {
-        console.warn('[DailyFlora] cloud favorite removal failed', error);
+        showFavoriteFeedback(error instanceof Error ? error.message : '取消收藏失败，请稍后重试。', true);
         return;
       }
     }
@@ -849,11 +850,27 @@ async function toggleFavorite() {
     try {
       await saveCloudFavorite(nextFavorite);
     } catch (error) {
-      console.warn('[DailyFlora] cloud favorite save failed', error);
+      showFavoriteFeedback(error instanceof Error ? error.message : '收藏失败，请稍后重试。', true);
       return;
     }
   }
   saveFavoriteBouquets([nextFavorite, ...favoriteBouquets.filter((item) => item.id !== currentFavoriteId())]);
+  showFavoriteFeedback('已保存到你的云端收藏。');
+}
+
+function showFavoriteFeedback(message: string, isError = false) {
+  let status = document.querySelector<HTMLElement>('#favorite-action-status');
+  if (!status) {
+    status = document.createElement('p');
+    status.id = 'favorite-action-status';
+    status.className = 'favorite-action-status';
+    status.setAttribute('role', 'status');
+    document.body.append(status);
+  }
+  status.textContent = message;
+  status.dataset.error = String(isError);
+  status.classList.add('is-visible');
+  window.setTimeout(() => status?.classList.remove('is-visible'), 3600);
 }
 
 function renderFavoriteButton() {
@@ -1598,8 +1615,14 @@ accountOpenButton?.addEventListener('click', () => {
 accountCloseButton?.addEventListener('click', closeAccountPanel);
 
 favoriteButton?.addEventListener('click', () => {
-  toggleFavorite();
+  void toggleFavorite();
   revealUi();
+});
+
+siteMenuFavoriteLink?.addEventListener('click', (event) => {
+  event.preventDefault();
+  toggleSiteMenu(false);
+  void toggleFavorite();
 });
 
 loginForm?.addEventListener('submit', async (event) => {
@@ -1631,7 +1654,7 @@ loginForm?.addEventListener('submit', async (event) => {
     try {
       const account = mainAuthMode === 'login'
         ? await loginAccount({ email, password })
-        : await registerAccount({ name, email, password, termsVersion: '0.71.1' });
+        : await registerAccount({ name, email, password, termsVersion: '0.72-beta.1' });
       saveAccountState(account);
       favoriteBouquets = await listCloudFavorites();
       if (!hadLocalAccount && localFavoritesBeforeAuth.length > 0 && window.confirm(`发现本机有 ${localFavoritesBeforeAuth.length} 条未同步收藏，是否合并到 ${account.email}？`)) {
@@ -1658,15 +1681,7 @@ loginForm?.addEventListener('submit', async (event) => {
       if (submitButton) submitButton.disabled = false;
     }
   }
-  if (mainAuthMode === 'login') {
-    setMainAuthError('当前是离线演示模式，无法验证云端密码。');
-    if (submitButton) submitButton.disabled = false;
-    return;
-  }
-  saveAccountState({ name, email, termsAccepted: true, termsVersion: '0.71.1', termsAcceptedAt: new Date().toISOString() });
-  if (!currentFavorite()) {
-    saveFavoriteBouquets([createFavorite(), ...favoriteBouquets]);
-  }
+  setMainAuthError('0.72 Beta 云端账户服务当前不可用，请稍后重试。');
   if (submitButton) submitButton.disabled = false;
 });
 

@@ -1,0 +1,7 @@
+{
+  "title": "DailyFlora 0.72 Beta generations",
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "required": ["userId", "id", "publicId", "seed", "createdAt"],
+  "properties": { "userId": { "bsonType": "string" }, "id": { "bsonType": "string" }, "publicId": { "bsonType": "string" }, "taskId": { "bsonType": "string" }, "name": { "bsonType": "string" }, "seed": { "bsonType": "string" }, "themeId": { "bsonType": "string" }, "date": { "bsonType": "string" }, "source": { "bsonType": "string" }, "status": { "bsonType": "string" }, "colors": { "bsonType": "array" }, "renderParams": { "bsonType": "object" }, "createdAt": { "bsonType": "date" }, "updatedAt": { "bsonType": "date" } },
+  "indexes": [{ "name": "userId_id_unique", "keys": { "userId": 1, "id": 1 }, "unique": true }, { "name": "publicId_unique", "keys": { "publicId": 1 }, "unique": true }, { "name": "userId_updatedAt", "keys": { "userId": 1, "updatedAt": -1 } }]
+}

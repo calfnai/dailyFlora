@@ -1,0 +1,7 @@
+{
+  "title": "DailyFlora 0.72 Beta points ledger",
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "required": ["id", "userId", "amount", "type", "reason", "balanceAfter", "createdAt"],
+  "properties": { "id": { "bsonType": "string" }, "userId": { "bsonType": "string" }, "amount": { "bsonType": "int" }, "type": { "bsonType": "string" }, "reason": { "bsonType": "string" }, "taskId": { "bsonType": "string" }, "balanceAfter": { "bsonType": "int" }, "createdAt": { "bsonType": "date" } },
+  "indexes": [{ "name": "id_unique", "keys": { "id": 1 }, "unique": true }, { "name": "userId_createdAt", "keys": { "userId": 1, "createdAt": -1 } }]
+}

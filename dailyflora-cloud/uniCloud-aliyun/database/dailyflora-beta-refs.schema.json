@@ -1,0 +1,7 @@
+{
+  "title": "DailyFlora 0.72 Beta private reference images",
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "required": ["id", "userId", "taskId", "referenceFileId", "thumbnailFileId", "createdAt"],
+  "properties": { "id": { "bsonType": "string" }, "userId": { "bsonType": "string" }, "taskId": { "bsonType": "string" }, "referenceFileId": { "bsonType": "string" }, "thumbnailFileId": { "bsonType": "string" }, "sourceFileName": { "bsonType": "string" }, "reference": { "bsonType": "object" }, "thumbnail": { "bsonType": "object" }, "storagePrefix": { "bsonType": "string" }, "status": { "bsonType": "string" }, "createdAt": { "bsonType": "date" }, "updatedAt": { "bsonType": "date" } },
+  "indexes": [{ "name": "id_unique", "keys": { "id": 1 }, "unique": true }, { "name": "taskId_unique", "keys": { "taskId": 1 }, "unique": true }, { "name": "userId_createdAt", "keys": { "userId": 1, "createdAt": -1 } }]
+}

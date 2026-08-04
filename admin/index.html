@@ -12,9 +12,9 @@
     <main class="admin-shell wrap">
       <header class="admin-header">
         <div>
-          <p class="eyebrow">DailyFlora / Internal</p>
-          <h1>处理任务后台</h1>
-          <p>只有 UniCloud 环境变量 <code>DAILYFLORA_ADMIN_EMAILS</code> 中的账户可以读取和回写任务。</p>
+          <p class="eyebrow">DailyFlora / 0.72 Beta / Internal</p>
+          <h1>Beta 任务后台</h1>
+          <p>只连接 <code>dailyflora-api-beta</code> 与 Beta 集合；不会读写 0.71 正式账户。</p>
         </div>
         <a class="button" href="../member/">返回个人花园</a>
       </header>
@@ -24,10 +24,11 @@
         <div class="admin-metrics" id="admin-metrics"></div>
         <section class="garden-panel admin-panel">
           <div class="panel-row"><div><p class="eyebrow">Accounts</p><h2>账户</h2></div><button class="button" id="admin-refresh" type="button">刷新</button></div>
-          <div class="admin-table-wrap"><table><thead><tr><th>昵称</th><th>邮箱</th><th>创建时间</th></tr></thead><tbody id="admin-users"></tbody></table></div>
+          <div class="admin-table-wrap"><table><thead><tr><th>昵称</th><th>邮箱</th><th>余额</th><th>创建时间</th><th>操作</th></tr></thead><tbody id="admin-users"></tbody></table></div>
         </section>
         <section class="garden-panel admin-panel">
-          <div class="panel-row"><div><p class="eyebrow">Codex queue</p><h2>参考图处理任务</h2></div><select id="admin-task-filter"><option value="">全部</option><option value="queued">queued</option><option value="processing">processing</option><option value="completed">completed</option><option value="failed">failed</option></select></div>
+          <div class="panel-row"><div><p class="eyebrow">Codex queue</p><h2>参考图处理任务</h2></div><div class="button-row"><button class="button primary" id="admin-process-queue" type="button">拉取并处理待生成任务</button><select id="admin-task-filter"><option value="">全部</option><option value="queued">queued</option><option value="processing">processing</option><option value="completed">completed</option><option value="failed">failed</option></select></div></div>
+          <p class="muted" id="admin-worker-state">本机桥接器应监听 127.0.0.1:43172；凭证仅对本批任务短时有效。</p>
           <div class="admin-task-list" id="admin-tasks"></div>
         </section>
       </section>

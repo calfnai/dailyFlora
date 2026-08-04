@@ -128,6 +128,7 @@ export default defineConfig({
         member: resolve(__dirname, 'member/index.html'),
         login: resolve(__dirname, 'login/index.html'),
         admin: resolve(__dirname, 'admin/index.html'),
+        publicBouquet: resolve(__dirname, 'bouquet/index.html'),
         legalTerms: resolve(__dirname, 'legal/terms/index.html'),
         legalPrivacy: resolve(__dirname, 'legal/privacy/index.html'),
         legalCredits: resolve(__dirname, 'legal/credits/index.html'),

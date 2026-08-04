@@ -1,0 +1,7 @@
+{
+  "title": "DailyFlora 0.72 Beta point accounts",
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "required": ["userId", "balance", "createdAt"],
+  "properties": { "userId": { "bsonType": "string" }, "balance": { "bsonType": "int", "minimum": 0 }, "operations": { "bsonType": "object" }, "createdAt": { "bsonType": "date" }, "updatedAt": { "bsonType": "date" } },
+  "indexes": [{ "name": "userId_unique", "keys": { "userId": 1 }, "unique": true }]
+}

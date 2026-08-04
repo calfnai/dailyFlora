@@ -11,8 +11,8 @@ import {
   type CloudFavorite
 } from './dailyfloraCloud';
 
-const accountKey = 'dailyflora.account.v2';
-const favoritesKey = 'dailyflora.favorites.v1';
+const accountKey = 'dailyflora.beta072.account.v1';
+const favoritesKey = 'dailyflora.beta072.favorites.v1';
 const mode = document.body.dataset.authMode === 'login' ? 'login' : 'signup';
 
 const authForm = document.querySelector<HTMLFormElement>('#auth-form');
@@ -105,7 +105,7 @@ authForm?.addEventListener('submit', async (event) => {
           name: String(data.get('name') || '').trim(),
           email,
           password,
-          termsVersion: '0.71.1'
+          termsVersion: '0.72-beta.1'
         });
     await mergeGuestFavorites(user);
     saveAccount(user);
