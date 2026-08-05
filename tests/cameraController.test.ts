@@ -8,6 +8,7 @@ import {
   detectsThreeFingersUp,
   dominantPinch,
   extractHandSignal,
+  resolveHandAssetUrls,
   resolvePhysicalHand,
   type HandControlAction,
   type HandSignal,
@@ -18,6 +19,16 @@ import {
   createDailyFloraActionRouter,
   type DailyFloraHandActions
 } from '../src/dailyFloraHandControl.ts';
+
+test('MediaPipe asset directory never ends with a slash', () => {
+  const root = resolveHandAssetUrls('https://dailyflora.calfn.com/');
+  assert.equal(root.wasmPath, 'https://dailyflora.calfn.com/mediapipe/wasm');
+  assert.equal(root.modelPath, 'https://dailyflora.calfn.com/models/gesture_recognizer.task');
+
+  const beta = resolveHandAssetUrls('https://dailyflora.calfn.com/beta-072/');
+  assert.equal(beta.wasmPath, 'https://dailyflora.calfn.com/beta-072/mediapipe/wasm');
+  assert.equal(beta.modelPath, 'https://dailyflora.calfn.com/beta-072/models/gesture_recognizer.task');
+});
 
 test('raw webcam handedness is corrected to physical left and right by default', () => {
   assert.equal(resolvePhysicalHand('Left'), 'right');
