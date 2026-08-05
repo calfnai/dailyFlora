@@ -95,7 +95,7 @@ function dailyRecorder() {
     cycleRender: record('render'),
     toggleClock: record('clock'),
     setAutomaticCameraEnabled: record('auto'),
-    toggleImmersive: record('immersive'),
+    requestFullscreen: record('fullscreen'),
     moveFramingBy: record('xy'),
     rotateBy: record('rotate'),
     zoomBy: record('zoom')
@@ -218,7 +218,8 @@ test('DailyFlora adapter accepts finalized symbolic commands from either hand', 
     recorded.calls.filter((call) => call.name === 'auto').map((call) => call.values),
     [[false], [true]]
   );
-  assert.equal(recorded.calls.filter((call) => call.name === 'immersive').length, 1);
+  assert.equal(recorded.calls.filter((call) => call.name === 'fullscreen').length, 1);
+  assert.equal(recorded.calls.filter((call) => call.name === 'immersive').length, 0);
 });
 
 test('fist acts as an immediate safety brake and suppresses rotate', () => {

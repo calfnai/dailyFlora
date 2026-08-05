@@ -11,7 +11,7 @@ export type DailyFloraHandActions = {
   cycleRender: () => void;
   toggleClock: () => void;
   setAutomaticCameraEnabled: (enabled: boolean) => void;
-  toggleImmersive: () => void;
+  requestFullscreen: () => void;
   moveFramingBy: (deltaX: number, deltaY: number) => void;
   rotateBy: (deltaYaw: number, deltaPitch: number) => void;
   zoomBy: (delta: number) => void;
@@ -34,7 +34,7 @@ export function createDailyFloraActionRouter(
         automaticCameraEnabled = !automaticCameraEnabled;
         actions.setAutomaticCameraEnabled(automaticCameraEnabled);
         onOutput(`${handT('autoCamera', 'Automatic camera')} · ${handT(automaticCameraEnabled ? 'on' : 'off', automaticCameraEnabled ? 'ON' : 'OFF')}`);
-      } else if (action.pose === 'four_up') actions.toggleImmersive();
+      } else if (action.pose === 'four_up') actions.requestFullscreen();
       return;
     }
     if (action.type === 'move_xy') actions.moveFramingBy(action.deltaX, action.deltaY);
@@ -71,7 +71,7 @@ export function bindHandControlKeyboard(actions: DailyFloraHandActions) {
     else if (event.code === 'Digit2' || event.key === '2') actions.cycleRender();
     else if (event.code === 'Digit3' || event.key === '3') actions.toggleClock();
     else if (event.code === 'Digit4' || event.key === '4') actions.setAutomaticCameraEnabled(true);
-    else if (event.code === 'Digit5' || event.key === '5') actions.toggleImmersive();
+    else if (event.code === 'Digit5' || event.key === '5') actions.requestFullscreen();
     else return;
     event.preventDefault();
   };

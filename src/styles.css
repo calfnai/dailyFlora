@@ -2926,13 +2926,59 @@ body.is-clock-visible:not(.is-special) .controls.is-expanded .controls-toggle {
   letter-spacing: 0.08em;
 }
 
-body.is-hand-control-immersive #hud,
-body.is-hand-control-immersive #controls,
-body.is-hand-control-immersive #site-menu,
-body.is-hand-control-immersive #account-dock,
-body.is-hand-control-immersive #release-mark,
-body.is-hand-control-immersive #debug-panel {
-  display: none !important;
+.gesture-fullscreen-prompt {
+  position: fixed;
+  z-index: 240;
+  left: 50%;
+  bottom: max(28px, calc(env(safe-area-inset-bottom) + 20px));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 10px 12px 10px 16px;
+  border: 1px solid rgba(245, 217, 118, .48);
+  border-radius: 999px;
+  color: rgba(251, 247, 233, .92);
+  background: rgba(6, 14, 9, .94);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, .34);
+  opacity: 0;
+  transform: translate(-50%, 12px);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.gesture-fullscreen-prompt.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+
+.gesture-fullscreen-prompt > span {
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+
+.gesture-fullscreen-prompt button {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid rgba(245, 217, 118, .48);
+  border-radius: 999px;
+  color: #10170f;
+  background: #e8d990;
+  cursor: pointer;
+}
+
+.gesture-fullscreen-prompt .gesture-fullscreen-dismiss {
+  min-width: 34px;
+  padding: 0;
+  color: rgba(251, 247, 233, .72);
+  background: transparent;
+}
+
+#fullscreen-button.is-gesture-requested {
+  outline: 2px solid rgba(245, 217, 118, .74);
+  outline-offset: 3px;
 }
 
 .favorite-action-status {

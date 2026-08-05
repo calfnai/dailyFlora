@@ -1938,6 +1938,55 @@ shuffleButton?.addEventListener('click', () => {
   syncTodayMode(date, date);
 });
 
+let gestureFullscreenPromptTimer = 0;
+
+function dismissGestureFullscreenPrompt() {
+  window.clearTimeout(gestureFullscreenPromptTimer);
+  document.querySelector('#gesture-fullscreen-prompt')?.classList.remove('is-visible');
+  fullscreenButton?.classList.remove('is-gesture-requested');
+}
+
+function showGestureFullscreenPrompt() {
+  revealUi();
+  let prompt = document.querySelector<HTMLElement>('#gesture-fullscreen-prompt');
+  if (!prompt) {
+    prompt = document.createElement('div');
+    prompt.id = 'gesture-fullscreen-prompt';
+    prompt.className = 'gesture-fullscreen-prompt';
+    prompt.setAttribute('role', 'status');
+    prompt.setAttribute('aria-live', 'polite');
+
+    const copy = document.createElement('span');
+    copy.dataset.fullscreenGestureCopy = '';
+    const enter = document.createElement('button');
+    enter.type = 'button';
+    enter.dataset.fullscreenGestureEnter = '';
+    enter.addEventListener('click', () => {
+      void toggleFullscreen().then((changed) => {
+        if (changed) dismissGestureFullscreenPrompt();
+      });
+    });
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'gesture-fullscreen-dismiss';
+    close.dataset.fullscreenGestureDismiss = '';
+    close.textContent = '×';
+    close.addEventListener('click', dismissGestureFullscreenPrompt);
+    prompt.append(copy, enter, close);
+    document.body.append(prompt);
+  }
+  const copy = prompt.querySelector<HTMLElement>('[data-fullscreen-gesture-copy]');
+  const enter = prompt.querySelector<HTMLButtonElement>('[data-fullscreen-gesture-enter]');
+  const close = prompt.querySelector<HTMLButtonElement>('[data-fullscreen-gesture-dismiss]');
+  if (copy) copy.textContent = t('hand.fullscreenGestureReady');
+  if (enter) enter.textContent = t('hand.fullscreenGestureButton');
+  if (close) close.setAttribute('aria-label', t('hand.fullscreenGestureDismiss'));
+  prompt.classList.add('is-visible');
+  fullscreenButton?.classList.add('is-gesture-requested');
+  window.clearTimeout(gestureFullscreenPromptTimer);
+  gestureFullscreenPromptTimer = window.setTimeout(dismissGestureFullscreenPrompt, 8000);
+}
+
 async function toggleFullscreen() {
   try {
     if (!document.fullscreenElement) {
@@ -1945,10 +1994,13 @@ async function toggleFullscreen() {
     } else {
       await document.exitFullscreen();
     }
+    revealUi();
+    return true;
   } catch {
-    // Fullscreen can be refused by an embedded or file-based browser context.
+    showFavoriteFeedback(t('hand.fullscreenGestureFailed'), true);
+    revealUi();
+    return false;
   }
-  revealUi();
 }
 
 fullscreenButton?.addEventListener('click', () => {
@@ -1956,6 +2008,7 @@ fullscreenButton?.addEventListener('click', () => {
 });
 
 document.addEventListener('fullscreenchange', () => {
+  dismissGestureFullscreenPrompt();
   if (document.fullscreenElement) {
     maybeShowFullscreenTutorial();
   }
@@ -2065,7 +2118,6 @@ async function startHandControl() {
   const { startDailyFloraHandControl } = await import('./dailyFloraHandControl.ts');
   const densityOrder: DensityName[] = ['low', 'medium', 'high'];
   const renderOrder: Array<Exclude<RenderQualityName, 'auto'>> = ['low', 'medium', 'high'];
-  let immersive = false;
   const actions: DailyFloraHandActions = {
     cycleDensity: () => {
       const index = densityOrder.indexOf(selectedDensity);
@@ -2085,9 +2137,9 @@ async function startHandControl() {
       syncPauseButton(!enabled);
       revealUi();
     },
-    toggleImmersive: () => {
-      immersive = !immersive;
-      document.body.classList.toggle('is-hand-control-immersive', immersive);
+    requestFullscreen: () => {
+      if (document.fullscreenElement) void toggleFullscreen();
+      else showGestureFullscreenPrompt();
     },
     moveFramingBy: (deltaX, deltaY) => {
       scene.moveGestureFramingBy(-deltaX, -deltaY);
@@ -2102,7 +2154,7 @@ async function startHandControl() {
   const stop = startDailyFloraHandControl(actions);
   return () => {
     stop();
-    document.body.classList.remove('is-hand-control-immersive');
+    dismissGestureFullscreenPrompt();
   };
 }
 
