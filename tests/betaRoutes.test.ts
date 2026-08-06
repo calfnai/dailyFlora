@@ -40,3 +40,20 @@ test('homepage heart and menu favorite share the same cloud action', () => {
   assert.match(homepage, /<button class="site-menu-primary" id="site-menu-favorite-link" type="button">/);
   assert.doesNotMatch(homepage, /member-test|member\/#signup/);
 });
+
+test('language switcher fits the menu and auth entry copy uses i18n', () => {
+  const css = read('src/styles.css');
+  const homepage = read('index.html');
+  const signup = read('signup/index.html');
+  const login = read('login/index.html');
+  const member = read('member/index.html');
+  const translations = read('src/i18n/index.ts');
+  assert.match(css, /grid-template-columns: repeat\(7, minmax\(0, 1fr\)\)/);
+  assert.match(css, /site-menu-language-switcher[\s\S]*overflow: hidden/);
+  assert.match(homepage, /data-auth-entry="login"/);
+  assert.match(homepage, /data-auth-entry="signup"/);
+  assert.match(signup, /data-i18n="common\.signInExisting"/);
+  assert.match(login, /data-i18n="common\.createAccount"/);
+  assert.match(member, /data-i18n="common\.signInExisting"/);
+  for (const key of ['signInExisting', 'createAccount', 'guestAuthHint']) assert.match(translations, new RegExp(`${key}:`));
+});

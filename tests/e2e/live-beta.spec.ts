@@ -60,5 +60,6 @@ test('线上 Credits 有内容，注册页不放密码重置', async ({ page }) 
   await expect(page.getByText(/Credits|Attributions|鸣谢与署名/).first()).toBeVisible();
   await page.goto('/beta-072/signup/');
   await expect(page.getByText('忘记密码？')).toHaveCount(0);
-  await expect(page.getByRole('link', { name: '登录已有账户' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Sign in to an existing account' })).toHaveCount(2);
+  await expect(page.getByRole('link', { name: 'Sign in to an existing account' }).first()).toBeVisible();
 });

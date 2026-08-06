@@ -42,11 +42,26 @@ function createState(): MockState {
   return { user: null, favorites: [], generations: [], tasks: [], balance: 20, points: [], favoriteWrites: 0 };
 }
 
+test('首页语言菜单不产生横向长滚动', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#site-menu-toggle').click();
+  const metrics = await page.locator('#language-switcher').evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+    buttonWidths: Array.from(element.querySelectorAll('button')).map((button) => button.getBoundingClientRect().width)
+  }));
+  expect(metrics.clientWidth).toBeGreaterThan(0);
+  expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth);
+  expect(metrics.buttonWidths).toHaveLength(7);
+  expect(Math.max(...metrics.buttonWidths)).toBeLessThan(metrics.clientWidth / 2);
+});
+
 test('注册、登录状态、真实收藏和退出形成闭环', async ({ page }) => {
   const state = createState();
   await mockApi(page, state);
   await page.goto('/signup/');
-  await expect(page.getByRole('link', { name: '登录已有账户' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Sign in to an existing account' })).toHaveCount(2);
+  await expect(page.getByRole('link', { name: 'Sign in to an existing account' }).first()).toBeVisible();
   await page.getByLabel('怎么称呼你').fill('Beta 花友');
   await page.getByLabel('邮箱').fill('beta@example.com');
   await page.getByLabel('密码').fill('beta-pass-123');

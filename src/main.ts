@@ -1082,7 +1082,11 @@ function applyStaticCopy() {
     ['#site-menu-panel a[href="./about/"]', 'index.about'],
     ['#site-menu-panel a[href="./bouquet-shop/"]', 'index.objects'],
     ['#site-menu-panel a[href="./downloads/"]', 'index.platforms'],
+    ['#site-menu-panel a[data-auth-entry="login"]', 'common.signInExisting'],
     ['#site-menu-panel .site-menu-primary', 'index.favorite'],
+    ['#account-guest-actions p[data-auth-copy="guest-hint"]', 'common.guestAuthHint'],
+    ['#account-guest-actions a[data-auth-entry="login"]', 'common.signInExisting'],
+    ['#account-guest-actions a[data-auth-entry="signup"]', 'common.createAccount'],
     ['#site-menu-debug-link', 'index.debug'],
     ['#account-open-title', 'index.gardenTitle'],
     ['#account-panel-title', accountState ? 'index.accountPanelTitleSigned' : 'index.accountPanelTitleGuest'],
@@ -1654,7 +1658,7 @@ loginForm?.addEventListener('submit', async (event) => {
     try {
       const account = mainAuthMode === 'login'
         ? await loginAccount({ email, password })
-        : await registerAccount({ name, email, password, termsVersion: '0.72-beta.1' });
+        : await registerAccount({ name, email, password, termsVersion: '0.72-beta.3' });
       saveAccountState(account);
       favoriteBouquets = await listCloudFavorites();
       if (!hadLocalAccount && localFavoritesBeforeAuth.length > 0 && window.confirm(`发现本机有 ${localFavoritesBeforeAuth.length} 条未同步收藏，是否合并到 ${account.email}？`)) {

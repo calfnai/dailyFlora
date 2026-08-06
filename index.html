@@ -35,7 +35,7 @@
         <div class="site-menu-panel" id="site-menu-panel" hidden>
           <button class="site-menu-primary" id="site-menu-favorite-link" type="button">收藏这束花</button>
           <a href="./member/">我的花园</a>
-          <a href="./login/">登录已有账户</a>
+          <a href="./login/" data-auth-entry="login">登录已有账户</a>
           <a href="./about/">关于 DailyFlora</a>
           <a href="./bouquet-shop/">周边与线下</a>
           <a href="./downloads/">多端入口</a>
@@ -74,9 +74,9 @@
           </button>
         </header>
         <section class="login-card account-guest-actions" id="account-guest-actions">
-          <p>登录后同步收藏；第一次使用可以先创建账户。</p>
-          <a class="primary-action" href="./login/">登录已有账户</a>
-          <a class="ghost-action" href="./signup/">创建新账户</a>
+          <p data-auth-copy="guest-hint">登录后同步收藏；第一次使用可以先创建账户。</p>
+          <a class="primary-action" href="./login/" data-auth-entry="login">登录已有账户</a>
+          <a class="ghost-action" href="./signup/" data-auth-entry="signup">创建新账户</a>
         </section>
         <section class="account-profile profile-card" id="account-profile" hidden>
           <span class="profile-avatar" id="profile-avatar" aria-hidden="true">花</span>
