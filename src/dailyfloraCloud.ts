@@ -81,6 +81,7 @@ export type AccountSnapshot = {
 type CloudResponse<T> = {
   code: number;
   message?: string;
+  error?: { code?: string | number; message?: string };
   token?: string;
   tokenExpired?: string;
   user?: CloudAccount;
@@ -167,9 +168,14 @@ export async function cloudRequest<T>(action: string, payload: Record<string, un
     body: JSON.stringify({ action, token, ...payload })
   });
   const result = (await response.json().catch(() => ({}))) as CloudResponse<T>;
-  if (!response.ok || result.code) {
-    if (response.status === 401 || result.code === 401) clearCloudSession();
-    throw new Error(result.message || `云端请求失败（${response.status}）。`);
+  const providerCode = String(result.error?.code || '');
+  const providerMessage = result.error?.message || '';
+  if (!response.ok || result.code || result.error) {
+    if (response.status === 401 || result.code === 401 || providerCode === '401') clearCloudSession();
+    if (providerCode === 'PrePayResourceExhausted') {
+      throw new Error('云端账户服务暂时达到 UniCloud 平台额度，请恢复按量资源后重试。');
+    }
+    throw new Error(result.message || providerMessage || `云端请求失败（${response.status}）。`);
   }
   return result;
 }

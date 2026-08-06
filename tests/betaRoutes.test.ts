@@ -57,3 +57,9 @@ test('language switcher fits the menu and auth entry copy uses i18n', () => {
   assert.match(member, /data-i18n="common\.signInExisting"/);
   for (const key of ['signInExisting', 'createAccount', 'guestAuthHint']) assert.match(translations, new RegExp(`${key}:`));
 });
+
+test('provider resource exhaustion is surfaced as an actionable account error', () => {
+  const cloud = read('src/dailyfloraCloud.ts');
+  assert.match(cloud, /PrePayResourceExhausted/);
+  assert.match(cloud, /恢复按量资源后重试/);
+});
