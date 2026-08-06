@@ -8,7 +8,7 @@ import { BouquetScene } from './bouquetScene';
 import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
 import { themes } from './themes';
 import { IdleClockController, normalizeClockInterval, type ClockDisplaySource, type IdleClockSettings } from './idleClock';
-import { warmupDailyFloraHandModel, type DailyFloraHandActions } from './dailyFloraHandControl';
+import type { DailyFloraHandActions } from './dailyFloraHandControl';
 import {
   dailyfloraCloudEnabled,
   listCloudFavorites,
@@ -2157,18 +2157,6 @@ scene.start();
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(new URL('./gesture-cache-worker.js', document.baseURI), { scope: new URL('./', document.baseURI).pathname }).catch(() => undefined);
 }
-const warmupHandModel = () => {
-  void warmupDailyFloraHandModel().catch(() => undefined);
-};
-const requestIdle = (window as Window & {
-  requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
-}).requestIdleCallback;
-if (requestIdle) {
-  requestIdle(warmupHandModel, { timeout: 5000 });
-} else {
-  window.setTimeout(warmupHandModel, 2500);
-}
-
 syncHandControlToggle();
 if (handControlInitiallyEnabled) void enableHandControl();
 

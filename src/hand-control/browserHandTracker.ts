@@ -30,9 +30,17 @@ const pinchDistanceScale = 1.12;
 
 let recognizerPromise: Promise<GestureRecognizer> | null = null;
 
+export function resolveHandAssetUrls(baseURI = document.baseURI) {
+  return {
+    // FilesetResolver appends `/vision_wasm_…` itself. Keep this directory
+    // path slash-free because UniCloud does not normalize a doubled slash.
+    wasmPath: new URL('mediapipe/wasm', baseURI).toString().replace(/\/$/, ''),
+    modelPath: new URL('models/gesture_recognizer.task', baseURI).toString()
+  };
+}
+
 async function createRecognizer() {
-  const wasmPath = new URL('mediapipe/wasm/', document.baseURI).toString();
-  const modelPath = new URL('models/gesture_recognizer.task', document.baseURI).toString();
+  const { wasmPath, modelPath } = resolveHandAssetUrls();
   const { FilesetResolver, GestureRecognizer } = await import('@mediapipe/tasks-vision');
   const vision = await FilesetResolver.forVisionTasks(wasmPath);
   const common = {
@@ -47,7 +55,8 @@ async function createRecognizer() {
       ...common,
       baseOptions: { modelAssetPath: modelPath, delegate: 'GPU' }
     });
-  } catch {
+  } catch (error) {
+    console.warn('[DailyFlora][hand-control] GPU recognizer unavailable; retrying with CPU.', error);
     return GestureRecognizer.createFromOptions(vision, {
       ...common,
       baseOptions: { modelAssetPath: modelPath, delegate: 'CPU' }
@@ -265,13 +274,16 @@ export class BrowserHandTracker {
   async start() {
     this.stop(false);
     const generation = this.generation;
+    let pendingStream: MediaStream | null = null;
+    let startupStage: 'camera' | 'model' | 'video' = 'camera';
     try {
       if (!navigator.mediaDevices?.getUserMedia) throw new Error('当前浏览器不支持摄像头访问');
-      this.options.onStatus('loading', '正在准备手势识别模型（首次可能需要一点时间）…');
-      const recognizer = await this.loadRecognizer();
-      if (generation !== this.generation) return;
-      this.options.onStatus('requesting-camera', '请允许网页使用摄像头');
-      const stream = await navigator.mediaDevices.getUserMedia({
+      // Keep the permission request tied to the user's click while the model
+      // loads in parallel.
+      const recognizerPromise = this.loadRecognizer();
+      void recognizerPromise.catch(() => undefined);
+      this.options.onStatus('requesting-camera', '请允许网页使用摄像头；手势模型正在同时加载…');
+      pendingStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'user',
           width: { ideal: 640 },
@@ -280,12 +292,17 @@ export class BrowserHandTracker {
         },
         audio: false
       });
+      startupStage = 'model';
+      this.options.onStatus('loading', '摄像头已授权，正在完成手势模型加载…');
+      const recognizer = await recognizerPromise;
       if (generation !== this.generation) {
-        stream.getTracks().forEach((track) => track.stop());
+        pendingStream.getTracks().forEach((track) => track.stop());
         return;
       }
-      this.stream = stream;
+      this.stream = pendingStream;
+      pendingStream = null;
       this.options.video.srcObject = this.stream;
+      startupStage = 'video';
       await this.options.video.play();
       const now = performance.now();
       this.previousTimestamp = now;
@@ -361,8 +378,28 @@ export class BrowserHandTracker {
       };
       this.requestId = requestAnimationFrame(process);
     } catch (error) {
+      pendingStream?.getTracks().forEach((track) => track.stop());
+      const errorName = error instanceof DOMException ? error.name : error instanceof Error ? error.name : 'UnknownError';
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[DailyFlora][hand-control] startup failed', {
+        stage: startupStage,
+        name: errorName,
+        message: errorMessage,
+        assets: resolveHandAssetUrls()
+      });
       this.stop(false);
-      this.options.onStatus('error', error instanceof Error ? error.message : '无法启动摄像头');
+      const message = startupStage === 'model'
+        ? `手势识别模型加载失败，请刷新后重试（${errorMessage}）`
+        : errorName === 'NotAllowedError'
+          ? '摄像头权限被拒绝，请在地址栏的网站权限中允许摄像头后重试'
+          : errorName === 'NotFoundError'
+            ? '没有检测到可用摄像头'
+            : errorName === 'NotReadableError'
+              ? '摄像头可能正被其他程序占用，请关闭其他摄像头应用后重试'
+              : startupStage === 'video'
+                ? `摄像头画面无法播放（${errorMessage}）`
+                : `摄像头启动失败（${errorMessage}）`;
+      this.options.onStatus('error', message);
     }
   }
 
