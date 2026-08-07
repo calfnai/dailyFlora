@@ -112,7 +112,7 @@ const server = createServer(async (request, response) => {
   if (request.method === 'OPTIONS') { response.writeHead(204, headers); response.end(); return; }
   if (request.method === 'GET' && request.url === '/health') {
     response.writeHead(200, headers);
-    response.end(JSON.stringify({ ok: true, version: '0.72-beta.1', queueRoot: root }));
+    response.end(JSON.stringify({ ok: true, version: '0.72-beta.4', queueRoot: root }));
     return;
   }
   if (request.method !== 'POST' || request.url !== '/process') { response.writeHead(404, headers); response.end(JSON.stringify({ message: 'Not found' })); return; }

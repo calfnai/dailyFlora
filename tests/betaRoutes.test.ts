@@ -39,6 +39,8 @@ test('homepage heart and menu favorite share the same cloud action', () => {
   assert.match(main, /await saveCloudFavorite\(nextFavorite\)/);
   assert.match(homepage, /<button class="site-menu-primary" id="site-menu-favorite-link" type="button">/);
   assert.doesNotMatch(homepage, /member-test|member\/#signup/);
+  assert.equal((main.match(/siteMenuFavoriteLink\?\.addEventListener\('click'/g) || []).length, 1);
+  assert.doesNotMatch(main, /window\.location\.href = '\.\/member\/#saved-title'/);
 });
 
 test('language switcher fits the menu and auth entry copy uses i18n', () => {
@@ -52,10 +54,20 @@ test('language switcher fits the menu and auth entry copy uses i18n', () => {
   assert.match(css, /site-menu-language-switcher[\s\S]*overflow: hidden/);
   assert.match(homepage, /data-auth-entry="login"/);
   assert.match(homepage, /data-auth-entry="signup"/);
+  assert.match(homepage, /data-i18n="common\.signInExisting"/);
+  assert.match(homepage, /id="account-profile-link"[^>]+data-i18n="common\.member"/);
   assert.match(signup, /data-i18n="common\.signInExisting"/);
   assert.match(login, /data-i18n="common\.createAccount"/);
   assert.match(member, /data-i18n="common\.signInExisting"/);
   for (const key of ['signInExisting', 'createAccount', 'guestAuthHint']) assert.match(translations, new RegExp(`${key}:`));
+});
+
+test('camera failure keeps the actionable startup reason visible', () => {
+  const monitor = read('src/hand-control/monitor.ts');
+  const tracker = read('src/hand-control/browserHandTracker.ts');
+  assert.match(monitor, /trackerStatus === 'error' && currentTrackerMessage/);
+  assert.match(tracker, /new URL\('mediapipe\/wasm', baseURI\)/);
+  assert.doesNotMatch(tracker, /new URL\('mediapipe\/wasm\/', baseURI\)/);
 });
 
 test('provider resource exhaustion is surfaced as an actionable account error', () => {

@@ -83,6 +83,25 @@ test('注册、登录状态、真实收藏和退出形成闭环', async ({ page 
   await expect(page.getByRole('button', { name: /登录并打开花园/ })).toBeVisible();
 });
 
+test('登录后首页保留个人中心入口，收藏菜单不跳离当前花束', async ({ page }) => {
+  const state = createState();
+  state.user = { id: 'beta-user-1', name: 'Beta User', email: 'beta@example.com' };
+  await mockApi(page, state);
+  await page.addInitScript(() => localStorage.setItem('dailyflora.beta072.cloud.token.v1', 'beta-token'));
+  await page.goto('/');
+
+  await expect(page.locator('#account-dock')).toBeVisible();
+  await page.locator('#account-open-button').click();
+  await expect(page.locator('#account-profile-link')).toBeVisible();
+  await expect(page.locator('#account-profile-link')).toHaveAttribute('href', './member/');
+
+  await page.locator('#site-menu-toggle').click();
+  await page.locator('#site-menu-favorite-link').click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator('#favorite-button')).toHaveAttribute('aria-pressed', 'true');
+  expect(state.favoriteWrites).toBe(1);
+});
+
 test('Member 不加载 3D、手势模型或 MediaPipe', async ({ page }) => {
   const state = createState();
   state.user = { id: 'beta-user-1', name: 'Beta User', email: 'beta@example.com' };

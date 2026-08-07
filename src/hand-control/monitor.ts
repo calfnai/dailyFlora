@@ -87,6 +87,7 @@ export function createHandMonitor(): HandMonitor {
   let currentMode: HandControlMode | null = null;
   let currentModeDetail = '';
   let outputIsWaiting = true;
+  let currentTrackerMessage = '';
 
   const translate = (key: string, fallback: string) => window.dailyfloraT?.(`hand.${key}`) || fallback;
   const syncTrackerCopy = () => {
@@ -98,7 +99,9 @@ export function createHandMonitor(): HandMonitor {
       error: ['statusError', 'The camera could not be started.']
     };
     const [key, fallback] = statusKeys[trackerStatus];
-    message.textContent = translate(key, fallback);
+    message.textContent = trackerStatus === 'error' && currentTrackerMessage
+      ? currentTrackerMessage
+      : translate(key, fallback);
     start.textContent = trackerStatus === 'running'
       ? translate('restart', 'Restart')
       : translate('enable', 'Enable camera');
@@ -184,8 +187,8 @@ export function createHandMonitor(): HandMonitor {
       swapHands.addEventListener('change', () => actions.setSwapHandedness(swapHands.checked));
     },
     setTrackerStatus: (status, text) => {
-      void text;
       trackerStatus = status;
+      currentTrackerMessage = text;
       dot.dataset.status = status;
       start.disabled = status === 'loading' || status === 'requesting-camera';
       syncTrackerCopy();

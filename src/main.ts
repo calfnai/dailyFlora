@@ -387,6 +387,7 @@ let calendarView = parseDateKey(spec.dateLabel);
 let accountState = readAccountState();
 let favoriteBouquets = readFavoriteBouquets();
 let mainAuthMode: 'signup' | 'login' = 'signup';
+let favoriteActionInFlight = false;
 
 function cloudFavoriteToLocal(favorite: CloudFavorite): FavoriteBouquet {
   return favorite;
@@ -775,6 +776,7 @@ function generateFromReference() {
 
 function openAccountPanel() {
   if (!accountPanel || !accountOpenButton) return;
+  toggleSiteMenu(false);
   accountPanel.hidden = false;
   accountOpenButton.setAttribute('aria-expanded', 'true');
   window.setTimeout(() => accountPanel.classList.add('is-open'), 20);
@@ -796,6 +798,7 @@ function closeAccountPanel() {
 function toggleSiteMenu(forceOpen?: boolean) {
   if (!siteMenuToggle || !siteMenuPanel) return;
   const open = forceOpen ?? siteMenuPanel.hidden;
+  if (open) closeAccountPanel();
   siteMenuPanel.hidden = !open;
   siteMenuToggle.setAttribute('aria-expanded', String(open));
 }
@@ -830,32 +833,38 @@ async function toggleFavorite() {
     window.location.href = './signup/?intent=favorite';
     return;
   }
+  if (favoriteActionInFlight) return;
+  favoriteActionInFlight = true;
 
-  const favorite = currentFavorite();
-  if (favorite) {
+  try {
+    const favorite = currentFavorite();
+    if (favorite) {
+      if (dailyfloraCloudEnabled) {
+        try {
+          await removeCloudFavorite(favorite.id);
+        } catch (error) {
+          showFavoriteFeedback(error instanceof Error ? error.message : '取消收藏失败，请稍后重试。', true);
+          return;
+        }
+      }
+      saveFavoriteBouquets(favoriteBouquets.filter((item) => item.id !== favorite.id));
+      return;
+    }
+
+    const nextFavorite = createFavorite();
     if (dailyfloraCloudEnabled) {
       try {
-        await removeCloudFavorite(favorite.id);
+        await saveCloudFavorite(nextFavorite);
       } catch (error) {
-        showFavoriteFeedback(error instanceof Error ? error.message : '取消收藏失败，请稍后重试。', true);
+        showFavoriteFeedback(error instanceof Error ? error.message : '收藏失败，请稍后重试。', true);
         return;
       }
     }
-    saveFavoriteBouquets(favoriteBouquets.filter((item) => item.id !== favorite.id));
-    return;
+    saveFavoriteBouquets([nextFavorite, ...favoriteBouquets.filter((item) => item.id !== currentFavoriteId())]);
+    showFavoriteFeedback(t('index.savedToday'));
+  } finally {
+    favoriteActionInFlight = false;
   }
-
-  const nextFavorite = createFavorite();
-  if (dailyfloraCloudEnabled) {
-    try {
-      await saveCloudFavorite(nextFavorite);
-    } catch (error) {
-      showFavoriteFeedback(error instanceof Error ? error.message : '收藏失败，请稍后重试。', true);
-      return;
-    }
-  }
-  saveFavoriteBouquets([nextFavorite, ...favoriteBouquets.filter((item) => item.id !== currentFavoriteId())]);
-  showFavoriteFeedback('已保存到你的云端收藏。');
 }
 
 function showFavoriteFeedback(message: string, isError = false) {
@@ -1658,7 +1667,7 @@ loginForm?.addEventListener('submit', async (event) => {
     try {
       const account = mainAuthMode === 'login'
         ? await loginAccount({ email, password })
-        : await registerAccount({ name, email, password, termsVersion: '0.72-beta.3' });
+        : await registerAccount({ name, email, password, termsVersion: '0.72-beta.4' });
       saveAccountState(account);
       favoriteBouquets = await listCloudFavorites();
       if (!hadLocalAccount && localFavoritesBeforeAuth.length > 0 && window.confirm(`发现本机有 ${localFavoritesBeforeAuth.length} 条未同步收藏，是否合并到 ${account.email}？`)) {
@@ -1741,13 +1750,6 @@ referenceGenerateButton?.addEventListener('click', generateFromReference);
 siteMenuToggle?.addEventListener('click', () => {
   toggleSiteMenu();
   revealUi();
-});
-
-siteMenuFavoriteLink?.addEventListener('click', (event) => {
-  if (!accountState) return;
-  event.preventDefault();
-  if (!currentFavorite()) saveFavoriteBouquets([createFavorite(), ...favoriteBouquets]);
-  window.location.href = './member/#saved-title';
 });
 
 document.addEventListener('pointerdown', (event) => {
