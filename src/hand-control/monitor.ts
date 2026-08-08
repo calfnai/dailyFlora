@@ -96,20 +96,24 @@ export function createHandMonitor(): HandMonitor {
       loading: ['statusLoading', 'Loading the hand-recognition model…'],
       'requesting-camera': ['statusRequesting', 'Allow this page to use the camera.'],
       running: ['statusRunning', 'Camera is on. Place both hands in view.'],
+      'model-error': ['statusModelError', 'The camera is ready, but the hand model could not be loaded.'],
       error: ['statusError', 'The camera could not be started.']
     };
     const [key, fallback] = statusKeys[trackerStatus];
-    message.textContent = trackerStatus === 'error' && currentTrackerMessage
+    message.textContent = (trackerStatus === 'error' || trackerStatus === 'model-error') && currentTrackerMessage
       ? currentTrackerMessage
       : translate(key, fallback);
     start.textContent = trackerStatus === 'running'
       ? translate('restart', 'Restart')
+      : trackerStatus === 'model-error'
+        ? translate('retryModel', 'Retry model')
       : translate('enable', 'Enable camera');
     if (trackerStatus !== 'running') {
       const cameraKeys: Record<Exclude<HandTrackerStatus, 'running'>, [string, string]> = {
         off: ['cameraOff', 'CAMERA OFF'],
         loading: ['cameraLoading', 'LOADING'],
         'requesting-camera': ['cameraRequesting', 'ALLOW CAMERA'],
+        'model-error': ['modelError', 'MODEL ERROR'],
         error: ['cameraError', 'CAMERA ERROR']
       };
       const [cameraKey, cameraFallback] = cameraKeys[trackerStatus];

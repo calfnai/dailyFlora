@@ -63,7 +63,7 @@ test('language switcher fits the menu and auth entry copy uses i18n', () => {
 test('camera failure keeps the actionable startup reason visible', () => {
   const monitor = read('src/hand-control/monitor.ts');
   const tracker = read('src/hand-control/browserHandTracker.ts');
-  assert.match(monitor, /trackerStatus === 'error' && currentTrackerMessage/);
+  assert.match(monitor, /trackerStatus === 'error' \|\| trackerStatus === 'model-error'/);
   assert.match(tracker, /new URL\('mediapipe\/wasm', baseURI\)/);
   assert.doesNotMatch(tracker, /new URL\('mediapipe\/wasm\/', baseURI\)/);
 });

@@ -1,8 +1,8 @@
 {
   "name": "daily-flora",
   "private": true,
-  "version": "0.72.0-beta.5",
-  "productVersion": "0.72-beta.5",
+  "version": "0.72.0-beta.6",
+  "productVersion": "0.72-beta.6",
   "type": "module",
   "engines": {
     "node": "24.x",
@@ -10,9 +10,9 @@
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc && vite build && node scripts/prepare-sites-build.mjs",
+    "build": "tsc && vite build && node scripts/prepare-hand-assets.mjs && node scripts/prepare-sites-build.mjs",
     "build:sites": "npm run build",
-    "build:vercel": "tsc && vite build",
+    "build:vercel": "tsc && vite build && node scripts/prepare-hand-assets.mjs",
     "test:daily-name": "node --test tests/dailyName.test.ts",
     "test:hand-control": "node --experimental-strip-types --test tests/cameraController.test.ts",
     "test:auth-routes": "node --test tests/authRoutes.test.ts",

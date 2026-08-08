@@ -34,13 +34,12 @@ test('member is a protected garden surface rather than an embedded auth page', (
   assert.doesNotMatch(html, /member-signup-form|member-reset-request-form|member-reset-form|member-forgot-link/);
 });
 
-test('homepage favorite onboarding points to signup while the account panel exposes both choices', () => {
+test('homepage favorite onboarding points to signup while navigation exposes login', () => {
   const html = source('index.html');
   const main = source('src/main.ts');
-  assert.match(html, /id="account-guest-actions"/);
-  assert.match(html, /href="\.\/login\/"/);
-  assert.match(html, /href="\.\/signup\/"/);
+  assert.match(html, /href="\.\/login\/" data-auth-entry="login"/);
   assert.match(main, /\.\/signup\/\?intent=favorite/);
+  assert.doesNotMatch(html, /id="account-guest-actions"/);
   assert.doesNotMatch(html, /id="login-form"/);
 });
 

@@ -29,6 +29,66 @@ const distance = (a: NormalizedLandmark, b: NormalizedLandmark) =>
 const pinchDistanceScale = 1.12;
 
 let recognizerPromise: Promise<GestureRecognizer> | null = null;
+let handAssetManifestPromise: Promise<HandAssetManifest> | null = null;
+
+type HandAssetManifest = {
+  version: number;
+  encoding: 'gzip';
+  assets: Record<string, { bytes: number; chunks: string[] }>;
+};
+
+const wait = (milliseconds: number) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+
+async function fetchHandAsset(url: string, attempt = 0): Promise<Response> {
+  try {
+    const response = await fetch(url, { cache: attempt === 0 ? 'force-cache' : 'reload' });
+    if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+    return response;
+  } catch (error) {
+    if (attempt >= 2) throw error;
+    await wait(500 * (attempt + 1));
+    return fetchHandAsset(url, attempt + 1);
+  }
+}
+
+async function loadHandAssetManifest(baseURI: string) {
+  if (!handAssetManifestPromise) {
+    const url = new URL('hand-assets.json', baseURI).toString();
+    handAssetManifestPromise = fetchHandAsset(url)
+      .then((response) => response.json() as Promise<HandAssetManifest>)
+      .catch((error) => {
+        handAssetManifestPromise = null;
+        throw error;
+      });
+  }
+  return handAssetManifestPromise;
+}
+
+async function decompressGzip(response: Response) {
+  if (!response.body || typeof DecompressionStream === 'undefined') {
+    throw new Error('This browser cannot unpack the local hand-control assets.');
+  }
+  const stream = response.body.pipeThrough(new DecompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+export async function loadPackedHandAsset(relativePath: string, baseURI = document.baseURI) {
+  const manifest = await loadHandAssetManifest(baseURI);
+  const entry = manifest.assets[relativePath];
+  if (!entry?.chunks.length) throw new Error(`Packed hand-control asset is missing: ${relativePath}`);
+  const chunks = await Promise.all(entry.chunks.map(async (chunkPath) => {
+    const response = await fetchHandAsset(new URL(chunkPath, baseURI).toString());
+    return decompressGzip(response);
+  }));
+  const output = new Uint8Array(entry.bytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    output.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  if (offset !== entry.bytes) throw new Error(`Packed hand-control asset is incomplete: ${relativePath}`);
+  return output;
+}
 
 export function resolveHandAssetUrls(baseURI = document.baseURI) {
   return {
@@ -43,6 +103,21 @@ async function createRecognizer() {
   const { wasmPath, modelPath } = resolveHandAssetUrls();
   const { FilesetResolver, GestureRecognizer } = await import('@mediapipe/tasks-vision');
   const vision = await FilesetResolver.forVisionTasks(wasmPath);
+  let modelBuffer: Uint8Array | null = null;
+  let wasmObjectUrl = '';
+  try {
+    const wasmFileName = new URL(vision.wasmBinaryPath, document.baseURI).pathname.split('/').pop();
+    if (!wasmFileName) throw new Error('MediaPipe did not provide a WASM filename.');
+    const [packedModel, packedWasm] = await Promise.all([
+      loadPackedHandAsset('models/gesture_recognizer.task'),
+      loadPackedHandAsset(`mediapipe/wasm/${wasmFileName}`)
+    ]);
+    modelBuffer = packedModel;
+    wasmObjectUrl = URL.createObjectURL(new Blob([packedWasm], { type: 'application/wasm' }));
+    vision.wasmBinaryPath = wasmObjectUrl;
+  } catch (error) {
+    console.warn('[DailyFlora][hand-control] Packed same-origin assets unavailable; using raw same-origin files.', error);
+  }
   const common = {
     runningMode: 'VIDEO' as const,
     numHands: 2,
@@ -50,17 +125,21 @@ async function createRecognizer() {
     minHandPresenceConfidence: 0.6,
     minTrackingConfidence: 0.6
   };
+  const options = (delegate: 'GPU' | 'CPU') => ({
+    ...common,
+    baseOptions: modelBuffer
+      ? { modelAssetBuffer: modelBuffer, delegate }
+      : { modelAssetPath: modelPath, delegate }
+  });
   try {
-    return await GestureRecognizer.createFromOptions(vision, {
-      ...common,
-      baseOptions: { modelAssetPath: modelPath, delegate: 'GPU' }
-    });
-  } catch (error) {
-    console.warn('[DailyFlora][hand-control] GPU recognizer unavailable; retrying with CPU.', error);
-    return GestureRecognizer.createFromOptions(vision, {
-      ...common,
-      baseOptions: { modelAssetPath: modelPath, delegate: 'CPU' }
-    });
+    try {
+      return await GestureRecognizer.createFromOptions(vision, options('GPU'));
+    } catch (error) {
+      console.warn('[DailyFlora][hand-control] GPU recognizer unavailable; retrying with CPU.', error);
+      return await GestureRecognizer.createFromOptions(vision, options('CPU'));
+    }
+  } finally {
+    if (wasmObjectUrl) URL.revokeObjectURL(wasmObjectUrl);
   }
 }
 
@@ -295,18 +374,18 @@ export class BrowserHandTracker {
         },
         audio: false
       });
-      startupStage = 'model';
-      this.options.onStatus('loading', '摄像头已授权，正在完成手势模型加载…');
-      const recognizer = await recognizerPromise;
-      if (generation !== this.generation) {
-        pendingStream.getTracks().forEach((track) => track.stop());
-        return;
-      }
       this.stream = pendingStream;
       pendingStream = null;
       this.options.video.srcObject = this.stream;
       startupStage = 'video';
       await this.options.video.play();
+      if (generation !== this.generation) {
+        return;
+      }
+      startupStage = 'model';
+      this.options.onStatus('loading', '摄像头已开启，正在加载同域手势模型；首次使用可能需要一点时间…');
+      const recognizer = await recognizerPromise;
+      if (generation !== this.generation) return;
       const now = performance.now();
       this.previousTimestamp = now;
       this.fpsWindow = { started: now, frames: 0, value: 0 };
@@ -402,7 +481,7 @@ export class BrowserHandTracker {
               : startupStage === 'video'
                 ? `摄像头画面无法播放（${errorMessage}）`
                 : `摄像头启动失败（${errorMessage}）`;
-      this.options.onStatus('error', message);
+      this.options.onStatus(startupStage === 'model' ? 'model-error' : 'error', message);
     }
   }
 

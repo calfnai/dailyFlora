@@ -1,6 +1,6 @@
 {
   "name": "dailyflora-api-beta",
-  "version": "0.72.0-beta.5",
+  "version": "0.72.0-beta.6",
   "main": "index.js",
   "description": "Isolated DailyFlora 0.72 Beta account, points and Codex queue API",
   "cloudfunction-config": {

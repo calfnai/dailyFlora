@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'dailyflora-gesture-assets-';
-const CACHE_NAME = `${CACHE_PREFIX}v2`;
+const CACHE_NAME = `${CACHE_PREFIX}v3`;
 
 self.addEventListener('install', () => {
   // Cache assets only when MediaPipe actually requests them. Preloading every
@@ -19,7 +19,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
-  if (request.method !== 'GET' || !url.pathname.match(/gesture_recognizer\.task|vision_wasm_/)) return;
+  if (request.method !== 'GET' || !url.pathname.match(/gesture_recognizer\.task|vision_wasm_|hand-assets\.json|\/hand-assets\//)) return;
   url.pathname = url.pathname.replace(/\/{2,}/g, '/');
   const normalizedRequest = new Request(url.toString(), request);
   event.respondWith(
