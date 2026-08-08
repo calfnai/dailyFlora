@@ -30,8 +30,6 @@ test('线上 Beta 登录、收藏、公开链接、退出及 Member 资源边界
   expect(token).toBeTruthy();
   await request.post(apiURL, { headers: { Authorization: `Bearer ${token}` }, data: { action: 'removeFavorite', favoriteId: 'DF-DATE-20260805' } });
   await page.goto('/beta-072/');
-  const favoriteButton = page.locator('#favorite-button');
-  await expect(favoriteButton).toHaveAttribute('aria-pressed', 'false');
   await page.locator('#site-menu-toggle').click();
   await page.locator('#site-menu-favorite-link').click();
   await expect(page.getByText('已保存到你的云端收藏。')).toBeVisible();

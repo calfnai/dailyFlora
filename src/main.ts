@@ -1667,7 +1667,7 @@ loginForm?.addEventListener('submit', async (event) => {
     try {
       const account = mainAuthMode === 'login'
         ? await loginAccount({ email, password })
-        : await registerAccount({ name, email, password, termsVersion: '0.72-beta.4' });
+        : await registerAccount({ name, email, password, termsVersion: '0.72-beta.5' });
       saveAccountState(account);
       favoriteBouquets = await listCloudFavorites();
       if (!hadLocalAccount && localFavoritesBeforeAuth.length > 0 && window.confirm(`发现本机有 ${localFavoritesBeforeAuth.length} 条未同步收藏，是否合并到 ${account.email}？`)) {

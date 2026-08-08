@@ -31,13 +31,13 @@ test('runtime configuration cannot fall back to production API', () => {
   assert.doesNotMatch(read('scripts/deploy-source-files.json'), /dailyflora-mock/);
 });
 
-test('homepage heart and menu favorite share the same cloud action', () => {
+test('homepage keeps account actions inside INDEX and uses the real favorite action', () => {
   const main = read('src/main.ts');
   const homepage = read('index.html');
-  assert.match(main, /favoriteButton\?\.addEventListener\('click',[\s\S]*void toggleFavorite\(\)/);
   assert.match(main, /siteMenuFavoriteLink\?\.addEventListener\('click',[\s\S]*void toggleFavorite\(\)/);
   assert.match(main, /await saveCloudFavorite\(nextFavorite\)/);
-  assert.match(homepage, /<button class="site-menu-primary" id="site-menu-favorite-link" type="button">/);
+  assert.match(homepage, /<button class="site-menu-primary" id="site-menu-favorite-link" type="button" data-i18n="index\.favorite">/);
+  assert.doesNotMatch(homepage, /id="account-dock"|id="account-panel"|id="favorite-button"/);
   assert.doesNotMatch(homepage, /member-test|member\/#signup/);
   assert.equal((main.match(/siteMenuFavoriteLink\?\.addEventListener\('click'/g) || []).length, 1);
   assert.doesNotMatch(main, /window\.location\.href = '\.\/member\/#saved-title'/);
@@ -53,9 +53,7 @@ test('language switcher fits the menu and auth entry copy uses i18n', () => {
   assert.match(css, /grid-template-columns: repeat\(7, minmax\(0, 1fr\)\)/);
   assert.match(css, /site-menu-language-switcher[\s\S]*overflow: hidden/);
   assert.match(homepage, /data-auth-entry="login"/);
-  assert.match(homepage, /data-auth-entry="signup"/);
   assert.match(homepage, /data-i18n="common\.signInExisting"/);
-  assert.match(homepage, /id="account-profile-link"[^>]+data-i18n="common\.member"/);
   assert.match(signup, /data-i18n="common\.signInExisting"/);
   assert.match(login, /data-i18n="common\.createAccount"/);
   assert.match(member, /data-i18n="common\.signInExisting"/);

@@ -69,6 +69,10 @@ test('注册、登录状态、真实收藏和退出形成闭环', async ({ page 
   await page.getByRole('button', { name: /创建账户/ }).click();
   await page.waitForURL('**/member/');
   await expect(page.getByRole('heading', { name: '我的收藏' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '我的生成' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '参考图任务' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '账户与积分' })).toBeVisible();
+  await expect(page.locator('#member-auth-gate')).toBeHidden();
   await expect(page.getByRole('link', { name: /登录/ })).toHaveCount(0);
   await expect(page.getByText('SIMULATED COLLECTION')).toHaveCount(0);
   await expect(page.getByText('还没有收藏')).toBeVisible();
@@ -83,22 +87,20 @@ test('注册、登录状态、真实收藏和退出形成闭环', async ({ page 
   await expect(page.getByRole('button', { name: /登录并打开花园/ })).toBeVisible();
 });
 
-test('登录后首页保留个人中心入口，收藏菜单不跳离当前花束', async ({ page }) => {
+test('登录后首页不挂载重复账户浮层，INDEX 提供个人中心和收藏', async ({ page }) => {
   const state = createState();
   state.user = { id: 'beta-user-1', name: 'Beta User', email: 'beta@example.com' };
   await mockApi(page, state);
   await page.addInitScript(() => localStorage.setItem('dailyflora.beta072.cloud.token.v1', 'beta-token'));
   await page.goto('/');
 
-  await expect(page.locator('#account-dock')).toBeVisible();
-  await page.locator('#account-open-button').click();
-  await expect(page.locator('#account-profile-link')).toBeVisible();
-  await expect(page.locator('#account-profile-link')).toHaveAttribute('href', './member/');
-
+  await expect(page.locator('#account-dock')).toHaveCount(0);
+  await expect(page.locator('#account-panel')).toHaveCount(0);
   await page.locator('#site-menu-toggle').click();
+  await expect(page.getByRole('link', { name: 'My garden' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Sign in to an existing account' })).toHaveCount(0);
   await page.locator('#site-menu-favorite-link').click();
   await expect(page).toHaveURL(/\/$/);
-  await expect(page.locator('#favorite-button')).toHaveAttribute('aria-pressed', 'true');
   expect(state.favoriteWrites).toBe(1);
 });
 

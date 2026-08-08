@@ -169,6 +169,7 @@ h1, h2, h3, p { margin: 0; }
 
 .member-main { padding-block: 46px 110px; }
 .member-loading, .member-guest { margin-top: 30px; }
+.member-guest[hidden], #member-workspace[hidden] { display: none !important; }
 .member-guest { display: grid; gap: 18px; max-width: 760px; }
 .member-guest h1, .member-hero h1 { font-family: var(--serif); font-size: clamp(45px, 7vw, 88px); font-weight: 400; line-height: .95; }
 .member-guest p, .muted { color: var(--muted); }

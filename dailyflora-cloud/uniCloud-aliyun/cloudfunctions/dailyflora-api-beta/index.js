@@ -15,7 +15,7 @@ const pointsLedger = db.collection('dailyflora-beta-points-ledger');
 const gardens = db.collection('dailyflora-beta-gardens');
 const passwordResets = db.collection('dailyflora-beta-resets');
 
-const VERSION = '0.72-beta.3';
+const VERSION = '0.72-beta.5';
 const SESSION_DAYS = 30;
 const RESET_MINUTES = 30;
 const TASK_COST = 10;
