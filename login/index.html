@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Sign in to your DailyFlora garden." />
+    <title>登录 DailyFlora</title>
+    <script type="module" crossorigin src="../assets/modulepreload-polyfill-B5Qt9EMX.js"></script>
+    <script type="module" crossorigin src="../assets/index-LONAQq15.js"></script>
+    <script type="module" crossorigin src="../assets/dailyfloraCloud-9r3IxdA1.js"></script>
+    <script type="module" crossorigin src="../assets/accountHeader-CJ3VrkbS.js"></script>
+    <script type="module" crossorigin src="../assets/staticI18n-CY9sOxcj.js"></script>
+    <script type="module" crossorigin src="../assets/authPage-B1-_DI3r.js"></script>
+    <link rel="stylesheet" crossorigin href="../assets/marketing-Db2Ey8yp.css">
+    <meta name="dailyflora-release" content="DF-20260814-0500-576736bc">
+  </head>
+  <body data-page="member" data-auth-mode="login">
+    <div class="page-shell product-shell">
+      <header class="site-header">
+        <a class="brand" href="../" aria-label="DailyFlora home" data-i18n-aria="common.brandHome"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA</a>
+        <nav class="site-nav" aria-label="站点导航"><a href="../" data-i18n="common.today">Today's bouquet</a><a href="../member/" data-i18n="common.member">My garden</a><a href="../about/" data-i18n="common.about">About</a><a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a><a href="../downloads/" data-i18n="common.platforms">Platforms</a><a href="../scifi/" data-i18n="common.scifi">SciFi Flora</a><a href="../login/" data-auth-entry="login" data-i18n="common.signInExisting">Sign in to an existing account</a><a class="nav-cta" href="../signup/" data-auth-entry="signup" data-i18n="common.createAccount">Create account</a></nav>
+      </header>
+      <main class="product-section wrap auth-page">
+        <section class="signup-intro">
+          <div class="signup-copy">
+            <p class="eyebrow" data-i18n="auth.loginEyebrow">DailyFlora ID</p>
+            <h1 class="display" data-i18n="auth.loginTitle">欢迎回到花园。</h1>
+            <p class="lead" data-i18n="auth.loginLead">在新设备登录后，继续查看同一份收藏、生成历史与个人花园。</p>
+          </div>
+          <article class="signup-card">
+            <span class="card-step" data-i18n="auth.loginStep">Sign in</span>
+            <h2 data-i18n="auth.loginHeading">登录</h2>
+            <p><span data-i18n="auth.noAccountPrompt">还没有账户？</span> <a href="../signup/" data-i18n="auth.signupLink">立即注册</a></p>
+            <form class="signup-form" id="auth-form">
+              <div class="field"><label for="auth-email" data-i18n="auth.emailLabel">邮箱</label><input id="auth-email" name="email" type="email" autocomplete="email" data-i18n-placeholder="auth.emailPlaceholder" placeholder="name@example.com" required /></div>
+              <div class="field"><label for="auth-password" data-i18n="auth.passwordLabel">密码</label><input id="auth-password" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" data-i18n-placeholder="auth.passwordPlaceholder" placeholder="8–128 位" required /></div>
+              <button class="button primary" type="submit"><span data-i18n="auth.loginSubmit">登录并打开花园</span> <span class="arrow" aria-hidden="true">→</span></button>
+              <p class="account-form-switch"><a href="#forgot" data-i18n="auth.forgotPassword">忘记密码？</a></p>
+            </form>
+            <form class="signup-form" id="forgot-form" hidden>
+              <div class="field"><label for="forgot-email" data-i18n="auth.forgotEmailLabel">注册邮箱</label><input id="forgot-email" name="email" type="email" autocomplete="email" required /></div>
+              <button class="button primary" type="submit" data-i18n="auth.sendReset">发送重置邮件</button>
+              <p class="account-form-switch"><a href="#" data-i18n="auth.backToLogin">返回登录</a></p>
+            </form>
+            <form class="signup-form" id="reset-form" hidden>
+              <input id="reset-token" name="token" type="hidden" />
+              <div class="field"><label for="reset-password" data-i18n="auth.newPasswordLabel">新密码</label><input id="reset-password" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required /></div>
+              <div class="field"><label for="reset-password-confirm" data-i18n="auth.confirmPasswordLabel">确认新密码</label><input id="reset-password-confirm" name="passwordConfirm" type="password" autocomplete="new-password" minlength="8" maxlength="128" required /></div>
+              <button class="button primary" type="submit" data-i18n="auth.savePassword">保存新密码并登录</button>
+            </form>
+            <p class="account-form-error" id="auth-status" role="status" aria-live="polite" hidden></p>
+          </article>
+        </section>
+      </main>
+      <footer class="site-footer"><div class="footer-main wrap"><p class="footer-statement">A flower you loved should have somewhere to stay.</p><nav class="footer-col"><strong>账户</strong><a href="../signup/">注册</a><a href="../member/">个人花园</a></nav><nav class="footer-col"><strong>系统</strong><a href="../legal/terms/">使用条款</a><a href="../legal/privacy/">隐私政策</a><a href="../legal/credits/">Credits</a></nav></div></footer>
+    </div>
+    <script src="../dailyflora-config.js"></script>
+  </body>
+</html>

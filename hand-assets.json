@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "encoding": "gzip",
+  "assets": {
+    "models/gesture_recognizer.task": {
+      "bytes": 8373440,
+      "chunks": [
+        "hand-assets/models__gesture_recognizer.task.part0.gz",
+        "hand-assets/models__gesture_recognizer.task.part1.gz",
+        "hand-assets/models__gesture_recognizer.task.part2.gz",
+        "hand-assets/models__gesture_recognizer.task.part3.gz"
+      ]
+    },
+    "mediapipe/wasm/vision_wasm_internal.wasm": {
+      "bytes": 11153617,
+      "chunks": [
+        "hand-assets/mediapipe__wasm__vision_wasm_internal.wasm.part0.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_internal.wasm.part1.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_internal.wasm.part2.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_internal.wasm.part3.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_internal.wasm.part4.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_internal.wasm.part5.gz"
+      ]
+    },
+    "mediapipe/wasm/vision_wasm_module_internal.wasm": {
+      "bytes": 11153641,
+      "chunks": [
+        "hand-assets/mediapipe__wasm__vision_wasm_module_internal.wasm.part0.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_module_internal.wasm.part1.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_module_internal.wasm.part2.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_module_internal.wasm.part3.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_module_internal.wasm.part4.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_module_internal.wasm.part5.gz"
+      ]
+    },
+    "mediapipe/wasm/vision_wasm_nosimd_internal.wasm": {
+      "bytes": 10481398,
+      "chunks": [
+        "hand-assets/mediapipe__wasm__vision_wasm_nosimd_internal.wasm.part0.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_nosimd_internal.wasm.part1.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_nosimd_internal.wasm.part2.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_nosimd_internal.wasm.part3.gz",
+        "hand-assets/mediapipe__wasm__vision_wasm_nosimd_internal.wasm.part4.gz"
+      ]
+    }
+  }
+}

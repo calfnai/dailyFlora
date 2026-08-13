@@ -6,22 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="DailyFlora grows a collectible 3D digital bouquet from each date." />
     <title>DailyFlora — A bouquet for every day</title>
-    <script type="module" crossorigin src="./assets/main-B2a1A49D.js"></script>
+    <script type="module" crossorigin src="./assets/main-Dq47KoOL.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-B5Qt9EMX.js">
-    <link rel="modulepreload" crossorigin href="./assets/random-CVcU7mnd.js">
-    <link rel="modulepreload" crossorigin href="./assets/three.core-BPWrdVeF.js">
-    <link rel="modulepreload" crossorigin href="./assets/three.module-DzvgNsjM.js">
-    <link rel="modulepreload" crossorigin href="./assets/floraPrimitives-C5qL2vqc.js">
-    <link rel="modulepreload" crossorigin href="./assets/plantOwnership-CEDI0TWb.js">
-    <link rel="modulepreload" crossorigin href="./assets/palmateMajorStructure-BnoqbU6U.js">
-    <link rel="modulepreload" crossorigin href="./assets/realisticLeafForms-DPacDZTr.js">
-    <link rel="modulepreload" crossorigin href="./assets/index-DsiJOeOn.js">
-    <link rel="stylesheet" crossorigin href="./assets/main-DbRkns97.css">
-    <meta name="dailyflora-release" content="DF-20260812-0346-a503b40c">
+    <link rel="modulepreload" crossorigin href="./assets/floraPrimitives-ChGc9NFR.js">
+    <link rel="modulepreload" crossorigin href="./assets/dailyfloraCloud-9r3IxdA1.js">
+    <link rel="modulepreload" crossorigin href="./assets/accountHeader-CJ3VrkbS.js">
+    <link rel="modulepreload" crossorigin href="./assets/index-LONAQq15.js">
+    <link rel="stylesheet" crossorigin href="./assets/main-CCMdk6zF.css">
+    <meta name="dailyflora-release" content="DF-20260814-0500-576736bc">
   </head>
   <body>
     <main class="app-shell" aria-label="DailyFlora 3D bouquet screensaver">
       <canvas id="flora-canvas"></canvas>
+
+      <section class="app-startup-state" id="app-startup-state" role="status" aria-live="polite">
+        <span class="app-startup-eyebrow">DAILYFLORA</span>
+        <strong id="app-startup-title">正在加载今日花束…</strong>
+        <span id="app-startup-detail">首次打开可能需要一点时间。</span>
+      </section>
 
       <div class="interface-frame" aria-hidden="true">
         <span class="interface-corner interface-corner-top"></span>
@@ -46,11 +48,12 @@
           <span data-interface-copy="index">INDEX</span>
         </button>
         <div class="site-menu-panel" id="site-menu-panel" hidden>
-          <a class="site-menu-primary" id="site-menu-favorite-link" href="./member/#signup">收藏这束花</a>
-          <a href="./member/">我的花园</a>
-          <a href="./about/">关于 DailyFlora</a>
-          <a href="./bouquet-shop/">周边与线下</a>
-          <a href="./downloads/">多端入口</a>
+          <button class="site-menu-primary" id="site-menu-favorite-link" type="button" data-i18n="index.favorite">Keep this bouquet</button>
+          <a href="./member/" data-i18n="index.myGarden">My garden</a>
+          <a href="./login/" data-auth-entry="login" data-i18n="common.signInExisting">Sign in to an existing account</a>
+          <a href="./about/" data-i18n="index.about">About DailyFlora</a>
+          <a href="./bouquet-shop/" data-i18n="index.objects">Objects & Collaborations</a>
+          <a href="./downloads/" data-i18n="index.platforms">Platforms</a>
           <a href="./scifi/">SciFi Flora</a>
           <a id="site-menu-debug-link" href="./docs/aesthetic-review-dashboard.html?debug=1" hidden>审美审核</a>
           <nav class="language-switcher site-menu-language-switcher" id="language-switcher" aria-label="Language">
@@ -64,61 +67,6 @@
           </nav>
         </div>
       </nav>
-
-      <div class="account-dock" id="account-dock">
-        <button class="account-favorite-button" id="favorite-button" type="button" aria-label="收藏今日花束" aria-pressed="false" title="收藏今日花束">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2 5.6 14A5.2 5.2 0 0 1 4 10.2 4.2 4.2 0 0 1 8.2 6c1.4 0 2.7.7 3.8 2 1.1-1.3 2.4-2 3.8-2A4.2 4.2 0 0 1 20 10.2c0 1.4-.5 2.7-1.6 3.8z" /></svg>
-        </button>
-        <button class="account-open-button" id="account-open-button" type="button" aria-label="打开个人花园" aria-expanded="false" aria-controls="account-panel">
-          <span class="account-avatar" id="account-avatar" aria-hidden="true">访</span>
-          <span class="account-open-copy"><span id="account-open-title">个人花园</span><span id="account-open-status">登录后同步收藏</span></span>
-        </button>
-      </div>
-
-      <aside class="account-panel" id="account-panel" aria-labelledby="account-panel-title" hidden>
-        <header class="account-panel-header">
-          <div>
-            <p class="account-eyebrow">DailyFlora Garden</p>
-            <h2 id="account-panel-title">把今天的花束收进个人花园</h2>
-          </div>
-          <button class="account-close-button" id="account-close-button" type="button" aria-label="关闭个人花园">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.4 5 12.6 12.6-1.4 1.4L5 6.4z" /><path d="M5 17.6 17.6 5l1.4 1.4L6.4 19z" /></svg>
-          </button>
-        </header>
-        <form class="login-card" id="login-form">
-          <label>怎么称呼你<input id="login-name-input" name="name" type="text" autocomplete="name" placeholder="例如：小花" required /></label>
-          <label>邮箱<input id="login-email-input" name="email" type="email" autocomplete="email" placeholder="name@example.com" required /></label>
-          <label class="registration-consent"><input id="login-consent-input" name="termsAccepted" type="checkbox" required /><span><span data-i18n="member.consentPrefix">我已阅读并同意</span> <a href="./legal/terms/" target="_blank" rel="noopener" data-i18n="legal.termsTitle">使用条款</a> <span data-i18n="member.consentAnd">和</span> <a href="./legal/privacy/" target="_blank" rel="noopener" data-i18n="legal.privacyTitle">隐私政策</a>。</span></label>
-          <button class="primary-action" type="submit">建立本机花园并收藏</button>
-        </form>
-        <section class="account-profile profile-card" id="account-profile" hidden>
-          <span class="profile-avatar" id="profile-avatar" aria-hidden="true">花</span>
-          <div><strong id="profile-name">DailyFlora 用户</strong><span id="profile-email"></span></div>
-          <button class="ghost-action" id="logout-button" type="button">退出</button>
-        </section>
-        <section class="collection-section" aria-label="我的收藏">
-          <div class="collection-header"><h3>我的收藏</h3><span class="collection-count" id="collection-count">0</span></div>
-          <div class="collection-list" id="collection-list"></div>
-        </section>
-        <section class="reference-card" aria-label="参考图生成">
-          <div class="reference-copy">
-            <h3>从参考图出发</h3>
-            <p>只在本机读取颜色和文件名，用来预览一束新的花；不会上传图片。</p>
-          </div>
-          <label class="reference-upload-zone">
-            <span class="reference-upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M11 4h2v9l3.2-3.2 1.4 1.4L12 16.8l-5.6-5.6 1.4-1.4L11 13z" /><path d="M5 18h14v2H5z" /></svg></span>
-            <span>选择一张参考图</span>
-            <input id="reference-file-input" type="file" accept="image/*" />
-          </label>
-          <div class="reference-preview" id="reference-preview" hidden>
-            <img id="reference-preview-image" alt="" />
-            <div><strong id="reference-preview-title"></strong><span id="reference-preview-meta"></span></div>
-          </div>
-          <label class="reference-note-label"><span>偏好备注</span><textarea id="reference-note-input" placeholder="例如：更轻、更冷一点，保留枝条感"></textarea></label>
-          <button class="primary-action" id="reference-generate-button" type="button" disabled>按参考图生成</button>
-          <p class="reference-result" id="reference-result" hidden></p>
-        </section>
-      </aside>
 
       <nav class="controls is-collapsed" id="controls" aria-label="Viewing controls">
         <button class="icon-button controls-toggle" id="controls-toggle" type="button" title="Show viewing controls" aria-label="Show viewing controls" aria-expanded="false" aria-controls="controls-panel" data-tooltip="观看设置">
@@ -214,6 +162,7 @@
             <div><dt><kbd>+</kbd><kbd>−</kbd></dt><dd data-shortcut-copy="zoom"></dd></div>
             <div><dt><kbd>R</kbd></dt><dd data-shortcut-copy="random"></dd></div>
             <div><dt><kbd>0</kbd></dt><dd data-shortcut-copy="reset"></dd></div>
+            <div><dt><kbd>P</kbd></dt><dd data-shortcut-copy="preset"></dd></div>
             <div><dt><kbd>Space</kbd></dt><dd data-shortcut-copy="rotation"></dd></div>
             <div><dt><kbd>H</kbd></dt><dd data-shortcut-copy="interface"></dd></div>
             <div><dt><kbd>F</kbd></dt><dd data-shortcut-copy="fullscreen"></dd></div>
@@ -254,5 +203,6 @@
       <p class="clock-exit-hint" id="clock-exit-hint" role="status">press esc to exit clock mode</p>
       <aside class="debug-panel" id="debug-panel" aria-label="Debug rendering stats" hidden></aside>
     </main>
+    <script src="./dailyflora-config.js"></script>
   </body>
 </html>
