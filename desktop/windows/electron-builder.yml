@@ -17,8 +17,11 @@ win:
         - x64
   artifactName: DailyFlora-${version}-${arch}.${ext}
 nsis:
+  artifactName: DailyFlora-${version}-${arch}-setup.${ext}
   oneClick: false
   perMachine: false
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   shortcutName: DailyFlora
+portable:
+  artifactName: DailyFlora-${version}-${arch}-portable.${ext}
