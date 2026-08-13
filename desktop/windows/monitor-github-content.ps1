@@ -5,7 +5,7 @@ param(
 )
 
 $urls = @(
-  "https://raw.githubusercontent.com/calfnai/dailyFlora/codex/dailyflora-072-beta/data/daily-content.json",
+  "https://raw.githubusercontent.com/calfnai/dailyFlora/codex/dailyflora-desktop-windows/data/daily-content.json",
   "https://calfnai.github.io/dailyFlora/daily-content.json"
 )
 
