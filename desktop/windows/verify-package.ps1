@@ -33,7 +33,7 @@ foreach ($line in Get-Content -LiteralPath $manifestPath) {
 
 $failed = $false
 foreach ($target in $targets) {
-  $file = Get-Item -LiteralPath $target
+  $file = if ($target -is [System.IO.FileInfo]) { $target } else { Get-Item -LiteralPath $target }
   $actual = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
   $expectedHash = $expected[$file.Name]
   if (-not $expectedHash) {
