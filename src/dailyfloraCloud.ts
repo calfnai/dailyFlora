@@ -103,7 +103,18 @@ type CloudResponse<T> = {
 
 declare global {
   interface Window {
-    __DAILYFLORA_CONFIG__?: { apiUrl?: string; releaseChannel?: string; workerBridgeUrl?: string };
+    __DAILYFLORA_CONFIG__?: {
+      apiUrl?: string;
+      releaseChannel?: string;
+      workerBridgeUrl?: string;
+      dailyContentUrl?: string;
+      dailyContentUrls?: string[];
+    };
+    dailyfloraDesktop?: {
+      isDesktop: boolean;
+      mode: 'windowed' | 'screensaver' | 'preview' | string;
+      isScreensaver: boolean;
+    };
   }
 }
 

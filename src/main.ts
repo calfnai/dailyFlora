@@ -7,6 +7,7 @@ import { resolveQuality } from './quality';
 import { BouquetScene } from './bouquetScene';
 import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
 import { themes } from './themes';
+import { loadDailyContent } from './dailyContent';
 import { IdleClockController, normalizeClockInterval, type ClockDisplaySource, type IdleClockSettings } from './idleClock';
 import type { DailyFloraHandActions } from './dailyFloraHandControl';
 import {
@@ -1495,9 +1496,36 @@ function scheduleDailyRollover() {
     if (followsToday && spec.dateLabel !== date) {
       rebuild(date, date);
       syncTodayMode(date, date);
+      void applyRemoteDailyContent(date);
     }
     scheduleDailyRollover();
   }, delay);
+}
+
+async function applyRemoteDailyContent(dateKey = params.date) {
+  if (
+    specialReference ||
+    !window.dailyfloraDesktop?.isDesktop ||
+    searchParams.has('date') ||
+    searchParams.has('seed')
+  ) {
+    return;
+  }
+
+  const loaded = await loadDailyContent(dateKey);
+  if (!loaded) return;
+
+  const entry = loaded.entry;
+  if (!searchParams.has('theme') && entry.themeId) selectedTheme = entry.themeId;
+  if (!requestedDensity && entry.density) selectedDensity = entry.density;
+  if (!requestedRender && entry.render) selectedRender = entry.render;
+  quality = resolveQuality(selectedDensity, selectedRender);
+  spec = createDailySpec(entry.date, entry.seed, selectedTheme);
+  scene.rebuild(spec, quality);
+  applyRotationSettings();
+  setLabels();
+  syncControls();
+  document.body.dataset.dailyContentSource = loaded.source;
 }
 
 function createSpecialOverlay() {
@@ -2226,6 +2254,7 @@ syncClockControls();
 idleClock.start();
 revealUi();
 scene.start();
+void applyRemoteDailyContent();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(new URL('./gesture-cache-worker.js', document.baseURI), { scope: new URL('./', document.baseURI).pathname }).catch(() => undefined);
