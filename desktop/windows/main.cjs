@@ -72,8 +72,14 @@ function createWindow() {
   const reportFullscreenState = () => {
     if (!win.isDestroyed()) win.webContents.send('dailyflora:fullscreen-changed', win.isFullScreen());
   };
-  win.on('enter-full-screen', reportFullscreenState);
-  win.on('leave-full-screen', reportFullscreenState);
+  win.on('enter-full-screen', () => {
+    win.setMenuBarVisibility(false);
+    reportFullscreenState();
+  });
+  win.on('leave-full-screen', () => {
+    if (!isScreensaver) win.setMenuBarVisibility(true);
+    reportFullscreenState();
+  });
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith(`${scheme}://`)) return { action: 'allow' };
@@ -106,6 +112,7 @@ app.whenReady().then(() => {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (!win || isScreensaver || isPreview) return false;
     const targetState = Boolean(enabled);
+    if (targetState) win.setMenuBarVisibility(false);
     win.setFullScreen(targetState);
     // Windows completes the native transition asynchronously. The renderer is
     // updated again by enter-full-screen / leave-full-screen below.
