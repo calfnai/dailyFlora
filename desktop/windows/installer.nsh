@@ -4,7 +4,7 @@
 ; before the new files can be installed. Clear only the old uninstall commands
 ; and executable; the new installer writes a fresh uninstaller at the end.
 !macro DF_CLEAR_OLD_UNINSTALL ROOT_KEY
-  ReadRegStr $R1 ${ROOT_KEY} "${UNINSTALL_REGISTRY_KEY}" "InstallLocation"
+  ReadRegStr $R1 ${ROOT_KEY} "${INSTALL_REGISTRY_KEY}" "InstallLocation"
   ${if} $R1 != ""
     Delete "$R1\Uninstall*.exe"
   ${endIf}
