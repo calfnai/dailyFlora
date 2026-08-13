@@ -1,0 +1,24 @@
+{
+  "title": "DailyFlora processing tasks",
+  "description": "Queued private reference-image tasks for authorized manual Codex processing.",
+  "properties": {
+    "id": { "bsonType": "string" },
+    "userId": { "bsonType": "string" },
+    "referenceId": { "bsonType": "string" },
+    "status": { "bsonType": "string" },
+    "input": { "bsonType": "object" },
+    "result": { "bsonType": ["object", "null"] },
+    "generationId": { "bsonType": ["string", "null"] },
+    "errorMessage": { "bsonType": ["string", "null"] },
+    "createdAt": { "bsonType": "date" },
+    "updatedAt": { "bsonType": "date" },
+    "completedAt": { "bsonType": ["date", "null"] }
+  },
+  "required": ["id", "userId", "referenceId", "status", "createdAt", "updatedAt"],
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "indexes": [
+    { "name": "id_unique", "keys": { "id": 1 }, "unique": true },
+    { "name": "userId_updatedAt", "keys": { "userId": 1, "updatedAt": -1 } },
+    { "name": "status_updatedAt", "keys": { "status": 1, "updatedAt": -1 } }
+  ]
+}

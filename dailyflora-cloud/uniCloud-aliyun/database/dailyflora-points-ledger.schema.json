@@ -1,0 +1,17 @@
+{
+  "title": "DailyFlora demo points ledger",
+  "description": "Demonstration-only points records; no payment or cash value.",
+  "properties": {
+    "userId": { "bsonType": "string" },
+    "amount": { "bsonType": "int" },
+    "type": { "bsonType": "string" },
+    "label": { "bsonType": "string" },
+    "referenceId": { "bsonType": "string" },
+    "createdAt": { "bsonType": "date" }
+  },
+  "required": ["userId", "amount", "type", "createdAt"],
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "indexes": [
+    { "name": "userId_createdAt", "keys": { "userId": 1, "createdAt": -1 } }
+  ]
+}

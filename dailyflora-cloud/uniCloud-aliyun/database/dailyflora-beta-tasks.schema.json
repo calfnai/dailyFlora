@@ -1,0 +1,7 @@
+{
+  "title": "DailyFlora 0.72 Beta processing tasks",
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "required": ["id", "userId", "referenceId", "status", "cost", "createdAt"],
+  "properties": { "id": { "bsonType": "string" }, "userId": { "bsonType": "string" }, "referenceId": { "bsonType": "string" }, "idempotencyKey": { "bsonType": "string" }, "status": { "bsonType": "string" }, "cost": { "bsonType": "int" }, "charged": { "bsonType": "bool" }, "refundedAt": { "bsonType": "date" }, "input": { "bsonType": "object" }, "result": { "bsonType": ["object", "null"] }, "generationId": { "bsonType": ["string", "null"] }, "publicId": { "bsonType": ["string", "null"] }, "workerBatchHash": { "bsonType": "string" }, "workerBatchExpiresAt": { "bsonType": "date" }, "errorMessage": { "bsonType": ["string", "null"] }, "createdAt": { "bsonType": "date" }, "updatedAt": { "bsonType": "date" }, "completedAt": { "bsonType": "date" } },
+  "indexes": [{ "name": "id_unique", "keys": { "id": 1 }, "unique": true }, { "name": "status_createdAt", "keys": { "status": 1, "createdAt": 1 } }, { "name": "userId_updatedAt", "keys": { "userId": 1, "updatedAt": -1 } }, { "name": "workerBatchHash", "keys": { "workerBatchHash": 1, "workerBatchExpiresAt": 1 } }]
+}

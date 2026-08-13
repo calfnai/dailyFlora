@@ -1,0 +1,7 @@
+{
+  "title": "DailyFlora 0.72 Beta sessions",
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "required": ["userId", "tokenHash", "expiresAt"],
+  "properties": { "userId": { "bsonType": "string" }, "tokenHash": { "bsonType": "string" }, "createdAt": { "bsonType": "date" }, "expiresAt": { "bsonType": "date" } },
+  "indexes": [{ "name": "tokenHash_unique", "keys": { "tokenHash": 1 }, "unique": true }, { "name": "expiresAt_ttl", "keys": { "expiresAt": 1 }, "expireAfterSeconds": 0 }]
+}

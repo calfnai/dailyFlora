@@ -8,6 +8,7 @@ import {
   detectsThreeFingersUp,
   dominantPinch,
   extractHandSignal,
+  resolveHandAssetUrls,
   resolvePhysicalHand,
   type HandControlAction,
   type HandSignal,
@@ -18,6 +19,16 @@ import {
   createDailyFloraActionRouter,
   type DailyFloraHandActions
 } from '../src/dailyFloraHandControl.ts';
+
+test('MediaPipe asset directory never ends with a slash', () => {
+  const root = resolveHandAssetUrls('https://dailyflora.calfn.com/');
+  assert.equal(root.wasmPath, 'https://dailyflora.calfn.com/mediapipe/wasm');
+  assert.equal(root.modelPath, 'https://dailyflora.calfn.com/models/gesture_recognizer.task');
+
+  const beta = resolveHandAssetUrls('https://dailyflora.calfn.com/beta-072/');
+  assert.equal(beta.wasmPath, 'https://dailyflora.calfn.com/beta-072/mediapipe/wasm');
+  assert.equal(beta.modelPath, 'https://dailyflora.calfn.com/beta-072/models/gesture_recognizer.task');
+});
 
 test('raw webcam handedness is corrected to physical left and right by default', () => {
   assert.equal(resolvePhysicalHand('Left'), 'right');
@@ -84,7 +95,7 @@ function dailyRecorder() {
     cycleRender: record('render'),
     toggleClock: record('clock'),
     setAutomaticCameraEnabled: record('auto'),
-    toggleImmersive: record('immersive'),
+    requestFullscreen: record('fullscreen'),
     moveFramingBy: record('xy'),
     rotateBy: record('rotate'),
     zoomBy: record('zoom')
@@ -207,7 +218,8 @@ test('DailyFlora adapter accepts finalized symbolic commands from either hand', 
     recorded.calls.filter((call) => call.name === 'auto').map((call) => call.values),
     [[false], [true]]
   );
-  assert.equal(recorded.calls.filter((call) => call.name === 'immersive').length, 1);
+  assert.equal(recorded.calls.filter((call) => call.name === 'fullscreen').length, 1);
+  assert.equal(recorded.calls.filter((call) => call.name === 'immersive').length, 0);
 });
 
 test('fist acts as an immediate safety brake and suppresses rotate', () => {

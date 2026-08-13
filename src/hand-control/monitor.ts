@@ -87,6 +87,7 @@ export function createHandMonitor(): HandMonitor {
   let currentMode: HandControlMode | null = null;
   let currentModeDetail = '';
   let outputIsWaiting = true;
+  let currentTrackerMessage = '';
 
   const translate = (key: string, fallback: string) => window.dailyfloraT?.(`hand.${key}`) || fallback;
   const syncTrackerCopy = () => {
@@ -95,18 +96,24 @@ export function createHandMonitor(): HandMonitor {
       loading: ['statusLoading', 'Loading the hand-recognition model…'],
       'requesting-camera': ['statusRequesting', 'Allow this page to use the camera.'],
       running: ['statusRunning', 'Camera is on. Place both hands in view.'],
+      'model-error': ['statusModelError', 'The camera is ready, but the hand model could not be loaded.'],
       error: ['statusError', 'The camera could not be started.']
     };
     const [key, fallback] = statusKeys[trackerStatus];
-    message.textContent = translate(key, fallback);
+    message.textContent = (trackerStatus === 'error' || trackerStatus === 'model-error') && currentTrackerMessage
+      ? currentTrackerMessage
+      : translate(key, fallback);
     start.textContent = trackerStatus === 'running'
       ? translate('restart', 'Restart')
+      : trackerStatus === 'model-error'
+        ? translate('retryModel', 'Retry model')
       : translate('enable', 'Enable camera');
     if (trackerStatus !== 'running') {
       const cameraKeys: Record<Exclude<HandTrackerStatus, 'running'>, [string, string]> = {
         off: ['cameraOff', 'CAMERA OFF'],
         loading: ['cameraLoading', 'LOADING'],
         'requesting-camera': ['cameraRequesting', 'ALLOW CAMERA'],
+        'model-error': ['modelError', 'MODEL ERROR'],
         error: ['cameraError', 'CAMERA ERROR']
       };
       const [cameraKey, cameraFallback] = cameraKeys[trackerStatus];
@@ -184,8 +191,8 @@ export function createHandMonitor(): HandMonitor {
       swapHands.addEventListener('change', () => actions.setSwapHandedness(swapHands.checked));
     },
     setTrackerStatus: (status, text) => {
-      void text;
       trackerStatus = status;
+      currentTrackerMessage = text;
       dot.dataset.status = status;
       start.disabled = status === 'loading' || status === 'requesting-camera';
       syncTrackerCopy();

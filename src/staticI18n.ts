@@ -11,6 +11,7 @@ import {
   type Locale
 } from './i18n/index';
 import { legalPageTranslations, privacyJapanRights, type LegalPageName } from './i18n/legalPages';
+import './accountHeader';
 
 declare global {
   interface Window {
@@ -35,12 +36,35 @@ const pagePath: Record<string, string> = {
 };
 
 function makeRelativePrefix() {
-  const depth = Math.max(0, window.location.pathname.split('/').filter(Boolean).length - 1);
+  const route = document.body.dataset.authMode || pagePath[page] || page;
+  const depth = route.split('/').filter(Boolean).length;
   return depth === 0 ? './' : '../'.repeat(depth);
 }
 
 function makeRootRelativePrefix() {
-  return '../'.repeat(window.location.pathname.split('/').filter(Boolean).length);
+  return makeRelativePrefix();
+}
+
+function ensureProductNav() {
+  const prefix = makeRelativePrefix();
+  const currentPage = document.body.dataset.authMode ? '' : document.body.dataset.page || '';
+  const items = [
+    { path: '', key: 'common.today', page: 'home' },
+    { path: 'member/', key: 'common.member', page: 'member' },
+    { path: 'about/', key: 'common.about', page: 'about' },
+    { path: 'bouquet-shop/', key: 'common.objects', page: 'objects' },
+    { path: 'downloads/', key: 'common.platforms', page: 'platforms' },
+    { path: 'scifi/', key: 'common.scifi', page: 'scifi' }
+  ];
+
+  document.querySelectorAll<HTMLElement>('.site-nav').forEach((nav) => {
+    nav.innerHTML = [
+      ...items.map(({ path, key, page }) => `<a href="${prefix}${path}"${currentPage === page ? ' aria-current="page"' : ''} data-i18n="${key}">${key}</a>`),
+      `<a href="${prefix}login/" data-auth-entry="login" data-i18n="common.signInExisting">common.signInExisting</a>`,
+      `<a class="nav-cta" href="${prefix}signup/" data-auth-entry="signup" data-i18n="common.createAccount">common.createAccount</a>`
+    ].join('');
+    nav.setAttribute('aria-label', getTranslation(currentLocale, 'common.siteNavigation') || 'Site navigation');
+  });
 }
 
 function ensureLanguageSwitcher() {
@@ -97,11 +121,19 @@ function applyLegalPageLocale(locale: Locale) {
   const documentRoot = document.querySelector<HTMLElement>('.legal-document');
   if (!documentRoot) return;
   documentRoot.querySelectorAll<HTMLElement>('.legal-language[data-generated-legal-language]').forEach((node) => node.remove());
-  const nativeArticle = Array.from(documentRoot.querySelectorAll<HTMLElement>('.legal-language')).find((node) => node.lang === locale);
-  documentRoot.querySelectorAll<HTMLElement>('.legal-language').forEach((node) => { node.hidden = node !== nativeArticle; });
-  if (nativeArticle) return;
+  const articles = Array.from(documentRoot.querySelectorAll<HTMLElement>('.legal-language'));
+  const nativeArticle = articles.find((node) => node.lang === locale);
+  if (nativeArticle) {
+    articles.forEach((node) => { node.hidden = node !== nativeArticle; });
+    return;
+  }
   const translated = legalPageTranslations[locale]?.[page as LegalPageName];
-  if (!translated) return;
+  if (!translated) {
+    const fallback = articles.find((node) => node.lang === 'en') || articles[0];
+    articles.forEach((node) => { node.hidden = node !== fallback; });
+    return;
+  }
+  articles.forEach((node) => { node.hidden = true; });
   const article = document.createElement('article');
   article.className = 'legal-language';
   article.lang = locale;
@@ -119,6 +151,17 @@ function applyLegalPageLocale(locale: Locale) {
     }
   }
   documentRoot.append(article);
+}
+
+function syncReleaseInfo() {
+  fetch(`${makeRelativePrefix()}version.json`)
+    .then((response) => response.ok ? response.json() : null)
+    .then((info) => {
+      if (!info) return;
+      document.querySelectorAll<HTMLElement>('[data-release-code]').forEach((node) => { node.textContent = info.releaseId || ''; });
+      document.querySelectorAll<HTMLElement>('[data-product-version]').forEach((node) => { node.textContent = info.productVersion || info.version || ''; });
+    })
+    .catch(() => {});
 }
 
 function markDevLinksHidden() {
@@ -163,8 +206,10 @@ document.querySelectorAll<HTMLAnchorElement>('[data-link-root]').forEach((link) 
 const pathLocale = normalizeLocale(window.location.pathname.split('/').filter(Boolean)[0]);
 if (pathLocale) currentLocale = pathLocale;
 
+ensureProductNav();
 ensureLanguageSwitcher();
 markDevLinksHidden();
 ensureTutorialFooterLink();
 ensureSciFiNavLink();
 applyLocale(currentLocale);
+syncReleaseInfo();

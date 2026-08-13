@@ -1,0 +1,23 @@
+{
+  "title": "DailyFlora private reference images",
+  "description": "Private object-storage metadata; file IDs are never exposed to other users.",
+  "properties": {
+    "id": { "bsonType": "string" },
+    "userId": { "bsonType": "string" },
+    "fileId": { "bsonType": "string" },
+    "fileName": { "bsonType": "string" },
+    "contentType": { "bsonType": "string" },
+    "size": { "bsonType": "int" },
+    "status": { "bsonType": "string" },
+    "taskId": { "bsonType": "string" },
+    "createdAt": { "bsonType": "date" },
+    "updatedAt": { "bsonType": "date" }
+  },
+  "required": ["id", "userId", "fileId", "status", "taskId", "createdAt"],
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "indexes": [
+    { "name": "id_unique", "keys": { "id": 1 }, "unique": true },
+    { "name": "userId_createdAt", "keys": { "userId": 1, "createdAt": -1 } },
+    { "name": "fileId_unique", "keys": { "fileId": 1 }, "unique": true }
+  ]
+}

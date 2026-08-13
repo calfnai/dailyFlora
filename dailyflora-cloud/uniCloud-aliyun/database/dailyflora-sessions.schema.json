@@ -1,0 +1,15 @@
+{
+  "bsonType": "object",
+  "required": ["tokenHash", "userId", "expiresAt"],
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "properties": {
+    "tokenHash": { "bsonType": "string" },
+    "userId": { "bsonType": "string" },
+    "createdAt": { "bsonType": "date" },
+    "expiresAt": { "bsonType": "date" }
+  },
+  "indexes": [
+    { "name": "tokenHash_unique", "key": { "tokenHash": 1 }, "unique": true },
+    { "name": "expiresAt_ttl", "key": { "expiresAt": 1 }, "expireAfterSeconds": 0 }
+  ]
+}

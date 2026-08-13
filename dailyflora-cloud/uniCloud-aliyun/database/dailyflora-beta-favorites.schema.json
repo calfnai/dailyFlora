@@ -1,0 +1,7 @@
+{
+  "title": "DailyFlora 0.72 Beta favorites",
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "required": ["userId", "id", "date", "seed", "savedAt"],
+  "properties": { "userId": { "bsonType": "string" }, "id": { "bsonType": "string" }, "date": { "bsonType": "string" }, "seed": { "bsonType": "string" }, "themeId": { "bsonType": "string" }, "themeName": { "bsonType": "string" }, "themeEnglishName": { "bsonType": "string" }, "flowerPlanName": { "bsonType": "string" }, "flowers": { "bsonType": "string" }, "savedAt": { "bsonType": "string" }, "createdAt": { "bsonType": "date" }, "updatedAt": { "bsonType": "date" } },
+  "indexes": [{ "name": "userId_id_unique", "keys": { "userId": 1, "id": 1 }, "unique": true }, { "name": "userId_savedAt", "keys": { "userId": 1, "savedAt": -1 } }]
+}

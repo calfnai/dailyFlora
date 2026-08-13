@@ -152,6 +152,29 @@ body:not(.is-special) .language-switcher button:focus-visible {
   cursor: grab;
 }
 
+.app-startup-state {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  z-index: 40;
+  display: grid;
+  gap: 10px;
+  width: min(360px, calc(100vw - 40px));
+  padding: 22px 24px;
+  border: 1px solid rgb(243 239 230 / 18%);
+  color: rgb(243 239 230 / 90%);
+  background: rgb(5 6 10 / 88%);
+  box-shadow: 0 20px 80px rgb(0 0 0 / 34%);
+  transform: translate(-50%, -50%);
+  backdrop-filter: blur(18px);
+}
+
+.app-startup-state[hidden] { display: none; }
+.app-startup-eyebrow { color: rgb(244 230 129 / 78%); font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .18em; }
+.app-startup-state strong { font-family: Georgia, 'Times New Roman', serif; font-size: 24px; font-weight: 400; }
+.app-startup-state span:last-child { color: rgb(243 239 230 / 58%); font-size: 12px; line-height: 1.6; }
+.app-startup-state.is-error { border-color: rgb(242 166 160 / 48%); }
+.app-startup-state.is-error strong { color: #ffd5cf; }
+
 .clock-overlay {
   position: fixed;
   inset: 0 0 0 32%;
@@ -186,11 +209,7 @@ body:not(.is-special) .language-switcher button:focus-visible {
 }
 
 .clock-overlay.is-auto.is-visible {
-  animation: clock-enter 2s ease both;
-}
-
-.clock-overlay.is-manual {
-  transition: none;
+  animation: clock-enter 260ms ease-out both;
 }
 
 .clock-exit-hint {
@@ -422,7 +441,8 @@ body:not(.is-special) .language-switcher button:focus-visible {
   display: none;
 }
 
-.site-menu-panel a {
+.site-menu-panel a,
+.site-menu-panel button {
   min-height: 38px;
   display: flex;
   align-items: center;
@@ -434,8 +454,18 @@ body:not(.is-special) .language-switcher button:focus-visible {
   text-decoration: none;
 }
 
+.site-menu-panel button {
+  width: 100%;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
 .site-menu-panel a:hover,
-.site-menu-panel a:focus-visible {
+.site-menu-panel a:focus-visible,
+.site-menu-panel button:hover,
+.site-menu-panel button:focus-visible {
   color: rgb(255 248 226);
   background: rgb(255 255 255 / 8%);
   outline: none;
@@ -802,6 +832,36 @@ body.is-preview .daily-theme {
 
 .registration-consent a { color: #f4e681; text-underline-offset: 2px; }
 
+.account-form-switch {
+  margin: 0;
+  color: rgb(255 250 235 / 58%);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.account-form-switch a {
+  color: #f4e681;
+  text-underline-offset: 2px;
+}
+
+.account-form-error {
+  margin: 0;
+  padding: 9px 11px;
+  border: 1px solid rgb(242 166 160 / 34%);
+  border-radius: 8px;
+  color: #ffd5cf;
+  background: rgb(111 42 35 / 20%);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.account-form-error[data-error="false"] {
+  border-color: rgb(184 210 139 / 24%);
+  color: #b8d28b;
+  background: rgb(79 111 63 / 14%);
+}
+
 .primary-action,
 .ghost-action {
   min-height: 38px;
@@ -828,6 +888,14 @@ body.is-preview .daily-theme {
   border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 8px;
   background: rgb(255 255 255 / 6%);
+}
+
+.account-profile-link {
+  display: inline-grid;
+  place-items: center;
+  padding: 0 12px;
+  white-space: nowrap;
+  text-decoration: none;
 }
 
 .profile-avatar {
@@ -1941,14 +2009,19 @@ body:not(.is-special) .app-shell {
 body:not(.is-special) .site-menu {
   top: max(18px, env(safe-area-inset-top));
   right: max(18px, env(safe-area-inset-right));
-  z-index: 19;
+  z-index: 30;
   gap: 8px;
 }
 
 body:not(.is-special) .account-dock {
-  top: max(18px, calc(env(safe-area-inset-top) + 8px));
+  top: max(70px, calc(env(safe-area-inset-top) + 70px));
   right: max(24px, calc(env(safe-area-inset-right) + 12px));
   z-index: 20;
+  display: flex;
+}
+
+body:not(.is-special) .account-panel {
+  top: max(124px, calc(env(safe-area-inset-top) + 124px));
 }
 
 body:not(.is-special) .site-menu-toggle {
@@ -1976,6 +2049,8 @@ body:not(.is-special) .site-menu-toggle:focus-visible {
 }
 
 body:not(.is-special) .site-menu-panel {
+  position: relative;
+  z-index: 31;
   min-width: 224px;
   padding: 6px;
   border-color: rgb(243 239 230 / 20%);
@@ -1985,7 +2060,8 @@ body:not(.is-special) .site-menu-panel {
   font-family: "SFMono-Regular", "Sarasa Term SC", "Iosevka Charon Mono", Menlo, Consolas, monospace;
 }
 
-body:not(.is-special) .site-menu-panel a {
+body:not(.is-special) .site-menu-panel a,
+body:not(.is-special) .site-menu-panel button {
   border-radius: 0;
   font-size: 11px;
   letter-spacing: 0.08em;
@@ -1997,28 +2073,26 @@ body:not(.is-special) .site-menu-panel .site-menu-primary {
   font-weight: 560;
 }
 
-body:not(.is-special) .account-dock {
-  display: none;
-}
-
 body:not(.is-special) .site-menu-panel .site-menu-language-switcher {
   position: static;
   right: auto;
   top: auto;
   z-index: auto;
-  display: flex;
-  justify-content: flex-start;
-  gap: 8px;
-  width: auto;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   margin-top: 6px;
   padding: 10px 8px 4px;
   border-top: 1px solid rgb(243 239 230 / 14%);
-  overflow-x: auto;
+  overflow: hidden;
 }
 
 body:not(.is-special) .site-menu-panel .site-menu-language-switcher button {
-  flex: 0 0 auto;
-  min-width: 24px;
+  width: auto;
+  min-width: 0;
   padding: 3px 0;
   border: 0;
   color: rgb(243 239 230 / 52%);
@@ -2888,18 +2962,93 @@ body.is-clock-visible:not(.is-special) .controls.is-expanded .controls-toggle {
   letter-spacing: 0.08em;
 }
 
-body.is-hand-control-immersive #hud,
-body.is-hand-control-immersive #controls,
-body.is-hand-control-immersive #site-menu,
-body.is-hand-control-immersive #account-dock,
-body.is-hand-control-immersive #release-mark,
-body.is-hand-control-immersive #debug-panel {
-  display: none !important;
+.gesture-fullscreen-prompt {
+  position: fixed;
+  z-index: 240;
+  left: 50%;
+  bottom: max(28px, calc(env(safe-area-inset-bottom) + 20px));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 10px 12px 10px 16px;
+  border: 1px solid rgba(245, 217, 118, .48);
+  border-radius: 999px;
+  color: rgba(251, 247, 233, .92);
+  background: rgba(6, 14, 9, .94);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, .34);
+  opacity: 0;
+  transform: translate(-50%, 12px);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
 }
+
+.gesture-fullscreen-prompt.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+
+.gesture-fullscreen-prompt > span {
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+
+.gesture-fullscreen-prompt button {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid rgba(245, 217, 118, .48);
+  border-radius: 999px;
+  color: #10170f;
+  background: #e8d990;
+  cursor: pointer;
+}
+
+.gesture-fullscreen-prompt .gesture-fullscreen-dismiss {
+  min-width: 34px;
+  padding: 0;
+  color: rgba(251, 247, 233, .72);
+  background: transparent;
+}
+
+#fullscreen-button.is-gesture-requested {
+  outline: 2px solid rgba(245, 217, 118, .74);
+  outline-offset: 3px;
+}
+
+.favorite-action-status {
+  position: fixed;
+  z-index: 120;
+  right: 24px;
+  bottom: 24px;
+  max-width: min(380px, calc(100vw - 48px));
+  margin: 0;
+  padding: 12px 16px;
+  border: 1px solid rgba(245, 217, 118, .42);
+  border-radius: 12px;
+  color: #f6f1e7;
+  background: rgba(6, 14, 9, .92);
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.favorite-action-status[data-error="true"] { border-color: rgba(239, 139, 115, .72); }
+.favorite-action-status.is-visible { opacity: 1; transform: translateY(0); }
 
 @media (max-width: 680px) {
   body:not(.is-special) .site-menu {
     right: max(28px, calc(env(safe-area-inset-right) + 16px));
+  }
+
+  body:not(.is-special) .account-dock {
+    top: max(68px, calc(env(safe-area-inset-top) + 68px));
+    right: max(28px, calc(env(safe-area-inset-right) + 16px));
+  }
+
+  body:not(.is-special) .account-panel {
+    top: max(118px, calc(env(safe-area-inset-top) + 118px));
   }
 
   .hand-camera-panel.is-collapsed {

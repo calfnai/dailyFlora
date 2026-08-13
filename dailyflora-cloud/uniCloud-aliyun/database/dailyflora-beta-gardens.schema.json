@@ -1,0 +1,7 @@
+{
+  "title": "DailyFlora 0.72 Beta gardens",
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "required": ["userId", "entries", "createdAt"],
+  "properties": { "userId": { "bsonType": "string" }, "entries": { "bsonType": "array" }, "createdAt": { "bsonType": "date" }, "updatedAt": { "bsonType": "date" } },
+  "indexes": [{ "name": "userId_unique", "keys": { "userId": 1 }, "unique": true }]
+}

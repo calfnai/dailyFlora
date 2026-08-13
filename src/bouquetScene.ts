@@ -2223,6 +2223,7 @@ export class BouquetScene {
   private baseCameraDistance = 5.36;
   private targetCameraDistance = 5.36;
   private presentationTargetX = 0;
+  private presentationX = 0;
   private gestureTargetX = 0;
   private gestureTargetY = 0;
   private cameraTargetY = 0.7;
@@ -2446,6 +2447,9 @@ export class BouquetScene {
     this.cameraPitch += (this.targetCameraPitch - this.cameraPitch) * 0.1;
     this.cameraDistance += (this.targetCameraDistance - this.cameraDistance) * 0.08;
     this.cameraTargetY += (this.targetCameraTargetY - this.cameraTargetY) * 0.08;
+    // Give clock mode a short, deliberate camera move so the bouquet clears
+    // the translucent clock surface instead of jumping underneath it.
+    this.presentationX += (this.presentationTargetX - this.presentationX) * (1 - Math.exp(-delta * 18));
     this.bouquet.position.y = 0.06 + Math.sin(performance.now() * 0.00025) * 0.026;
     if (this.spec.special) {
       const elapsed = performance.now() * 0.001;
@@ -2508,7 +2512,7 @@ export class BouquetScene {
     const pitch = THREE.MathUtils.clamp(this.cameraPitch, minCameraPitch, maxCameraPitch);
     const distance = THREE.MathUtils.clamp(this.cameraDistance, 3.2, 8.7);
     const target = new THREE.Vector3(
-      this.presentationTargetX + this.gestureTargetX,
+      this.presentationX + this.gestureTargetX,
       this.cameraTargetY + this.gestureTargetY,
       0
     );
@@ -2650,7 +2654,7 @@ export class BouquetScene {
   }
 
   setClockLayout(active: boolean) {
-    this.presentationTargetX = active ? 1.08 : 0;
+    this.presentationTargetX = active ? -1.08 : 0;
     this.updateCamera(emptyRouteOffsets);
   }
 

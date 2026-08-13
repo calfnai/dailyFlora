@@ -1,0 +1,12 @@
+{
+  "name": "DailyFlora Cloud",
+  "appid": "__UNI__DAILYFLORA_CLOUD",
+  "description": "DailyFlora uniCloud database and HTTP cloud functions",
+  "versionName": "0.71.1",
+  "versionCode": 711,
+  "transformPx": false,
+  "uniStatistics": {
+    "enable": false
+  },
+  "vueVersion": "3"
+}

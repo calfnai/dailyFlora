@@ -1,0 +1,11 @@
+{
+  "name": "dailyflora-api",
+  "version": "0.71.1",
+  "main": "index.js",
+  "description": "DailyFlora authentication and private garden API",
+  "cloudfunction-config": {
+    "memorySize": 256,
+    "timeout": 15,
+    "path": "/dailyflora-api"
+  }
+}
