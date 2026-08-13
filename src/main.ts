@@ -384,6 +384,7 @@ let specialAudio: HTMLAudioElement | null = null;
 let specialAudioMuted = false;
 let debugTimer = 0;
 let dateRolloverTimer = 0;
+let desktopNativeFullscreen = false;
 let calendarView = parseDateKey(spec.dateLabel);
 let accountState = readAccountState();
 let favoriteBouquets = readFavoriteBouquets();
@@ -1085,6 +1086,20 @@ function updateInterfaceLanguage(language: Locale) {
   window.dispatchEvent(new CustomEvent('dailyflora:localechange', { detail: { locale: language } }));
 }
 
+function isFullscreenActive() {
+  return desktopNativeFullscreen || Boolean(document.fullscreenElement);
+}
+
+function syncFullscreenUi() {
+  if (!fullscreenButton) return;
+  const active = isFullscreenActive();
+  const label = active ? t('shortcuts.escape') : t('view.fullscreen');
+  fullscreenButton.setAttribute('aria-pressed', String(active));
+  fullscreenButton.dataset.tooltip = label;
+  fullscreenButton.title = label;
+  fullscreenButton.setAttribute('aria-label', label);
+}
+
 function applyStaticCopy() {
   const textBySelector: Array<[string, string]> = [
     ['#site-menu-panel a[href="./"]', 'index.currentBouquet'],
@@ -1191,6 +1206,7 @@ function applyStaticCopy() {
   document.querySelector<HTMLElement>('.render-control')?.setAttribute('aria-label', t('view.render'));
   if (referenceNoteInput) referenceNoteInput.placeholder = t('index.referencePlaceholder');
   if (loginNameInput) loginNameInput.placeholder = t('index.loginNamePlaceholder');
+  syncFullscreenUi();
 }
 
 function updateUrl(date: string, seed: string) {
@@ -1888,13 +1904,17 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && inlineTutorialDialog?.open) {
     event.preventDefault();
     closeInlineTutorial();
+    if (isFullscreenActive()) void exitFullscreen();
     return;
   }
   if (event.key === 'Escape') {
     closeCalendar();
     closeAccountPanel();
     if (clockDisplaySource) hideClock();
-    if (document.fullscreenElement) void document.exitFullscreen();
+    if (isFullscreenActive()) {
+      event.preventDefault();
+      void exitFullscreen();
+    }
   }
   if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
     event.preventDefault();
@@ -2023,6 +2043,15 @@ function showGestureFullscreenPrompt() {
 
 async function toggleFullscreen() {
   try {
+    const desktopApi = window.dailyfloraDesktop;
+    if (desktopApi?.isDesktop && desktopApi.setFullscreen) {
+      const targetState = !desktopNativeFullscreen;
+      const actualState = await desktopApi.setFullscreen(targetState);
+      desktopNativeFullscreen = actualState;
+      syncFullscreenUi();
+      revealUi();
+      return actualState === targetState;
+    }
     if (!document.fullscreenElement) {
       await document.documentElement.requestFullscreen();
     } else {
@@ -2037,16 +2066,38 @@ async function toggleFullscreen() {
   }
 }
 
+async function exitFullscreen() {
+  if (desktopNativeFullscreen && window.dailyfloraDesktop?.setFullscreen) {
+    desktopNativeFullscreen = await window.dailyfloraDesktop.setFullscreen(false);
+    syncFullscreenUi();
+    return;
+  }
+  if (document.fullscreenElement) await document.exitFullscreen();
+}
+
 fullscreenButton?.addEventListener('click', () => {
   void toggleFullscreen();
 });
 
 document.addEventListener('fullscreenchange', () => {
+  desktopNativeFullscreen = false;
+  syncFullscreenUi();
   dismissGestureFullscreenPrompt();
   if (document.fullscreenElement) {
     maybeShowFullscreenTutorial();
   }
 });
+
+const removeDesktopFullscreenListener = window.dailyfloraDesktop?.onFullscreenChange?.((active) => {
+  desktopNativeFullscreen = active;
+  syncFullscreenUi();
+  dismissGestureFullscreenPrompt();
+  if (active) {
+    showFavoriteFeedback(t('shortcuts.escape'));
+    maybeShowFullscreenTutorial();
+  }
+});
+window.addEventListener('beforeunload', () => removeDesktopFullscreenListener?.(), { once: true });
 
 zoomInButton?.addEventListener('click', () => {
   zoomBy(-0.28);
@@ -2172,7 +2223,7 @@ async function startHandControl() {
       revealUi();
     },
     requestFullscreen: () => {
-      if (document.fullscreenElement) void toggleFullscreen();
+      if (isFullscreenActive()) void toggleFullscreen();
       else showGestureFullscreenPrompt();
     },
     moveFramingBy: (deltaX, deltaY) => {

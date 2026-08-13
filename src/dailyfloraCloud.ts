@@ -114,6 +114,8 @@ declare global {
       isDesktop: boolean;
       mode: 'windowed' | 'screensaver' | 'preview' | string;
       isScreensaver: boolean;
+      setFullscreen?: (enabled: boolean) => Promise<boolean>;
+      onFullscreenChange?: (callback: (enabled: boolean) => void) => () => void;
     };
   }
 }

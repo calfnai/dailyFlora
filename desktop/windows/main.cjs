@@ -1,4 +1,4 @@
-const { app, BrowserWindow, net, protocol, session, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, net, protocol, session, shell } = require('electron');
 const { existsSync, statSync } = require('node:fs');
 const { join, normalize, relative } = require('node:path');
 const { pathToFileURL } = require('node:url');
@@ -68,6 +68,13 @@ function createWindow() {
     }
   });
 
+  win.setFullScreenable(true);
+  const reportFullscreenState = () => {
+    if (!win.isDestroyed()) win.webContents.send('dailyflora:fullscreen-changed', win.isFullScreen());
+  };
+  win.on('enter-full-screen', reportFullscreenState);
+  win.on('leave-full-screen', reportFullscreenState);
+
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith(`${scheme}://`)) return { action: 'allow' };
     if (url.startsWith('https://') || url.startsWith('http://')) {
@@ -95,6 +102,16 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  ipcMain.handle('dailyflora:set-fullscreen', (event, enabled) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (!win || isScreensaver || isPreview) return false;
+    const targetState = Boolean(enabled);
+    win.setFullScreen(targetState);
+    // Windows completes the native transition asynchronously. The renderer is
+    // updated again by enter-full-screen / leave-full-screen below.
+    return targetState;
+  });
+
   protocol.handle(scheme, (request) => {
     const requestUrl = new URL(request.url);
     const target = resolveDistFile(requestUrl.pathname);

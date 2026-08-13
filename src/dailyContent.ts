@@ -22,6 +22,15 @@ export type DailyContentLoadResult = {
   error?: string;
 };
 
+type DailyContentCache = {
+  schemaVersion: 1;
+  checkedDate: string;
+  checkedAt: string;
+  sourceUrl?: string;
+  networkSucceeded: boolean;
+  manifest: DailyContentManifest | null;
+};
+
 const dailyContentCacheKey = 'dailyflora.desktop.daily-content.v1';
 const defaultDailyContentUrls = [
   'https://raw.githubusercontent.com/calfnai/dailyFlora/codex/dailyflora-desktop-windows/data/daily-content.json',
@@ -74,19 +83,61 @@ function writeAudit(audit: Record<string, unknown>) {
   document.body.dataset.dailyContentSource = String(audit.source || 'local');
 }
 
-function readCachedManifest() {
+function readCachedContent(): DailyContentCache | null {
   if (typeof window === 'undefined') return null;
   try {
-    return validateDailyContentManifest(JSON.parse(window.localStorage.getItem(dailyContentCacheKey) || 'null'));
+    const value = JSON.parse(window.localStorage.getItem(dailyContentCacheKey) || 'null');
+    const manifest = validateDailyContentManifest(value);
+    if (manifest) {
+      // Keep accepting the old cache format created before the once-per-day gate.
+      return {
+        schemaVersion: 1,
+        checkedDate: '',
+        checkedAt: '',
+        networkSucceeded: true,
+        manifest
+      };
+    }
+    if (
+      !value ||
+      typeof value !== 'object' ||
+      value.schemaVersion !== 1 ||
+      typeof value.checkedDate !== 'string' ||
+      typeof value.checkedAt !== 'string' ||
+      typeof value.networkSucceeded !== 'boolean'
+    ) {
+      return null;
+    }
+    return {
+      schemaVersion: 1,
+      checkedDate: value.checkedDate,
+      checkedAt: value.checkedAt,
+      sourceUrl: typeof value.sourceUrl === 'string' ? value.sourceUrl : undefined,
+      networkSucceeded: value.networkSucceeded,
+      manifest: validateDailyContentManifest(value.manifest)
+    };
   } catch {
     return null;
   }
 }
 
-function cacheManifest(manifest: DailyContentManifest) {
+function cacheContent(
+  manifest: DailyContentManifest | null,
+  checkedDate: string,
+  sourceUrl: string | undefined,
+  networkSucceeded: boolean
+) {
   if (typeof window === 'undefined') return;
   try {
-    window.localStorage.setItem(dailyContentCacheKey, JSON.stringify(manifest));
+    const cache: DailyContentCache = {
+      schemaVersion: 1,
+      checkedDate,
+      checkedAt: new Date().toISOString(),
+      sourceUrl,
+      networkSucceeded,
+      manifest
+    };
+    window.localStorage.setItem(dailyContentCacheKey, JSON.stringify(cache));
   } catch {
     // A full or disabled localStorage must not prevent the online content from applying.
   }
@@ -110,16 +161,46 @@ async function fetchManifest(url: string) {
 export async function loadDailyContent(dateKey: string): Promise<DailyContentLoadResult | null> {
   if (typeof window === 'undefined' || !window.dailyfloraDesktop?.isDesktop) return null;
 
+  const cached = readCachedContent();
+  if (cached?.checkedDate === dateKey) {
+    const entry = cached.manifest?.entries[dateKey];
+    if (entry) {
+      writeAudit({
+        source: 'cache',
+        date: dateKey,
+        contentVersion: entry.contentVersion,
+        sourceUrl: cached.sourceUrl,
+        checkedDate: dateKey,
+        networkSkipped: true,
+        error: cached.networkSucceeded ? '今日已检查线上内容' : '今日线上检查失败，使用缓存内容'
+      });
+      return { entry, source: 'cache', url: cached.sourceUrl, error: '今日已检查线上内容' };
+    }
+
+    writeAudit({
+      source: 'local',
+      date: dateKey,
+      checkedDate: dateKey,
+      networkSkipped: true,
+      error: cached.networkSucceeded ? `GitHub 内容没有 ${dateKey} 条目` : '今日线上检查失败，使用本地内容'
+    });
+    return null;
+  }
+
   let lastError = '';
+  let lastManifest: DailyContentManifest | null = null;
+  let lastUrl: string | undefined;
   for (const url of getDailyContentUrls(window.__DAILYFLORA_CONFIG__)) {
     try {
       const { manifest, latencyMs } = await fetchManifest(url);
       const entry = manifest.entries[dateKey];
-      cacheManifest(manifest);
+      lastManifest = manifest;
+      lastUrl = url;
       if (!entry) {
         lastError = `GitHub 内容没有 ${dateKey} 条目`;
         continue;
       }
+      cacheContent(manifest, dateKey, url, true);
       writeAudit({ source: 'github', url, latencyMs, date: dateKey, contentVersion: entry.contentVersion });
       return { entry, source: 'github', url, latencyMs };
     } catch (error) {
@@ -127,11 +208,17 @@ export async function loadDailyContent(dateKey: string): Promise<DailyContentLoa
     }
   }
 
-  const cached = readCachedManifest();
-  const entry = cached?.entries[dateKey];
+  const entry = cached?.manifest?.entries[dateKey];
+  const fallbackManifest = entry && cached?.manifest && lastManifest
+    ? {
+        ...lastManifest,
+        entries: { ...lastManifest.entries, [dateKey]: entry }
+      }
+    : lastManifest || cached?.manifest || null;
+  cacheContent(fallbackManifest, dateKey, lastUrl || cached?.sourceUrl, false);
   if (entry) {
     writeAudit({ source: 'cache', date: dateKey, error: lastError });
-    return { entry, source: 'cache', error: lastError };
+    return { entry, source: 'cache', url: cached?.sourceUrl, error: lastError };
   }
 
   writeAudit({ source: 'local', date: dateKey, error: lastError || '没有可用的远程或缓存内容' });

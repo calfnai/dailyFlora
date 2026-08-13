@@ -1,4 +1,4 @@
-const { contextBridge } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 const args = process.argv.slice(1).map((value) => value.toLowerCase());
 const modeArgument = args.find((value) => value.startsWith('--dailyflora-mode='));
@@ -9,5 +9,11 @@ const isPreview = requestedMode === 'preview' || args.includes('/p') || args.inc
 contextBridge.exposeInMainWorld('dailyfloraDesktop', {
   isDesktop: true,
   mode: isScreensaver ? 'screensaver' : isPreview ? 'preview' : 'windowed',
-  isScreensaver
+  isScreensaver,
+  setFullscreen: async (enabled) => ipcRenderer.invoke('dailyflora:set-fullscreen', Boolean(enabled)),
+  onFullscreenChange: (callback) => {
+    const listener = (_event, enabled) => callback(Boolean(enabled));
+    ipcRenderer.on('dailyflora:fullscreen-changed', listener);
+    return () => ipcRenderer.removeListener('dailyflora:fullscreen-changed', listener);
+  }
 });
