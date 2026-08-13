@@ -18,6 +18,7 @@ win:
   artifactName: DailyFlora-${version}-${arch}.${ext}
 nsis:
   artifactName: DailyFlora-${version}-${arch}-setup.${ext}
+  include: desktop/windows/installer.nsh
   oneClick: false
   perMachine: false
   allowToChangeInstallationDirectory: true
