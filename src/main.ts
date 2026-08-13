@@ -1993,6 +1993,8 @@ shuffleButton?.addEventListener('click', () => {
 });
 
 let gestureFullscreenPromptTimer = 0;
+let fullscreenTutorialTimer = 0;
+let fullscreenEntryFeedbackAt = 0;
 
 function dismissGestureFullscreenPrompt() {
   window.clearTimeout(gestureFullscreenPromptTimer);
@@ -2041,6 +2043,19 @@ function showGestureFullscreenPrompt() {
   gestureFullscreenPromptTimer = window.setTimeout(dismissGestureFullscreenPrompt, 8000);
 }
 
+function announceFullscreenEntry() {
+  if (!isFullscreenActive()) return;
+  const now = Date.now();
+  if (now - fullscreenEntryFeedbackAt > 500) {
+    fullscreenEntryFeedbackAt = now;
+    showFavoriteFeedback(t('shortcuts.escape'));
+  }
+  window.clearTimeout(fullscreenTutorialTimer);
+  fullscreenTutorialTimer = window.setTimeout(() => {
+    if (isFullscreenActive()) maybeShowFullscreenTutorial();
+  }, 80);
+}
+
 async function toggleFullscreen() {
   try {
     const desktopApi = window.dailyfloraDesktop;
@@ -2049,6 +2064,7 @@ async function toggleFullscreen() {
       const actualState = await desktopApi.setFullscreen(targetState);
       desktopNativeFullscreen = actualState;
       syncFullscreenUi();
+      if (targetState && actualState) announceFullscreenEntry();
       revealUi();
       return actualState === targetState;
     }
@@ -2084,7 +2100,7 @@ document.addEventListener('fullscreenchange', () => {
   syncFullscreenUi();
   dismissGestureFullscreenPrompt();
   if (document.fullscreenElement) {
-    maybeShowFullscreenTutorial();
+    announceFullscreenEntry();
   }
 });
 
@@ -2093,8 +2109,7 @@ const removeDesktopFullscreenListener = window.dailyfloraDesktop?.onFullscreenCh
   syncFullscreenUi();
   dismissGestureFullscreenPrompt();
   if (active) {
-    showFavoriteFeedback(t('shortcuts.escape'));
-    maybeShowFullscreenTutorial();
+    announceFullscreenEntry();
   }
 });
 window.addEventListener('beforeunload', () => removeDesktopFullscreenListener?.(), { once: true });
