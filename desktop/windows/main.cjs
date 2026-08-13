@@ -17,6 +17,7 @@ const isPreview = args.includes('/p') || args.includes('--preview');
 const isConfigure = args.includes('/c') || args.includes('--configure');
 const mode = isScreensaver ? 'screensaver' : isPreview ? 'preview' : isConfigure ? 'windowed' : 'windowed';
 const distRoot = normalize(join(app.getAppPath(), 'dist'));
+const screenSaverReadyAt = Date.now() + 1000;
 
 function isInsideDist(targetPath) {
   const relativePath = relative(distRoot, targetPath);
@@ -48,8 +49,8 @@ function createWindow() {
   const win = new BrowserWindow({
     width: isPreview ? 480 : 1440,
     height: isPreview ? 300 : 900,
-    minWidth: 960,
-    minHeight: 640,
+    minWidth: isPreview ? 320 : 960,
+    minHeight: isPreview ? 200 : 640,
     show: false,
     frame: !isScreensaver,
     fullscreen: isScreensaver,
@@ -77,7 +78,8 @@ function createWindow() {
 
   if (isScreensaver) {
     win.webContents.on('before-input-event', (_event, input) => {
-      if (input.type === 'keyDown' || input.type === 'mouseDown' || input.type === 'mouseMove') app.quit();
+      const movingAfterStartup = input.type === 'mouseMove' && Date.now() >= screenSaverReadyAt;
+      if (input.type === 'keyDown' || input.type === 'mouseDown' || movingAfterStartup) app.quit();
     });
   }
 
