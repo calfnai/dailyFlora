@@ -19,11 +19,20 @@ test('login owns sign-in, account creation and password recovery', () => {
   const css = source('src/marketing.css');
   assert.match(html, /<form[^>]+id="auth-form"/);
   assert.match(html, /href="\.\.\/signup\/"/);
-  assert.match(html, /href="#forgot">忘记密码/);
+  assert.match(html, /href="#forgot"[^>]*data-i18n="auth\.forgotPassword"/);
   assert.match(html, /id="forgot-form"/);
   assert.match(html, /id="reset-form"/);
   assert.doesNotMatch(html, /http-equiv="refresh"|window\.location\.replace/);
   assert.match(css, /\.signup-form\[hidden\] \{ display: none !important; \}/);
+});
+
+test('marketing and account pages share one canonical site navigation order', () => {
+  const expected = ['common.today', 'common.member', 'common.about', 'common.objects', 'common.platforms', 'common.scifi', 'common.signInExisting', 'common.createAccount'];
+  for (const path of ['member/index.html', 'login/index.html', 'signup/index.html', 'about/index.html', 'downloads/index.html', 'bouquet-shop/index.html']) {
+    const html = source(path);
+    const nav = html.match(/<nav class="site-nav"[^>]*>([\s\S]*?)<\/nav>/)?.[1] || '';
+    assert.deepEqual([...nav.matchAll(/data-i18n="([^"]+)"/g)].map((match) => match[1]), expected, path);
+  }
 });
 
 test('member is a protected garden surface rather than an embedded auth page', () => {

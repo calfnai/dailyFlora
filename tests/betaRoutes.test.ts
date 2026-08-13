@@ -73,3 +73,26 @@ test('provider resource exhaustion is surfaced as an actionable account error', 
   assert.match(cloud, /PrePayResourceExhausted/);
   assert.match(cloud, /恢复按量资源后重试/);
 });
+
+test('local Beta worker exposes a verified browser-readable root status route', () => {
+  const worker = read('scripts/dailyflora-beta-worker.mjs');
+  assert.match(worker, /request\.method === 'GET' && request\.url === '\/'/);
+  assert.match(worker, /service: 'DailyFlora 0\.72 Beta worker'/);
+  assert.match(worker, /request\.method === 'GET' && request\.url === '\/health'/);
+});
+
+test('static marketing navigation resolves from the known route depth', () => {
+  const runtime = read('src/staticI18n.ts');
+  assert.match(runtime, /document\.body\.dataset\.authMode \|\| pagePath\[page\] \|\| page/);
+  assert.doesNotMatch(runtime, /window\.location\.pathname\.split\('\/'\)\.filter\(Boolean\)\.length - 1/);
+});
+
+test('homepage exposes a visible startup state instead of failing as a silent black screen', () => {
+  const homepage = read('index.html');
+  const main = read('src/main.ts');
+  const css = read('src/styles.css');
+  assert.match(homepage, /id="app-startup-state"/);
+  assert.match(main, /showStartupError/);
+  assert.match(main, /startupState\?\.setAttribute\('hidden', ''\)/);
+  assert.match(css, /\.app-startup-state\.is-error/);
+});

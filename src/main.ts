@@ -155,6 +155,9 @@ const rotationPresets: Array<{
 ];
 
 const canvas = document.querySelector<HTMLCanvasElement>('#flora-canvas');
+const startupState = document.querySelector<HTMLElement>('#app-startup-state');
+const startupTitle = document.querySelector<HTMLElement>('#app-startup-title');
+const startupDetail = document.querySelector<HTMLElement>('#app-startup-detail');
 const hud = document.querySelector<HTMLElement>('#hud');
 const dailyMark = document.querySelector<HTMLElement>('.daily-mark');
 const controls = document.querySelector<HTMLElement>('#controls');
@@ -244,6 +247,20 @@ const clockExitHint = document.querySelector<HTMLElement>('#clock-exit-hint');
 const languageSwitcher = document.querySelector<HTMLElement>('#language-switcher');
 let interfaceLanguage: Locale = detectInitialLocale();
 const legacyInterfaceLanguageKey = 'dailyflora.interface-language.v1';
+let startupReady = false;
+
+function showStartupError(error: unknown) {
+  if (startupReady || !startupState || !startupTitle || !startupDetail) return;
+  const message = error instanceof Error ? error.message : String(error || 'Unknown startup error');
+  startupState.hidden = false;
+  startupState.classList.add('is-error');
+  startupTitle.textContent = '花束加载失败';
+  startupDetail.textContent = `请刷新页面重试；如果仍然失败，请检查浏览器是否启用 WebGL。(${message})`;
+}
+
+window.addEventListener('error', (event) => showStartupError(event.error || event.message));
+window.addEventListener('unhandledrejection', (event) => showStartupError(event.reason));
+
 try {
   const legacy = normalizeLocale(window.localStorage.getItem(legacyInterfaceLanguageKey));
   if (legacy && !window.localStorage.getItem(localeStorageKey)) {
@@ -1667,7 +1684,7 @@ loginForm?.addEventListener('submit', async (event) => {
     try {
       const account = mainAuthMode === 'login'
         ? await loginAccount({ email, password })
-        : await registerAccount({ name, email, password, termsVersion: '0.72-beta.6' });
+        : await registerAccount({ name, email, password, termsVersion: '0.72.0' });
       saveAccountState(account);
       favoriteBouquets = await listCloudFavorites();
       if (!hadLocalAccount && localFavoritesBeforeAuth.length > 0 && window.confirm(`发现本机有 ${localFavoritesBeforeAuth.length} 条未同步收藏，是否合并到 ${account.email}？`)) {
@@ -2226,6 +2243,8 @@ syncClockControls();
 idleClock.start();
 revealUi();
 scene.start();
+startupReady = true;
+startupState?.setAttribute('hidden', '');
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(new URL('./gesture-cache-worker.js', document.baseURI), { scope: new URL('./', document.baseURI).pathname }).catch(() => undefined);

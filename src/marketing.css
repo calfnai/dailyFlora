@@ -59,7 +59,7 @@ h1, h2, h3, p { margin: 0; }
     conic-gradient(from 10deg, transparent, rgba(184, 210, 139, .72), transparent 19%, rgba(242, 166, 160, .75), transparent 41%, rgba(245, 217, 118, .74), transparent 63%, rgba(184, 210, 139, .7), transparent 84%);
   box-shadow: 0 0 30px rgba(245, 217, 118, .14);
 }
-.site-nav { display: flex; align-items: center; gap: clamp(16px, 2.5vw, 34px); }
+.site-nav { min-width: 0; flex: 1 1 auto; display: flex; align-items: center; justify-content: flex-end; gap: clamp(16px, 2.5vw, 34px); }
 .site-nav a {
   color: var(--muted);
   font-size: 13px;
@@ -92,7 +92,7 @@ h1, h2, h3, p { margin: 0; }
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .marketing-language-switcher button {

@@ -152,6 +152,29 @@ body:not(.is-special) .language-switcher button:focus-visible {
   cursor: grab;
 }
 
+.app-startup-state {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  z-index: 40;
+  display: grid;
+  gap: 10px;
+  width: min(360px, calc(100vw - 40px));
+  padding: 22px 24px;
+  border: 1px solid rgb(243 239 230 / 18%);
+  color: rgb(243 239 230 / 90%);
+  background: rgb(5 6 10 / 88%);
+  box-shadow: 0 20px 80px rgb(0 0 0 / 34%);
+  transform: translate(-50%, -50%);
+  backdrop-filter: blur(18px);
+}
+
+.app-startup-state[hidden] { display: none; }
+.app-startup-eyebrow { color: rgb(244 230 129 / 78%); font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .18em; }
+.app-startup-state strong { font-family: Georgia, 'Times New Roman', serif; font-size: 24px; font-weight: 400; }
+.app-startup-state span:last-child { color: rgb(243 239 230 / 58%); font-size: 12px; line-height: 1.6; }
+.app-startup-state.is-error { border-color: rgb(242 166 160 / 48%); }
+.app-startup-state.is-error strong { color: #ffd5cf; }
+
 .clock-overlay {
   position: fixed;
   inset: 0 0 0 32%;

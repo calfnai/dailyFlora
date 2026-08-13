@@ -56,6 +56,7 @@ export const translations: Record<Locale, TranslationTree> = {
       close: 'Close',
       localOnly: 'Saved on this device only',
       language: 'Language',
+      siteNavigation: 'Site navigation',
       signInExisting: 'Sign in to an existing account',
       createAccount: 'Create account',
       guestAuthHint: 'Sign in to sync your collection; create an account if this is your first visit.',
@@ -344,6 +345,7 @@ export const translations: Record<Locale, TranslationTree> = {
       close: '关闭',
       localOnly: '仅本机保存',
       language: '语言',
+      siteNavigation: '站点导航',
       signInExisting: '登录已有账户',
       createAccount: '创建账户',
       guestAuthHint: '登录后同步收藏；第一次使用可以先创建账户。',
@@ -622,7 +624,7 @@ const conciseLocaleOverrides: Partial<Record<Locale, TranslationTree>> = {
       platformsTitle: 'DailyFlora Plataformas',
       platformsDescription: 'Estado de DailyFlora en web, escritorio, móvil y pantallas ambientales.'
     },
-    common: { today: 'Ramo de hoy', member: 'Mi jardín', about: 'Acerca de DailyFlora', objects: 'Objetos y colaboraciones', platforms: 'Plataformas', scifi: 'SciFi Flora', collect: 'Guardar este ramo', openWeb: 'Abrir versión web', explore: 'Explorar', system: 'Sistema', version: 'Leer código de versión...', localOnly: 'Guardado solo en este dispositivo', signInExisting: 'Iniciar sesión con una cuenta existente', createAccount: 'Crear cuenta', guestAuthHint: 'Inicia sesión para sincronizar tu colección; crea una cuenta si es tu primera visita.' },
+    common: { today: 'Ramo de hoy', member: 'Mi jardín', about: 'Acerca de DailyFlora', objects: 'Objetos y colaboraciones', platforms: 'Plataformas', scifi: 'SciFi Flora', collect: 'Guardar este ramo', openWeb: 'Abrir versión web', explore: 'Explorar', system: 'Sistema', version: 'Leer código de versión...', localOnly: 'Guardado solo en este dispositivo', siteNavigation: 'Navegación del sitio', signInExisting: 'Iniciar sesión con una cuenta existente', createAccount: 'Crear cuenta', guestAuthHint: 'Inicia sesión para sincronizar tu colección; crea una cuenta si es tu primera visita.' },
     index: { index: 'ÍNDICE', view: 'VISTA', hideView: 'CERRAR', siteMenu: 'Menú de DailyFlora', currentBouquet: 'Ramo de hoy', myGarden: 'Mi jardín', about: 'Acerca de DailyFlora', objects: 'Objetos y colaboraciones', platforms: 'Plataformas', favorite: 'Guardar este ramo', debug: 'Revisión estética', openGarden: 'Abrir mi jardín', favoriteToday: 'Guardar el ramo de hoy', savedToday: 'Ramo guardado', gardenTitle: 'Mi jardín', gardenStatusGuest: 'Inicia sesión para guardar', gardenStatusSigned: '{count} guardados', accountPanelTitleGuest: 'Guarda el ramo de hoy en tu jardín', accountPanelTitleSigned: 'Tu colección DailyFlora', collection: 'Mi colección', emptyTitle: 'Aún no hay ramos guardados', emptyBody: 'Enciende el corazón y este ramo quedará aquí.', referenceTitle: 'Partir de una imagen', referenceBody: 'Lee color y nombre de archivo en este dispositivo para prever un ramo. No se sube nada.', referenceChoose: 'Elegir imagen', referenceGenerate: 'Generar desde la referencia', referenceReading: 'Leyendo la imagen...', referenceReady: 'Se encontró {theme}. Ya puedes generar.', referenceDone: 'Generado desde {theme}. Usa el corazón para guardarlo.' },
     view: { show: 'Mostrar controles', hide: 'Ocultar controles', howToUse: 'Cómo usarlo', date: 'Elegir fecha', dateWithName: 'Elegir fecha: {name}', random: 'Ver otra fecha', fullscreen: 'Pantalla completa', handOn: 'Activar gestos', handOff: 'Desactivar gestos', zoomOut: 'Alejar', zoomIn: 'Acercar', density: 'Densidad del ramo', densityLow: 'Más ligero', densityMedium: 'Medio', densityHigh: 'Más denso', render: 'Precisión visual', renderAuto: 'Auto', renderLow: 'Ahorro', renderMedium: 'Claro', renderHigh: 'Detallado', pause: 'Pausar rotación', resume: 'Reanudar rotación', reverse: 'Invertir ruta de cámara', speed: 'Velocidad de cámara', preset: 'Ruta de cámara aleatoria', clock: 'Reloj', showClock: 'Mostrar reloj', hideClock: 'Ocultar reloj', clockMinutes: 'min', clockAuto: 'Auto', previousMonth: 'Mes anterior', nextMonth: 'Mes siguiente', weekdays: 'Dom,Lun,Mar,Mié,Jue,Vie,Sáb' },
     about: { eyebrow: 'UN RAMO PARA CADA DÍA', title: 'Donde las fechas se encuentran con las flores.', lead: 'En la oscuridad, un ramo toma forma despacio. Cada fecha se vuelve semilla para una flor digital tranquila.', primary: 'Ver la flor de hoy', secondary: 'Mantener un día en flor', quote: 'No es una imagen que tengas que terminar.', manifestoTitle: 'Una pantalla también puede guardar una señal de vida.', principlesTitle: 'No se trata de tener más flores.' },
@@ -631,7 +633,7 @@ const conciseLocaleOverrides: Partial<Record<Locale, TranslationTree>> = {
     objects: { eyebrow: 'Ediciones DailyFlora', title: 'Lleva DailyFlora a la vida cotidiana.', lead: 'Descubre los próximos objetos y registra tu interés en la preventa.', primary: 'Ver ediciones en preventa', secondary: '#Floristplan', sectionEyebrow: 'Próximas ediciones', sectionTitle: 'Objetos para que un ramo DailyFlora viva más allá de la pantalla.', sectionBody: 'Explora la primera colección y guarda tu interés para recibir novedades.', floristEyebrow: '#Floristplan', floristTitle: 'Plan de floristas DailyFlora', floristBody: 'Experiencias urbanas, ediciones de ramos físicos y colaboraciones con floristas.', cityTitle: 'Puntos de experiencia urbanos', cityBody: 'Hangzhou, Shanghái y Shenzhen son las primeras ciudades candidatas.', bouquetCollabTitle: 'Ediciones de ramos físicos', bouquetCollabBody: 'Traducir ramos digitales seleccionados a flores reales, envoltorios y escaparates.', collaborationTitle: 'Colaboraciones', collaborationBody: 'Una futura entrada para floristas, creadores y socios urbanos.', interest: 'Registrar interés', toast: 'Interés de preventa guardado. Las novedades aparecerán aquí.' }
   },
   fr: {
-    common: { today: 'Bouquet du jour', member: 'Mon jardin', about: 'À propos de DailyFlora', objects: 'Objets et collaborations', platforms: 'Plateformes', scifi: 'SciFi Flora', collect: 'Garder ce bouquet', openWeb: 'Ouvrir la version web', explore: 'Explorer', system: 'Système', version: 'Lire le code de version...', signInExisting: 'Se connecter à un compte existant', createAccount: 'Créer un compte', guestAuthHint: 'Connectez-vous pour synchroniser votre collection ; créez un compte si vous arrivez pour la première fois.' },
+    common: { today: 'Bouquet du jour', member: 'Mon jardin', about: 'À propos de DailyFlora', objects: 'Objets et collaborations', platforms: 'Plateformes', scifi: 'SciFi Flora', collect: 'Garder ce bouquet', openWeb: 'Ouvrir la version web', explore: 'Explorer', system: 'Système', version: 'Lire le code de version...', siteNavigation: 'Navigation du site', signInExisting: 'Se connecter à un compte existant', createAccount: 'Créer un compte', guestAuthHint: 'Connectez-vous pour synchroniser votre collection ; créez un compte si vous arrivez pour la première fois.' },
     index: { index: 'INDEX', view: 'VUE', hideView: 'FERMER', siteMenu: 'Menu DailyFlora', currentBouquet: 'Bouquet du jour', myGarden: 'Mon jardin', about: 'À propos de DailyFlora', objects: 'Objets et collaborations', platforms: 'Plateformes', favorite: 'Garder ce bouquet', debug: 'Revue esthétique', gardenStatusSigned: '{count} gardés' },
     view: { show: 'Afficher les contrôles', hide: 'Masquer les contrôles', howToUse: 'Mode d’emploi', date: 'Choisir la date', random: 'Voir une autre date', fullscreen: 'Plein écran', zoomOut: 'Éloigner', zoomIn: 'Rapprocher', pause: 'Mettre en pause', resume: 'Reprendre', clock: 'Horloge', showClock: 'Afficher l’horloge', hideClock: 'Masquer l’horloge', weekdays: 'Dim,Lun,Mar,Mer,Jeu,Ven,Sam' },
     about: { eyebrow: 'UN BOUQUET POUR CHAQUE JOUR', title: 'Là où les dates rencontrent les fleurs.', lead: 'Dans l’obscurité, un bouquet prend lentement forme. Une date devient une graine, puis un espace, une couleur, une fleur numérique.', primary: 'Voir la fleur du jour', secondary: 'Garder un jour en fleur', quote: 'Ce n’est pas une image qu’il faut finir.' },
@@ -640,7 +642,7 @@ const conciseLocaleOverrides: Partial<Record<Locale, TranslationTree>> = {
     objects: { eyebrow: 'Éditions DailyFlora', title: 'Faites entrer DailyFlora dans la vie quotidienne.', lead: 'Découvrez les prochains objets et inscrivez votre intérêt pour la prévente.', primary: 'Voir les éditions en prévente', secondary: '#Floristplan', sectionEyebrow: 'Prochaines éditions', sectionTitle: 'Des objets pour faire vivre un bouquet DailyFlora au-delà de l’écran.', sectionBody: 'Explorez la première collection et suivez son lancement.', floristEyebrow: '#Floristplan', floristTitle: 'Plan fleuristes DailyFlora', floristBody: 'Expériences urbaines, bouquets physiques et collaborations avec des fleuristes.', cityTitle: 'Points d’expérience en ville', cityBody: 'Hangzhou, Shanghai et Shenzhen sont les premières villes candidates.', bouquetCollabTitle: 'Éditions de bouquets physiques', bouquetCollabBody: 'Traduire des bouquets numériques en fleurs réelles, emballages et vitrines.', collaborationTitle: 'Collaborations', collaborationBody: 'Une future entrée pour fleuristes, créateurs et partenaires urbains.', interest: 'Inscrire mon intérêt', toast: 'Intérêt pour la prévente enregistré. Les nouveautés seront affichées ici.' }
   },
   pt: {
-    common: { today: 'Buquê de hoje', member: 'Meu jardim', about: 'Sobre DailyFlora', objects: 'Objetos e colaborações', platforms: 'Plataformas', scifi: 'SciFi Flora', collect: 'Guardar este buquê', openWeb: 'Abrir versão web', explore: 'Explorar', system: 'Sistema', version: 'Ler código da versão...', signInExisting: 'Entrar com uma conta existente', createAccount: 'Criar conta', guestAuthHint: 'Entre para sincronizar sua coleção; crie uma conta se esta for sua primeira visita.' },
+    common: { today: 'Buquê de hoje', member: 'Meu jardim', about: 'Sobre DailyFlora', objects: 'Objetos e colaborações', platforms: 'Plataformas', scifi: 'SciFi Flora', collect: 'Guardar este buquê', openWeb: 'Abrir versão web', explore: 'Explorar', system: 'Sistema', version: 'Ler código da versão...', siteNavigation: 'Navegação do site', signInExisting: 'Entrar com uma conta existente', createAccount: 'Criar conta', guestAuthHint: 'Entre para sincronizar sua coleção; crie uma conta se esta for sua primeira visita.' },
     index: { index: 'ÍNDICE', view: 'VISTA', hideView: 'FECHAR', currentBouquet: 'Buquê de hoje', myGarden: 'Meu jardim', about: 'Sobre DailyFlora', objects: 'Objetos e colaborações', platforms: 'Plataformas', favorite: 'Guardar este buquê', gardenStatusSigned: '{count} guardados' },
     view: { show: 'Mostrar controles', hide: 'Ocultar controles', howToUse: 'Como usar', date: 'Escolher data', random: 'Ver outra data', fullscreen: 'Tela cheia', zoomOut: 'Afastar', zoomIn: 'Aproximar', pause: 'Pausar rotação', resume: 'Continuar rotação', clock: 'Relógio', weekdays: 'Dom,Seg,Ter,Qua,Qui,Sex,Sáb' },
     about: { eyebrow: 'UM BUQUÊ PARA CADA DIA', title: 'Onde datas encontram flores.', lead: 'No escuro, um buquê se forma devagar. A data vira semente para uma flor digital silenciosa.', primary: 'Ver a flor de hoje', secondary: 'Manter um dia florido', quote: 'Não é uma imagem que você precisa terminar.' },
@@ -649,7 +651,7 @@ const conciseLocaleOverrides: Partial<Record<Locale, TranslationTree>> = {
     objects: { eyebrow: 'Edições DailyFlora', title: 'Leve DailyFlora para a vida cotidiana.', lead: 'Conheça os próximos objetos e registre interesse na pré-venda.', primary: 'Ver edições em pré-venda', secondary: '#Floristplan', sectionEyebrow: 'Próximas edições', sectionTitle: 'Objetos para o buquê DailyFlora viver além da tela.', sectionBody: 'Explore a primeira coleção e acompanhe o lançamento.', floristEyebrow: '#Floristplan', floristTitle: 'Plano de floristas DailyFlora', floristBody: 'Experiências urbanas, buquês físicos e colaborações com floristas.', cityTitle: 'Pontos de experiência nas cidades', cityBody: 'Hangzhou, Xangai e Shenzhen são as primeiras cidades candidatas.', bouquetCollabTitle: 'Edições de buquês físicos', bouquetCollabBody: 'Traduzir buquês digitais em flores reais, embalagens e vitrines.', collaborationTitle: 'Colaborações', collaborationBody: 'Uma futura entrada para floristas, criadores e parceiros urbanos.', interest: 'Registrar interesse', toast: 'Interesse de pré-venda salvo. As novidades aparecerão aqui.' }
   },
   it: {
-    common: { today: 'Bouquet di oggi', member: 'Il mio giardino', about: 'Informazioni su DailyFlora', objects: 'Oggetti e collaborazioni', platforms: 'Piattaforme', scifi: 'SciFi Flora', collect: 'Conserva questo bouquet', openWeb: 'Apri versione web', explore: 'Esplora', system: 'Sistema', version: 'Leggi codice versione...', signInExisting: 'Accedi con un account esistente', createAccount: 'Crea account', guestAuthHint: 'Accedi per sincronizzare la tua raccolta; crea un account se è la tua prima visita.' },
+    common: { today: 'Bouquet di oggi', member: 'Il mio giardino', about: 'Informazioni su DailyFlora', objects: 'Oggetti e collaborazioni', platforms: 'Piattaforme', scifi: 'SciFi Flora', collect: 'Conserva questo bouquet', openWeb: 'Apri versione web', explore: 'Esplora', system: 'Sistema', version: 'Leggi codice versione...', siteNavigation: 'Navigazione del sito', signInExisting: 'Accedi con un account esistente', createAccount: 'Crea account', guestAuthHint: 'Accedi per sincronizzare la tua raccolta; crea un account se è la tua prima visita.' },
     index: { index: 'INDICE', view: 'VISTA', hideView: 'CHIUDI', currentBouquet: 'Bouquet di oggi', myGarden: 'Il mio giardino', about: 'About DailyFlora', objects: 'Oggetti e collaborazioni', platforms: 'Piattaforme', favorite: 'Conserva questo bouquet', gardenStatusSigned: '{count} salvati' },
     view: { show: 'Mostra controlli', hide: 'Nascondi controlli', howToUse: 'Come si usa', date: 'Scegli data', random: 'Vedi un’altra data', fullscreen: 'Schermo intero', zoomOut: 'Allontana', zoomIn: 'Avvicina', pause: 'Pausa rotazione', resume: 'Riprendi rotazione', clock: 'Orologio', weekdays: 'Dom,Lun,Mar,Mer,Gio,Ven,Sab' },
     about: { eyebrow: 'UN BOUQUET PER OGNI GIORNO', title: 'Dove le date incontrano i fiori.', lead: 'Nel buio, un bouquet prende forma lentamente. La data diventa seme per un fiore digitale quieto.', primary: 'Vedi il fiore di oggi', secondary: 'Tenere un giorno in fiore', quote: 'Non è un’immagine da finire.' },
@@ -658,7 +660,7 @@ const conciseLocaleOverrides: Partial<Record<Locale, TranslationTree>> = {
     objects: { eyebrow: 'Edizioni DailyFlora', title: 'Porta DailyFlora nella vita quotidiana.', lead: 'Scopri i prossimi oggetti e registra il tuo interesse per la prevendita.', primary: 'Vedi le edizioni in prevendita', secondary: '#Floristplan', sectionEyebrow: 'Prossime edizioni', sectionTitle: 'Oggetti che fanno vivere un bouquet DailyFlora oltre lo schermo.', sectionBody: 'Esplora la prima collezione e segui il lancio.', floristEyebrow: '#Floristplan', floristTitle: 'Piano fioristi DailyFlora', floristBody: 'Esperienze urbane, bouquet fisici e collaborazioni con fioristi.', cityTitle: 'Punti esperienza in città', cityBody: 'Hangzhou, Shanghai e Shenzhen sono le prime città candidate.', bouquetCollabTitle: 'Edizioni di bouquet fisici', bouquetCollabBody: 'Tradurre bouquet digitali in fiori reali, confezioni e vetrine.', collaborationTitle: 'Collaborazioni', collaborationBody: 'Un futuro ingresso per fioristi, creatori e partner urbani.', interest: 'Registra interesse', toast: 'Interesse per la prevendita salvato. Gli aggiornamenti appariranno qui.' }
   },
   ja: {
-    common: { today: '今日の花束', member: '私の庭', about: 'DailyFlora について', objects: 'オブジェクトと協業', platforms: 'プラットフォーム', scifi: 'SciFi Flora', collect: 'この花束を残す', openWeb: 'Web版を開く', explore: '見る', system: 'システム', version: 'バージョンを読む…', signInExisting: '既存のアカウントでログイン', createAccount: 'アカウントを作成', guestAuthHint: 'ログインするとコレクションを同期できます。初めての方はアカウントを作成してください。' },
+    common: { today: '今日の花束', member: '私の庭', about: 'DailyFlora について', objects: 'オブジェクトと協業', platforms: 'プラットフォーム', scifi: 'SciFi Flora', collect: 'この花束を残す', openWeb: 'Web版を開く', explore: '見る', system: 'システム', version: 'バージョンを読む…', siteNavigation: 'サイトナビゲーション', signInExisting: '既存のアカウントでログイン', createAccount: 'アカウントを作成', guestAuthHint: 'ログインするとコレクションを同期できます。初めての方はアカウントを作成してください。' },
     index: { index: 'INDEX', view: 'VIEW', hideView: 'CLOSE', siteMenu: 'DailyFlora メニュー', currentBouquet: '今日の花束', myGarden: '私の庭', about: 'DailyFlora について', objects: 'オブジェクトと協業', platforms: 'プラットフォーム', favorite: 'この花束を残す', debug: '美意識レビュー', openGarden: '私の庭を開く', favoriteToday: '今日の花束を保存', savedToday: '保存済み', gardenStatusSigned: '{count} 件保存' },
     view: { show: '表示設定を開く', hide: '表示設定を閉じる', howToUse: '使い方', date: '日付を選ぶ', random: '別の日を見る', fullscreen: '全画面', handOn: '手の操作を有効にする', handOff: '手の操作を閉じる', zoomOut: '引く', zoomIn: '寄る', pause: '回転を止める', resume: '回転を再開', reverse: 'カメラ経路を反転', clock: '時計', showClock: '時計を表示', hideClock: '時計を隠す', weekdays: '日,月,火,水,木,金,土' },
     about: { eyebrow: '毎日のための花束', title: '日付と花が、ここで出会う。', lead: '暗い空間の中で、一束の花がゆっくり形になる。日付は種になり、色と茎と余白が静かに育つ。', primary: '今日の花を見る', secondary: 'この日を咲かせておく', quote: 'これは「見終える」ための画像ではありません。' },
@@ -707,6 +709,118 @@ const registrationConsentLocaleOverrides: Partial<Record<Locale, TranslationTree
 for (const locale of locales) {
   const override = registrationConsentLocaleOverrides[locale];
   if (override) translations[locale] = deepMerge(translations[locale], override);
+}
+
+const authLocaleOverrides: Record<Locale, TranslationTree> = {
+  en: {
+    auth: {
+      signupEyebrow: 'DailyFlora ID',
+      signupTitle: 'Create your garden.',
+      signupLead: 'Your saved bouquets, generation history, and private garden sync across devices after you sign up.',
+      proofCloud: 'Cloud account',
+      proofPrivate: 'Private garden records',
+      proofLogout: 'Sign out anytime',
+      signupStep: 'Create account',
+      signupHeading: 'Create account',
+      existingPrompt: 'Already have an account?',
+      nameLabel: 'Your name',
+      namePlaceholder: 'For example: Flora',
+      emailLabel: 'Email',
+      emailPlaceholder: 'name@example.com',
+      passwordLabel: 'Password',
+      passwordPlaceholder: '8–128 characters',
+      consentPrefix: 'I have read and agree to the',
+      termsLink: 'Terms of Use',
+      consentAnd: 'and the',
+      privacyLink: 'Privacy Policy',
+      consentPeriod: '.',
+      signupSubmit: 'Create account',
+      loginEyebrow: 'DailyFlora ID',
+      loginTitle: 'Welcome back to your garden.',
+      loginLead: 'Sign in on a new device to continue with the same collection, generation history, and private garden.',
+      loginStep: 'Sign in',
+      loginHeading: 'Sign in',
+      noAccountPrompt: 'Don’t have an account?',
+      signupLink: 'Create one now',
+      loginSubmit: 'Sign in and open garden',
+      forgotPassword: 'Forgot password?',
+      forgotEmailLabel: 'Registration email',
+      sendReset: 'Send reset email',
+      backToLogin: 'Back to sign in',
+      newPasswordLabel: 'New password',
+      confirmPasswordLabel: 'Confirm new password',
+      savePassword: 'Save new password and sign in'
+    }
+  },
+  'zh-CN': {
+    auth: {
+      signupEyebrow: 'DailyFlora ID',
+      signupTitle: '建立你的花园。',
+      signupLead: '注册后，收藏、生成历史和个人花园会随账户跨设备同步。',
+      proofCloud: '真实云端账户',
+      proofPrivate: '私有花园记录',
+      proofLogout: '随时可以退出',
+      signupStep: '创建账户',
+      signupHeading: '注册',
+      existingPrompt: '已经有账户？',
+      nameLabel: '怎么称呼你',
+      namePlaceholder: '例如：小花',
+      emailLabel: '邮箱',
+      emailPlaceholder: 'name@example.com',
+      passwordLabel: '密码',
+      passwordPlaceholder: '8–128 位',
+      consentPrefix: '我已阅读并同意',
+      termsLink: '使用条款',
+      consentAnd: '和',
+      privacyLink: '隐私政策',
+      consentPeriod: '。',
+      signupSubmit: '创建账户',
+      loginEyebrow: 'DailyFlora ID',
+      loginTitle: '欢迎回到花园。',
+      loginLead: '在新设备登录后，继续查看同一份收藏、生成历史与个人花园。',
+      loginStep: '登录',
+      loginHeading: '登录',
+      noAccountPrompt: '还没有账户？',
+      signupLink: '立即注册',
+      loginSubmit: '登录并打开花园',
+      forgotPassword: '忘记密码？',
+      forgotEmailLabel: '注册邮箱',
+      sendReset: '发送重置邮件',
+      backToLogin: '返回登录',
+      newPasswordLabel: '新密码',
+      confirmPasswordLabel: '确认新密码',
+      savePassword: '保存新密码并登录'
+    }
+  },
+  es: {
+    auth: {
+      signupEyebrow: 'DailyFlora ID', signupTitle: 'Crea tu jardín.', signupLead: 'Tus ramos guardados, tu historial y tu jardín privado se sincronizan entre dispositivos al registrarte.', proofCloud: 'Cuenta en la nube', proofPrivate: 'Registros privados', proofLogout: 'Puedes salir cuando quieras', signupStep: 'Crear cuenta', signupHeading: 'Crear cuenta', existingPrompt: '¿Ya tienes una cuenta?', nameLabel: 'Tu nombre', namePlaceholder: 'Por ejemplo: Flora', emailLabel: 'Correo electrónico', emailPlaceholder: 'name@example.com', passwordLabel: 'Contraseña', passwordPlaceholder: '8–128 caracteres', consentPrefix: 'He leído y acepto los', termsLink: 'Términos de uso', consentAnd: 'y la', privacyLink: 'Política de privacidad', consentPeriod: '.', signupSubmit: 'Crear cuenta', loginEyebrow: 'DailyFlora ID', loginTitle: 'Vuelve a tu jardín.', loginLead: 'Inicia sesión en un dispositivo nuevo para continuar con tu colección, historial y jardín privado.', loginStep: 'Iniciar sesión', loginHeading: 'Iniciar sesión', noAccountPrompt: '¿No tienes una cuenta?', signupLink: 'Regístrate ahora', loginSubmit: 'Iniciar sesión y abrir el jardín', forgotPassword: '¿Olvidaste la contraseña?', forgotEmailLabel: 'Correo de registro', sendReset: 'Enviar correo de restablecimiento', backToLogin: 'Volver a iniciar sesión', newPasswordLabel: 'Nueva contraseña', confirmPasswordLabel: 'Confirmar nueva contraseña', savePassword: 'Guardar contraseña e iniciar sesión'
+    }
+  },
+  fr: {
+    auth: {
+      signupEyebrow: 'DailyFlora ID', signupTitle: 'Créez votre jardin.', signupLead: 'Vos bouquets, votre historique et votre jardin privé se synchronisent entre appareils après votre inscription.', proofCloud: 'Compte cloud', proofPrivate: 'Archives privées', proofLogout: 'Déconnexion à tout moment', signupStep: 'Créer un compte', signupHeading: 'Créer un compte', existingPrompt: 'Vous avez déjà un compte ?', nameLabel: 'Votre nom', namePlaceholder: 'Par exemple : Flora', emailLabel: 'E-mail', emailPlaceholder: 'name@example.com', passwordLabel: 'Mot de passe', passwordPlaceholder: '8 à 128 caractères', consentPrefix: 'J’ai lu et j’accepte les', termsLink: 'Conditions d’utilisation', consentAnd: 'et la', privacyLink: 'Politique de confidentialité', consentPeriod: '.', signupSubmit: 'Créer un compte', loginEyebrow: 'DailyFlora ID', loginTitle: 'Retrouvez votre jardin.', loginLead: 'Connectez-vous sur un nouvel appareil pour retrouver votre collection, votre historique et votre jardin privé.', loginStep: 'Connexion', loginHeading: 'Connexion', noAccountPrompt: 'Vous n’avez pas encore de compte ?', signupLink: 'Inscrivez-vous maintenant', loginSubmit: 'Se connecter et ouvrir le jardin', forgotPassword: 'Mot de passe oublié ?', forgotEmailLabel: 'E-mail d’inscription', sendReset: 'Envoyer l’e-mail de réinitialisation', backToLogin: 'Retour à la connexion', newPasswordLabel: 'Nouveau mot de passe', confirmPasswordLabel: 'Confirmer le nouveau mot de passe', savePassword: 'Enregistrer et se connecter'
+    }
+  },
+  pt: {
+    auth: {
+      signupEyebrow: 'DailyFlora ID', signupTitle: 'Crie o seu jardim.', signupLead: 'Seus buquês salvos, histórico e jardim privado sincronizam entre dispositivos após o cadastro.', proofCloud: 'Conta na nuvem', proofPrivate: 'Registros privados', proofLogout: 'Saia quando quiser', signupStep: 'Criar conta', signupHeading: 'Criar conta', existingPrompt: 'Já tem uma conta?', nameLabel: 'Seu nome', namePlaceholder: 'Por exemplo: Flora', emailLabel: 'E-mail', emailPlaceholder: 'name@example.com', passwordLabel: 'Senha', passwordPlaceholder: '8–128 caracteres', consentPrefix: 'Li e concordo com os', termsLink: 'Termos de uso', consentAnd: 'e a', privacyLink: 'Política de privacidade', consentPeriod: '.', signupSubmit: 'Criar conta', loginEyebrow: 'DailyFlora ID', loginTitle: 'Bem-vindo de volta ao jardim.', loginLead: 'Entre em um novo dispositivo para continuar com a mesma coleção, histórico e jardim privado.', loginStep: 'Entrar', loginHeading: 'Entrar', noAccountPrompt: 'Ainda não tem uma conta?', signupLink: 'Cadastre-se agora', loginSubmit: 'Entrar e abrir o jardim', forgotPassword: 'Esqueceu a senha?', forgotEmailLabel: 'E-mail de cadastro', sendReset: 'Enviar e-mail de redefinição', backToLogin: 'Voltar ao login', newPasswordLabel: 'Nova senha', confirmPasswordLabel: 'Confirmar nova senha', savePassword: 'Salvar senha e entrar'
+    }
+  },
+  it: {
+    auth: {
+      signupEyebrow: 'DailyFlora ID', signupTitle: 'Crea il tuo giardino.', signupLead: 'Dopo la registrazione, bouquet salvati, cronologia e giardino privato si sincronizzano tra i dispositivi.', proofCloud: 'Account cloud', proofPrivate: 'Record privati', proofLogout: 'Esci quando vuoi', signupStep: 'Crea account', signupHeading: 'Crea account', existingPrompt: 'Hai già un account?', nameLabel: 'Il tuo nome', namePlaceholder: 'Per esempio: Flora', emailLabel: 'E-mail', emailPlaceholder: 'name@example.com', passwordLabel: 'Password', passwordPlaceholder: '8–128 caratteri', consentPrefix: 'Ho letto e accetto i', termsLink: 'Termini di utilizzo', consentAnd: 'e la', privacyLink: 'Privacy Policy', consentPeriod: '.', signupSubmit: 'Crea account', loginEyebrow: 'DailyFlora ID', loginTitle: 'Bentornato nel giardino.', loginLead: 'Accedi da un nuovo dispositivo per continuare con la stessa raccolta, cronologia e giardino privato.', loginStep: 'Accedi', loginHeading: 'Accedi', noAccountPrompt: 'Non hai ancora un account?', signupLink: 'Registrati ora', loginSubmit: 'Accedi e apri il giardino', forgotPassword: 'Password dimenticata?', forgotEmailLabel: 'E-mail di registrazione', sendReset: 'Invia e-mail di reimpostazione', backToLogin: 'Torna all’accesso', newPasswordLabel: 'Nuova password', confirmPasswordLabel: 'Conferma nuova password', savePassword: 'Salva password e accedi'
+    }
+  },
+  ja: {
+    auth: {
+      signupEyebrow: 'DailyFlora ID', signupTitle: 'あなたの庭をつくる。', signupLead: '登録すると、保存した花束、生成履歴、個人の庭が端末をまたいで同期されます。', proofCloud: 'クラウドアカウント', proofPrivate: '非公開の庭の記録', proofLogout: 'いつでもログアウト', signupStep: 'アカウント作成', signupHeading: '登録', existingPrompt: 'すでにアカウントをお持ちですか？', nameLabel: 'お名前', namePlaceholder: '例：Flora', emailLabel: 'メールアドレス', emailPlaceholder: 'name@example.com', passwordLabel: 'パスワード', passwordPlaceholder: '8～128文字', consentPrefix: '以下を読み、同意します：', termsLink: '利用規約', consentAnd: 'および', privacyLink: 'プライバシーポリシー', consentPeriod: '。', signupSubmit: 'アカウントを作成', loginEyebrow: 'DailyFlora ID', loginTitle: '庭へおかえりなさい。', loginLead: '新しい端末でログインすると、保存した花束、生成履歴、個人の庭を続けて利用できます。', loginStep: 'ログイン', loginHeading: 'ログイン', noAccountPrompt: 'アカウントをお持ちでないですか？', signupLink: '今すぐ登録', loginSubmit: 'ログインして庭を開く', forgotPassword: 'パスワードを忘れた場合', forgotEmailLabel: '登録メールアドレス', sendReset: '再設定メールを送る', backToLogin: 'ログインに戻る', newPasswordLabel: '新しいパスワード', confirmPasswordLabel: '新しいパスワード（確認）', savePassword: '保存してログイン'
+    }
+  }
+};
+
+for (const locale of locales) {
+  translations[locale] = deepMerge(translations[locale], authLocaleOverrides[locale]);
 }
 
 const controlLocaleOverrides: Record<Locale, TranslationTree> = {
