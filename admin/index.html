@@ -16,11 +16,16 @@
           <h1>Beta 任务后台</h1>
           <p>只连接 <code>dailyflora-api-beta</code> 与 Beta 集合；不会读写 0.71 正式账户。</p>
         </div>
-        <a class="button" href="../member/">返回个人花园</a>
+        <div class="admin-header-actions">
+          <span class="admin-identity" id="admin-identity">正在读取身份…</span>
+          <a class="button" href="../member/">返回个人花园</a>
+          <button class="button" id="admin-logout" type="button">退出账户</button>
+        </div>
       </header>
 
       <section class="admin-state garden-panel" id="admin-state" aria-live="polite">正在检查后台权限…</section>
       <section class="admin-content" id="admin-content" hidden>
+        <div class="admin-runtime garden-panel" id="admin-runtime" aria-live="polite">正在检查 Beta API…</div>
         <div class="admin-metrics" id="admin-metrics"></div>
         <section class="garden-panel admin-panel">
           <div class="panel-row"><div><p class="eyebrow">Accounts</p><h2>账户</h2></div><button class="button" id="admin-refresh" type="button">刷新</button></div>
