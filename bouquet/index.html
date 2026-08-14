@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A uniquely generated DailyFlora bouquet." />
+    <title>DailyFlora 公开花束</title>
+    <link rel="stylesheet" href="../src/marketing.css" />
+  </head>
+  <body data-page="bouquet">
+    <div class="public-bouquet-shell">
+      <header class="public-bouquet-header"><a class="brand" href="../"><span class="brand-mark" aria-hidden="true"></span>DAILYFLORA <small class="beta-mark">0.72 BETA</small></a><a class="button" href="../">查看今日花束</a></header>
+      <main class="public-bouquet-main">
+        <section class="public-bouquet-state" id="public-bouquet-state" aria-live="polite">正在读取公开花束…</section>
+        <iframe id="public-bouquet-frame" title="DailyFlora generated bouquet" hidden></iframe>
+        <aside class="public-bouquet-caption" id="public-bouquet-caption" hidden><p class="eyebrow">Unique public bouquet</p><h1 id="public-bouquet-title"></h1><p id="public-bouquet-summary"></p></aside>
+      </main>
+    </div>
+    <script src="../dailyflora-config.js"></script>
+    <script type="module" src="../src/publicBouquet.ts"></script>
+  </body>
+</html>
