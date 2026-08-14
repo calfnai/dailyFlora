@@ -2112,7 +2112,20 @@ const removeDesktopFullscreenListener = window.dailyfloraDesktop?.onFullscreenCh
     announceFullscreenEntry();
   }
 });
+const removeDesktopEscapeListener = window.dailyfloraDesktop?.onEscape?.(() => {
+  // The main process handles the native fullscreen transition. This renderer
+  // callback closes any open overlay at the same time, even when Chromium did
+  // not deliver the original Esc keydown to the page.
+  closeInlineTutorial();
+  closeCalendar();
+  closeAccountPanel();
+  if (clockDisplaySource) hideClock();
+  desktopNativeFullscreen = false;
+  syncFullscreenUi();
+  revealUi();
+});
 window.addEventListener('beforeunload', () => removeDesktopFullscreenListener?.(), { once: true });
+window.addEventListener('beforeunload', () => removeDesktopEscapeListener?.(), { once: true });
 
 zoomInButton?.addEventListener('click', () => {
   zoomBy(-0.28);

@@ -15,5 +15,10 @@ contextBridge.exposeInMainWorld('dailyfloraDesktop', {
     const listener = (_event, enabled) => callback(Boolean(enabled));
     ipcRenderer.on('dailyflora:fullscreen-changed', listener);
     return () => ipcRenderer.removeListener('dailyflora:fullscreen-changed', listener);
+  },
+  onEscape: (callback) => {
+    const listener = () => callback();
+    ipcRenderer.on('dailyflora:escape', listener);
+    return () => ipcRenderer.removeListener('dailyflora:escape', listener);
   }
 });

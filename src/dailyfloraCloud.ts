@@ -116,6 +116,7 @@ declare global {
       isScreensaver: boolean;
       setFullscreen?: (enabled: boolean) => Promise<boolean>;
       onFullscreenChange?: (callback: (enabled: boolean) => void) => () => void;
+      onEscape?: (callback: () => void) => () => void;
     };
   }
 }
