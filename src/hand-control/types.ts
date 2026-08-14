@@ -43,7 +43,7 @@ export type HandControlAction =
   | { type: 'zoom'; source: 'depth' | 'spread'; delta: number }
   | { type: 'rotate'; deltaYaw: number; deltaPitch: number };
 
-export type HandTrackerStatus = 'off' | 'loading' | 'requesting-camera' | 'running' | 'error';
+export type HandTrackerStatus = 'off' | 'loading' | 'requesting-camera' | 'running' | 'model-error' | 'error';
 
 export const EMPTY_HAND_SIGNAL: HandSignal = {
   tracked: false,

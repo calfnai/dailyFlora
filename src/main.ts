@@ -7,8 +7,21 @@ import { resolveQuality } from './quality';
 import { BouquetScene } from './bouquetScene';
 import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
 import { themes } from './themes';
+import { loadDailyContent } from './dailyContent';
 import { IdleClockController, normalizeClockInterval, type ClockDisplaySource, type IdleClockSettings } from './idleClock';
 import type { DailyFloraHandActions } from './dailyFloraHandControl';
+import {
+  dailyfloraCloudEnabled,
+  listCloudFavorites,
+  loginAccount,
+  logoutAccount,
+  registerAccount,
+  removeCloudFavorite,
+  restoreAccount,
+  saveCloudFavorite,
+  type CloudFavorite
+} from './dailyfloraCloud';
+import './accountHeader';
 import {
   configureDocument,
   detectInitialLocale,
@@ -62,8 +75,8 @@ const renderLabels: Record<Exclude<RenderQualityName, 'auto'>, string> = {
   medium: '清',
   high: '精'
 };
-const accountStorageKey = 'dailyflora.account.v2';
-const favoritesStorageKey = 'dailyflora.favorites.v1';
+const accountStorageKey = 'dailyflora.beta072.account.v1';
+const favoritesStorageKey = 'dailyflora.beta072.favorites.v1';
 const themeEnglishNames: Record<string, string> = {
   'tropical-forest': 'Tropical Forest',
   'moon-white': 'Moon White Hand-Tied',
@@ -143,6 +156,9 @@ const rotationPresets: Array<{
 ];
 
 const canvas = document.querySelector<HTMLCanvasElement>('#flora-canvas');
+const startupState = document.querySelector<HTMLElement>('#app-startup-state');
+const startupTitle = document.querySelector<HTMLElement>('#app-startup-title');
+const startupDetail = document.querySelector<HTMLElement>('#app-startup-detail');
 const hud = document.querySelector<HTMLElement>('#hud');
 const dailyMark = document.querySelector<HTMLElement>('.daily-mark');
 const controls = document.querySelector<HTMLElement>('#controls');
@@ -151,7 +167,7 @@ const controlsPanel = document.querySelector<HTMLElement>('#controls-panel');
 const siteMenu = document.querySelector<HTMLElement>('#site-menu');
 const siteMenuToggle = document.querySelector<HTMLButtonElement>('#site-menu-toggle');
 const siteMenuPanel = document.querySelector<HTMLElement>('#site-menu-panel');
-const siteMenuFavoriteLink = document.querySelector<HTMLAnchorElement>('#site-menu-favorite-link');
+const siteMenuFavoriteLink = document.querySelector<HTMLButtonElement>('#site-menu-favorite-link');
 const siteMenuDebugLink = document.querySelector<HTMLAnchorElement>('#site-menu-debug-link');
 const handControlToggle = document.querySelector<HTMLButtonElement>('#hand-control-toggle');
 const dateLabel = document.querySelector<HTMLElement>('#daily-date');
@@ -185,8 +201,16 @@ const accountOpenTitle = document.querySelector<HTMLElement>('#account-open-titl
 const accountOpenStatus = document.querySelector<HTMLElement>('#account-open-status');
 const accountPanelTitle = document.querySelector<HTMLElement>('#account-panel-title');
 const loginForm = document.querySelector<HTMLFormElement>('#login-form');
+const loginNameField = document.querySelector<HTMLElement>('#login-name-field');
 const loginNameInput = document.querySelector<HTMLInputElement>('#login-name-input');
 const loginEmailInput = document.querySelector<HTMLInputElement>('#login-email-input');
+const loginPasswordInput = document.querySelector<HTMLInputElement>('#login-password-input');
+const loginConsentField = document.querySelector<HTMLElement>('#login-consent-field');
+const loginSubmitLabel = document.querySelector<HTMLElement>('#login-submit-label');
+const accountFormSwitchCopy = document.querySelector<HTMLElement>('#account-form-switch-copy');
+const accountFormSwitchLink = document.querySelector<HTMLAnchorElement>('#account-form-switch-link');
+const accountFormError = document.querySelector<HTMLElement>('#account-form-error');
+const accountGuestActions = document.querySelector<HTMLElement>('#account-guest-actions');
 const accountProfile = document.querySelector<HTMLElement>('#account-profile');
 const profileAvatar = document.querySelector<HTMLElement>('#profile-avatar');
 const profileName = document.querySelector<HTMLElement>('#profile-name');
@@ -224,6 +248,20 @@ const clockExitHint = document.querySelector<HTMLElement>('#clock-exit-hint');
 const languageSwitcher = document.querySelector<HTMLElement>('#language-switcher');
 let interfaceLanguage: Locale = detectInitialLocale();
 const legacyInterfaceLanguageKey = 'dailyflora.interface-language.v1';
+let startupReady = false;
+
+function showStartupError(error: unknown) {
+  if (startupReady || !startupState || !startupTitle || !startupDetail) return;
+  const message = error instanceof Error ? error.message : String(error || 'Unknown startup error');
+  startupState.hidden = false;
+  startupState.classList.add('is-error');
+  startupTitle.textContent = '花束加载失败';
+  startupDetail.textContent = `请刷新页面重试；如果仍然失败，请检查浏览器是否启用 WebGL。(${message})`;
+}
+
+window.addEventListener('error', (event) => showStartupError(event.error || event.message));
+window.addEventListener('unhandledrejection', (event) => showStartupError(event.reason));
+
 try {
   const legacy = normalizeLocale(window.localStorage.getItem(legacyInterfaceLanguageKey));
   if (legacy && !window.localStorage.getItem(localeStorageKey)) {
@@ -363,9 +401,31 @@ let specialAudio: HTMLAudioElement | null = null;
 let specialAudioMuted = false;
 let debugTimer = 0;
 let dateRolloverTimer = 0;
+let desktopNativeFullscreen = false;
 let calendarView = parseDateKey(spec.dateLabel);
 let accountState = readAccountState();
 let favoriteBouquets = readFavoriteBouquets();
+let mainAuthMode: 'signup' | 'login' = 'signup';
+let favoriteActionInFlight = false;
+
+function cloudFavoriteToLocal(favorite: CloudFavorite): FavoriteBouquet {
+  return favorite;
+}
+
+async function restoreCloudState() {
+  if (!dailyfloraCloudEnabled) return;
+  try {
+    const account = await restoreAccount();
+    if (!account) return;
+    accountState = account;
+    const favorites = await listCloudFavorites();
+    favoriteBouquets = favorites.map(cloudFavoriteToLocal).slice(0, 24);
+    renderAccountState();
+  } catch (error) {
+    console.warn('[DailyFlora] cloud session restore failed', error);
+    if (error instanceof Error && /需要登录|登录已过期/.test(error.message)) saveAccountState(null);
+  }
+}
 let referenceState: ReferenceState | null = null;
 let clockTickTimer = 0;
 let clockExitHintTimer = 0;
@@ -735,11 +795,12 @@ function generateFromReference() {
 
 function openAccountPanel() {
   if (!accountPanel || !accountOpenButton) return;
+  toggleSiteMenu(false);
   accountPanel.hidden = false;
   accountOpenButton.setAttribute('aria-expanded', 'true');
   window.setTimeout(() => accountPanel.classList.add('is-open'), 20);
   if (!accountState) {
-    loginNameInput?.focus();
+    accountGuestActions?.querySelector<HTMLAnchorElement>('a')?.focus();
   }
   revealUi();
 }
@@ -756,23 +817,88 @@ function closeAccountPanel() {
 function toggleSiteMenu(forceOpen?: boolean) {
   if (!siteMenuToggle || !siteMenuPanel) return;
   const open = forceOpen ?? siteMenuPanel.hidden;
+  if (open) closeAccountPanel();
   siteMenuPanel.hidden = !open;
   siteMenuToggle.setAttribute('aria-expanded', String(open));
 }
 
-function toggleFavorite() {
+function setMainAuthError(message: string, isError = true) {
+  if (!accountFormError) return;
+  accountFormError.textContent = message;
+  accountFormError.hidden = !message;
+  accountFormError.dataset.error = String(isError);
+}
+
+function setMainAuthMode(nextMode: 'signup' | 'login') {
+  mainAuthMode = nextMode;
+  const login = nextMode === 'login';
+  if (loginNameField) loginNameField.hidden = login;
+  if (loginNameInput) loginNameInput.required = !login;
+  if (loginConsentField) loginConsentField.hidden = login;
+  const consent = loginConsentField?.querySelector<HTMLInputElement>('input[name="termsAccepted"]');
+  if (consent) consent.required = !login;
+  if (loginPasswordInput) loginPasswordInput.autocomplete = login ? 'current-password' : 'new-password';
+  if (loginSubmitLabel) loginSubmitLabel.textContent = login ? '登录并打开花园' : '建立账户并收藏';
+  if (accountFormSwitchCopy) accountFormSwitchCopy.textContent = login ? '还没有账户？' : '已有账户？';
+  if (accountFormSwitchLink) {
+    accountFormSwitchLink.textContent = login ? '立即注册' : '直接登录';
+    accountFormSwitchLink.href = login ? '#signup' : '#login';
+  }
+  setMainAuthError('');
+}
+
+async function toggleFavorite() {
   if (!accountState) {
-    openAccountPanel();
+    window.location.href = './signup/?intent=favorite';
     return;
   }
+  if (favoriteActionInFlight) return;
+  favoriteActionInFlight = true;
 
-  const favorite = currentFavorite();
-  if (favorite) {
-    saveFavoriteBouquets(favoriteBouquets.filter((item) => item.id !== favorite.id));
-    return;
+  try {
+    const favorite = currentFavorite();
+    if (favorite) {
+      if (dailyfloraCloudEnabled) {
+        try {
+          await removeCloudFavorite(favorite.id);
+        } catch (error) {
+          showFavoriteFeedback(error instanceof Error ? error.message : '取消收藏失败，请稍后重试。', true);
+          return;
+        }
+      }
+      saveFavoriteBouquets(favoriteBouquets.filter((item) => item.id !== favorite.id));
+      return;
+    }
+
+    const nextFavorite = createFavorite();
+    if (dailyfloraCloudEnabled) {
+      try {
+        await saveCloudFavorite(nextFavorite);
+      } catch (error) {
+        showFavoriteFeedback(error instanceof Error ? error.message : '收藏失败，请稍后重试。', true);
+        return;
+      }
+    }
+    saveFavoriteBouquets([nextFavorite, ...favoriteBouquets.filter((item) => item.id !== currentFavoriteId())]);
+    showFavoriteFeedback(t('index.savedToday'));
+  } finally {
+    favoriteActionInFlight = false;
   }
+}
 
-  saveFavoriteBouquets([createFavorite(), ...favoriteBouquets.filter((item) => item.id !== currentFavoriteId())]);
+function showFavoriteFeedback(message: string, isError = false) {
+  let status = document.querySelector<HTMLElement>('#favorite-action-status');
+  if (!status) {
+    status = document.createElement('p');
+    status.id = 'favorite-action-status';
+    status.className = 'favorite-action-status';
+    status.setAttribute('role', 'status');
+    document.body.append(status);
+  }
+  status.textContent = message;
+  status.dataset.error = String(isError);
+  status.classList.add('is-visible');
+  window.setTimeout(() => status?.classList.remove('is-visible'), 3600);
 }
 
 function renderFavoriteButton() {
@@ -822,6 +948,7 @@ function renderAccountState() {
   if (accountAvatar) accountAvatar.textContent = signedIn ? initials(accountState?.name || '', '花') : '访';
   if (accountPanelTitle) accountPanelTitle.textContent = signedIn ? t('index.accountPanelTitleSigned') : t('index.accountPanelTitleGuest');
   if (loginForm) loginForm.hidden = signedIn;
+  if (accountGuestActions) accountGuestActions.hidden = signedIn;
   if (accountProfile) accountProfile.hidden = !signedIn;
   if (profileAvatar) profileAvatar.textContent = initials(accountState?.name || '', '花');
   if (profileName) profileName.textContent = accountState?.name || 'DailyFlora';
@@ -976,6 +1103,20 @@ function updateInterfaceLanguage(language: Locale) {
   window.dispatchEvent(new CustomEvent('dailyflora:localechange', { detail: { locale: language } }));
 }
 
+function isFullscreenActive() {
+  return desktopNativeFullscreen || Boolean(document.fullscreenElement);
+}
+
+function syncFullscreenUi() {
+  if (!fullscreenButton) return;
+  const active = isFullscreenActive();
+  const label = active ? t('shortcuts.escape') : t('view.fullscreen');
+  fullscreenButton.setAttribute('aria-pressed', String(active));
+  fullscreenButton.dataset.tooltip = label;
+  fullscreenButton.title = label;
+  fullscreenButton.setAttribute('aria-label', label);
+}
+
 function applyStaticCopy() {
   const textBySelector: Array<[string, string]> = [
     ['#site-menu-panel a[href="./"]', 'index.currentBouquet'],
@@ -983,7 +1124,11 @@ function applyStaticCopy() {
     ['#site-menu-panel a[href="./about/"]', 'index.about'],
     ['#site-menu-panel a[href="./bouquet-shop/"]', 'index.objects'],
     ['#site-menu-panel a[href="./downloads/"]', 'index.platforms'],
+    ['#site-menu-panel a[data-auth-entry="login"]', 'common.signInExisting'],
     ['#site-menu-panel .site-menu-primary', 'index.favorite'],
+    ['#account-guest-actions p[data-auth-copy="guest-hint"]', 'common.guestAuthHint'],
+    ['#account-guest-actions a[data-auth-entry="login"]', 'common.signInExisting'],
+    ['#account-guest-actions a[data-auth-entry="signup"]', 'common.createAccount'],
     ['#site-menu-debug-link', 'index.debug'],
     ['#account-open-title', 'index.gardenTitle'],
     ['#account-panel-title', accountState ? 'index.accountPanelTitleSigned' : 'index.accountPanelTitleGuest'],
@@ -1078,6 +1223,7 @@ function applyStaticCopy() {
   document.querySelector<HTMLElement>('.render-control')?.setAttribute('aria-label', t('view.render'));
   if (referenceNoteInput) referenceNoteInput.placeholder = t('index.referencePlaceholder');
   if (loginNameInput) loginNameInput.placeholder = t('index.loginNamePlaceholder');
+  syncFullscreenUi();
 }
 
 function updateUrl(date: string, seed: string) {
@@ -1319,6 +1465,16 @@ function applyRoutePreset(preset: (typeof rotationPresets)[number]) {
   applyRotationSettings(preset.pitch);
 }
 
+function applyRandomRoutePreset() {
+  const preset = rotationPresets[Math.floor(Math.random() * rotationPresets.length)];
+  applyRoutePreset({
+    ...preset,
+    direction: Math.random() > 0.5 ? 1 : -1,
+    speed: THREEClamp(preset.speed * (0.78 + Math.random() * 0.58), minRotationSpeed, maxRotationSpeed)
+  });
+  revealUi();
+}
+
 function randomDateKey() {
   const start = new Date('2026-01-01T00:00:00');
   const end = new Date(`${maxSelectableDate}T00:00:00`);
@@ -1373,9 +1529,36 @@ function scheduleDailyRollover() {
     if (followsToday && spec.dateLabel !== date) {
       rebuild(date, date);
       syncTodayMode(date, date);
+      void applyRemoteDailyContent(date);
     }
     scheduleDailyRollover();
   }, delay);
+}
+
+async function applyRemoteDailyContent(dateKey = params.date) {
+  if (
+    specialReference ||
+    !window.dailyfloraDesktop?.isDesktop ||
+    searchParams.has('date') ||
+    searchParams.has('seed')
+  ) {
+    return;
+  }
+
+  const loaded = await loadDailyContent(dateKey);
+  if (!loaded) return;
+
+  const entry = loaded.entry;
+  if (!searchParams.has('theme') && entry.themeId) selectedTheme = entry.themeId;
+  if (!requestedDensity && entry.density) selectedDensity = entry.density;
+  if (!requestedRender && entry.render) selectedRender = entry.render;
+  quality = resolveQuality(selectedDensity, selectedRender);
+  spec = createDailySpec(entry.date, entry.seed, selectedTheme);
+  scene.rebuild(spec, quality);
+  applyRotationSettings();
+  setLabels();
+  syncControls();
+  document.body.dataset.dailyContentSource = loaded.source;
 }
 
 function createSpecialOverlay() {
@@ -1506,27 +1689,92 @@ accountOpenButton?.addEventListener('click', () => {
 accountCloseButton?.addEventListener('click', closeAccountPanel);
 
 favoriteButton?.addEventListener('click', () => {
-  toggleFavorite();
+  void toggleFavorite();
   revealUi();
 });
 
-loginForm?.addEventListener('submit', (event) => {
+siteMenuFavoriteLink?.addEventListener('click', (event) => {
   event.preventDefault();
+  toggleSiteMenu(false);
+  void toggleFavorite();
+});
+
+loginForm?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  if (!loginForm.checkValidity()) {
+    loginForm.reportValidity();
+    return;
+  }
   const data = new FormData(loginForm);
-  if (data.get('termsAccepted') !== 'on') {
+  if (mainAuthMode === 'signup' && data.get('termsAccepted') !== 'on') {
     loginForm.reportValidity();
     return;
   }
   const name = loginNameInput?.value.trim() || 'DailyFlora 用户';
-  const email = loginEmailInput?.value.trim() || `${name.replace(/\s+/g, '').toLowerCase()}@dailyflora.local`;
-  saveAccountState({ name, email, termsAccepted: true, termsVersion: '0.70', termsAcceptedAt: new Date().toISOString() });
-  if (!currentFavorite()) {
-    saveFavoriteBouquets([createFavorite(), ...favoriteBouquets]);
+  const email = loginEmailInput?.value.trim() || '';
+  const password = loginPasswordInput?.value || '';
+  const hadLocalAccount = Boolean(accountState);
+  const localFavoritesBeforeAuth = [...favoriteBouquets];
+  if (dailyfloraCloudEnabled && password.length < 8) {
+    loginPasswordInput?.setCustomValidity('云端账户密码至少 8 位。');
+    loginPasswordInput?.reportValidity();
+    return;
+  }
+  if (loginPasswordInput) loginPasswordInput.setCustomValidity('');
+  const submitButton = loginForm.querySelector<HTMLButtonElement>('button[type="submit"]');
+  if (submitButton) submitButton.disabled = true;
+  setMainAuthError('');
+  if (dailyfloraCloudEnabled) {
+    try {
+      const account = mainAuthMode === 'login'
+        ? await loginAccount({ email, password })
+        : await registerAccount({ name, email, password, termsVersion: '0.72.0' });
+      saveAccountState(account);
+      favoriteBouquets = await listCloudFavorites();
+      if (!hadLocalAccount && localFavoritesBeforeAuth.length > 0 && window.confirm(`发现本机有 ${localFavoritesBeforeAuth.length} 条未同步收藏，是否合并到 ${account.email}？`)) {
+        const remoteIds = new Set(favoriteBouquets.map((favorite) => favorite.id));
+        for (const favorite of localFavoritesBeforeAuth) {
+          if (!remoteIds.has(favorite.id)) await saveCloudFavorite(favorite);
+        }
+        favoriteBouquets = await listCloudFavorites();
+      }
+      window.localStorage.setItem(favoritesStorageKey, JSON.stringify(favoriteBouquets));
+      renderAccountState();
+      if (!currentFavorite()) {
+        const favorite = createFavorite();
+        await saveCloudFavorite(favorite);
+        saveFavoriteBouquets([favorite, ...favoriteBouquets]);
+      }
+      loginForm.reset();
+      setMainAuthMode('signup');
+      return;
+    } catch (error) {
+      setMainAuthError(error instanceof Error ? error.message : '账户请求失败，请稍后重试。');
+      return;
+    } finally {
+      if (submitButton) submitButton.disabled = false;
+    }
+  }
+  setMainAuthError('0.72 Beta 云端账户服务当前不可用，请稍后重试。');
+  if (submitButton) submitButton.disabled = false;
+});
+
+logoutButton?.addEventListener('click', async () => {
+  try {
+    await logoutAccount();
+  } catch (error) {
+    console.warn('[DailyFlora] logout request failed; clearing local session', error);
+  } finally {
+    saveAccountState(null);
+    favoriteBouquets = [];
+    window.localStorage.removeItem(favoritesStorageKey);
   }
 });
 
-logoutButton?.addEventListener('click', () => {
-  saveAccountState(null);
+accountFormSwitchLink?.addEventListener('click', (event) => {
+  event.preventDefault();
+  setMainAuthMode(mainAuthMode === 'login' ? 'signup' : 'login');
+  loginEmailInput?.focus();
 });
 
 collectionList?.addEventListener('click', (event) => {
@@ -1563,13 +1811,6 @@ referenceGenerateButton?.addEventListener('click', generateFromReference);
 siteMenuToggle?.addEventListener('click', () => {
   toggleSiteMenu();
   revealUi();
-});
-
-siteMenuFavoriteLink?.addEventListener('click', (event) => {
-  if (!accountState) return;
-  event.preventDefault();
-  if (!currentFavorite()) saveFavoriteBouquets([createFavorite(), ...favoriteBouquets]);
-  window.location.href = './member/#saved-title';
 });
 
 document.addEventListener('pointerdown', (event) => {
@@ -1680,13 +1921,17 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && inlineTutorialDialog?.open) {
     event.preventDefault();
     closeInlineTutorial();
+    if (isFullscreenActive()) void exitFullscreen();
     return;
   }
   if (event.key === 'Escape') {
     closeCalendar();
     closeAccountPanel();
     if (clockDisplaySource) hideClock();
-    if (document.fullscreenElement) void document.exitFullscreen();
+    if (isFullscreenActive()) {
+      event.preventDefault();
+      void exitFullscreen();
+    }
   }
   if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
     event.preventDefault();
@@ -1721,6 +1966,11 @@ document.addEventListener('keydown', (event) => {
   if (event.key === '0') {
     event.preventDefault();
     resetView();
+    return;
+  }
+  if (event.key.toLowerCase() === 'p') {
+    event.preventDefault();
+    applyRandomRoutePreset();
     return;
   }
   if (event.code === 'Space') {
@@ -1759,17 +2009,103 @@ shuffleButton?.addEventListener('click', () => {
   syncTodayMode(date, date);
 });
 
+let gestureFullscreenPromptTimer = 0;
+let fullscreenTutorialTimer = 0;
+let fullscreenEntryFeedbackAt = 0;
+
+function dismissGestureFullscreenPrompt() {
+  window.clearTimeout(gestureFullscreenPromptTimer);
+  document.querySelector('#gesture-fullscreen-prompt')?.classList.remove('is-visible');
+  fullscreenButton?.classList.remove('is-gesture-requested');
+}
+
+function showGestureFullscreenPrompt() {
+  revealUi();
+  let prompt = document.querySelector<HTMLElement>('#gesture-fullscreen-prompt');
+  if (!prompt) {
+    prompt = document.createElement('div');
+    prompt.id = 'gesture-fullscreen-prompt';
+    prompt.className = 'gesture-fullscreen-prompt';
+    prompt.setAttribute('role', 'status');
+    prompt.setAttribute('aria-live', 'polite');
+
+    const copy = document.createElement('span');
+    copy.dataset.fullscreenGestureCopy = '';
+    const enter = document.createElement('button');
+    enter.type = 'button';
+    enter.dataset.fullscreenGestureEnter = '';
+    enter.addEventListener('click', () => {
+      void toggleFullscreen().then((changed) => {
+        if (changed) dismissGestureFullscreenPrompt();
+      });
+    });
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'gesture-fullscreen-dismiss';
+    close.dataset.fullscreenGestureDismiss = '';
+    close.textContent = '×';
+    close.addEventListener('click', dismissGestureFullscreenPrompt);
+    prompt.append(copy, enter, close);
+    document.body.append(prompt);
+  }
+  const copy = prompt.querySelector<HTMLElement>('[data-fullscreen-gesture-copy]');
+  const enter = prompt.querySelector<HTMLButtonElement>('[data-fullscreen-gesture-enter]');
+  const close = prompt.querySelector<HTMLButtonElement>('[data-fullscreen-gesture-dismiss]');
+  if (copy) copy.textContent = t('hand.fullscreenGestureReady');
+  if (enter) enter.textContent = t('hand.fullscreenGestureButton');
+  if (close) close.setAttribute('aria-label', t('hand.fullscreenGestureDismiss'));
+  prompt.classList.add('is-visible');
+  fullscreenButton?.classList.add('is-gesture-requested');
+  window.clearTimeout(gestureFullscreenPromptTimer);
+  gestureFullscreenPromptTimer = window.setTimeout(dismissGestureFullscreenPrompt, 8000);
+}
+
+function announceFullscreenEntry() {
+  if (!isFullscreenActive()) return;
+  const now = Date.now();
+  if (now - fullscreenEntryFeedbackAt > 500) {
+    fullscreenEntryFeedbackAt = now;
+    showFavoriteFeedback(t('shortcuts.escape'));
+  }
+  window.clearTimeout(fullscreenTutorialTimer);
+  fullscreenTutorialTimer = window.setTimeout(() => {
+    if (isFullscreenActive()) maybeShowFullscreenTutorial();
+  }, 80);
+}
+
 async function toggleFullscreen() {
   try {
+    const desktopApi = window.dailyfloraDesktop;
+    if (desktopApi?.isDesktop && desktopApi.setFullscreen) {
+      const targetState = !desktopNativeFullscreen;
+      const actualState = await desktopApi.setFullscreen(targetState);
+      desktopNativeFullscreen = actualState;
+      syncFullscreenUi();
+      if (targetState && actualState) announceFullscreenEntry();
+      revealUi();
+      return actualState === targetState;
+    }
     if (!document.fullscreenElement) {
       await document.documentElement.requestFullscreen();
     } else {
       await document.exitFullscreen();
     }
+    revealUi();
+    return true;
   } catch {
-    // Fullscreen can be refused by an embedded or file-based browser context.
+    showFavoriteFeedback(t('hand.fullscreenGestureFailed'), true);
+    revealUi();
+    return false;
   }
-  revealUi();
+}
+
+async function exitFullscreen() {
+  if (desktopNativeFullscreen && window.dailyfloraDesktop?.setFullscreen) {
+    desktopNativeFullscreen = await window.dailyfloraDesktop.setFullscreen(false);
+    syncFullscreenUi();
+    return;
+  }
+  if (document.fullscreenElement) await document.exitFullscreen();
 }
 
 fullscreenButton?.addEventListener('click', () => {
@@ -1777,10 +2113,36 @@ fullscreenButton?.addEventListener('click', () => {
 });
 
 document.addEventListener('fullscreenchange', () => {
+  desktopNativeFullscreen = false;
+  syncFullscreenUi();
+  dismissGestureFullscreenPrompt();
   if (document.fullscreenElement) {
-    maybeShowFullscreenTutorial();
+    announceFullscreenEntry();
   }
 });
+
+const removeDesktopFullscreenListener = window.dailyfloraDesktop?.onFullscreenChange?.((active) => {
+  desktopNativeFullscreen = active;
+  syncFullscreenUi();
+  dismissGestureFullscreenPrompt();
+  if (active) {
+    announceFullscreenEntry();
+  }
+});
+const removeDesktopEscapeListener = window.dailyfloraDesktop?.onEscape?.(() => {
+  // The main process handles the native fullscreen transition. This renderer
+  // callback closes any open overlay at the same time, even when Chromium did
+  // not deliver the original Esc keydown to the page.
+  closeInlineTutorial();
+  closeCalendar();
+  closeAccountPanel();
+  if (clockDisplaySource) hideClock();
+  desktopNativeFullscreen = false;
+  syncFullscreenUi();
+  revealUi();
+});
+window.addEventListener('beforeunload', () => removeDesktopFullscreenListener?.(), { once: true });
+window.addEventListener('beforeunload', () => removeDesktopEscapeListener?.(), { once: true });
 
 zoomInButton?.addEventListener('click', () => {
   zoomBy(-0.28);
@@ -1826,15 +2188,7 @@ rotationDirectionButton?.addEventListener('click', () => {
   revealUi();
 });
 
-rotationPresetButton?.addEventListener('click', () => {
-  const preset = rotationPresets[Math.floor(Math.random() * rotationPresets.length)];
-  applyRoutePreset({
-    ...preset,
-    direction: Math.random() > 0.5 ? 1 : -1,
-    speed: THREEClamp(preset.speed * (0.78 + Math.random() * 0.58), minRotationSpeed, maxRotationSpeed)
-  });
-  revealUi();
-});
+rotationPresetButton?.addEventListener('click', applyRandomRoutePreset);
 
 clockToggleButton?.addEventListener('click', () => {
   idleClock.toggleManual();
@@ -1894,7 +2248,6 @@ async function startHandControl() {
   const { startDailyFloraHandControl } = await import('./dailyFloraHandControl.ts');
   const densityOrder: DensityName[] = ['low', 'medium', 'high'];
   const renderOrder: Array<Exclude<RenderQualityName, 'auto'>> = ['low', 'medium', 'high'];
-  let immersive = false;
   const actions: DailyFloraHandActions = {
     cycleDensity: () => {
       const index = densityOrder.indexOf(selectedDensity);
@@ -1914,9 +2267,9 @@ async function startHandControl() {
       syncPauseButton(!enabled);
       revealUi();
     },
-    toggleImmersive: () => {
-      immersive = !immersive;
-      document.body.classList.toggle('is-hand-control-immersive', immersive);
+    requestFullscreen: () => {
+      if (isFullscreenActive()) void toggleFullscreen();
+      else showGestureFullscreenPrompt();
     },
     moveFramingBy: (deltaX, deltaY) => {
       scene.moveGestureFramingBy(-deltaX, -deltaY);
@@ -1931,7 +2284,7 @@ async function startHandControl() {
   const stop = startDailyFloraHandControl(actions);
   return () => {
     stop();
-    document.body.classList.remove('is-hand-control-immersive');
+    dismissGestureFullscreenPrompt();
   };
 }
 
@@ -1979,6 +2332,7 @@ window.addEventListener('beforeunload', () => stopHandControl?.(), { once: true 
 setLabels();
 if (!specialReference) updateInterfaceLanguage(interfaceLanguage);
 renderAccountState();
+void restoreCloudState();
 setupDebugMode();
 if (specialReference) {
   rotationSpeed = 0.024;
@@ -1996,6 +2350,13 @@ syncClockControls();
 idleClock.start();
 revealUi();
 scene.start();
+void applyRemoteDailyContent();
+startupReady = true;
+startupState?.setAttribute('hidden', '');
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register(new URL('./gesture-cache-worker.js', document.baseURI), { scope: new URL('./', document.baseURI).pathname }).catch(() => undefined);
+}
 
 syncHandControlToggle();
 if (handControlInitiallyEnabled) void enableHandControl();
@@ -2007,7 +2368,7 @@ function isTextInputTarget(target: EventTarget | null) {
 let activeTutorialKind: 'fullscreen' | 'gesture' | 'clock' | null = null;
 
 function syncFullscreenShortcutCopy() {
-  const shortcutKeys = ['fullscreen', 'escape', 'dates', 'arrowZoom', 'zoom', 'random', 'reset', 'rotation', 'interface', 'view', 'help'];
+  const shortcutKeys = ['fullscreen', 'escape', 'dates', 'arrowZoom', 'zoom', 'random', 'reset', 'preset', 'rotation', 'interface', 'view', 'help'];
   document.querySelectorAll<HTMLElement>('[data-shortcut-copy]').forEach((element) => {
     const key = element.dataset.shortcutCopy;
     if (key && shortcutKeys.includes(key)) element.textContent = t(`shortcuts.${key}`);

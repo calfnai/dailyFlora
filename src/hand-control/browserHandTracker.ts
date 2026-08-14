@@ -28,6 +28,131 @@ const distance = (a: NormalizedLandmark, b: NormalizedLandmark) =>
   Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
 const pinchDistanceScale = 1.12;
 
+let recognizerPromise: Promise<GestureRecognizer> | null = null;
+let handAssetManifestPromise: Promise<HandAssetManifest> | null = null;
+
+type HandAssetManifest = {
+  version: number;
+  encoding: 'gzip';
+  assets: Record<string, { bytes: number; chunks: string[] }>;
+};
+
+const wait = (milliseconds: number) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+
+async function fetchHandAsset(url: string, attempt = 0): Promise<Response> {
+  try {
+    const response = await fetch(url, { cache: attempt === 0 ? 'force-cache' : 'reload' });
+    if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+    return response;
+  } catch (error) {
+    if (attempt >= 2) throw error;
+    await wait(500 * (attempt + 1));
+    return fetchHandAsset(url, attempt + 1);
+  }
+}
+
+async function loadHandAssetManifest(baseURI: string) {
+  if (!handAssetManifestPromise) {
+    const url = new URL('hand-assets.json', baseURI).toString();
+    handAssetManifestPromise = fetchHandAsset(url)
+      .then((response) => response.json() as Promise<HandAssetManifest>)
+      .catch((error) => {
+        handAssetManifestPromise = null;
+        throw error;
+      });
+  }
+  return handAssetManifestPromise;
+}
+
+async function decompressGzip(response: Response) {
+  if (!response.body || typeof DecompressionStream === 'undefined') {
+    throw new Error('This browser cannot unpack the local hand-control assets.');
+  }
+  const stream = response.body.pipeThrough(new DecompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+export async function loadPackedHandAsset(relativePath: string, baseURI = document.baseURI) {
+  const manifest = await loadHandAssetManifest(baseURI);
+  const entry = manifest.assets[relativePath];
+  if (!entry?.chunks.length) throw new Error(`Packed hand-control asset is missing: ${relativePath}`);
+  const chunks = await Promise.all(entry.chunks.map(async (chunkPath) => {
+    const response = await fetchHandAsset(new URL(chunkPath, baseURI).toString());
+    return decompressGzip(response);
+  }));
+  const output = new Uint8Array(entry.bytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    output.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  if (offset !== entry.bytes) throw new Error(`Packed hand-control asset is incomplete: ${relativePath}`);
+  return output;
+}
+
+export function resolveHandAssetUrls(baseURI = document.baseURI) {
+  return {
+    // FilesetResolver appends `/vision_wasm_…` itself. A trailing slash here
+    // would therefore produce `/wasm//vision_wasm_…`, which UniCloud rejects.
+    wasmPath: new URL('mediapipe/wasm', baseURI).toString().replace(/\/$/, ''),
+    modelPath: new URL('models/gesture_recognizer.task', baseURI).toString()
+  };
+}
+
+async function createRecognizer() {
+  const { wasmPath, modelPath } = resolveHandAssetUrls();
+  const { FilesetResolver, GestureRecognizer } = await import('@mediapipe/tasks-vision');
+  const vision = await FilesetResolver.forVisionTasks(wasmPath);
+  let modelBuffer: Uint8Array | null = null;
+  let wasmObjectUrl = '';
+  try {
+    const wasmFileName = new URL(vision.wasmBinaryPath, document.baseURI).pathname.split('/').pop();
+    if (!wasmFileName) throw new Error('MediaPipe did not provide a WASM filename.');
+    const [packedModel, packedWasm] = await Promise.all([
+      loadPackedHandAsset('models/gesture_recognizer.task'),
+      loadPackedHandAsset(`mediapipe/wasm/${wasmFileName}`)
+    ]);
+    modelBuffer = packedModel;
+    wasmObjectUrl = URL.createObjectURL(new Blob([packedWasm], { type: 'application/wasm' }));
+    vision.wasmBinaryPath = wasmObjectUrl;
+  } catch (error) {
+    console.warn('[DailyFlora][hand-control] Packed same-origin assets unavailable; using raw same-origin files.', error);
+  }
+  const common = {
+    runningMode: 'VIDEO' as const,
+    numHands: 2,
+    minHandDetectionConfidence: 0.6,
+    minHandPresenceConfidence: 0.6,
+    minTrackingConfidence: 0.6
+  };
+  const options = (delegate: 'GPU' | 'CPU') => ({
+    ...common,
+    baseOptions: modelBuffer
+      ? { modelAssetBuffer: modelBuffer, delegate }
+      : { modelAssetPath: modelPath, delegate }
+  });
+  try {
+    try {
+      return await GestureRecognizer.createFromOptions(vision, options('GPU'));
+    } catch (error) {
+      console.warn('[DailyFlora][hand-control] GPU recognizer unavailable; retrying with CPU.', error);
+      return await GestureRecognizer.createFromOptions(vision, options('CPU'));
+    }
+  } finally {
+    if (wasmObjectUrl) URL.revokeObjectURL(wasmObjectUrl);
+  }
+}
+
+export function preloadHandRecognizer() {
+  if (!recognizerPromise) {
+    recognizerPromise = createRecognizer().catch((error) => {
+      recognizerPromise = null;
+      throw error;
+    });
+  }
+  return recognizerPromise;
+}
+
 export function resolvePhysicalHand(categoryName: string | undefined, swapHandedness = true): HandName {
   const reported: HandName = categoryName?.toLowerCase() === 'left' ? 'left' : 'right';
   if (!swapHandedness) return reported;
@@ -221,41 +346,26 @@ export class BrowserHandTracker {
 
   private async loadRecognizer() {
     if (this.recognizer) return this.recognizer;
-    const wasmPath = new URL('mediapipe/wasm/', document.baseURI).toString();
-    const modelPath = new URL('models/gesture_recognizer.task', document.baseURI).toString();
-    const { FilesetResolver, GestureRecognizer } = await import('@mediapipe/tasks-vision');
-    const vision = await FilesetResolver.forVisionTasks(wasmPath);
-    const common = {
-      runningMode: 'VIDEO' as const,
-      numHands: 2,
-      minHandDetectionConfidence: 0.6,
-      minHandPresenceConfidence: 0.6,
-      minTrackingConfidence: 0.6
-    };
-    try {
-      this.recognizer = await GestureRecognizer.createFromOptions(vision, {
-        ...common,
-        baseOptions: { modelAssetPath: modelPath, delegate: 'GPU' }
-      });
-    } catch {
-      this.recognizer = await GestureRecognizer.createFromOptions(vision, {
-        ...common,
-        baseOptions: { modelAssetPath: modelPath, delegate: 'CPU' }
-      });
-    }
+    this.recognizer = await preloadHandRecognizer();
     return this.recognizer;
   }
 
   async start() {
     this.stop(false);
     const generation = this.generation;
+    let pendingStream: MediaStream | null = null;
+    let startupStage: 'camera' | 'model' | 'video' = 'camera';
     try {
       if (!navigator.mediaDevices?.getUserMedia) throw new Error('当前浏览器不支持摄像头访问');
-      this.options.onStatus('loading', '正在按需加载手部识别模型…');
-      const recognizer = await this.loadRecognizer();
-      if (generation !== this.generation) return;
-      this.options.onStatus('requesting-camera', '请允许网页使用摄像头');
-      const stream = await navigator.mediaDevices.getUserMedia({
+      // Start camera permission and model loading together. This keeps the
+      // permission prompt tied to the user's click and hides model latency.
+      const recognizerPromise = this.loadRecognizer();
+      // If camera permission fails first, the parallel model request may still
+      // reject later. Attach a handler now so it never becomes an unhandled
+      // rejection; the original promise is still awaited when camera succeeds.
+      void recognizerPromise.catch(() => undefined);
+      this.options.onStatus('requesting-camera', '请允许网页使用摄像头；手势模型正在同时加载…');
+      pendingStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'user',
           width: { ideal: 640 },
@@ -264,13 +374,18 @@ export class BrowserHandTracker {
         },
         audio: false
       });
+      this.stream = pendingStream;
+      pendingStream = null;
+      this.options.video.srcObject = this.stream;
+      startupStage = 'video';
+      await this.options.video.play();
       if (generation !== this.generation) {
-        stream.getTracks().forEach((track) => track.stop());
         return;
       }
-      this.stream = stream;
-      this.options.video.srcObject = this.stream;
-      await this.options.video.play();
+      startupStage = 'model';
+      this.options.onStatus('loading', '摄像头已开启，正在加载同域手势模型；首次使用可能需要一点时间…');
+      const recognizer = await recognizerPromise;
+      if (generation !== this.generation) return;
       const now = performance.now();
       this.previousTimestamp = now;
       this.fpsWindow = { started: now, frames: 0, value: 0 };
@@ -345,8 +460,28 @@ export class BrowserHandTracker {
       };
       this.requestId = requestAnimationFrame(process);
     } catch (error) {
+      pendingStream?.getTracks().forEach((track) => track.stop());
+      const errorName = error instanceof DOMException ? error.name : error instanceof Error ? error.name : 'UnknownError';
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[DailyFlora][hand-control] startup failed', {
+        stage: startupStage,
+        name: errorName,
+        message: errorMessage,
+        assets: resolveHandAssetUrls()
+      });
       this.stop(false);
-      this.options.onStatus('error', error instanceof Error ? error.message : '无法启动摄像头');
+      const message = startupStage === 'model'
+        ? `手势识别模型加载失败，请刷新后重试（${errorMessage}）`
+        : errorName === 'NotAllowedError'
+          ? '摄像头权限被拒绝，请在地址栏的网站权限中允许摄像头后重试'
+          : errorName === 'NotFoundError'
+            ? '没有检测到可用摄像头'
+            : errorName === 'NotReadableError'
+              ? '摄像头可能正被其他程序占用，请关闭其他摄像头应用后重试'
+              : startupStage === 'video'
+                ? `摄像头画面无法播放（${errorMessage}）`
+                : `摄像头启动失败（${errorMessage}）`;
+      this.options.onStatus(startupStage === 'model' ? 'model-error' : 'error', message);
     }
   }
 
