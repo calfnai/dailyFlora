@@ -1,9 +1,12 @@
 .admin-shell { padding-top: 42px; padding-bottom: 80px; }
 .admin-header { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; margin-bottom: 24px; }
+.admin-header-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+.admin-identity { color: var(--muted, rgb(247 240 227 / 68%)); font-size: 12px; }
 .admin-header h1 { margin: 6px 0 10px; font-size: clamp(34px, 6vw, 68px); letter-spacing: -.06em; }
 .admin-header p { max-width: 720px; color: var(--muted, rgb(247 240 227 / 68%)); }
 .admin-header code { color: var(--gold, #f2cb62); }
 .admin-state { margin-bottom: 16px; }
+.admin-runtime { margin-bottom: 16px; color: var(--muted, rgb(247 240 227 / 68%)); }
 .admin-metrics { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
 .admin-metric { padding: 15px; border: 1px solid rgb(247 240 227 / 14%); border-radius: 10px; background: rgb(17 22 15 / 77%); }
 .admin-metric strong { display: block; margin-top: 6px; font-size: 27px; }

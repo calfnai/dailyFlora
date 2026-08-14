@@ -95,6 +95,9 @@ type CloudResponse<T> = {
   points?: PointEntry[];
   snapshot?: AccountSnapshot;
   summary?: Record<string, unknown>;
+  service?: string;
+  version?: string;
+  isolated?: boolean;
   users?: Array<CloudAccount & { balance?: number }>;
   reference?: Record<string, unknown>;
   batch?: T;
@@ -297,6 +300,11 @@ export async function resetPassword(input: { token: string; password: string }) 
 export async function getAdminSummary() {
   const result = await cloudRequest<Record<string, unknown>>('adminSummary');
   return result.summary || {};
+}
+
+export async function getCloudHealth() {
+  const result = await cloudRequest<never>('health');
+  return { service: result.service || 'dailyflora-api-beta', version: result.version || 'unknown', isolated: result.isolated !== false };
 }
 
 export async function listAdminUsers() {

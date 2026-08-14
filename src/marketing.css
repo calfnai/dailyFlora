@@ -805,6 +805,56 @@ h1, h2, h3, p { margin: 0; }
   text-underline-offset: 4px;
 }
 
+.desktop-download-sources {
+  display: grid;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.download-source-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.desktop-download-source {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(255,255,255,.018);
+}
+
+.desktop-download-source.is-primary {
+  border-color: rgba(211, 178, 91, .42);
+  background: rgba(211, 178, 91, .055);
+}
+
+.desktop-download-source-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.desktop-download-source h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.desktop-download-source p {
+  margin: 0;
+}
+
+.desktop-download-source .state-pill {
+  white-space: nowrap;
+}
+
 .desktop-download-details {
   background: rgba(8, 17, 12, .78);
 }

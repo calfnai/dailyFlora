@@ -1,10 +1,12 @@
 import {
   createWorkerBatch,
   getAdminReference,
+  getCloudHealth,
   getAdminSummary,
   grantPoints,
   listAdminTasks,
   listAdminUsers,
+  logoutAccount,
   restoreAccount,
   workerBridgeUrl,
   type CloudAccount,
@@ -19,6 +21,10 @@ const users = document.querySelector<HTMLTableSectionElement>('#admin-users');
 const tasks = document.querySelector<HTMLElement>('#admin-tasks');
 const filter = document.querySelector<HTMLSelectElement>('#admin-task-filter');
 const workerState = document.querySelector<HTMLElement>('#admin-worker-state');
+const runtime = document.querySelector<HTMLElement>('#admin-runtime');
+const identity = document.querySelector<HTMLElement>('#admin-identity');
+
+let loadSequence = 0;
 
 function escapeHtml(value: unknown) {
   return String(value ?? '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character] || character);
@@ -59,20 +65,37 @@ function renderTasks(items: CloudTask[]) {
 }
 
 async function load() {
-  const account = await restoreAccount();
-  if (!account) { showState('请先登录 Beta 账户，再访问后台。', true); return; }
+  const sequence = ++loadSequence;
   try {
-    const [summary, adminUsers, adminTasks] = await Promise.all([getAdminSummary(), listAdminUsers(), listAdminTasks(filter?.value || '')]);
+    const account = await restoreAccount();
+    if (!account) { showState('请先登录 Beta 账户，再访问后台。', true); if (content) content.hidden = true; return; }
+    if (identity) identity.textContent = `${account.name} · ${account.email}`;
+    const [health, summary, adminUsers, adminTasks] = await Promise.all([getCloudHealth(), getAdminSummary(), listAdminUsers(), listAdminTasks(filter?.value || '')]);
+    if (sequence !== loadSequence) return;
+    if (runtime) runtime.textContent = `${health.service} · ${health.version} · ${health.isolated ? 'Beta 数据隔离已开启' : '请检查数据隔离配置'}`;
     renderMetrics(summary); renderUsers(adminUsers); renderTasks(adminTasks);
     if (content) content.hidden = false;
     showState(`已验证 0.72 Beta 后台账户：${account.email}`);
   } catch (error) {
+    if (runtime) runtime.textContent = 'Beta API 状态读取失败。';
     showState(error instanceof Error ? error.message : '后台暂时不可用。', true);
   }
 }
 
 document.querySelector<HTMLButtonElement>('#admin-refresh')?.addEventListener('click', () => void load());
 filter?.addEventListener('change', () => void load());
+
+document.querySelector<HTMLButtonElement>('#admin-logout')?.addEventListener('click', async (event) => {
+  const button = event.currentTarget as HTMLButtonElement;
+  button.disabled = true;
+  try {
+    await logoutAccount();
+    window.location.href = '../login/';
+  } catch {
+    button.disabled = false;
+    showState('退出失败，请稍后重试。', true);
+  }
+});
 
 users?.addEventListener('click', async (event) => {
   const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-grant-user]') : null;
@@ -103,8 +126,12 @@ tasks?.addEventListener('click', async (event) => {
 document.querySelector<HTMLButtonElement>('#admin-process-queue')?.addEventListener('click', async (event) => {
   const button = event.currentTarget as HTMLButtonElement;
   button.disabled = true;
-  if (workerState) workerState.textContent = '正在签发短期批次凭证…';
+  if (workerState) workerState.textContent = '正在检查本机桥接器…';
   try {
+    const healthResponse = await fetch(`${workerBridgeUrl.replace(/\/$/, '')}/health`, { credentials: 'omit' });
+    const healthResult = await healthResponse.json().catch(() => ({}));
+    if (!healthResponse.ok || !healthResult.ok) throw new Error('本机桥接器未启动');
+    if (workerState) workerState.textContent = '本机桥接器已连接，正在签发短期批次凭证…';
     const batch = await createWorkerBatch();
     if (!batch.taskCount) { if (workerState) workerState.textContent = '当前没有 queued 任务。'; return; }
     if (workerState) workerState.textContent = `已签发 ${batch.taskCount} 个任务，正在交给本机桥接器…`;

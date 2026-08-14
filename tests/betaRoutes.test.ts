@@ -21,6 +21,23 @@ test('formal auth and public bouquet routes exist, obsolete member-test is exclu
   assert.doesNotMatch(read('scripts/deploy-source-files.json'), /member-test/);
 });
 
+test('downloads page offers OneDrive and Feishu sources for both Windows packages', () => {
+  const html = read('downloads/index.html');
+  assert.match(html, /1drv\.ms\/u\/c\/0302618EAAA684CD\/IQA3PxAQ3wVUQKSkqA-H_6AU/);
+  assert.match(html, /1drv\.ms\/u\/c\/0302618EAAA684CD\/IQBOo5dJbDrwSaADCUG23v8SATrHCdFH7Fo6wFDKVfWWgVM/);
+  assert.match(html, /kmfon4jqb9\.feishu\.cn\/file\/JjjZbjN3Fowrk3xYK99c1R9vnJg/);
+  assert.match(html, /kmfon4jqb9\.feishu\.cn\/file\/FFVvbasvroozd1xsevHcrvKknLe/);
+  assert.match(html, /windowsSourceTitle/);
+});
+
+test('admin checks the local worker before issuing a processing batch', () => {
+  const admin = read('src/admin.ts');
+  assert.match(admin, /workerBridgeUrl.*\/health/);
+  assert.match(admin, /createWorkerBatch\(\)/);
+  assert.ok(admin.indexOf('/health') < admin.indexOf('createWorkerBatch()'));
+  assert.match(admin, /id="admin-logout"|#admin-logout/);
+});
+
 test('runtime configuration cannot fall back to production API', () => {
   const config = read('public/dailyflora-config.js');
   const main = read('src/main.ts');
