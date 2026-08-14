@@ -72,6 +72,7 @@
   "scripts/ingest-lobster-inbox.mjs",
   "scripts/ingest-owner-links.mjs",
   "scripts/lobster-xhs-plan.mjs",
+  "scripts/prepare-hand-assets.mjs",
   "scripts/prepare-sites-build.mjs",
   "scripts/vercel-ignore-build.mjs",
   "sites/worker.js",
