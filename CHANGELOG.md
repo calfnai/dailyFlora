@@ -2,6 +2,15 @@
 
 > 自 `0.14.10` 起，新增版本记录使用中英文双语。 / Starting with `0.14.10`, all new release notes are written in both Chinese and English.
 
+## 0.72.0 - 2026-08-14 (GitHub Pages formal release)
+
+正式网页发布线切换到 GitHub Pages，并保留 0.72 专用的 UniCloud 隔离账户库。/ The formal web release moves to GitHub Pages while retaining the isolated UniCloud account store for 0.72.
+
+- 首页、注册、登录、个人花园与营销页面统一导航顺序和相对路径，避免从嵌套路由跳到错误的 `/downloads/*` 子路径。
+- 注册与登录表单接入七语言文案；账户请求继续走已验证的 HTTPS `dailyflora-api-beta` URL，避免读取 0.71 的正式账户集合。
+- GitHub Pages 已启用 HTTPS 强制跳转；本地 `127.0.0.1` worker 仍是仅限管理员本机的内部桥接，不是正式站入口。
+- 启动阶段增加可见失败提示，WebGL 正常完成后自动隐藏；版本标识由构建生成的 `/version.json` 提供。
+
 ## 0.71.1 - 2026-08-03 (uniCloud preparation)
 
 新增阿里云 uniCloud 账户、会话与用户私有收藏后端，并为前端保留未登录本地体验与云端登录后的收藏同步。/ Added the Alibaba Cloud uniCloud account, session, and private-favorites backend while preserving the local guest experience and cloud favorite sync after login.

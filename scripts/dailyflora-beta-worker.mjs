@@ -110,6 +110,11 @@ function corsHeaders(origin) {
 const server = createServer(async (request, response) => {
   const headers = corsHeaders(request.headers.origin || '');
   if (request.method === 'OPTIONS') { response.writeHead(204, headers); response.end(); return; }
+  if (request.method === 'GET' && request.url === '/') {
+    response.writeHead(200, headers);
+    response.end(JSON.stringify({ ok: true, service: 'DailyFlora 0.72 Beta worker', version: '0.72-beta.6', health: '/health', process: 'POST /process' }));
+    return;
+  }
   if (request.method === 'GET' && request.url === '/health') {
     response.writeHead(200, headers);
     response.end(JSON.stringify({ ok: true, version: '0.72-beta.6', queueRoot: root }));

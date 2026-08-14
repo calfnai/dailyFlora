@@ -36,12 +36,35 @@ const pagePath: Record<string, string> = {
 };
 
 function makeRelativePrefix() {
-  const depth = Math.max(0, window.location.pathname.split('/').filter(Boolean).length - 1);
+  const route = document.body.dataset.authMode || pagePath[page] || page;
+  const depth = route.split('/').filter(Boolean).length;
   return depth === 0 ? './' : '../'.repeat(depth);
 }
 
 function makeRootRelativePrefix() {
-  return '../'.repeat(window.location.pathname.split('/').filter(Boolean).length);
+  return makeRelativePrefix();
+}
+
+function ensureProductNav() {
+  const prefix = makeRelativePrefix();
+  const currentPage = document.body.dataset.authMode ? '' : document.body.dataset.page || '';
+  const items = [
+    { path: '', key: 'common.today', page: 'home' },
+    { path: 'member/', key: 'common.member', page: 'member' },
+    { path: 'about/', key: 'common.about', page: 'about' },
+    { path: 'bouquet-shop/', key: 'common.objects', page: 'objects' },
+    { path: 'downloads/', key: 'common.platforms', page: 'platforms' },
+    { path: 'scifi/', key: 'common.scifi', page: 'scifi' }
+  ];
+
+  document.querySelectorAll<HTMLElement>('.site-nav').forEach((nav) => {
+    nav.innerHTML = [
+      ...items.map(({ path, key, page }) => `<a href="${prefix}${path}"${currentPage === page ? ' aria-current="page"' : ''} data-i18n="${key}">${key}</a>`),
+      `<a href="${prefix}login/" data-auth-entry="login" data-i18n="common.signInExisting">common.signInExisting</a>`,
+      `<a class="nav-cta" href="${prefix}signup/" data-auth-entry="signup" data-i18n="common.createAccount">common.createAccount</a>`
+    ].join('');
+    nav.setAttribute('aria-label', getTranslation(currentLocale, 'common.siteNavigation') || 'Site navigation');
+  });
 }
 
 function ensureLanguageSwitcher() {
@@ -183,6 +206,7 @@ document.querySelectorAll<HTMLAnchorElement>('[data-link-root]').forEach((link) 
 const pathLocale = normalizeLocale(window.location.pathname.split('/').filter(Boolean)[0]);
 if (pathLocale) currentLocale = pathLocale;
 
+ensureProductNav();
 ensureLanguageSwitcher();
 markDevLinksHidden();
 ensureTutorialFooterLink();
