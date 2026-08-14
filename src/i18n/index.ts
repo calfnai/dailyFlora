@@ -270,7 +270,7 @@ export const translations: Record<Locale, TranslationTree> = {
     platforms: {
       eyebrow: 'DailyFlora across screens',
       title: 'Let the flower stay on the screen you use most.',
-      lead: 'The web version works now, and the Windows desktop beta is ready for testing.',
+      lead: 'The web version works now, and the Windows desktop beta build is prepared. A public download link is being verified.',
       primary: 'Download Windows beta',
       secondary: 'Open web version',
       sectionEyebrow: 'Platform roadmap',
@@ -300,8 +300,9 @@ export const translations: Record<Locale, TranslationTree> = {
       windowsExitLabel: 'Exit fullscreen',
       windowsExit: 'Press Esc; the app returns to the tray',
       windowsNote: 'This is a beta desktop display, not a registered Windows .scr screensaver. Windows may show an unsigned-app warning; verify the installer with SHA-256 before opening it.',
-      windowsCardBody: 'The tray-resident desktop beta is available above. It reads the daily bouquet online and keeps heavy runtime assets local.',
-      windowsOpen: 'View download',
+      windowsCardBody: 'The tray-resident desktop beta is built. It reads the daily bouquet online and keeps heavy runtime assets local; public download access is still being verified.',
+      windowsOpen: 'View availability',
+      windowsDownloadPending: 'The Windows package is prepared, but the current Feishu file links are not publicly reachable yet. Enable link sharing before publishing a download button here.',
       toast: 'Saved on this device. No install or subscription was triggered.',
       footer: 'DailyFlora across screens.'
     },
@@ -578,7 +579,7 @@ export const translations: Record<Locale, TranslationTree> = {
     platforms: {
       eyebrow: 'DailyFlora across screens',
       title: '让花停留在你最常用的屏幕上。',
-      lead: '当前 Web 版可用，Windows 桌面 Beta 也已经开放测试。',
+      lead: '当前 Web 版可用，Windows 桌面 Beta 已经构建完成；公开下载链接正在核对。',
       primary: '下载 Windows Beta',
       secondary: '打开 Web 版',
       sectionEyebrow: 'Platform roadmap',
@@ -608,8 +609,9 @@ export const translations: Record<Locale, TranslationTree> = {
       windowsExitLabel: '退出全屏',
       windowsExit: '按 Esc；程序会回到系统托盘',
       windowsNote: '这是 Beta 桌面展示程序，不是注册到 Windows 的 .scr 屏保。Windows 可能提示程序尚未签名；打开前请用 SHA-256 校验安装包。',
-      windowsCardBody: '上方提供系统托盘驻留桌面 Beta。它在线读取每日花束，并把体积较大的运行资源保存在本机。',
-      windowsOpen: '查看下载',
+      windowsCardBody: '系统托盘驻留桌面 Beta 已经构建完成。它在线读取每日花束，并把体积较大的运行资源保存在本机；公开下载权限仍在核对。',
+      windowsOpen: '查看可用状态',
+      windowsDownloadPending: 'Windows 安装包已经准备好，但当前飞书文件链接从公开网络无法访问。请先开启“获得链接的人可查看/下载”，再把下载按钮发布到这里。',
       toast: '已在本机记下关注。正式下载开放前，这里不会触发安装或订阅。',
       footer: 'DailyFlora，多屏绽放。'
     },
