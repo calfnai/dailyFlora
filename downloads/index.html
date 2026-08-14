@@ -6,12 +6,12 @@
     <meta name="description" content="DailyFlora platform status across web, desktop, mobile, and ambient screens." />
     <title>DailyFlora Platforms</title>
     <script type="module" crossorigin src="../assets/modulepreload-polyfill-B5Qt9EMX.js"></script>
-    <script type="module" crossorigin src="../assets/index-ptaHYtFy.js"></script>
-    <script type="module" crossorigin src="../assets/dailyfloraCloud-9r3IxdA1.js"></script>
-    <script type="module" crossorigin src="../assets/accountHeader-CJ3VrkbS.js"></script>
-    <script type="module" crossorigin src="../assets/staticI18n-DiY0Oomk.js"></script>
-    <link rel="stylesheet" crossorigin href="../assets/marketing-BpqqjLms.css">
-    <meta name="dailyflora-release" content="DF-20260814-1659-94e44a52">
+    <script type="module" crossorigin src="../assets/index-Bg-FqJiQ.js"></script>
+    <script type="module" crossorigin src="../assets/dailyfloraCloud-DRcOVg2w.js"></script>
+    <script type="module" crossorigin src="../assets/accountHeader-CgO5qBiv.js"></script>
+    <script type="module" crossorigin src="../assets/staticI18n-Cj4VY99b.js"></script>
+    <link rel="stylesheet" crossorigin href="../assets/marketing-BMAbPgF8.css">
+    <meta name="dailyflora-release" content="DF-20260815-0325-eb75684e">
   </head>
   <body data-page="platforms">
     <div class="page-shell product-shell downloads-shell">
@@ -41,11 +41,26 @@
               <span class="state-pill warm" data-i18n="platforms.windowsStatus">0.72 Beta · x64</span>
               <h3 data-i18n="platforms.windowsCardTitle">DailyFlora for Windows</h3>
               <p data-i18n="platforms.windowsBody">The installer keeps the flower engine, Three.js, MediaPipe files, and hand model local. When the window closes, DailyFlora stays in the Windows system tray instead of quitting.</p>
-              <div class="button-row desktop-download-actions">
-                <a class="button primary" href="https://1drv.ms/u/c/0302618EAAA684CD/IQA3PxAQ3wVUQKSkqA-H_6AUAbbdRWsem6yRLT0MRV31HOk?e=Pu1P7I" target="_blank" rel="noopener" data-i18n="platforms.windowsInstaller">Download installer</a>
-                <a class="button" href="https://1drv.ms/u/c/0302618EAAA684CD/IQBOo5dJbDrwSaADCUG23v8SATrHCdFH7Fo6wFDKVfWWgVM?e=clUZuo" target="_blank" rel="noopener" data-i18n="platforms.windowsPortable">Download portable</a>
+              <div class="desktop-download-sources" role="group" aria-labelledby="windows-download-source-title">
+                <p class="download-source-title" id="windows-download-source-title" data-i18n="platforms.windowsSourceTitle">Choose a download source</p>
+                <section class="desktop-download-source is-primary">
+                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.windowsOneDriveTitle">OneDrive</h4><span class="state-pill" data-i18n="platforms.windowsRecommended">Recommended</span></div>
+                  <p data-i18n="platforms.windowsOneDriveBody">Use OneDrive first if it opens normally on your device.</p>
+                  <div class="button-row desktop-download-actions">
+                    <a class="button primary" href="https://1drv.ms/u/c/0302618EAAA684CD/IQA3PxAQ3wVUQKSkqA-H_6AUAbbdRWsem6yRLT0MRV31HOk?e=Pu1P7I" target="_blank" rel="noopener" data-i18n="platforms.windowsInstaller">Download installer</a>
+                    <a class="button" href="https://1drv.ms/u/c/0302618EAAA684CD/IQBOo5dJbDrwSaADCUG23v8SATrHCdFH7Fo6wFDKVfWWgVM?e=clUZuo" target="_blank" rel="noopener" data-i18n="platforms.windowsPortable">Download portable</a>
+                  </div>
+                </section>
+                <section class="desktop-download-source">
+                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.windowsFeishuTitle">Feishu backup</h4><span class="state-pill quiet" data-i18n="platforms.windowsFallback">Backup</span></div>
+                  <p data-i18n="platforms.windowsFeishuBody">If OneDrive cannot be opened, use these Feishu links instead.</p>
+                  <div class="button-row desktop-download-actions">
+                    <a class="button" href="https://kmfon4jqb9.feishu.cn/file/JjjZbjN3Fowrk3xYK99c1R9vnJg?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.windowsInstaller">Download installer</a>
+                    <a class="button" href="https://kmfon4jqb9.feishu.cn/file/FFVvbasvroozd1xsevHcrvKknLe?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.windowsPortable">Download portable</a>
+                  </div>
+                </section>
               </div>
-              <p class="download-note" data-i18n="platforms.windowsDownloadHost">Files are shared through OneDrive. If Windows displays a SmartScreen warning, verify the SHA-256 value before opening the package.</p>
+              <p class="download-note" data-i18n="platforms.windowsDownloadHost">Choose OneDrive first. If it does not open, use the Feishu backup links. Verify SHA-256 before opening the package.</p>
             </div>
             <div class="desktop-download-details">
               <dl>
