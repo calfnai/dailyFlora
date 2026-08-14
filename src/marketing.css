@@ -762,6 +762,77 @@ h1, h2, h3, p { margin: 0; }
 
 .platform-card { min-height: 280px; align-content: start; }
 
+.desktop-download-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(280px, .88fr);
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--line);
+}
+
+.desktop-download-copy,
+.desktop-download-details {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: clamp(20px, 4vw, 42px);
+  background: rgba(255,255,255,.032);
+}
+
+.desktop-download-copy h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(30px, 4vw, 52px);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.desktop-download-copy p,
+.desktop-download-details p {
+  max-width: 62ch;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.desktop-download-actions { align-items: center; }
+.desktop-download-actions .text-link {
+  margin-left: 4px;
+  color: var(--leaf);
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.desktop-download-details {
+  background: rgba(8, 17, 12, .78);
+}
+
+.desktop-download-details dl {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.desktop-download-details dl div {
+  display: grid;
+  grid-template-columns: minmax(100px, .72fr) minmax(0, 1.28fr);
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.desktop-download-details dt {
+  color: var(--quiet);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.desktop-download-details dd { margin: 0; color: var(--ink); line-height: 1.5; }
+.download-note { margin: 0; font-size: 13px; }
+
 .garden-app { display: grid; gap: 72px; }
 .garden-hero { margin-bottom: 0; }
 
@@ -1130,7 +1201,7 @@ h1, h2, h3, p { margin: 0; }
     padding-bottom: 4px;
   }
   .about-hero, .signup-intro, .manifesto-grid, .benefits-head, .legal-grid { grid-template-columns: 1fr; }
-  .product-hero, .garden-grid, .member-workbench { grid-template-columns: 1fr; }
+  .product-hero, .garden-grid, .member-workbench, .desktop-download-card { grid-template-columns: 1fr; }
   .object-grid, .platform-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .product-section-head, .garden-hero { display: grid; align-items: start; }
   .about-hero { padding-top: 40px; }
@@ -1161,6 +1232,7 @@ h1, h2, h3, p { margin: 0; }
   .object-showpiece, .device-showpiece { min-height: 360px; }
   .member-flower-preview { min-height: 360px; }
   .member-workbench .form-grid { grid-template-columns: 1fr; }
+  .desktop-download-details dl div { grid-template-columns: 1fr; gap: 5px; }
   .steps { grid-template-columns: 1fr; }
   .step, .step + .step { padding: 25px 0; border-right: 0; border-bottom: 1px solid var(--line); }
   .step:last-child { border-bottom: 0; }

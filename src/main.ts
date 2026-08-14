@@ -7,6 +7,7 @@ import { resolveQuality } from './quality';
 import { BouquetScene } from './bouquetScene';
 import { createSpecialSpec, readSpecialId, specialPathname, specialReferences, withBasePath } from './special';
 import { themes } from './themes';
+import { loadDailyContent } from './dailyContent';
 import { IdleClockController, normalizeClockInterval, type ClockDisplaySource, type IdleClockSettings } from './idleClock';
 import type { DailyFloraHandActions } from './dailyFloraHandControl';
 import {
@@ -400,6 +401,7 @@ let specialAudio: HTMLAudioElement | null = null;
 let specialAudioMuted = false;
 let debugTimer = 0;
 let dateRolloverTimer = 0;
+let desktopNativeFullscreen = false;
 let calendarView = parseDateKey(spec.dateLabel);
 let accountState = readAccountState();
 let favoriteBouquets = readFavoriteBouquets();
@@ -1101,6 +1103,20 @@ function updateInterfaceLanguage(language: Locale) {
   window.dispatchEvent(new CustomEvent('dailyflora:localechange', { detail: { locale: language } }));
 }
 
+function isFullscreenActive() {
+  return desktopNativeFullscreen || Boolean(document.fullscreenElement);
+}
+
+function syncFullscreenUi() {
+  if (!fullscreenButton) return;
+  const active = isFullscreenActive();
+  const label = active ? t('shortcuts.escape') : t('view.fullscreen');
+  fullscreenButton.setAttribute('aria-pressed', String(active));
+  fullscreenButton.dataset.tooltip = label;
+  fullscreenButton.title = label;
+  fullscreenButton.setAttribute('aria-label', label);
+}
+
 function applyStaticCopy() {
   const textBySelector: Array<[string, string]> = [
     ['#site-menu-panel a[href="./"]', 'index.currentBouquet'],
@@ -1207,6 +1223,7 @@ function applyStaticCopy() {
   document.querySelector<HTMLElement>('.render-control')?.setAttribute('aria-label', t('view.render'));
   if (referenceNoteInput) referenceNoteInput.placeholder = t('index.referencePlaceholder');
   if (loginNameInput) loginNameInput.placeholder = t('index.loginNamePlaceholder');
+  syncFullscreenUi();
 }
 
 function updateUrl(date: string, seed: string) {
@@ -1512,9 +1529,36 @@ function scheduleDailyRollover() {
     if (followsToday && spec.dateLabel !== date) {
       rebuild(date, date);
       syncTodayMode(date, date);
+      void applyRemoteDailyContent(date);
     }
     scheduleDailyRollover();
   }, delay);
+}
+
+async function applyRemoteDailyContent(dateKey = params.date) {
+  if (
+    specialReference ||
+    !window.dailyfloraDesktop?.isDesktop ||
+    searchParams.has('date') ||
+    searchParams.has('seed')
+  ) {
+    return;
+  }
+
+  const loaded = await loadDailyContent(dateKey);
+  if (!loaded) return;
+
+  const entry = loaded.entry;
+  if (!searchParams.has('theme') && entry.themeId) selectedTheme = entry.themeId;
+  if (!requestedDensity && entry.density) selectedDensity = entry.density;
+  if (!requestedRender && entry.render) selectedRender = entry.render;
+  quality = resolveQuality(selectedDensity, selectedRender);
+  spec = createDailySpec(entry.date, entry.seed, selectedTheme);
+  scene.rebuild(spec, quality);
+  applyRotationSettings();
+  setLabels();
+  syncControls();
+  document.body.dataset.dailyContentSource = loaded.source;
 }
 
 function createSpecialOverlay() {
@@ -1877,13 +1921,17 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && inlineTutorialDialog?.open) {
     event.preventDefault();
     closeInlineTutorial();
+    if (isFullscreenActive()) void exitFullscreen();
     return;
   }
   if (event.key === 'Escape') {
     closeCalendar();
     closeAccountPanel();
     if (clockDisplaySource) hideClock();
-    if (document.fullscreenElement) void document.exitFullscreen();
+    if (isFullscreenActive()) {
+      event.preventDefault();
+      void exitFullscreen();
+    }
   }
   if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
     event.preventDefault();
@@ -1962,6 +2010,8 @@ shuffleButton?.addEventListener('click', () => {
 });
 
 let gestureFullscreenPromptTimer = 0;
+let fullscreenTutorialTimer = 0;
+let fullscreenEntryFeedbackAt = 0;
 
 function dismissGestureFullscreenPrompt() {
   window.clearTimeout(gestureFullscreenPromptTimer);
@@ -2010,8 +2060,31 @@ function showGestureFullscreenPrompt() {
   gestureFullscreenPromptTimer = window.setTimeout(dismissGestureFullscreenPrompt, 8000);
 }
 
+function announceFullscreenEntry() {
+  if (!isFullscreenActive()) return;
+  const now = Date.now();
+  if (now - fullscreenEntryFeedbackAt > 500) {
+    fullscreenEntryFeedbackAt = now;
+    showFavoriteFeedback(t('shortcuts.escape'));
+  }
+  window.clearTimeout(fullscreenTutorialTimer);
+  fullscreenTutorialTimer = window.setTimeout(() => {
+    if (isFullscreenActive()) maybeShowFullscreenTutorial();
+  }, 80);
+}
+
 async function toggleFullscreen() {
   try {
+    const desktopApi = window.dailyfloraDesktop;
+    if (desktopApi?.isDesktop && desktopApi.setFullscreen) {
+      const targetState = !desktopNativeFullscreen;
+      const actualState = await desktopApi.setFullscreen(targetState);
+      desktopNativeFullscreen = actualState;
+      syncFullscreenUi();
+      if (targetState && actualState) announceFullscreenEntry();
+      revealUi();
+      return actualState === targetState;
+    }
     if (!document.fullscreenElement) {
       await document.documentElement.requestFullscreen();
     } else {
@@ -2026,16 +2099,50 @@ async function toggleFullscreen() {
   }
 }
 
+async function exitFullscreen() {
+  if (desktopNativeFullscreen && window.dailyfloraDesktop?.setFullscreen) {
+    desktopNativeFullscreen = await window.dailyfloraDesktop.setFullscreen(false);
+    syncFullscreenUi();
+    return;
+  }
+  if (document.fullscreenElement) await document.exitFullscreen();
+}
+
 fullscreenButton?.addEventListener('click', () => {
   void toggleFullscreen();
 });
 
 document.addEventListener('fullscreenchange', () => {
+  desktopNativeFullscreen = false;
+  syncFullscreenUi();
   dismissGestureFullscreenPrompt();
   if (document.fullscreenElement) {
-    maybeShowFullscreenTutorial();
+    announceFullscreenEntry();
   }
 });
+
+const removeDesktopFullscreenListener = window.dailyfloraDesktop?.onFullscreenChange?.((active) => {
+  desktopNativeFullscreen = active;
+  syncFullscreenUi();
+  dismissGestureFullscreenPrompt();
+  if (active) {
+    announceFullscreenEntry();
+  }
+});
+const removeDesktopEscapeListener = window.dailyfloraDesktop?.onEscape?.(() => {
+  // The main process handles the native fullscreen transition. This renderer
+  // callback closes any open overlay at the same time, even when Chromium did
+  // not deliver the original Esc keydown to the page.
+  closeInlineTutorial();
+  closeCalendar();
+  closeAccountPanel();
+  if (clockDisplaySource) hideClock();
+  desktopNativeFullscreen = false;
+  syncFullscreenUi();
+  revealUi();
+});
+window.addEventListener('beforeunload', () => removeDesktopFullscreenListener?.(), { once: true });
+window.addEventListener('beforeunload', () => removeDesktopEscapeListener?.(), { once: true });
 
 zoomInButton?.addEventListener('click', () => {
   zoomBy(-0.28);
@@ -2161,7 +2268,7 @@ async function startHandControl() {
       revealUi();
     },
     requestFullscreen: () => {
-      if (document.fullscreenElement) void toggleFullscreen();
+      if (isFullscreenActive()) void toggleFullscreen();
       else showGestureFullscreenPrompt();
     },
     moveFramingBy: (deltaX, deltaY) => {
@@ -2243,6 +2350,7 @@ syncClockControls();
 idleClock.start();
 revealUi();
 scene.start();
+void applyRemoteDailyContent();
 startupReady = true;
 startupState?.setAttribute('hidden', '');
 

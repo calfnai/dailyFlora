@@ -1,0 +1,28 @@
+appId: com.calfn.dailyflora
+productName: DailyFlora
+directories:
+  output: desktop/windows/release
+files:
+  - dist/**/*
+  - desktop/windows/main.cjs
+  - desktop/windows/preload.cjs
+asar: false
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+  artifactName: DailyFlora-${version}-${arch}.${ext}
+nsis:
+  artifactName: DailyFlora-${version}-${arch}-setup.${ext}
+  include: desktop/windows/installer.nsh
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  shortcutName: DailyFlora
+portable:
+  artifactName: DailyFlora-${version}-${arch}-portable.${ext}
