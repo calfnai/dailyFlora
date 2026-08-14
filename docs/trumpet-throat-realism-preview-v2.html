@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DailyFlora · Trumpet Throat v2 Archive</title>
+  <style>
+    :root{color-scheme:dark;--bg:#080b0f;--panel:#121923;--line:rgb(247 240 227 / 14%);--text:#f7f0e3;--muted:rgb(247 240 227 / 68%);--accent:#f2cb62;--warn:#efb960;--bad:#ff8c74;--good:#87d486}*{box-sizing:border-box}body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(circle at 12% 0%,rgb(242 203 98 / 12%),transparent 28%),linear-gradient(180deg,#080b0f,#101720 58%,#080b0f);color:var(--text)}main{width:min(1100px,100%);margin:0 auto;padding:28px 18px 48px}header,.card{border:1px solid var(--line);border-radius:10px;background:rgb(18 25 35 / 78%)}header{display:grid;gap:12px;padding:24px;background:linear-gradient(145deg,rgb(18 25 35 / 96%),rgb(24 33 45 / 84%))}h1,h2,h3,p{margin:0}h1{font-size:clamp(32px,6vw,60px);line-height:1}.eyebrow{color:var(--warn);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.lead{max-width:92ch;color:var(--muted);line-height:1.68;font-size:14px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}.card{padding:16px}.card h2{font-size:18px;margin-bottom:10px}.card p,.card li{color:var(--muted);font-size:14px;line-height:1.7}.card ul{margin:8px 0 0;padding-left:20px}.tag{display:inline-flex;align-items:center;min-height:24px;padding:0 8px;border:1px solid currentColor;border-radius:999px;font-size:12px;font-weight:800}.bad{color:var(--bad)}.good{color:var(--good)}.warn{color:var(--warn)}.links{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.links a{display:inline-flex;align-items:center;min-height:34px;padding:0 12px;border:1px solid var(--line);border-radius:999px;color:var(--text);text-decoration:none;background:rgb(255 255 255 / 4%)}.links a.primary{border-color:rgb(242 203 98 / 52%);color:var(--accent)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:rgb(247 240 227 / 82%)}.note{margin-top:16px;padding:14px 16px;border:1px solid rgb(255 140 116 / 34%);border-radius:10px;background:rgb(255 140 116 / 6%);color:var(--muted);line-height:1.7;font-size:14px}@media(max-width:800px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">DailyFlora trumpet-throat v2 archive</p>
+      <h1>v2 错误实验记录</h1>
+      <p class="lead">这个页面用于回答“v2 到底做了什么”。v2 不是有效结果：它为了增加拖拽旋转，重新用 Canvas 2.5D 投影画了一套花，导致花型偏离 v1。它应作为失败样本保留，不作为后续实现依据。</p>
+      <div class="links">
+        <a class="primary" href="./trumpet-throat-realism-preview-v3.html">打开正确下一步 v3</a>
+        <a href="./trumpet-throat-realism-preview-v1.html">打开 v1 基准</a>
+        <a href="./trumpet-throat-realism-compare.html">打开主对比入口</a>
+      </div>
+    </header>
+
+    <section class="grid">
+      <article class="card">
+        <span class="tag bad">v2 做错的事</span>
+        <h2>它不是“给 v1 加旋转”</h2>
+        <ul>
+          <li>把 v1 的 SVG 正面画法重写成 Canvas 投影。</li>
+          <li>为了做 yaw / pitch / zoom，重新定义了花瓣、cup、茎叶的空间坐标。</li>
+          <li>因此花型不再等同于 v1，只是一个新的实验花。</li>
+          <li>Pages 里旧 v2 地址没有稳定发布，导致你打开 404。</li>
+        </ul>
+      </article>
+      <article class="card">
+        <span class="tag good">正确下一步</span>
+        <h2>v3 的目标</h2>
+        <ul>
+          <li>左侧固定显示 v1 正面基准。</li>
+          <li>右侧只在同一套花型上增加拖拽旋转。</li>
+          <li>重置视角时，应尽量贴近 v1 正面。</li>
+          <li>旋转只用于查看 cup / corona 的突出关系，不重新定义花。</li>
+        </ul>
+      </article>
+      <article class="card">
+        <span class="tag warn">v2 技术变化</span>
+        <h2>可追溯变化</h2>
+        <p>v2 对应源码路径：</p>
+        <p class="mono">docs/trumpet-throat-realism-preview.html</p>
+        <p>它引入了：</p>
+        <ul>
+          <li>Canvas 绘制</li>
+          <li>pointer drag 旋转</li>
+          <li>wheel zoom</li>
+          <li>yaw / pitch / zoom 参数显示</li>
+        </ul>
+      </article>
+      <article class="card">
+        <span class="tag bad">验收结论</span>
+        <h2>v2 不合格</h2>
+        <p>用户反馈“比上一版更奇怪”，原因是我把交互需求误读为重新建模需求。v2 只保留为错误记录，避免以后重复这个方向。</p>
+      </article>
+    </section>
+
+    <p class="note">后续不要继续修 v2 的花型。正确路线是以 v1 为视觉基准，做 v3 / v4：只增加 360 拖拽查看，不改花瓣、cup、rim、喉部和绿色连接点的正面基准。</p>
+  </main>
+</body>
+</html>
