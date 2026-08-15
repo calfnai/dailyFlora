@@ -23,10 +23,10 @@ test('formal auth and public bouquet routes exist, obsolete member-test is exclu
 
 test('downloads page offers OneDrive and Feishu sources for both Windows packages', () => {
   const html = read('downloads/index.html');
-  assert.match(html, /1drv\.ms\/u\/c\/0302618EAAA684CD\/IQA3PxAQ3wVUQKSkqA-H_6AU/);
-  assert.match(html, /1drv\.ms\/u\/c\/0302618EAAA684CD\/IQBOo5dJbDrwSaADCUG23v8SATrHCdFH7Fo6wFDKVfWWgVM/);
-  assert.match(html, /kmfon4jqb9\.feishu\.cn\/file\/JjjZbjN3Fowrk3xYK99c1R9vnJg/);
-  assert.match(html, /kmfon4jqb9\.feishu\.cn\/file\/FFVvbasvroozd1xsevHcrvKknLe/);
+  assert.match(html, /1drv\.ms\/u\/c\/0302618EAAA684CD\/IQA2VXVMo3wrSLEwtqweoNyTATjDAuGUEL6hye6pmcbOpOQ/);
+  assert.match(html, /1drv\.ms\/u\/c\/0302618EAAA684CD\/IQBu39PnfRU2Q5iH-g9k049lAfhlfrzrI6rF0QCMM-oofD8/);
+  assert.match(html, /kmfon4jqb9\.feishu\.cn\/file\/ImxZb1XYvoZQxzxhtD4c08Lbnrb/);
+  assert.match(html, /kmfon4jqb9\.feishu\.cn\/file\/L7Orb73hfoO5p2xaYJicjGsFnxb/);
   assert.match(html, /windowsSourceTitle/);
 });
 
