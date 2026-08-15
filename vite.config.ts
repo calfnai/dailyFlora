@@ -140,6 +140,20 @@ export default defineConfig({
         scifi: resolve(__dirname, 'scifi/index.html'),
         signup: resolve(__dirname, 'signup/index.html'),
         howToUse: resolve(__dirname, 'how-to-use/index.html'),
+        aestheticReviewDashboard: resolve(__dirname, 'docs/aesthetic-review-dashboard.html'),
+        dailyfloraFlowerPlanSamples: resolve(__dirname, 'docs/dailyflora-flower-plan-samples.html'),
+        primitiveLab: resolve(__dirname, 'docs/primitive-lab.html'),
+        realisticFlowerLab: resolve(__dirname, 'docs/realistic-flower-lab.html'),
+        flowerSystemReview: resolve(__dirname, 'docs/flower-system-review.html'),
+        leafFlowerPairingLab: resolve(__dirname, 'docs/leaf-flower-pairing-lab.html'),
+        leafSilhouetteLab: resolve(__dirname, 'docs/leaf-silhouette-lab.html'),
+        strap3DMiniLab: resolve(__dirname, 'docs/strap-3d-mini-lab.html'),
+        palmate3DMiniLab: resolve(__dirname, 'docs/palmate-3d-mini-lab.html'),
+        ammiMajusApprovalLab: resolve(__dirname, 'docs/ammi-majus-approval-lab.html'),
+        foxtailLilyApprovalLab: resolve(__dirname, 'docs/foxtail-lily-approval-lab.html'),
+        scifiFlowerLab: resolve(__dirname, 'docs/scifi-flower-lab.html'),
+        scifiBouquetLab: resolve(__dirname, 'docs/scifi-bouquet-lab.html'),
+        avatarLab: resolve(__dirname, 'docs/avatar-lab.html'),
       }
     }
   }
