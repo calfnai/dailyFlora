@@ -11,7 +11,7 @@
     <script type="module" crossorigin src="../assets/accountHeader-CgO5qBiv.js"></script>
     <script type="module" crossorigin src="../assets/staticI18n-Cj4VY99b.js"></script>
     <link rel="stylesheet" crossorigin href="../assets/marketing-BMAbPgF8.css">
-    <meta name="dailyflora-release" content="DF-20260815-1337-a416304d">
+    <meta name="dailyflora-release" content="DF-20260815-1337-a416304d-dirty">
   </head>
   <body data-page="platforms">
     <div class="page-shell product-shell downloads-shell">
@@ -82,25 +82,15 @@
           <div class="platform-grid">
             <article class="platform-card"><span class="state-pill" data-i18n="platforms.browserStatus">MVP available</span><h3>Browser</h3><p data-i18n="platforms.browserBody">Open daily bouquets, favorites, the member garden, and project records now.</p><a class="button" href="../" data-i18n="common.openWeb">Open</a></article>
             <article class="platform-card"><span class="state-pill warm" data-i18n="platforms.windowsStatus">Beta available</span><h3>Windows 10 / 11</h3><p data-i18n="platforms.windowsCardBody">The tray-resident desktop beta is available above. It reads the daily bouquet online and keeps heavy runtime assets local.</p><a class="button" href="#windows-download" data-i18n="platforms.windowsOpen">View download</a></article>
-            <article class="platform-card"><span class="state-pill warm" data-i18n="platforms.planned">Planned</span><h3>iOS / Android</h3><p>Favorites, reminders, private generation, and sharing will be gathered on mobile first.</p><button class="button interest-button" type="button" data-i18n="platforms.follow">Follow release</button></article>
-            <article class="platform-card"><span class="state-pill quiet" data-i18n="platforms.closed">Not open yet</span><h3>TV / Ambient Display</h3><p>TV, ambient display, and offline spaces will use a separate presentation mode.</p><button class="button interest-button" type="button" data-i18n="platforms.follow">Follow release</button></article>
+            <article class="platform-card"><span class="state-pill warm" data-i18n="platforms.planned">Planned</span><h3>iOS / Android</h3><p>Favorites, reminders, private generation, and sharing will be gathered on mobile first.</p><a class="button interest-button" href="mailto:contact@calfn.com?subject=%E6%88%91%E6%9C%9F%E5%BE%85iOS%2FAndroid%E7%89%88" data-i18n="platforms.follow">Follow release</a></article>
+            <article class="platform-card"><span class="state-pill quiet" data-i18n="platforms.closed">Not open yet</span><h3>TV / Ambient Display</h3><p>TV, ambient display, and offline spaces will use a separate presentation mode.</p><a class="button interest-button" href="mailto:contact@calfn.com?subject=%E6%88%91%E6%9C%9F%E5%BE%85Android%20TV%E7%89%88" data-i18n="platforms.follow">Follow release</a></article>
           </div>
         </section>
 
       </main>
       <footer class="site-footer"><div class="footer-main wrap"><p class="footer-statement" data-i18n="platforms.footer">DailyFlora across screens.</p><nav class="footer-col" aria-label="Explore"><strong data-i18n="common.explore">Explore</strong><a href="../" data-i18n="common.today">Today's bouquet</a><a href="../member/" data-i18n="common.member">My garden</a><a href="../about/" data-i18n="common.about">About DailyFlora</a><a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a><a href="../scifi/" data-i18n="common.scifi">SciFi Flora</a><a href="../how-to-use/" data-i18n="tutorial.title">How to use</a></nav><nav class="footer-col" aria-label="System"><strong data-i18n="common.system">System</strong><a href="../version.json" data-release-code data-i18n="common.version">Read release code...</a><a href="../legal/terms/" data-i18n="legal.termsTitle">Terms of Use</a><a href="../legal/privacy/" data-i18n="legal.privacyTitle">Privacy Policy</a><a href="../legal/copyright/" data-i18n="legal.copyrightTitle">Copyright</a><a href="../legal/credits/" data-i18n="legal.creditsTitle">Credits &amp; Attributions</a></nav></div></footer>
     </div>
-    <div class="local-toast" id="local-toast" role="status" aria-live="polite"></div>
     <script>
-      const toast = document.querySelector('#local-toast');
-      document.querySelectorAll('.interest-button').forEach((button) => {
-        button.addEventListener('click', () => {
-          toast.textContent = window.dailyfloraT?.('platforms.toast') || 'Saved on this device. No install or subscription was triggered.';
-          toast.classList.add('is-visible');
-          clearTimeout(window.dailyfloraToastTimer);
-          window.dailyfloraToastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2400);
-        });
-      });
       fetch('../version.json').then((response) => response.ok ? response.json() : null).then((info) => { if (info?.releaseId) document.querySelectorAll('[data-release-code]').forEach((node) => { node.textContent = info.releaseId; }); }).catch(() => {});
     </script>
   </body>
