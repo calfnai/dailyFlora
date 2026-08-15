@@ -31,3 +31,11 @@ test('downloads page preserves the finalized four-link Windows release', () => {
   assert.match(html, /data-i18n="platforms\.windowsOneDriveTitle"/);
   assert.match(html, /data-i18n="platforms\.windowsFeishuTitle"/);
 });
+
+test('downloads page presents Windows and macOS hosts as neutral mirrors', () => {
+  assert.doesNotMatch(html, /windowsRecommended|windowsFallback|Recommended|Backup/);
+  assert.equal((html.match(/class="desktop-download-source"/g) || []).length, 4);
+  assert.match(html, /data-i18n="platforms\.windowsMirror"/);
+  assert.match(html, /data-i18n="platforms\.macSourceTitle"/);
+  assert.match(html, /data-i18n="platforms\.macMirror"/);
+});

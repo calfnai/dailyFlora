@@ -35,17 +35,24 @@
               <span class="state-pill warm" data-i18n="platforms.macStatus">0.72 Beta · arm64 / x64</span>
               <h3 data-i18n="platforms.macCardTitle">DailyFlora for macOS</h3>
               <p data-i18n="platforms.macBody">Apple Silicon includes local hand-control resources and camera support. Intel packages omit camera and gesture resources for a lighter display-only build.</p>
-              <div class="button-row mac-download-actions">
-                <div class="download-platform-group">
-                  <strong data-i18n="platforms.macArmLabel">Apple Silicon · arm64</strong>
-                  <a class="button primary" href="https://kmfon4jqb9.feishu.cn/file/EXiXbSSwQorxOJxULBxcwMeRnHf?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.macFeishu">Download from Feishu</a>
-                  <a class="button" href="https://1drv.ms/u/c/0302618EAAA684CD/IQAr-QXcorcmSYDy9qobFXCMAT7WTyV_ZW5BedzXWubRNQ0?e=2HIlhy" target="_blank" rel="noopener" data-i18n="platforms.macOneDrive">Download from OneDrive</a>
-                </div>
-                <div class="download-platform-group">
-                  <strong data-i18n="platforms.macIntelLabel">Intel · x64</strong>
-                  <a class="button primary" href="https://kmfon4jqb9.feishu.cn/file/Cbabbkju5oIfxTxuCtZcq0PxnOg?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.macFeishu">Download from Feishu</a>
-                  <a class="button" href="https://1drv.ms/u/c/0302618EAAA684CD/IQDb6HMXaMPfT7aXn2JTAmVJAVB_KAMCiYOAVqPHK-k9NKw?e=1fCeSi" target="_blank" rel="noopener" data-i18n="platforms.macOneDrive">Download from OneDrive</a>
-                </div>
+              <div class="desktop-download-sources mac-download-sources" role="group" aria-labelledby="mac-download-source-title">
+                <p class="download-source-title" id="mac-download-source-title" data-i18n="platforms.macSourceTitle">Choose a Mac architecture and mirror</p>
+                <section class="desktop-download-source">
+                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.macArmLabel">Apple Silicon · arm64</h4><span class="state-pill quiet" data-i18n="platforms.macMirror">Mirror</span></div>
+                  <p data-i18n="platforms.macMirrorBody">Both mirrors contain the same architecture package. Choose the source that opens normally on your device.</p>
+                  <div class="button-row desktop-download-actions">
+                    <a class="button" href="https://kmfon4jqb9.feishu.cn/file/EXiXbSSwQorxOJxULBxcwMeRnHf?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.macFeishu">Download from Feishu</a>
+                    <a class="button" href="https://1drv.ms/u/c/0302618EAAA684CD/IQAr-QXcorcmSYDy9qobFXCMAT7WTyV_ZW5BedzXWubRNQ0?e=2HIlhy" target="_blank" rel="noopener" data-i18n="platforms.macOneDrive">Download from OneDrive</a>
+                  </div>
+                </section>
+                <section class="desktop-download-source">
+                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.macIntelLabel">Intel · x64</h4><span class="state-pill quiet" data-i18n="platforms.macMirror">Mirror</span></div>
+                  <p data-i18n="platforms.macMirrorBody">Both mirrors contain the same architecture package. Choose the source that opens normally on your device.</p>
+                  <div class="button-row desktop-download-actions">
+                    <a class="button" href="https://kmfon4jqb9.feishu.cn/file/Cbabbkju5oIfxTxuCtZcq0PxnOg?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.macFeishu">Download from Feishu</a>
+                    <a class="button" href="https://1drv.ms/u/c/0302618EAAA684CD/IQDb6HMXaMPfT7aXn2JTAmVJAVB_KAMCiYOAVqPHK-k9NKw?e=1fCeSi" target="_blank" rel="noopener" data-i18n="platforms.macOneDrive">Download from OneDrive</a>
+                  </div>
+                </section>
               </div>
               <p class="download-note" data-i18n="platforms.macDownloadHost">Feishu and OneDrive are mirrors for the same architecture packages. Choose the mirror that opens normally in your browser.</p>
             </div>
@@ -72,24 +79,24 @@
               <p data-i18n="platforms.windowsBody">The installer keeps the flower engine, Three.js, MediaPipe files, and hand model local. When the window closes, DailyFlora stays in the Windows system tray instead of quitting.</p>
               <div class="desktop-download-sources" role="group" aria-labelledby="windows-download-source-title">
                 <p class="download-source-title" id="windows-download-source-title" data-i18n="platforms.windowsSourceTitle">Choose a download source</p>
-                <section class="desktop-download-source is-primary">
-                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.windowsOneDriveTitle">OneDrive</h4><span class="state-pill" data-i18n="platforms.windowsRecommended">Recommended</span></div>
-                  <p data-i18n="platforms.windowsOneDriveBody">Use OneDrive first if it opens normally on your device.</p>
+                <section class="desktop-download-source">
+                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.windowsOneDriveTitle">OneDrive mirror</h4><span class="state-pill quiet" data-i18n="platforms.windowsMirror">Mirror</span></div>
+                  <p data-i18n="platforms.windowsOneDriveBody">OneDrive mirror for the same Windows package. Use it if it opens normally on your device.</p>
                   <div class="button-row desktop-download-actions">
-                    <a class="button primary" href="https://1drv.ms/u/c/0302618EAAA684CD/IQA2VXVMo3wrSLEwtqweoNyTATjDAuGUEL6hye6pmcbOpOQ?e=BlNqCb" target="_blank" rel="noopener" data-i18n="platforms.windowsInstaller">Download installer</a>
+                    <a class="button" href="https://1drv.ms/u/c/0302618EAAA684CD/IQA2VXVMo3wrSLEwtqweoNyTATjDAuGUEL6hye6pmcbOpOQ?e=BlNqCb" target="_blank" rel="noopener" data-i18n="platforms.windowsInstaller">Download installer</a>
                     <a class="button" href="https://1drv.ms/u/c/0302618EAAA684CD/IQBu39PnfRU2Q5iH-g9k049lAfhlfrzrI6rF0QCMM-oofD8?e=xilg0A" target="_blank" rel="noopener" data-i18n="platforms.windowsPortable">Download portable</a>
                   </div>
                 </section>
                 <section class="desktop-download-source">
-                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.windowsFeishuTitle">Feishu backup</h4><span class="state-pill quiet" data-i18n="platforms.windowsFallback">Backup</span></div>
-                  <p data-i18n="platforms.windowsFeishuBody">If OneDrive cannot be opened, use these Feishu links instead.</p>
+                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.windowsFeishuTitle">Feishu mirror</h4><span class="state-pill quiet" data-i18n="platforms.windowsMirror">Mirror</span></div>
+                  <p data-i18n="platforms.windowsFeishuBody">Feishu mirror for the same Windows package. Use it if it opens normally on your device.</p>
                   <div class="button-row desktop-download-actions">
                     <a class="button" href="https://kmfon4jqb9.feishu.cn/file/ImxZb1XYvoZQxzxhtD4c08Lbnrb?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.windowsInstaller">Download installer</a>
                     <a class="button" href="https://kmfon4jqb9.feishu.cn/file/L7Orb73hfoO5p2xaYJicjGsFnxb?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.windowsPortable">Download portable</a>
                   </div>
                 </section>
               </div>
-              <p class="download-note" data-i18n="platforms.windowsDownloadHost">Choose OneDrive first. If it does not open, use the Feishu backup links. Verify SHA-256 before opening the package.</p>
+              <p class="download-note" data-i18n="platforms.windowsDownloadHost">OneDrive and Feishu are mirrors for the same package. Choose the source that opens normally in your browser. Verify SHA-256 before opening the package.</p>
             </div>
             <div class="desktop-download-details">
               <dl>
