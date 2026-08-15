@@ -19,10 +19,52 @@
           <div class="product-hero-copy">
             <p class="eyebrow" data-i18n="platforms.eyebrow">DailyFlora across screens</p>
             <h1 data-i18n="platforms.title">Let the flower stay on the screen you use most.</h1>
-            <p data-i18n="platforms.lead">The web version works now, and the Windows desktop beta is available for testing.</p>
-            <div class="button-row"><a class="button primary" href="#windows-download" data-i18n="platforms.primary">Download Windows beta</a><a class="button" href="../" data-i18n="platforms.secondary">Open web version</a></div>
+            <p data-i18n="platforms.lead">The web version works now, and the Windows and macOS desktop betas are available for testing.</p>
+            <div class="button-row"><a class="button primary" href="#mac-download" data-i18n="platforms.primary">Download macOS beta</a><a class="button" href="../" data-i18n="platforms.secondary">Open web version</a></div>
           </div>
           <div class="device-showpiece" aria-hidden="true"><span></span></div>
+        </section>
+
+        <section class="product-section wrap desktop-download-section" id="mac-download">
+          <div class="product-section-head">
+            <div><p class="eyebrow" data-i18n="platforms.macEyebrow">macOS desktop beta</p><h2 data-i18n="platforms.macTitle">Let the daily bouquet stay on your Mac.</h2></div>
+            <p data-i18n="platforms.macLead">A local-first display app for macOS 12 Monterey and later. Apple Silicon keeps camera gestures; Intel stays display-only.</p>
+          </div>
+          <article class="desktop-download-card">
+            <div class="desktop-download-copy">
+              <span class="state-pill warm" data-i18n="platforms.macStatus">0.72 Beta · arm64 / x64</span>
+              <h3 data-i18n="platforms.macCardTitle">DailyFlora for macOS</h3>
+              <p data-i18n="platforms.macBody">Apple Silicon includes local hand-control resources and camera support. Intel packages omit camera and gesture resources for a lighter display-only build.</p>
+              <div class="desktop-download-sources mac-download-sources" role="group" aria-labelledby="mac-download-source-title">
+                <p class="download-source-title" id="mac-download-source-title" data-i18n="platforms.macSourceTitle">Choose a Mac architecture and mirror</p>
+                <section class="desktop-download-source">
+                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.macArmLabel">Apple Silicon · arm64</h4><span class="state-pill quiet" data-i18n="platforms.macMirror">Mirror</span></div>
+                  <p data-i18n="platforms.macMirrorBody">Both mirrors contain the same architecture package. Choose the source that opens normally on your device.</p>
+                  <div class="button-row desktop-download-actions">
+                    <a class="button" href="https://kmfon4jqb9.feishu.cn/file/EXiXbSSwQorxOJxULBxcwMeRnHf?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.macFeishu">Download from Feishu</a>
+                    <a class="button" href="https://1drv.ms/u/c/0302618EAAA684CD/IQAr-QXcorcmSYDy9qobFXCMAT7WTyV_ZW5BedzXWubRNQ0?e=2HIlhy" target="_blank" rel="noopener" data-i18n="platforms.macOneDrive">Download from OneDrive</a>
+                  </div>
+                </section>
+                <section class="desktop-download-source">
+                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.macIntelLabel">Intel · x64</h4><span class="state-pill quiet" data-i18n="platforms.macMirror">Mirror</span></div>
+                  <p data-i18n="platforms.macMirrorBody">Both mirrors contain the same architecture package. Choose the source that opens normally on your device.</p>
+                  <div class="button-row desktop-download-actions">
+                    <a class="button" href="https://kmfon4jqb9.feishu.cn/file/Cbabbkju5oIfxTxuCtZcq0PxnOg?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.macFeishu">Download from Feishu</a>
+                    <a class="button" href="https://1drv.ms/u/c/0302618EAAA684CD/IQDb6HMXaMPfT7aXn2JTAmVJAVB_KAMCiYOAVqPHK-k9NKw?e=1fCeSi" target="_blank" rel="noopener" data-i18n="platforms.macOneDrive">Download from OneDrive</a>
+                  </div>
+                </section>
+              </div>
+              <p class="download-note" data-i18n="platforms.macDownloadHost">Feishu and OneDrive are mirrors for the same architecture packages. Choose the mirror that opens normally in your browser.</p>
+            </div>
+            <div class="desktop-download-details">
+              <dl>
+                <div><dt data-i18n="platforms.macSystemLabel">System</dt><dd data-i18n="platforms.macSystem">macOS 12 Monterey or later</dd></div>
+                <div><dt data-i18n="platforms.macModeLabel">Modes</dt><dd data-i18n="platforms.macMode">arm64 camera gestures · x64 display only</dd></div>
+                <div><dt data-i18n="platforms.macSecurityLabel">Security</dt><dd data-i18n="platforms.macSecurity">Local Beta; not Developer ID notarized</dd></div>
+              </dl>
+              <p class="download-note" data-i18n="platforms.macNote">macOS may show a security warning because this is a local Beta package. Do not treat it as a notarized public release.</p>
+            </div>
+          </article>
         </section>
 
         <section class="product-section wrap desktop-download-section" id="windows-download">
@@ -37,24 +79,24 @@
               <p data-i18n="platforms.windowsBody">The installer keeps the flower engine, Three.js, MediaPipe files, and hand model local. When the window closes, DailyFlora stays in the Windows system tray instead of quitting.</p>
               <div class="desktop-download-sources" role="group" aria-labelledby="windows-download-source-title">
                 <p class="download-source-title" id="windows-download-source-title" data-i18n="platforms.windowsSourceTitle">Choose a download source</p>
-                <section class="desktop-download-source is-primary">
-                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.windowsOneDriveTitle">OneDrive</h4><span class="state-pill" data-i18n="platforms.windowsRecommended">Recommended</span></div>
-                  <p data-i18n="platforms.windowsOneDriveBody">Use OneDrive first if it opens normally on your device.</p>
+                <section class="desktop-download-source">
+                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.windowsOneDriveTitle">OneDrive mirror</h4><span class="state-pill quiet" data-i18n="platforms.windowsMirror">Mirror</span></div>
+                  <p data-i18n="platforms.windowsOneDriveBody">OneDrive mirror for the same Windows package. Use it if it opens normally on your device.</p>
                   <div class="button-row desktop-download-actions">
-                    <a class="button primary" href="https://1drv.ms/u/c/0302618EAAA684CD/IQA3PxAQ3wVUQKSkqA-H_6AUAbbdRWsem6yRLT0MRV31HOk?e=Pu1P7I" target="_blank" rel="noopener" data-i18n="platforms.windowsInstaller">Download installer</a>
-                    <a class="button" href="https://1drv.ms/u/c/0302618EAAA684CD/IQBOo5dJbDrwSaADCUG23v8SATrHCdFH7Fo6wFDKVfWWgVM?e=clUZuo" target="_blank" rel="noopener" data-i18n="platforms.windowsPortable">Download portable</a>
+                    <a class="button" href="https://1drv.ms/u/c/0302618EAAA684CD/IQA2VXVMo3wrSLEwtqweoNyTATjDAuGUEL6hye6pmcbOpOQ?e=BlNqCb" target="_blank" rel="noopener" data-i18n="platforms.windowsInstaller">Download installer</a>
+                    <a class="button" href="https://1drv.ms/u/c/0302618EAAA684CD/IQBu39PnfRU2Q5iH-g9k049lAfhlfrzrI6rF0QCMM-oofD8?e=xilg0A" target="_blank" rel="noopener" data-i18n="platforms.windowsPortable">Download portable</a>
                   </div>
                 </section>
                 <section class="desktop-download-source">
-                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.windowsFeishuTitle">Feishu backup</h4><span class="state-pill quiet" data-i18n="platforms.windowsFallback">Backup</span></div>
-                  <p data-i18n="platforms.windowsFeishuBody">If OneDrive cannot be opened, use these Feishu links instead.</p>
+                  <div class="desktop-download-source-head"><h4 data-i18n="platforms.windowsFeishuTitle">Feishu mirror</h4><span class="state-pill quiet" data-i18n="platforms.windowsMirror">Mirror</span></div>
+                  <p data-i18n="platforms.windowsFeishuBody">Feishu mirror for the same Windows package. Use it if it opens normally on your device.</p>
                   <div class="button-row desktop-download-actions">
-                    <a class="button" href="https://kmfon4jqb9.feishu.cn/file/JjjZbjN3Fowrk3xYK99c1R9vnJg?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.windowsInstaller">Download installer</a>
-                    <a class="button" href="https://kmfon4jqb9.feishu.cn/file/FFVvbasvroozd1xsevHcrvKknLe?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.windowsPortable">Download portable</a>
+                    <a class="button" href="https://kmfon4jqb9.feishu.cn/file/ImxZb1XYvoZQxzxhtD4c08Lbnrb?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.windowsInstaller">Download installer</a>
+                    <a class="button" href="https://kmfon4jqb9.feishu.cn/file/L7Orb73hfoO5p2xaYJicjGsFnxb?from=from_copylink" target="_blank" rel="noopener" data-i18n="platforms.windowsPortable">Download portable</a>
                   </div>
                 </section>
               </div>
-              <p class="download-note" data-i18n="platforms.windowsDownloadHost">Choose OneDrive first. If it does not open, use the Feishu backup links. Verify SHA-256 before opening the package.</p>
+              <p class="download-note" data-i18n="platforms.windowsDownloadHost">OneDrive and Feishu are mirrors for the same package. Choose the source that opens normally in your browser. Verify SHA-256 before opening the package.</p>
             </div>
             <div class="desktop-download-details">
               <dl>
@@ -75,26 +117,17 @@
           </div>
           <div class="platform-grid">
             <article class="platform-card"><span class="state-pill" data-i18n="platforms.browserStatus">MVP available</span><h3>Browser</h3><p data-i18n="platforms.browserBody">Open daily bouquets, favorites, the member garden, and project records now.</p><a class="button" href="../" data-i18n="common.openWeb">Open</a></article>
+            <article class="platform-card"><span class="state-pill warm" data-i18n="platforms.macStatus">0.72 Beta · arm64 / x64</span><h3>macOS 12+</h3><p data-i18n="platforms.macCardBody">The macOS beta provides camera gestures on Apple Silicon and a lighter display-only build on Intel.</p><a class="button" href="#mac-download" data-i18n="platforms.macOpen">View download</a></article>
             <article class="platform-card"><span class="state-pill warm" data-i18n="platforms.windowsStatus">Beta available</span><h3>Windows 10 / 11</h3><p data-i18n="platforms.windowsCardBody">The tray-resident desktop beta is available above. It reads the daily bouquet online and keeps heavy runtime assets local.</p><a class="button" href="#windows-download" data-i18n="platforms.windowsOpen">View download</a></article>
-            <article class="platform-card"><span class="state-pill warm" data-i18n="platforms.planned">Planned</span><h3>iOS / Android</h3><p>Favorites, reminders, private generation, and sharing will be gathered on mobile first.</p><button class="button interest-button" type="button" data-i18n="platforms.follow">Follow release</button></article>
-            <article class="platform-card"><span class="state-pill quiet" data-i18n="platforms.closed">Not open yet</span><h3>TV / Ambient Display</h3><p>TV, ambient display, and offline spaces will use a separate presentation mode.</p><button class="button interest-button" type="button" data-i18n="platforms.follow">Follow release</button></article>
+            <article class="platform-card"><span class="state-pill warm" data-i18n="platforms.planned">Planned</span><h3>iOS / Android</h3><p>Favorites, reminders, private generation, and sharing will be gathered on mobile first.</p><a class="button interest-button" href="mailto:contact@calfn.com?subject=%E6%88%91%E6%9C%9F%E5%BE%85iOS%2FAndroid%E7%89%88" data-i18n="platforms.follow">Follow release</a></article>
+            <article class="platform-card"><span class="state-pill quiet" data-i18n="platforms.closed">Not open yet</span><h3>TV / Ambient Display</h3><p>TV, ambient display, and offline spaces will use a separate presentation mode.</p><a class="button interest-button" href="mailto:contact@calfn.com?subject=%E6%88%91%E6%9C%9F%E5%BE%85Android%20TV%E7%89%88" data-i18n="platforms.follow">Follow release</a></article>
           </div>
         </section>
 
       </main>
       <footer class="site-footer"><div class="footer-main wrap"><p class="footer-statement" data-i18n="platforms.footer">DailyFlora across screens.</p><nav class="footer-col" aria-label="Explore"><strong data-i18n="common.explore">Explore</strong><a href="../" data-i18n="common.today">Today's bouquet</a><a href="../member/" data-i18n="common.member">My garden</a><a href="../about/" data-i18n="common.about">About DailyFlora</a><a href="../bouquet-shop/" data-i18n="common.objects">Objects & Collaborations</a><a href="../scifi/" data-i18n="common.scifi">SciFi Flora</a><a href="../how-to-use/" data-i18n="tutorial.title">How to use</a></nav><nav class="footer-col" aria-label="System"><strong data-i18n="common.system">System</strong><a href="../version.json" data-release-code data-i18n="common.version">Read release code...</a><a href="../legal/terms/" data-i18n="legal.termsTitle">Terms of Use</a><a href="../legal/privacy/" data-i18n="legal.privacyTitle">Privacy Policy</a><a href="../legal/copyright/" data-i18n="legal.copyrightTitle">Copyright</a><a href="../legal/credits/" data-i18n="legal.creditsTitle">Credits &amp; Attributions</a></nav></div></footer>
     </div>
-    <div class="local-toast" id="local-toast" role="status" aria-live="polite"></div>
     <script>
-      const toast = document.querySelector('#local-toast');
-      document.querySelectorAll('.interest-button').forEach((button) => {
-        button.addEventListener('click', () => {
-          toast.textContent = window.dailyfloraT?.('platforms.toast') || 'Saved on this device. No install or subscription was triggered.';
-          toast.classList.add('is-visible');
-          clearTimeout(window.dailyfloraToastTimer);
-          window.dailyfloraToastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2400);
-        });
-      });
       fetch('../version.json').then((response) => response.ok ? response.json() : null).then((info) => { if (info?.releaseId) document.querySelectorAll('[data-release-code]').forEach((node) => { node.textContent = info.releaseId; }); }).catch(() => {});
     </script>
     <script type="module" src="../src/staticI18n.ts"></script>

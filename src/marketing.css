@@ -828,11 +828,6 @@ h1, h2, h3, p { margin: 0; }
   background: rgba(255,255,255,.018);
 }
 
-.desktop-download-source.is-primary {
-  border-color: rgba(211, 178, 91, .42);
-  background: rgba(211, 178, 91, .055);
-}
-
 .desktop-download-source-head {
   display: flex;
   align-items: center;
