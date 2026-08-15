@@ -855,6 +855,27 @@ h1, h2, h3, p { margin: 0; }
   white-space: nowrap;
 }
 
+.mac-download-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.download-platform-group {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.download-platform-group strong {
+  color: var(--ink);
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+
+.download-platform-group .button { width: 100%; }
+
 .desktop-download-details {
   background: rgba(8, 17, 12, .78);
 }
@@ -1282,6 +1303,7 @@ h1, h2, h3, p { margin: 0; }
   .object-showpiece, .device-showpiece { min-height: 360px; }
   .member-flower-preview { min-height: 360px; }
   .member-workbench .form-grid { grid-template-columns: 1fr; }
+  .mac-download-actions { grid-template-columns: 1fr; }
   .desktop-download-details dl div { grid-template-columns: 1fr; gap: 5px; }
   .steps { grid-template-columns: 1fr; }
   .step, .step + .step { padding: 25px 0; border-right: 0; border-bottom: 1px solid var(--line); }
