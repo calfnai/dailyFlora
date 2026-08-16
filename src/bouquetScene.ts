@@ -36,6 +36,7 @@ const minCameraPitch = 0.03;
 const maxCameraPitch = 1.34;
 const minZoomOffset = -1.35;
 const maxZoomOffset = 2.05;
+const routeResumeAfterDragMs = 10_000;
 
 const acceptedRealisticFlowerByType: Partial<Record<FlowerTypeId, RealisticFlowerId>> = {
   daisy: 'daisy',
@@ -2284,6 +2285,7 @@ export class BouquetScene {
   private routeMode: CameraRouteMode = 'orbit';
   private routeTime = 0;
   private routePausedByDrag = false;
+  private routeResumeTimer = 0;
   private cameraYaw = 0;
   private targetCameraYaw = 0;
   private cameraPitch = 0.38;
@@ -2412,6 +2414,7 @@ export class BouquetScene {
   }
 
   setStaticCameraView(view: 'front' | 'side' | 'top') {
+    this.clearRouteResumeTimer();
     this.routePausedByDrag = true;
     this.routeTime = 0;
     this.cameraYaw = view === 'side' ? Math.PI / 2 : 0;
@@ -2443,6 +2446,7 @@ export class BouquetScene {
 
   stop() {
     window.cancelAnimationFrame(this.animationId);
+    this.clearRouteResumeTimer();
   }
 
   togglePause() {
@@ -2471,6 +2475,7 @@ export class BouquetScene {
       this.targetCameraPitch = this.baseCameraPitch;
     }
     if (settings.mode !== undefined) {
+      this.clearRouteResumeTimer();
       this.routeMode = settings.mode;
       this.routeTime = 0;
       this.routePausedByDrag = false;
@@ -2686,6 +2691,7 @@ export class BouquetScene {
 
   private bindPointer() {
     this.canvas.addEventListener('pointerdown', (event) => {
+      this.clearRouteResumeTimer();
       this.isDragging = true;
       this.routePausedByDrag = true;
       this.canvas.setPointerCapture(event.pointerId);
@@ -2717,9 +2723,24 @@ export class BouquetScene {
       if (this.canvas.hasPointerCapture(event.pointerId)) {
         this.canvas.releasePointerCapture(event.pointerId);
       }
+      this.scheduleRouteResume();
     };
     this.canvas.addEventListener('pointerup', release);
     this.canvas.addEventListener('pointercancel', release);
+  }
+
+  private clearRouteResumeTimer() {
+    if (!this.routeResumeTimer) return;
+    window.clearTimeout(this.routeResumeTimer);
+    this.routeResumeTimer = 0;
+  }
+
+  private scheduleRouteResume() {
+    this.clearRouteResumeTimer();
+    this.routeResumeTimer = window.setTimeout(() => {
+      this.routeResumeTimer = 0;
+      this.routePausedByDrag = false;
+    }, routeResumeAfterDragMs);
   }
 
   setZoomOffset(offset: number) {
@@ -2752,6 +2773,7 @@ export class BouquetScene {
   }
 
   setAutomaticCameraEnabled(enabled: boolean) {
+    this.clearRouteResumeTimer();
     this.isPaused = !enabled;
     if (enabled) {
       this.routePausedByDrag = false;
