@@ -1,14 +1,14 @@
 {
   "version": "0.72.0",
   "productVersion": "0.72",
-  "releaseId": "DF-20260816-2300-7d7836fa-dirty",
-  "builtAt": "2026-08-16T15:00:56.762Z",
+  "releaseId": "DF-20260816-2319-7d7836fa",
+  "builtAt": "2026-08-16T15:19:20.166Z",
   "timezone": "Asia/Shanghai",
   "commitSha": "7d7836fa54e009e8a56a9c4164d4616975d1b8bc",
   "shortSha": "7d7836fa",
   "branch": "unknown",
   "commitMessage": "Apply stemless rule to single-bloom flower models",
-  "dirty": true,
+  "dirty": false,
   "buildSource": "local",
   "deploymentId": null,
   "deploymentUrl": null
