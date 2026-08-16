@@ -9,9 +9,9 @@
     <script type="module" crossorigin src="../assets/index-BvU9y6t3.js"></script>
     <script type="module" crossorigin src="../assets/dailyfloraCloud-CCB1fFRn.js"></script>
     <script type="module" crossorigin src="../assets/accountHeader-D3Y_rfEk.js"></script>
-    <script type="module" crossorigin src="../assets/staticI18n-Bvkps-pM.js"></script>
+    <script type="module" crossorigin src="../assets/staticI18n-a1w_6ru7.js"></script>
     <link rel="stylesheet" crossorigin href="../assets/marketing-CqL6LHVD.css">
-    <meta name="dailyflora-release" content="DF-20260816-2005-9855718a">
+    <meta name="dailyflora-release" content="DF-20260816-2045-19947732">
   </head>
   <body data-page="about">
     <div class="page-shell">
@@ -171,8 +171,6 @@
         <div class="footer-bottom wrap"><span data-i18n="common.copyright">© 2026 CALFN LAU. All rights reserved.</span><span data-product-version>0.73</span></div>
       </footer>
     </div>
-    <script>
-      fetch('../version.json').then((response) => response.ok ? response.json() : null).then((info) => { if (info?.releaseId) document.querySelectorAll('[data-release-code]').forEach((node) => { node.textContent = info.releaseId; }); }).catch(() => {});
-    </script>
+    <script src="../dailyflora-config.js"></script>
   </body>
 </html>
