@@ -1951,6 +1951,12 @@ document.addEventListener('keydown', (event) => {
     resetView();
     return;
   }
+  if (event.code === 'Digit3' || event.key === '3') {
+    event.preventDefault();
+    idleClock.toggleManual();
+    revealUi();
+    return;
+  }
   if (event.key.toLowerCase() === 'p') {
     event.preventDefault();
     applyRandomRoutePreset();
@@ -2351,10 +2357,12 @@ function isTextInputTarget(target: EventTarget | null) {
 let activeTutorialKind: 'fullscreen' | 'gesture' | 'clock' | null = null;
 
 function syncFullscreenShortcutCopy() {
-  const shortcutKeys = ['fullscreen', 'escape', 'dates', 'arrowZoom', 'zoom', 'random', 'reset', 'preset', 'rotation', 'interface', 'view', 'help'];
+  const shortcutKeys = ['fullscreen', 'escape', 'dates', 'arrowZoom', 'zoom', 'random', 'reset', 'clock', 'preset', 'rotation', 'interface', 'view', 'help'];
   document.querySelectorAll<HTMLElement>('[data-shortcut-copy]').forEach((element) => {
     const key = element.dataset.shortcutCopy;
-    if (key && shortcutKeys.includes(key)) element.textContent = t(`shortcuts.${key}`);
+    if (key && shortcutKeys.includes(key)) {
+      element.textContent = key === 'clock' ? `${t('view.showClock')} / ${t('view.hideClock')}` : t(`shortcuts.${key}`);
+    }
   });
   if (fullscreenHelpMore) fullscreenHelpMore.textContent = t('shortcuts.more');
   if (fullscreenHelpClose) fullscreenHelpClose.textContent = t('tutorial.acknowledge');
