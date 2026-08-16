@@ -411,6 +411,16 @@ git push
 请只发布本次相关文件。若只是美感文档，只更新 main，不要部署 gh-pages。
 若修改了网页生成效果，请运行 npm run build，并把 dist 发布到 gh-pages。
 不要把无关的本地草稿或 inbox 文件带进提交。
+
+## 2026-08-17 0.74 当前发布候选边界
+
+- 16 类只表示 Primitive Lab 的核心抽象词表；完整审核库存为 16 核心抽象 + 25 偏写实花型 + H01 + C01，共 43 条审核记录。
+- R01-R16、C01 和当前花叶搭配 LAB 中的洋水仙、风信子、狐尾百合三组关系已获用户确认；H01 与 01 盘状花只保留 SciFi，08/09/10 不采用，13/14 先修复显示 bug。
+- 0.74 以完整的 0.73 integration 候选为基线；16 类只表示 Primitive Lab 的核心抽象词表，完整审核库存为 16 核心抽象 + 25 偏写实花型 + H01 + C01，共 43 条审核记录。
+- “非长串花型不自带长后茎”已进入正式 realistic flower source 与审美 Dashboard：面花、层叠花和单朵雕塑花只保留花头与必要花托，由花束主枝、细茎、共同扎口和绑点负责连接。
+- 穗状花、果材/吊坠风铃果和叶材/草线/枝条属于需要连续连接的长串或枝条形态，保留自身茎/枝，不套用无长后茎规则。
+- 本轮不修改 `special0629`、正式导航或页面路由；花、茎、叶继续共享 `PlantStemInstance`，未确认成员保持 `unresolved + none`。
+- 开发日志位于 `docs/development-log.html`，正式入口为 `/admin/` 的 Developer workspace；旧 `docs/admin-*.html` 仅是历史 mock。
 ```
 2026-07-23 叶片关系定稿，2026-07-25 复验修订：Strap D2 基生原型当前只定稿映射洋水仙和狐尾百合；风信子配 Strap 降级为 `review-needed`，只在单独搭配验收页检查“风信子花序 + Strap 基生叶”，不得算作 confirmed。飞燕草使用槭属来源 Palmate 的映射因形态错误被用户否决，恢复 `unresolved + none`；Palmate 只保留为独立原型，不映射成员。其余 22 个偏写实花型必须保持 `unresolved + none`，不得使用通用椭圆叶兜底。所有确认叶片必须属于具体 `PlantStemInstance`，使用独立 RNG，并继续服从“叶材支撑空气、不挡主花、不改变主要构图”的审美边界。
 
