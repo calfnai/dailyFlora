@@ -173,7 +173,7 @@ export function readAccountMirror(): CloudAccount | null {
 }
 
 export async function cloudRequest<T>(action: string, payload: Record<string, unknown> = {}): Promise<CloudResponse<T>> {
-  if (!dailyfloraApiBase) throw new Error('0.72 Beta 云端账户尚未配置。');
+  if (!dailyfloraApiBase) throw new Error('0.73 Beta 云端账户尚未配置。');
   const token = readToken();
   const response = await fetch(dailyfloraApiBase, {
     method: 'POST',

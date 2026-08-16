@@ -127,6 +127,21 @@ button { color: inherit; }
   text-decoration: none;
 }
 
+.scifi-menu-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 9px;
+  margin-top: 6px;
+  padding: 8px 3px 3px;
+  border-top: 1px solid rgb(243 239 230 / 16%);
+  color: rgb(243 239 230 / 58%);
+  font-size: 9px;
+  letter-spacing: .05em;
+}
+
+.scifi-menu-footer a:hover,
+.scifi-menu-footer a:focus-visible { color: rgb(243 239 230 / 94%); }
+
 .scifi-index-panel > a:hover,
 .scifi-index-panel > a:focus-visible {
   color: #fff;

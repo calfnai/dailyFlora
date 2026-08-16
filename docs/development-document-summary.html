@@ -240,6 +240,7 @@
         }
       }
     </style>
+      <link rel="stylesheet" href="../docs-footer.css">
   </head>
   <body>
     <main>
@@ -335,11 +336,11 @@
       </section>
 
       <section class="section">
-        <h2>建议路由结构</h2>
+        <h2>当前路由结构与历史建议</h2>
         <div class="route-list">
           <div class="route">
             <strong><code>/docs/dev-index.html</code></strong>
-            <p>开发组总目录：列出开发中页面、客户页面 debug 版、版本列表、平台管理临时入口。</p>
+            <p>开发组快捷目录：列出开发中页面、客户页面 debug 版和 LAB。正式开发工作台入口已迁入 <code>/admin/</code>，这里保留直接链接。</p>
           </div>
           <div class="route">
             <strong><code>/docs/reviews/</code></strong>
@@ -354,12 +355,16 @@
             <p>固定样例列表；默认截图卡片，支持每页 20/50、分类、排序、进入实时详情。</p>
           </div>
           <div class="route">
-            <strong><code>/member</code> 或 <code>/docs/member-test.html</code></strong>
-            <p>用户页面测试：资料、头像、密码、生成历史、上传记录、积分、订阅、订单、获奖返还。</p>
+            <strong><code>/member/</code> 与 <code>/how-to-use/</code></strong>
+            <p>用户从首页 INDEX 进入使用说明，再进入个人花园；<code>/signup/</code> 只保留为注册兼容入口。手势、Clock UI、Fullscreen 和精度密度说明集中在 <code>/how-to-use/</code>。</p>
           </div>
           <div class="route">
-            <strong><code>/admin</code> 或 <code>/docs/admin-test.html</code></strong>
-            <p>平台管理临时页：花花库、用户、订阅、积分操作日志；将来应从开发组剥离。</p>
+            <strong><code>/admin/</code> → 开发工作台</strong>
+            <p>正式 Admin 负责 Beta 账户和任务后台；同页增加开发工具入口，连接开发日志、审美 Dashboard、花型与叶片 LAB。旧 <code>/docs/admin-*.html</code> 只作为历史 mock。</p>
+          </div>
+          <div class="route">
+            <strong><code>/docs/development-log.html</code></strong>
+            <p>按日期和版本解释 GUI、Clock UI、手势、公开路由、Admin 和花型/叶片整合，不把计划误写成已发布功能。</p>
           </div>
         </div>
       </section>
@@ -507,5 +512,7 @@
         </ul>
       </section>
     </main>
+
+    <footer class="docs-footer" aria-label="DailyFlora internal navigation"><div class="docs-footer-links"><a href="../">DailyFlora</a><a href="../admin/">Admin</a><a href="./development-log.html">开发日志</a><a href="./aesthetic-review-dashboard.html?debug=1">审美 Dashboard</a><a href="../how-to-use/">使用说明</a><a href="../legal/terms/">条款</a><a href="../legal/privacy/">隐私</a></div><span>0.73 · internal documentation</span></footer>
   </body>
 </html>

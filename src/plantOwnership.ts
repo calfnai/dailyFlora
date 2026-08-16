@@ -124,18 +124,15 @@ export const realisticFlowerIds: readonly RealisticFlowerId[] = [
 
 const confirmedFoliageByMember: Partial<Record<RealisticFlowerId, StemFoliageProfile>> = {
   narcissus: confirmedStrapBasalProfile,
-  'foxtail-lily': confirmedStrapBasalProfile
-};
-
-const reviewNeededFoliageByMember: Partial<Record<RealisticFlowerId, StemFoliageProfile>> = {
-  hyacinth: reviewNeededStrapBasalProfile
+  'foxtail-lily': confirmedStrapBasalProfile,
+  hyacinth: confirmedStrapBasalProfile
 };
 
 export const realisticFlowerFoliageStatus: Readonly<Record<RealisticFlowerId, StemFoliageProfile>> =
   Object.freeze(Object.fromEntries(
     realisticFlowerIds.map((id) => [
       id,
-      Object.freeze({ ...(confirmedFoliageByMember[id] ?? reviewNeededFoliageByMember[id] ?? unresolvedFoliageProfile) })
+      Object.freeze({ ...(confirmedFoliageByMember[id] ?? unresolvedFoliageProfile) })
     ])
   ) as Record<RealisticFlowerId, StemFoliageProfile>);
 

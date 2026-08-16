@@ -6,6 +6,16 @@
 
 - 恢复 GitHub Pages 发布门禁需要的 docs/LAB 页面为 Vite 构建入口，确保审美复盘 Dashboard、Primitive Lab、固定花束样例库和相关花型/叶片 LAB 随正式构建产出。 / Restored the docs/LAB pages required by the GitHub Pages release gate as Vite build inputs, ensuring the aesthetic review Dashboard, Primitive Lab, fixed bouquet sample library, and related flower/leaf LAB pages are emitted by the formal build.
 
+## 0.73.0 - 2026-08-16 (formal integration candidate)
+
+本版本将 0.15 验收版中已确认的花型/叶片结果定向整合到 0.72 正式源头，并补齐开发日志与 Admin 开发工作台；当前只完成源码与本地构建候选，尚未部署网页或重打 DMG、EXE、ScreenSaver。 / This release directionally reconciles the accepted flower/leaf results from the 0.15 acceptance build into the 0.72 formal source and adds the development log plus the Admin developer workspace; this is currently a source and local-build candidate only, not a web deployment or DMG, EXE, or ScreenSaver rebuild.
+
+- 明确花型库存分层：16 类是 Primitive Lab 的核心抽象词表；另有 25 种偏写实花型、H01 混合花型和 C01 候选花型，完整审核库存为 43 条，不再把 16 写成全部类别。 / Clarified the shape inventory: 16 is the Primitive Lab abstract core; the inventory also contains 25 realistic forms, H01 hybrid, and C01 candidate, for 43 review entries rather than 16 total categories.
+- 将 0.15 已确认的 R01-R16、C01 和三组 Strap 花叶关系回填正式源头；H01 与 01 盘状花保留 SciFi-only，08/09/10 不采用，13/14 先修复显示 bug。 / Reconciled accepted R01-R16, C01, and three confirmed Strap pairings from 0.15; H01 and 01 Disk/Face Flower remain SciFi-only, 08/09/10 stay rejected, and 13/14 remain blocked by display bugs.
+- 新增可查看的开发日志，记录 GUI v1、Clock UI、浏览器手势、Fullscreen、公开路由和用户引导的日期、首次实现线与正式用户入口。 / Added a browsable development log with dates, first implementation lines, and formal user routes for GUI v1, Clock UI, browser gestures, Fullscreen, public routing, and user guidance.
+- 将开发工具入口并入正式 `/admin/`；旧 `/docs/admin-*.html` 仅保留为历史 mock，账户和任务后台仍受 Beta 权限控制。 / Merged the developer-tool entry into formal `/admin/`; legacy `/docs/admin-*.html` pages remain historical mocks, while account and task administration stays behind Beta authorization.
+- 版本从 `0.72.0` 升为 `0.73.0`，release channel 与本机 Beta worker 同步为 0.73；安装包和线上发布留待独立门禁。 / Bumped the version from `0.72.0` to `0.73.0`, synchronizing the release channel and local Beta worker to 0.73; installers and online publication remain separate gates.
+
 ## 0.72.0 - 2026-08-14 (GitHub Pages formal release)
 
 正式网页发布线切换到 GitHub Pages，并保留 0.72 专用的 UniCloud 隔离账户库。/ The formal web release moves to GitHub Pages while retaining the isolated UniCloud account store for 0.72.

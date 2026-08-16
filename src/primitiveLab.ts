@@ -164,7 +164,7 @@ const displayShapes: DisplayShape[] = [
     candidate: true,
     family: 'candidate' as const,
     indexLabel: `C${String(index + 1).padStart(2, '0')}`,
-    statusLabel: 'candidate'
+    statusLabel: shape.status
   })),
   ...shapeEntries.map((shape, index) => ({
     id: shape.id,
@@ -188,7 +188,7 @@ const displayShapes: DisplayShape[] = [
     candidate: false,
     family: 'concrete' as const,
     indexLabel: `R${String(index + 1).padStart(2, '0')}`,
-    statusLabel: 'concrete'
+    statusLabel: 'pass'
   }))
 ];
 
@@ -219,10 +219,14 @@ function escapeHtml(value: unknown) {
     .replace(/"/g, '&quot;');
 }
 
+function anchorId(prefix: string, value: string) {
+  return `${prefix}-${value.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+}
+
 function renderLabels() {
   labelLayer.innerHTML = displayShapes.map((item) => {
     return `
-      <article class="shape-cell${item.candidate ? ' is-candidate' : ''}${item.family === 'concrete' ? ' is-concrete' : ''}" data-shape="${escapeHtml(item.id)}">
+      <article id="${anchorId('shape', item.id)}" class="shape-cell${item.candidate ? ' is-candidate' : ''}${item.family === 'concrete' ? ' is-concrete' : ''}" data-shape="${escapeHtml(item.id)}">
         <div class="shape-copy">
           <div class="shape-index"><span>${escapeHtml(item.indexLabel)}</span><span class="shape-status">${escapeHtml(item.statusLabel)}</span></div>
           <h3>${escapeHtml(item.name)}</h3>
@@ -232,6 +236,18 @@ function renderLabels() {
       </article>
     `;
   }).join('');
+}
+
+function focusRequestedShape() {
+  const requestedId = new URLSearchParams(window.location.search).get('shape')?.replace(/^[^:]+:/, '');
+  if (!requestedId) return;
+  const item = displayShapes.find((candidate) => candidate.id === requestedId);
+  if (!item) return;
+  const cell = document.getElementById(anchorId('shape', item.id));
+  if (!cell) return;
+  cell.classList.add('is-focus-target');
+  cell.setAttribute('aria-current', 'true');
+  cell.scrollIntoView({ block: 'center', behavior: 'smooth' });
 }
 
 function primitiveModelScale(primitive: FloraPrimitiveName) {
@@ -446,6 +462,7 @@ try {
   renderLabels();
   initScenes();
   updateLayout();
+  window.requestAnimationFrame(focusRequestedShape);
   window.addEventListener('resize', updateLayout);
   window.requestAnimationFrame(animate);
 } catch (error) {

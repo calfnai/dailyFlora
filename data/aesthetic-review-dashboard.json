@@ -1,12 +1,12 @@
 {
-  "updatedAt": "2026-07-25",
+  "updatedAt": "2026-08-16",
   "gate": {
     "status": "pass",
-    "title": "0.14 审美基线通过",
-    "summary": "用户已确认当前 dashboard 中的主要审美组都可以标记为 pass。16 类花材/叶材形态、晨露莓园原创候选、荔枝花园彩虹、多组参考花束方向和反向边界共同构成 0.14 的可用审美基线；后续调整以实际运行页面反馈为准。",
+    "title": "0.73 正式源头花型门禁已更新",
+    "summary": "当前正式源头已记录本轮用户验收：R01-R16 写实花型、C01 褶边副冠水仙型和已标记为 pass 的普通花束抽象形态可进入后续 high 路径；H01 星环脉冲与 01 盘状花仅保留在 SciFi；08、09、10 不采用；13、14 等待显示修复后再验收。",
     "rules": [
       "先复盘参考图，不直接改主花束视觉。",
-      "Primitive Lab 已按 16 类主流花材/叶材形态达到用户验收及格线。",
+      "Primitive Lab 已按 16 类核心抽象花材/叶材形态达到用户验收及格线；这 16 类不代表全部 43 条审核记录。",
       "旧 7 类只作为兼容别名和历史粗分类，不再代表完整覆盖。",
       "后续可以进入整束 composition 改造准备，但任何主视觉修改必须同步更新本 dashboard 的状态和下一步任务。",
       "新增 owner-provided 审美参考必须进入本 dashboard；一旦生成新花，必须有独立 theme/seed 地址，弃用时弃用该地址本身，不借用其他花束地址。",
@@ -235,13 +235,13 @@
     {
       "id": "confirmed-leaf-member-mapping",
       "title": "已验收叶片原型的受控成员映射",
-      "summary": "Strap 当前只有洋水仙和狐尾百合定稿；风信子降级为 review-needed 单独复验，Palmate 保留为独立原型但不映射成员。",
+      "summary": "当前花叶搭配验收 LAB 中列出的洋水仙、狐尾百合和风信子三组关系均可通过；其余成员仍保持未研究，不用通用叶片补位。",
       "principles": [
-        "Strap D2 基生原型已定稿映射洋水仙和狐尾百合；风信子只进入待复验验收页，不算 confirmed。",
+        "Strap D2 基生原型已定稿映射洋水仙、狐尾百合和风信子；这三组关系均来自当前搭配验收 LAB 的明确展示。",
         "飞燕草使用槭属来源 Palmate 的关系已经用户复验否决；Palmate Major Structure Envelope 不映射任何偏写实成员。",
         "叶片必须属于具体 PlantStemInstance，同一花茎只能使用一个 foliageProfile 和一种叶序。",
         "主花束只在既有花材计划实际出现已映射成员时生成少量确认叶片，不为叶片改变花朵计划、RNG 或主要构图。",
-        "其余 22 个偏写实花型保持 unresolved + none；风信子是 review-needed，不得被当作已定稿关系。",
+        "其余 22 个偏写实花型保持 unresolved + none；不得因为本轮三组搭配通过而给其他成员套用通用叶片。",
         "叶片继续承担空间和空气支撑，不遮挡主花，也不因原型获准接入而扩大绿色体量。"
       ],
       "rejectSignals": [
@@ -250,7 +250,7 @@
         "同一根花茎混用多个叶型或出现无 stemId 的叶片。",
         "把受控程序化近似宣称为具体物种扫描叶型。"
       ],
-      "ownerAcceptance": "2026-07-23 用户确认两个叶片原型可用，并要求定稿叶片—花型关系后并入主线。"
+      "ownerAcceptance": "2026-08-16 用户明确确认花叶搭配验收 LAB 中已列出的三组关系可以通过；当前数量较少，后续只增加新的花型—叶片关系。"
     },
     {
       "id": "exclude-lisianthus",
@@ -370,6 +370,14 @@
       "ownerAcceptance": "2026-07-13 用户明确提醒：Dashboard 也供 Codex 主动复习审美使用，不要总等用户提醒花花整体形态问题。"
     }
   ],
+  "shapeVocabularyInventory": {
+    "reviewEntries": 43,
+    "abstractCore": 16,
+    "realisticConcrete": 25,
+    "acceptedHybrid": 1,
+    "candidate": 1,
+    "note": "16 是 Primitive Lab 的核心抽象词表，不是全部花型数量；25 种写实花型、H01 混合花型和 C01 候选花型在独立层记录，合计 43 条审核记录。"
+  },
   "targetShapeVocabulary": [
     {
       "id": "disk-face-flower",
@@ -490,26 +498,60 @@
       "name": "星环脉冲花型",
       "englishName": "Orbital Pulse Flower",
       "primitive": "OrbitalPulseFlower",
-      "status": "pass",
+      "status": "scifi-only",
       "source": "2026-07-12 realistic-skeleton palette-control experiment",
       "examples": "中心能量核、双层放射花瓣、两组实体星环、光脉花蕊和背部生命连接点",
       "whyNeeded": "作为写实花朵骨架叠加非现实配色的正式对照组，帮助区分科幻感究竟来自形态还是来自颜色。",
       "acceptance": "正面先读成花而不是机械徽章；星环通过实体辐条连接花心，侧面能看出能量核、轨道倾角、花蕊高度和背部连接点；360° 旋转没有漂浮圆环。",
-      "ownerNote": "2026-07-13 用户确认可以验收。正式进入可用花库，但分类仍是“写实骨架 × 非现实配色”的混合花型，不代表真正的结构科幻形态已经通过。"
+      "ownerNote": "2026-07-13 用户确认可以验收；本轮进一步限定为仅保留在 SciFi 花库，不进入普通花束。分类仍是“写实骨架 × 非现实配色”的混合花型，不代表真正的结构科幻形态已经通过。"
     }
   ],
+  "acceptedRealisticFlowerGate": {
+    "label": "R01-R16",
+    "status": "pass",
+    "flowerIds": [
+      "daisy",
+      "chamomile",
+      "gerbera",
+      "sunflower",
+      "anemone",
+      "cosmos",
+      "dahlia",
+      "rose",
+      "ranunculus",
+      "camellia",
+      "peony",
+      "pompon-mum",
+      "tulip",
+      "narcissus",
+      "phalaenopsis",
+      "calla"
+    ],
+    "ownerAcceptance": "2026-08-16 用户明确确认 R01-R16 写实花型可以通过；high 主花束允许实际调用这 16 个写实模型。"
+  },
+  "leafFoliageGate": {
+    "status": "pass",
+    "label": "3 组已列关系",
+    "confirmedMembers": [
+      { "id": "narcissus", "cn": "洋水仙", "en": "Narcissus", "foliageProfile": "confirmed:strap-d2-basal-v1", "leafArrangement": "basal" },
+      { "id": "foxtail-lily", "cn": "狐尾百合", "en": "Foxtail Lily", "foliageProfile": "confirmed:strap-d2-basal-v1", "leafArrangement": "basal" },
+      { "id": "hyacinth", "cn": "风信子", "en": "Hyacinth", "foliageProfile": "confirmed:strap-d2-basal-v1", "leafArrangement": "basal" }
+    ],
+    "coverage": "3 / 25",
+    "ownerAcceptance": "2026-08-16 用户明确确认花叶搭配验收 LAB 中当前列出的三组关系可以通过；后续继续增加关系，不把未列成员自动视为通过。"
+  },
   "candidateShapeVocabulary": [
     {
       "id": "frilled-narcissus-corona",
       "name": "褶边副冠水仙型",
       "englishName": "Frilled Narcissus Corona Flower",
       "primitive": "FrilledNarcissusFlower",
-      "status": "reject",
+      "status": "pass",
       "source": "2026-07-05 trumpet-throat v1/v3 realism experiment",
       "examples": "六片略向后反折的花被、明显杯状副冠、波浪褶边、深喉、可见花蕊和背部绿色连接点",
       "whyNeeded": "保留 v1/v3 被认可的正面基准，并把 cup/corona 的深度、褶边和花蕊做成真正可旋转的 3D 结构；它必须与简化洋水仙管心型和 Datura 大喇叭型明显不同。",
       "acceptance": "正面应先读成六片花被围绕褶边副冠；侧面能看出副冠突出与深喉，但不能变成单纯喇叭。360° 旋转时花瓣、褶边、花蕊和绿色连接点都应连续成立。",
-      "ownerNote": "2026-07-25 用户在 43 项花型验收中明确选择不通过。继续保留为未入库候选并回炉修改，不把正式花库从 16 类扩为 17 类。"
+      "ownerNote": "2026-08-16 用户通过截图确认 C01 褶边副冠水仙型；纳入已通过的候选花型，可在普通花束候选中使用，并继续与 07 洋水仙管心型保持形态区分。"
     }
   ],
   "sciFiFlowerExperiment": {
@@ -534,20 +576,20 @@
     {
       "primitive": "OrbitalPulseFlower",
       "humanName": "星环脉冲花型",
-      "status": "pass",
+      "status": "scifi-only",
       "acceptance": "正面、侧面和 360° 旋转均保持花形、能量核、实体星环、花蕊与背部连接连续，不出现机械徽章或漂浮圆环感。",
       "ownerStatus": "2026-07-13 已验收",
       "ownerFeedback": "用户查看线上 Primitive Lab 后确认环脉冲花型可以验收。",
-      "nextTask": "作为正式可用的混合花型和配色对照进入后续花束计划；仍不可替代真正的结构科幻花型研究。",
-      "ownerAcceptance": "用户明确确认通过。"
+      "nextTask": "仅保留在 SciFi 花库和 SciFi 花束；普通花束不生成。",
+      "ownerAcceptance": "用户明确确认通过，但限定为 SciFi-only。"
     },
     {
       "primitive": "DiskFlower",
       "humanName": "盘状花",
-      "status": "pass",
+      "status": "scifi-only",
       "acceptance": "隐藏标签后 3 秒内应读成洋甘菊、雏菊、非洲菊、太阳花一类的脸盘花。",
-      "nextTask": "已达到花库及格线；下一步用于 composition 改造验证。",
-      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+      "nextTask": "仅保留在 SciFi 花库和 SciFi 花束；普通花束不生成。",
+      "ownerAcceptance": "用户确认本轮模型可用，但限定为 SciFi-only，不进入普通花束。"
     },
     {
       "primitive": "CosmosOpenFlower",
@@ -612,32 +654,32 @@
     {
       "primitive": "DaturaTrumpetFlower",
       "humanName": "大喇叭型",
-      "status": "pass",
+      "status": "reject",
       "acceptance": "隐藏标签后应读成 Datura / devil's trumpet 这类大喇叭、深喉部、外翻口缘花。",
       "ownerStatus": "7 太像一个喇叭：重做",
       "ownerFeedback": "这次喇叭形太离谱，像一个喇叭而已，不像花。",
-      "nextTask": "已从单个喇叭物件改成五瓣外翻围出喉部，已达到花库及格线；下一步用于 composition 改造验证。",
-      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+      "nextTask": "不采用；保留为失败记录，普通花束不生成。",
+      "ownerAcceptance": "用户明确不通过，不采用。"
     },
     {
       "primitive": "OrchidButterflyFlower",
       "humanName": "兰花/蝴蝶型",
-      "status": "pass",
+      "status": "reject",
       "acceptance": "隐藏标签后应读成蝴蝶兰或蝴蝶形不对称开口花。",
       "ownerStatus": "8 比例对，角度错",
       "ownerFeedback": "这次比例对了，但花瓣角度不对；上上次角度更正确。",
-      "nextTask": "已保留这次比例和花蕊，并把花瓣角度往上上版方向回调，已达到花库及格线；下一步用于 composition 改造验证。",
-      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+      "nextTask": "不采用；保留为失败记录，普通花束不生成。",
+      "ownerAcceptance": "用户明确不通过，不采用。"
     },
     {
       "primitive": "CallaCurledBract",
       "humanName": "马蹄莲/卷曲苞片型",
-      "status": "pass",
+      "status": "reject",
       "acceptance": "隐藏标签后应读成马蹄莲、卷曲苞片或单片包裹的曲线雕塑花。",
       "ownerStatus": "单看可用，整束比例偏大",
       "ownerFeedback": "马蹄莲/卷曲苞片型单看没问题，但放在一起会稍微比其他花大一点。",
-      "nextTask": "已只在整束 composition 渲染里下调尺度，保留 Primitive Lab 单体形态；下一轮看整束比例是否自然。",
-      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+      "nextTask": "不采用；保留为失败记录，普通花束不生成。",
+      "ownerAcceptance": "用户明确不通过，不采用。"
     },
     {
       "primitive": "SpikeFlower",
@@ -662,20 +704,22 @@
     {
       "primitive": "FullHydrangeaCloud",
       "humanName": "绣球/云团型",
-      "status": "pass",
+      "status": "display-bug",
       "acceptance": "隐藏标签后应读成绣球、绿色云团或密集云状小花簇。",
-      "nextTask": "已增加更多微花和雾点，让它更丰满，已达到花库及格线；下一步用于 composition 改造验证。",
-      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+      "nextTask": "先修复 Primitive Lab 显示 bug，再重新验收；修复前不进入普通花束。",
+      "ownerStatus": "2026-08-16 用户指出当前显示有 bug",
+      "ownerFeedback": "当前画面存在显示 bug，不能据此判定模型通过。",
+      "ownerAcceptance": "未验收，等待显示修复。"
     },
     {
       "primitive": "FruitPodCluster",
       "humanName": "果材/荚果型",
-      "status": "pass",
+      "status": "display-bug",
       "acceptance": "隐藏标签后应读成蓝莓感浆果、小圆果、荚果或枝端果粒。",
-      "ownerStatus": "同类结构风险较轻",
-      "ownerFeedback": "果材/荚果型也有支撑结构问题的风险，但目前不如伞状/小簇型严重，可能与配色和数量有关。",
-      "nextTask": "暂不重做；继续观察主花束中果材数量、颜色和枝条归属是否自然。",
-      "ownerAcceptance": "用户确认本轮 Primitive Gate / 花库验收达到及格线。"
+      "ownerStatus": "2026-08-16 用户指出当前显示有 bug",
+      "ownerFeedback": "当前画面存在显示 bug，不能据此判定模型通过。",
+      "nextTask": "先修复 Primitive Lab 显示 bug，再重新验收；修复前不进入普通花束。",
+      "ownerAcceptance": "未验收，等待显示修复。"
     },
     {
       "primitive": "HangingBellFruit",

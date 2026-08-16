@@ -328,6 +328,12 @@ if (releaseMark) {
     buildInfo.deploymentId ? `Vercel: ${buildInfo.deploymentId}` : ''
   ].filter(Boolean).join('\n');
 }
+document.querySelectorAll<HTMLElement>('[data-release-code]').forEach((node) => {
+  node.textContent = buildInfo.releaseId;
+});
+document.querySelectorAll<HTMLElement>('[data-product-version]').forEach((node) => {
+  node.textContent = buildInfo.releaseId;
+});
 
 const specialId = readSpecialId();
 const specialReference = specialId ? specialReferences[specialId] : null;
@@ -359,19 +365,13 @@ if (clampedRequestedDate !== requestedDate) {
 if (datePicker) datePicker.max = maxSelectableDate;
 let selectedDensity = requestedDensity
   ? normalizeDensity(requestedDensity)
-  : internalPreviewMode
-    ? 'high'
-    : specialReference
-      ? 'medium'
-      : normalizeDensity(params.density);
+  : 'high';
 document.body.classList.toggle('is-preview', previewMode);
 document.body.classList.toggle('is-flower-embed', embedMode);
 siteMenuDebugLink && (siteMenuDebugLink.hidden = !debugMode);
 let selectedRender = requestedRender
   ? normalizeRender(requestedRender)
-  : internalPreviewMode || specialReference
-    ? 'high'
-    : normalizeRender(params.render);
+  : 'high';
 let selectedTheme = specialReference ? specialReference.theme.id : params.theme;
 let quality = resolveQuality(selectedDensity, selectedRender);
 let spec = specialReference
@@ -1550,8 +1550,6 @@ async function applyRemoteDailyContent(dateKey = params.date) {
 
   const entry = loaded.entry;
   if (!searchParams.has('theme') && entry.themeId) selectedTheme = entry.themeId;
-  if (!requestedDensity && entry.density) selectedDensity = entry.density;
-  if (!requestedRender && entry.render) selectedRender = entry.render;
   quality = resolveQuality(selectedDensity, selectedRender);
   spec = createDailySpec(entry.date, entry.seed, selectedTheme);
   scene.rebuild(spec, quality);
@@ -1728,7 +1726,7 @@ loginForm?.addEventListener('submit', async (event) => {
     try {
       const account = mainAuthMode === 'login'
         ? await loginAccount({ email, password })
-        : await registerAccount({ name, email, password, termsVersion: '0.72.0' });
+        : await registerAccount({ name, email, password, termsVersion: '0.73.0' });
       saveAccountState(account);
       favoriteBouquets = await listCloudFavorites();
       if (!hadLocalAccount && localFavoritesBeforeAuth.length > 0 && window.confirm(`发现本机有 ${localFavoritesBeforeAuth.length} 条未同步收藏，是否合并到 ${account.email}？`)) {
@@ -1755,7 +1753,7 @@ loginForm?.addEventListener('submit', async (event) => {
       if (submitButton) submitButton.disabled = false;
     }
   }
-  setMainAuthError('0.72 Beta 云端账户服务当前不可用，请稍后重试。');
+  setMainAuthError('0.73 Beta 云端账户服务当前不可用，请稍后重试。');
   if (submitButton) submitButton.disabled = false;
 });
 

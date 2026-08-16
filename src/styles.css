@@ -478,6 +478,28 @@ body:not(.is-special) .language-switcher button:focus-visible {
   font-weight: 800;
 }
 
+.site-menu-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-top: 8px;
+  padding: 8px 4px 2px;
+  border-top: 1px solid rgb(255 255 255 / 12%);
+  color: rgb(243 239 230 / 58%);
+  font: 500 9px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .08em;
+}
+
+.site-menu-footer a,
+.site-menu-footer span {
+  min-height: 0;
+  padding: 3px 0;
+  color: inherit;
+}
+
+.site-menu-footer a:hover,
+.site-menu-footer a:focus-visible { color: rgb(243 239 230 / 94%); background: transparent; }
+
 .hud {
   left: max(18px, env(safe-area-inset-left));
   top: max(16px, env(safe-area-inset-top));

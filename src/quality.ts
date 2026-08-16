@@ -47,15 +47,7 @@ export const renderProfiles: Record<Exclude<RenderQualityName, 'auto'>, RenderSe
 
 export function resolveRenderQuality(input: RenderQualityName): Exclude<RenderQualityName, 'auto'> {
   if (input !== 'auto') return input;
-
-  const cores = navigator.hardwareConcurrency || 4;
-  const smallScreen = Math.min(window.innerWidth, window.innerHeight) < 720;
-  const mobileLike = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 900;
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (reducedMotion || cores <= 6 || smallScreen || mobileLike) return 'low';
-  if (cores >= 8 && window.devicePixelRatio <= 2 && window.innerWidth >= 1200) return 'high';
-  return 'medium';
+  return 'high';
 }
 
 export function resolveQuality(density: DensityName, render: RenderQualityName): QualityProfile {

@@ -29,7 +29,7 @@ async function download(url, destination) {
 
 function runCodex(referencePath, manifestPath, outputPath, task) {
   const prompt = [
-    '你是 DailyFlora 0.72 Beta 的只读花束参数分析器。',
+    '你是 DailyFlora 0.73 Beta 的只读花束参数分析器。',
     '查看附带的参考图和 manifest.json，仅输出符合指定 JSON Schema 的 JSON。',
     '不得修改源码、不得写项目目录、不得执行外部副作用。',
     `用户偏好：${task.input?.preference || '未填写'}`,
@@ -112,12 +112,12 @@ const server = createServer(async (request, response) => {
   if (request.method === 'OPTIONS') { response.writeHead(204, headers); response.end(); return; }
   if (request.method === 'GET' && request.url === '/') {
     response.writeHead(200, headers);
-    response.end(JSON.stringify({ ok: true, service: 'DailyFlora 0.72 Beta worker', version: '0.72-beta.6', health: '/health', process: 'POST /process' }));
+    response.end(JSON.stringify({ ok: true, service: 'DailyFlora 0.73 Beta worker', version: '0.73-beta.1', health: '/health', process: 'POST /process' }));
     return;
   }
   if (request.method === 'GET' && request.url === '/health') {
     response.writeHead(200, headers);
-    response.end(JSON.stringify({ ok: true, version: '0.72-beta.6', queueRoot: root }));
+    response.end(JSON.stringify({ ok: true, version: '0.73-beta.1', queueRoot: root }));
     return;
   }
   if (request.method !== 'POST' || request.url !== '/process') { response.writeHead(404, headers); response.end(JSON.stringify({ message: 'Not found' })); return; }
@@ -136,5 +136,5 @@ const server = createServer(async (request, response) => {
 });
 
 server.listen(port, '127.0.0.1', () => {
-  process.stdout.write(`DailyFlora 0.72 Beta worker listening on http://127.0.0.1:${port}\nQueue: ${root}\n`);
+  process.stdout.write(`DailyFlora 0.73 Beta worker listening on http://127.0.0.1:${port}\nQueue: ${root}\n`);
 });

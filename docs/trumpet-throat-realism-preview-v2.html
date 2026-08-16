@@ -7,7 +7,8 @@
   <style>
     :root{color-scheme:dark;--bg:#080b0f;--panel:#121923;--line:rgb(247 240 227 / 14%);--text:#f7f0e3;--muted:rgb(247 240 227 / 68%);--accent:#f2cb62;--warn:#efb960;--bad:#ff8c74;--good:#87d486}*{box-sizing:border-box}body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(circle at 12% 0%,rgb(242 203 98 / 12%),transparent 28%),linear-gradient(180deg,#080b0f,#101720 58%,#080b0f);color:var(--text)}main{width:min(1100px,100%);margin:0 auto;padding:28px 18px 48px}header,.card{border:1px solid var(--line);border-radius:10px;background:rgb(18 25 35 / 78%)}header{display:grid;gap:12px;padding:24px;background:linear-gradient(145deg,rgb(18 25 35 / 96%),rgb(24 33 45 / 84%))}h1,h2,h3,p{margin:0}h1{font-size:clamp(32px,6vw,60px);line-height:1}.eyebrow{color:var(--warn);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.lead{max-width:92ch;color:var(--muted);line-height:1.68;font-size:14px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}.card{padding:16px}.card h2{font-size:18px;margin-bottom:10px}.card p,.card li{color:var(--muted);font-size:14px;line-height:1.7}.card ul{margin:8px 0 0;padding-left:20px}.tag{display:inline-flex;align-items:center;min-height:24px;padding:0 8px;border:1px solid currentColor;border-radius:999px;font-size:12px;font-weight:800}.bad{color:var(--bad)}.good{color:var(--good)}.warn{color:var(--warn)}.links{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.links a{display:inline-flex;align-items:center;min-height:34px;padding:0 12px;border:1px solid var(--line);border-radius:999px;color:var(--text);text-decoration:none;background:rgb(255 255 255 / 4%)}.links a.primary{border-color:rgb(242 203 98 / 52%);color:var(--accent)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:rgb(247 240 227 / 82%)}.note{margin-top:16px;padding:14px 16px;border:1px solid rgb(255 140 116 / 34%);border-radius:10px;background:rgb(255 140 116 / 6%);color:var(--muted);line-height:1.7;font-size:14px}@media(max-width:800px){.grid{grid-template-columns:1fr}}
   </style>
-</head>
+    <link rel="stylesheet" href="../docs-footer.css">
+  </head>
 <body>
   <main>
     <header>
@@ -64,5 +65,7 @@
 
     <p class="note">后续不要继续修 v2 的花型。正确路线是以 v1 为视觉基准，做 v3 / v4：只增加 360 拖拽查看，不改花瓣、cup、rim、喉部和绿色连接点的正面基准。</p>
   </main>
-</body>
+
+    <footer class="docs-footer" aria-label="DailyFlora internal navigation"><div class="docs-footer-links"><a href="../">DailyFlora</a><a href="../admin/">Admin</a><a href="./development-log.html">开发日志</a><a href="./aesthetic-review-dashboard.html?debug=1">审美 Dashboard</a><a href="../how-to-use/">使用说明</a><a href="../legal/terms/">条款</a><a href="../legal/privacy/">隐私</a></div><span>0.73 · internal documentation</span></footer>
+  </body>
 </html>
