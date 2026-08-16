@@ -71,15 +71,6 @@ export default defineConfig({
   plugins: [
     {
       name: 'dailyflora-build-metadata',
-      transformIndexHtml() {
-        return [
-          {
-            tag: 'meta',
-            attrs: { name: 'dailyflora-release', content: buildInfo.releaseId },
-            injectTo: 'head'
-          }
-        ];
-      },
       closeBundle() {
         mkdirSync(resolve(__dirname, 'dist'), { recursive: true });
         writeFileSync(resolve(__dirname, 'dist/version.json'), `${JSON.stringify(buildInfo, null, 2)}\n`);
