@@ -6,15 +6,6 @@
 
 - 恢复 GitHub Pages 发布门禁需要的 docs/LAB 页面为 Vite 构建入口，确保审美复盘 Dashboard、Primitive Lab、固定花束样例库和相关花型/叶片 LAB 随正式构建产出。 / Restored the docs/LAB pages required by the GitHub Pages release gate as Vite build inputs, ensuring the aesthetic review Dashboard, Primitive Lab, fixed bouquet sample library, and related flower/leaf LAB pages are emitted by the formal build.
 
-## 0.74.0 - 2026-08-17 (release candidate)
-
-在 0.73 integration 候选的完整源头上，补回并固化用户确认的“非长串花型不自带长后茎”规则，生成可审计的 0.74 发布候选。 / Built on the complete 0.73 integration candidate, restored and locked the user-confirmed rule that non-spike blooms do not carry a detached long rear stem, producing an auditable 0.74 release candidate.
-
-- 面花、层叠花和单朵雕塑花只保留花头与必要花托；花束连接由主枝细茎、共同扎口和绑点承担。
-- 穗状花、果材/吊坠风铃果和叶材/草线/枝条保留自身连续连接，不套用无长后茎规则。
-- Primitive Lab 明确标注 16 种无长后茎花型与 4 种保留茎/枝条形态，保留旋转、路由和正式导航边界。
-- 补齐公开运行配置、0.74 账户文案、Beta worker、法律/帮助页和开发文档版本标识；不修改 \`special0629\`。
-
 ## 0.73.0 - 2026-08-16 (formal integration candidate)
 
 本版本将 0.15 验收版中已确认的花型/叶片结果定向整合到 0.72 正式源头，并补齐开发日志与 Admin 开发工作台；当前只完成源码与本地构建候选，尚未部署网页或重打 DMG、EXE、ScreenSaver。 / This release directionally reconciles the accepted flower/leaf results from the 0.15 acceptance build into the 0.72 formal source and adds the development log plus the Admin developer workspace; this is currently a source and local-build candidate only, not a web deployment or DMG, EXE, or ScreenSaver rebuild.

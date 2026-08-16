@@ -1711,7 +1711,7 @@ loginForm?.addEventListener('submit', async (event) => {
     try {
       const account = mainAuthMode === 'login'
         ? await loginAccount({ email, password })
-        : await registerAccount({ name, email, password, termsVersion: '0.74.0' });
+        : await registerAccount({ name, email, password, termsVersion: '0.73.0' });
       saveAccountState(account);
       favoriteBouquets = await listCloudFavorites();
       if (!hadLocalAccount && localFavoritesBeforeAuth.length > 0 && window.confirm(`发现本机有 ${localFavoritesBeforeAuth.length} 条未同步收藏，是否合并到 ${account.email}？`)) {
@@ -1738,7 +1738,7 @@ loginForm?.addEventListener('submit', async (event) => {
       if (submitButton) submitButton.disabled = false;
     }
   }
-  setMainAuthError('0.74 Beta 云端账户服务当前不可用，请稍后重试。');
+  setMainAuthError('0.73 Beta 云端账户服务当前不可用，请稍后重试。');
   if (submitButton) submitButton.disabled = false;
 });
 

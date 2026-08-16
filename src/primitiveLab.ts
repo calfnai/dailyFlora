@@ -141,13 +141,6 @@ const gateEntries = dashboardData.primitiveGate as GateEntry[];
 const promotedRealisticDefinitions = realisticFlowerDefinitions.filter(
   (definition) => definition.category !== 'spike' && definition.category !== 'cluster'
 );
-const stemlessRealisticCategories = new Set<RealisticFlowerDefinition['category']>(['face', 'layered', 'sculptural']);
-const stemBearingTargetShapeIds = new Set([
-  'spike-vertical-form',
-  'fruit-pod-form',
-  'hanging-bell-fruit',
-  'foliage-grass-branch'
-]);
 const displayShapes: DisplayShape[] = [
   ...acceptedHybridEntries.map((shape, index) => ({
     id: shape.id,
@@ -165,7 +158,7 @@ const displayShapes: DisplayShape[] = [
     id: shape.id,
     name: shape.name,
     englishName: shape.englishName,
-    description: `${shape.examples}${stemBearingTargetShapeIds.has(shape.id) ? ` 本页分类：${shape.id === 'spike-vertical-form' ? '长串花型' : '带茎/枝条型'}，保留连接部分；不适用“无长后茎”规则。` : ''}`,
+    description: shape.examples,
     primitive: shape.primitive,
     realisticDefinition: null,
     candidate: true,
@@ -183,21 +176,19 @@ const displayShapes: DisplayShape[] = [
     candidate: false,
     family: 'target' as const,
     indexLabel: String(index + 1).padStart(2, '0'),
-    statusLabel: stemBearingTargetShapeIds.has(shape.id)
-      ? shape.id === 'spike-vertical-form' ? '长串花型' : '保留茎/枝条'
-      : gateEntries.find((item) => item.primitive === targetPrimitiveByShapeId[shape.id])?.status || 'pass'
+    statusLabel: gateEntries.find((item) => item.primitive === targetPrimitiveByShapeId[shape.id])?.status || 'pass'
   })),
   ...promotedRealisticDefinitions.map((definition, index) => ({
     id: definition.id,
     name: definition.cn,
     englishName: definition.en,
-    description: `${definition.description} ${definition.printStructure} 本页规则：不自带长后茎，由花束主枝承接。`,
+    description: `${definition.description} ${definition.printStructure}`,
     primitive: null,
     realisticDefinition: definition,
     candidate: false,
     family: 'concrete' as const,
     indexLabel: `R${String(index + 1).padStart(2, '0')}`,
-    statusLabel: stemlessRealisticCategories.has(definition.category) ? '无长后茎' : 'concrete'
+    statusLabel: 'pass'
   }))
 ];
 
@@ -234,9 +225,8 @@ function anchorId(prefix: string, value: string) {
 
 function renderLabels() {
   labelLayer.innerHTML = displayShapes.map((item) => {
-    const stemBearingClass = stemBearingTargetShapeIds.has(item.id) ? ' is-stem-bearing' : '';
     return `
-      <article id="${anchorId('shape', item.id)}" class="shape-cell${item.candidate ? ' is-candidate' : ''}${item.family === 'concrete' ? ' is-concrete' : ''}${stemBearingClass}" data-shape="${escapeHtml(item.id)}">
+      <article id="${anchorId('shape', item.id)}" class="shape-cell${item.candidate ? ' is-candidate' : ''}${item.family === 'concrete' ? ' is-concrete' : ''}" data-shape="${escapeHtml(item.id)}">
         <div class="shape-copy">
           <div class="shape-index"><span>${escapeHtml(item.indexLabel)}</span><span class="shape-status">${escapeHtml(item.statusLabel)}</span></div>
           <h3>${escapeHtml(item.name)}</h3>
