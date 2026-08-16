@@ -105,7 +105,7 @@ authForm?.addEventListener('submit', async (event) => {
           name: String(data.get('name') || '').trim(),
           email,
           password,
-          termsVersion: '0.73.0'
+          termsVersion: '0.74.0'
         });
     await mergeGuestFavorites(user);
     saveAccount(user);

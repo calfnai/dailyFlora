@@ -94,7 +94,7 @@ test('provider resource exhaustion is surfaced as an actionable account error', 
 test('local Beta worker exposes a verified browser-readable root status route', () => {
   const worker = read('scripts/dailyflora-beta-worker.mjs');
   assert.match(worker, /request\.method === 'GET' && request\.url === '\/'/);
-  assert.match(worker, /service: 'DailyFlora 0\.73 Beta worker'/);
+  assert.match(worker, /service: 'DailyFlora 0\.74 Beta worker'/);
   assert.match(worker, /request\.method === 'GET' && request\.url === '\/health'/);
 });
 

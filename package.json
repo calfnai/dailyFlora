@@ -1,8 +1,8 @@
 {
   "name": "daily-flora",
   "private": true,
-  "version": "0.73.0",
-  "productVersion": "0.73",
+  "version": "0.74.0",
+  "productVersion": "0.74",
   "main": "desktop/windows/main.cjs",
   "description": "DailyFlora generative flower display for Windows 10 and 11",
   "type": "module",
