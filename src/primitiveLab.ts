@@ -141,6 +141,13 @@ const gateEntries = dashboardData.primitiveGate as GateEntry[];
 const promotedRealisticDefinitions = realisticFlowerDefinitions.filter(
   (definition) => definition.category !== 'spike' && definition.category !== 'cluster'
 );
+const stemlessRealisticCategories = new Set<RealisticFlowerDefinition['category']>(['face', 'layered', 'sculptural']);
+const stemBearingTargetShapeIds = new Set([
+  'spike-vertical-form',
+  'fruit-pod-form',
+  'hanging-bell-fruit',
+  'foliage-grass-branch'
+]);
 const displayShapes: DisplayShape[] = [
   ...acceptedHybridEntries.map((shape, index) => ({
     id: shape.id,
@@ -158,13 +165,13 @@ const displayShapes: DisplayShape[] = [
     id: shape.id,
     name: shape.name,
     englishName: shape.englishName,
-    description: shape.examples,
+    description: `${shape.examples}${stemBearingTargetShapeIds.has(shape.id) ? ` 本页分类：${shape.id === 'spike-vertical-form' ? '长串花型' : '带茎/枝条型'}，保留连接部分；不适用“无长后茎”规则。` : ''}`,
     primitive: shape.primitive,
     realisticDefinition: null,
     candidate: true,
     family: 'candidate' as const,
     indexLabel: `C${String(index + 1).padStart(2, '0')}`,
-    statusLabel: 'candidate'
+    statusLabel: shape.status
   })),
   ...shapeEntries.map((shape, index) => ({
     id: shape.id,
@@ -176,19 +183,21 @@ const displayShapes: DisplayShape[] = [
     candidate: false,
     family: 'target' as const,
     indexLabel: String(index + 1).padStart(2, '0'),
-    statusLabel: gateEntries.find((item) => item.primitive === targetPrimitiveByShapeId[shape.id])?.status || 'pass'
+    statusLabel: stemBearingTargetShapeIds.has(shape.id)
+      ? shape.id === 'spike-vertical-form' ? '长串花型' : '保留茎/枝条'
+      : gateEntries.find((item) => item.primitive === targetPrimitiveByShapeId[shape.id])?.status || 'pass'
   })),
   ...promotedRealisticDefinitions.map((definition, index) => ({
     id: definition.id,
     name: definition.cn,
     englishName: definition.en,
-    description: `${definition.description} ${definition.printStructure}`,
+    description: `${definition.description} ${definition.printStructure} 本页规则：不自带长后茎，由花束主枝承接。`,
     primitive: null,
     realisticDefinition: definition,
     candidate: false,
     family: 'concrete' as const,
     indexLabel: `R${String(index + 1).padStart(2, '0')}`,
-    statusLabel: 'concrete'
+    statusLabel: stemlessRealisticCategories.has(definition.category) ? '无长后茎' : 'concrete'
   }))
 ];
 
@@ -219,10 +228,15 @@ function escapeHtml(value: unknown) {
     .replace(/"/g, '&quot;');
 }
 
+function anchorId(prefix: string, value: string) {
+  return `${prefix}-${value.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+}
+
 function renderLabels() {
   labelLayer.innerHTML = displayShapes.map((item) => {
+    const stemBearingClass = stemBearingTargetShapeIds.has(item.id) ? ' is-stem-bearing' : '';
     return `
-      <article class="shape-cell${item.candidate ? ' is-candidate' : ''}${item.family === 'concrete' ? ' is-concrete' : ''}" data-shape="${escapeHtml(item.id)}">
+      <article id="${anchorId('shape', item.id)}" class="shape-cell${item.candidate ? ' is-candidate' : ''}${item.family === 'concrete' ? ' is-concrete' : ''}${stemBearingClass}" data-shape="${escapeHtml(item.id)}">
         <div class="shape-copy">
           <div class="shape-index"><span>${escapeHtml(item.indexLabel)}</span><span class="shape-status">${escapeHtml(item.statusLabel)}</span></div>
           <h3>${escapeHtml(item.name)}</h3>
@@ -232,6 +246,18 @@ function renderLabels() {
       </article>
     `;
   }).join('');
+}
+
+function focusRequestedShape() {
+  const requestedId = new URLSearchParams(window.location.search).get('shape')?.replace(/^[^:]+:/, '');
+  if (!requestedId) return;
+  const item = displayShapes.find((candidate) => candidate.id === requestedId);
+  if (!item) return;
+  const cell = document.getElementById(anchorId('shape', item.id));
+  if (!cell) return;
+  cell.classList.add('is-focus-target');
+  cell.setAttribute('aria-current', 'true');
+  cell.scrollIntoView({ block: 'center', behavior: 'smooth' });
 }
 
 function primitiveModelScale(primitive: FloraPrimitiveName) {
@@ -446,6 +472,7 @@ try {
   renderLabels();
   initScenes();
   updateLayout();
+  window.requestAnimationFrame(focusRequestedShape);
   window.addEventListener('resize', updateLayout);
   window.requestAnimationFrame(animate);
 } catch (error) {

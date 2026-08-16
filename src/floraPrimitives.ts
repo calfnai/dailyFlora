@@ -1081,6 +1081,9 @@ export function createFullHydrangeaCloud(options: FloraPrimitiveOptions) {
       cursor += 1;
     }
   }
+  micro.instanceMatrix.needsUpdate = true;
+  if (micro.instanceColor) micro.instanceColor.needsUpdate = true;
+  micro.frustumCulled = false;
   const hazePositions: number[] = [];
   const hazeColors: number[] = [];
   for (let i = 0; i < 90; i += 1) {
@@ -1145,6 +1148,11 @@ export function createBerryCluster(options: FloraPrimitiveOptions) {
   const highlightGeometry = new THREE.BufferGeometry();
   highlightGeometry.setAttribute('position', new THREE.Float32BufferAttribute(highlightPositions, 3));
   highlightGeometry.setAttribute('color', new THREE.Float32BufferAttribute(highlightColors, 3));
+  berries.instanceMatrix.needsUpdate = true;
+  if (berries.instanceColor) berries.instanceColor.needsUpdate = true;
+  berries.frustumCulled = false;
+  stemGeometry.computeBoundingSphere();
+  highlightGeometry.computeBoundingSphere();
   group.add(
     new THREE.LineSegments(stemGeometry, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.72 })),
     berries,

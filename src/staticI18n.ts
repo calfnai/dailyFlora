@@ -158,7 +158,11 @@ function syncReleaseInfo() {
     .then((response) => response.ok ? response.json() : null)
     .then((info) => {
       if (!info) return;
-      document.querySelectorAll<HTMLElement>('[data-release-code]').forEach((node) => { node.textContent = info.releaseId || ''; });
+      const publicVersion = info.productVersion || info.version || '';
+      document.querySelectorAll<HTMLElement>('[data-release-code]').forEach((node) => {
+        node.textContent = publicVersion;
+        if (node instanceof HTMLAnchorElement) node.removeAttribute('href');
+      });
       document.querySelectorAll<HTMLElement>('[data-product-version]').forEach((node) => { node.textContent = info.productVersion || info.version || ''; });
     })
     .catch(() => {});

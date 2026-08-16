@@ -71,6 +71,10 @@ function escapeHtml(value: unknown) {
     .replace(/"/g, '&quot;');
 }
 
+function anchorId(prefix: string, value: string) {
+  return `${prefix}-${value.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+}
+
 function renderLabels() {
   labels.innerHTML = displayedDefinitions.map((definition, index) => {
     const foliage = realisticFlowerFoliageStatus[definition.id];
@@ -80,7 +84,7 @@ function renderLabels() {
         ? '待复验：仅在搭配验收页显示'
         : '后续需要独立研究';
     return `
-      <article class="cell" data-flower="${escapeHtml(definition.id)}" data-foliage-profile="${escapeHtml(foliage.foliageProfile)}" data-leaf-mode="${escapeHtml(foliage.leafMode)}">
+      <article id="${anchorId('flower', definition.id)}" class="cell" data-flower="${escapeHtml(definition.id)}" data-foliage-profile="${escapeHtml(foliage.foliageProfile)}" data-leaf-mode="${escapeHtml(foliage.leafMode)}">
         <div class="label">
           <div class="meta"><span>${String(index + 1).padStart(2, '0')} · ${escapeHtml(definition.category)}</span><span class="connected">${definition.frozen ? 'frozen' : 'connected'}</span></div>
           <h3>${escapeHtml(definition.cn)}</h3>
@@ -95,6 +99,18 @@ function renderLabels() {
       </article>
     `;
   }).join('');
+}
+
+function focusRequestedFlower() {
+  const requestedId = new URLSearchParams(window.location.search).get('flower')?.replace(/^[^:]+:/, '');
+  if (!requestedId) return;
+  const definition = displayedDefinitions.find((candidate) => candidate.id === requestedId);
+  if (!definition) return;
+  const cell = document.getElementById(anchorId('flower', definition.id));
+  if (!cell) return;
+  cell.classList.add('is-focus-target');
+  cell.setAttribute('aria-current', 'true');
+  cell.scrollIntoView({ block: 'center', behavior: 'smooth' });
 }
 
 function modelScale(definition: RealisticFlowerDefinition) {
@@ -307,6 +323,7 @@ try {
   renderLabels();
   initScenes();
   updateLayout();
+  window.requestAnimationFrame(focusRequestedFlower);
   window.addEventListener('resize', updateLayout);
   window.requestAnimationFrame(animate);
 } catch (error) {

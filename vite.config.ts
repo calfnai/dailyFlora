@@ -71,15 +71,6 @@ export default defineConfig({
   plugins: [
     {
       name: 'dailyflora-build-metadata',
-      transformIndexHtml() {
-        return [
-          {
-            tag: 'meta',
-            attrs: { name: 'dailyflora-release', content: buildInfo.releaseId },
-            injectTo: 'head'
-          }
-        ];
-      },
       closeBundle() {
         mkdirSync(resolve(__dirname, 'dist'), { recursive: true });
         writeFileSync(resolve(__dirname, 'dist/version.json'), `${JSON.stringify(buildInfo, null, 2)}\n`);
@@ -101,6 +92,11 @@ export default defineConfig({
           resolve(__dirname, 'sites/worker.js'),
           resolve(__dirname, 'dist/server/index.js')
         );
+        mkdirSync(resolve(__dirname, 'dist/what-did-hubble-see-on-your-birthday'), { recursive: true });
+        copyFileSync(
+          resolve(__dirname, 'docs/what-did-hubble-see-on-your-birthday/index.html'),
+          resolve(__dirname, 'dist/what-did-hubble-see-on-your-birthday/index.html')
+        );
         const indexHtmlPath = resolve(__dirname, 'dist/index.html');
         if (existsSync(indexHtmlPath)) {
           const indexHtml = readFileSync(indexHtmlPath, 'utf8');
@@ -112,11 +108,6 @@ export default defineConfig({
             );
           }
         }
-        mkdirSync(resolve(__dirname, 'dist/what-did-hubble-see-on-your-birthday'), { recursive: true });
-        copyFileSync(
-          resolve(__dirname, 'docs/what-did-hubble-see-on-your-birthday/index.html'),
-          resolve(__dirname, 'dist/what-did-hubble-see-on-your-birthday/index.html')
-        );
       }
     }
   ],
@@ -132,6 +123,8 @@ export default defineConfig({
         member: resolve(__dirname, 'member/index.html'),
         login: resolve(__dirname, 'login/index.html'),
         admin: resolve(__dirname, 'admin/index.html'),
+        devIndex: resolve(__dirname, 'docs/dev-index.html'),
+        developmentLog: resolve(__dirname, 'docs/development-log.html'),
         publicBouquet: resolve(__dirname, 'bouquet/index.html'),
         legalTerms: resolve(__dirname, 'legal/terms/index.html'),
         legalPrivacy: resolve(__dirname, 'legal/privacy/index.html'),

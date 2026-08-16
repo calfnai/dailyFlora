@@ -13,6 +13,12 @@ import {
   type PlantStemInstance
 } from './plantOwnership';
 import { buildConfirmedFoliage } from './realisticLeafForms';
+import {
+  createRealisticFlower,
+  realisticFlowerDefinitions,
+  type RealisticFlowerDefinition,
+  type RealisticFlowerId
+} from './realisticFlowerForms';
 
 const tempObject = new THREE.Object3D();
 const tempColor = new THREE.Color();
@@ -30,6 +36,31 @@ const minCameraPitch = 0.03;
 const maxCameraPitch = 1.34;
 const minZoomOffset = -1.35;
 const maxZoomOffset = 2.05;
+const routeResumeAfterDragMs = 10_000;
+
+const acceptedRealisticFlowerByType: Partial<Record<FlowerTypeId, RealisticFlowerId>> = {
+  daisy: 'daisy',
+  chamomile: 'chamomile',
+  gerbera: 'gerbera',
+  sunflower: 'sunflower',
+  anemone: 'anemone',
+  cosmos: 'cosmos',
+  dahlia: 'dahlia',
+  rose: 'rose',
+  ranunculus: 'ranunculus',
+  camellia: 'camellia',
+  peony: 'peony',
+  pompon: 'pompon-mum',
+  tulip: 'tulip',
+  narcissus: 'narcissus',
+  phalaenopsis: 'phalaenopsis',
+  calla: 'calla'
+};
+const acceptedRealisticDefinitions = new Map<RealisticFlowerId, RealisticFlowerDefinition>(
+  realisticFlowerDefinitions
+    .filter((definition) => Object.values(acceptedRealisticFlowerByType).includes(definition.id))
+    .map((definition) => [definition.id, definition])
+);
 
 type FlowerBuildResult = {
   object: THREE.Object3D;
@@ -513,7 +544,7 @@ function geometryForFlowerType(typeId: FlowerTypeId, radius: number) {
   }
 }
 
-function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimitiveName {
+function rawPrimitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimitiveName {
   if (planId === 'lychee-garden-rainbow') {
     if (item.typeId === 'chamomile') return 'CosmosOpenFlower';
     if (item.typeId === 'bellFruit') return 'FruitPodCluster';
@@ -618,6 +649,29 @@ function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimit
     calla: 'CallaCurledBract'
   };
   return primitiveByType[item.typeId];
+}
+
+function realisticDefinitionForPlanItem(item: FlowerPlanItem): RealisticFlowerDefinition | null {
+  const definitionId = acceptedRealisticFlowerByType[item.typeId];
+  return definitionId ? acceptedRealisticDefinitions.get(definitionId) ?? null : null;
+}
+
+// Keep the ordinary bouquet path limited to accepted, visually stable primitives.
+// SciFi keeps its own OrbitalPulse/Disk entries; rejected or display-bug entries
+// must not leak back into a normal daily bouquet through an old plan mapping.
+const ordinaryPrimitiveFallback: Partial<Record<FloraPrimitiveName, FloraPrimitiveName>> = {
+  OrbitalPulseFlower: 'StarPinwheelFlower',
+  DiskFlower: 'CosmosOpenFlower',
+  DaturaTrumpetFlower: 'TrumpetThroatFlower',
+  OrchidButterflyFlower: 'TulipCupFlower',
+  CallaCurledBract: 'TulipCupFlower',
+  FullHydrangeaCloud: 'UmbelMiniCluster',
+  FruitPodCluster: 'HangingBellFruit'
+};
+
+function primitiveForPlanItem(item: FlowerPlanItem, planId: string): FloraPrimitiveName {
+  const primitive = rawPrimitiveForPlanItem(item, planId);
+  return ordinaryPrimitiveFallback[primitive] ?? primitive;
 }
 
 function primitiveRoleForPlanItem(item: FlowerPlanItem): FloraPrimitiveRole {
@@ -893,6 +947,17 @@ function orientPrimitiveGroup(
   group.rotateY(rng.range(0, Math.PI * 2));
 }
 
+function orientRealisticFlowerGroup(
+  group: THREE.Group,
+  point: THREE.Vector3,
+  rng: ReturnType<typeof createRng>
+) {
+  const outward = point.clone().setY(point.y * 0.55 + 0.48).normalize();
+  group.quaternion.setFromUnitVectors(up, outward.lengthSq() ? outward : up);
+  group.rotateZ(rng.range(0, Math.PI * 2));
+  group.rotateX(rng.range(-0.16, 0.16));
+}
+
 function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) {
   const plannedCount = Math.floor(quality.flowerCount * spec.flowerDensity);
   const specialPrimitiveRatio = spec.flowerPlan.id === 'her-real-bouquet-memory-v4' ? 0.5 : 0.34;
@@ -911,9 +976,11 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
     const adjustedShare = weightedShares[index] / shareTotal;
     const batchCount = index === batches.length - 1 ? count - used : Math.max(1, Math.floor(count * adjustedShare));
     used += batchCount;
-    const primitive = primitiveForPlanItem(batch, spec.flowerPlan.id);
-    const factory = floraPrimitiveFactories[primitive];
-    const localRng = createRng(`${spec.seed}:primitive-flowers:${spec.flowerPlan.id}:${batch.typeId}:${primitive}`);
+    const realisticDefinition = realisticDefinitionForPlanItem(batch);
+    const primitive = realisticDefinition ? null : primitiveForPlanItem(batch, spec.flowerPlan.id);
+    const factory = primitive ? floraPrimitiveFactories[primitive] : null;
+    const modelKey = realisticDefinition ? `realistic-${realisticDefinition.id}` : primitive;
+    const localRng = createRng(`${spec.seed}:primitive-flowers:${spec.flowerPlan.id}:${batch.typeId}:${modelKey}`);
 
     for (let i = 0; i < batchCount; i += 1) {
       const { p, theta } = placementPoint(spec, localRng, batch.placement);
@@ -932,27 +999,36 @@ function buildPrimitiveFlowers(spec: DailyBouquetSpec, quality: QualityProfile) 
       const specialScale = bloom ? localRng.range(bloom.small, bloom.medium) * 0.52 : 1;
       const tuningScale = spec.compositionTuning?.roleScale?.[batch.role] ?? 1;
       const spikeScale = primitive === 'SpikeFlower' ? spec.compositionTuning?.spikeScale ?? 1 : 1;
-      const primitiveGroup = factory({
-        seed: `${spec.seed}:bouquet-primitive:${primitive}:${batch.typeId}:${i}`,
-        position: p,
-        scale: roleScale * batch.scale * compositionScaleForPrimitive(primitive) * localRng.range(0.72, primitive === 'SpikeFlower' ? 1.02 : 1.22) * specialScale * tuningScale * spikeScale,
-        colorPalette: primitivePalette(spec, primitive, localRng, batch),
-        openness: ['OrchidButterflyFlower', 'TrumpetThroatFlower', 'DaturaTrumpetFlower', 'CallaCurledBract'].includes(primitive) ? 0.94 : localRng.range(0.62, 0.86),
-        density: ['UmbelMiniCluster', 'FullHydrangeaCloud', 'FruitPodCluster'].includes(primitive) ? 1.08 : localRng.range(0.86, 1.02),
-        curvature: ['SpikeFlower', 'FoliageGrassBranch', 'CallaCurledBract'].includes(primitive) ? 0.86 : 0.42,
-        role: primitiveRoleForPlanItem(batch)
-      });
-      primitiveGroup.name = `${primitive}:${batch.cn}`;
-      orientPrimitiveGroup(primitiveGroup, primitive, p, theta, localRng, batch.placement);
+      const modelScale = roleScale * batch.scale * localRng.range(0.72, primitive === 'SpikeFlower' ? 1.02 : 1.22) * specialScale * tuningScale;
+      const primitiveGroup = realisticDefinition
+        ? createRealisticFlower(realisticDefinition, `${spec.seed}:bouquet-realistic:${realisticDefinition.id}:${i}`)
+        : factory!({
+          seed: `${spec.seed}:bouquet-primitive:${primitive}:${batch.typeId}:${i}`,
+          position: p,
+          scale: modelScale * compositionScaleForPrimitive(primitive!),
+          colorPalette: primitivePalette(spec, primitive!, localRng, batch),
+          openness: ['OrchidButterflyFlower', 'TrumpetThroatFlower', 'DaturaTrumpetFlower', 'CallaCurledBract'].includes(primitive!) ? 0.94 : localRng.range(0.62, 0.86),
+          density: ['UmbelMiniCluster', 'FullHydrangeaCloud', 'FruitPodCluster'].includes(primitive!) ? 1.08 : localRng.range(0.86, 1.02),
+          curvature: ['SpikeFlower', 'FoliageGrassBranch', 'CallaCurledBract'].includes(primitive!) ? 0.86 : 0.42,
+          role: primitiveRoleForPlanItem(batch)
+        });
+      if (realisticDefinition) {
+        primitiveGroup.position.copy(p);
+        primitiveGroup.scale.setScalar(modelScale * 1.15);
+        orientRealisticFlowerGroup(primitiveGroup, p, localRng);
+      } else {
+        orientPrimitiveGroup(primitiveGroup, primitive!, p, theta, localRng, batch.placement);
+      }
+      primitiveGroup.name = `${modelKey}:${batch.cn}`;
       primitiveGroup.updateMatrix();
-      const flowerId = `${spec.flowerPlan.id}:${batch.typeId}:${primitive}:${i}`;
+      const flowerId = `${spec.flowerPlan.id}:${batch.typeId}:${modelKey}:${i}`;
       flowerRecords.push({
         flowerId,
         placementOrder: flowerRecords.length,
         matrix: primitiveGroup.matrix.toArray(),
         colors: objectColorSignature(primitiveGroup)
       });
-      stems.push(createFlowerStem(spec, `stem:${flowerId}`, batch.typeId, p));
+      stems.push(createFlowerStem(spec, `stem:${flowerId}`, realisticDefinition?.id ?? batch.typeId, p));
       group.add(primitiveGroup);
       if (primitive === 'SpikeFlower') group.add(buildSpikeStemConnector(spec, primitiveGroup, localRng));
     }
@@ -2209,6 +2285,7 @@ export class BouquetScene {
   private routeMode: CameraRouteMode = 'orbit';
   private routeTime = 0;
   private routePausedByDrag = false;
+  private routeResumeTimer = 0;
   private cameraYaw = 0;
   private targetCameraYaw = 0;
   private cameraPitch = 0.38;
@@ -2337,6 +2414,7 @@ export class BouquetScene {
   }
 
   setStaticCameraView(view: 'front' | 'side' | 'top') {
+    this.clearRouteResumeTimer();
     this.routePausedByDrag = true;
     this.routeTime = 0;
     this.cameraYaw = view === 'side' ? Math.PI / 2 : 0;
@@ -2368,6 +2446,7 @@ export class BouquetScene {
 
   stop() {
     window.cancelAnimationFrame(this.animationId);
+    this.clearRouteResumeTimer();
   }
 
   togglePause() {
@@ -2396,6 +2475,7 @@ export class BouquetScene {
       this.targetCameraPitch = this.baseCameraPitch;
     }
     if (settings.mode !== undefined) {
+      this.clearRouteResumeTimer();
       this.routeMode = settings.mode;
       this.routeTime = 0;
       this.routePausedByDrag = false;
@@ -2611,6 +2691,7 @@ export class BouquetScene {
 
   private bindPointer() {
     this.canvas.addEventListener('pointerdown', (event) => {
+      this.clearRouteResumeTimer();
       this.isDragging = true;
       this.routePausedByDrag = true;
       this.canvas.setPointerCapture(event.pointerId);
@@ -2642,9 +2723,24 @@ export class BouquetScene {
       if (this.canvas.hasPointerCapture(event.pointerId)) {
         this.canvas.releasePointerCapture(event.pointerId);
       }
+      this.scheduleRouteResume();
     };
     this.canvas.addEventListener('pointerup', release);
     this.canvas.addEventListener('pointercancel', release);
+  }
+
+  private clearRouteResumeTimer() {
+    if (!this.routeResumeTimer) return;
+    window.clearTimeout(this.routeResumeTimer);
+    this.routeResumeTimer = 0;
+  }
+
+  private scheduleRouteResume() {
+    this.clearRouteResumeTimer();
+    this.routeResumeTimer = window.setTimeout(() => {
+      this.routeResumeTimer = 0;
+      this.routePausedByDrag = false;
+    }, routeResumeAfterDragMs);
   }
 
   setZoomOffset(offset: number) {
@@ -2677,6 +2773,7 @@ export class BouquetScene {
   }
 
   setAutomaticCameraEnabled(enabled: boolean) {
+    this.clearRouteResumeTimer();
     this.isPaused = !enabled;
     if (enabled) {
       this.routePausedByDrag = false;

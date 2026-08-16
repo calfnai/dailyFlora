@@ -67,6 +67,7 @@ export function bindHandControlKeyboard(actions: DailyFloraHandActions) {
   const onKey = (event: KeyboardEvent) => {
     const target = event.target;
     if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) return;
+    if (event.defaultPrevented) return;
     if (event.code === 'Digit1' || event.key === '1') actions.cycleDensity();
     else if (event.code === 'Digit2' || event.key === '2') actions.cycleRender();
     else if (event.code === 'Digit3' || event.key === '3') actions.toggleClock();

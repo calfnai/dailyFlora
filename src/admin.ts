@@ -75,7 +75,7 @@ async function load() {
     if (runtime) runtime.textContent = `${health.service} · ${health.version} · ${health.isolated ? 'Beta 数据隔离已开启' : '请检查数据隔离配置'}`;
     renderMetrics(summary); renderUsers(adminUsers); renderTasks(adminTasks);
     if (content) content.hidden = false;
-    showState(`已验证 0.72 Beta 后台账户：${account.email}`);
+    showState(`已验证 0.74 Beta 后台账户：${account.email}`);
   } catch (error) {
     if (runtime) runtime.textContent = 'Beta API 状态读取失败。';
     showState(error instanceof Error ? error.message : '后台暂时不可用。', true);

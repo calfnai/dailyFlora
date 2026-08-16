@@ -196,6 +196,13 @@
         border-bottom: 1px solid var(--line);
       }
 
+      .shape-cell.is-focus-target {
+        z-index: 2;
+        outline: 2px solid var(--warn);
+        outline-offset: -2px;
+        background: linear-gradient(135deg, rgb(242 203 98 / 18%), transparent 58%);
+      }
+
       .shape-cell.is-candidate {
         background: linear-gradient(135deg, rgb(242 203 98 / 8%), transparent 55%);
       }
@@ -203,6 +210,12 @@
       .shape-cell.is-concrete {
         background: linear-gradient(135deg, rgb(135 212 134 / 7%), transparent 56%);
       }
+
+      .shape-cell.is-stem-bearing {
+        background: linear-gradient(135deg, rgb(242 203 98 / 10%), transparent 56%);
+      }
+
+      .shape-cell.is-stem-bearing .shape-status { color: var(--warn); }
 
       .shape-copy {
         position: absolute;
@@ -277,6 +290,7 @@
         .shape-description { font-size: 10px; }
       }
     </style>
+      <link rel="stylesheet" href="../docs-footer.css">
   </head>
   <body>
     <main class="shell">
@@ -284,12 +298,12 @@
         <div>
           <p class="eyebrow">Target shape vocabulary · Primitive Lab</p>
           <h1>花型词表 · 34 项</h1>
-          <p class="hero-copy">16 类抽象目标形态、16 种具体单花、1 个已验收混合花型和 1 个 trumpet-throat 候选，共 34 项放在同一个 3D 花库画布里。真正的结构科幻花型仍移到独立科幻 LAB 测试。</p>
+          <p class="hero-copy">当前画布共 34 项：16 类核心抽象目标形态、R01-R16 具象单花、1 个已验收混合花型 H01 和 1 个候选花型 C01。完整审核库存是 43 项；R17-R25 仍在独立的 25 种写实花型 LAB 中，不会被这个 34 项画布重复计算。R01-R16 的花头不自带长后茎，由花束主枝承接；第 11 项穗状花和第 14–16 项果材/叶材仍保留连接部分。真正的结构科幻花型仍移到独立科幻 LAB 测试。</p>
         </div>
         <aside class="hero-side">
           <div>
             <div class="hero-number">34 <small>one canvas</small></div>
-            <strong>16 抽象类 + 16 具象花型 + 1 已验收混合花型 + 1 候选</strong>
+            <strong>R01–R16 具象花型 · 无长后茎</strong>
             <p class="hero-copy">星环脉冲花已通过用户验收，正式归为“写实骨架 × 非现实配色”混合花型；这不等于真正的结构科幻花型已经通过。截图中的 9 种穗状和簇状偏写实花型仍不并入。</p>
           </div>
           <div class="link-row">
@@ -305,7 +319,7 @@
           <div>
             <p class="eyebrow">One canvas · thirty-four flower forms</p>
             <h2 id="shape-list-title">在一个大框里看完整花库</h2>
-            <p class="section-copy">拖动某一朵花所在区域可单独旋转。下方工具统一切换观察角度、轮廓、网格和自动旋转。</p>
+            <p class="section-copy">拖动某一朵花所在区域可单独旋转。第 11 项穗状花和第 14–16 项果材、吊坠风铃果、叶材/草线/枝条保留茎或枝条；“无长后茎”只适用于 R01–R16 这 16 种具体单花。下方工具统一切换观察角度、轮廓、网格和自动旋转。</p>
           </div>
           <div class="tools" aria-label="Primitive lab controls">
             <button type="button" data-view="front" aria-pressed="true">正面</button>
@@ -318,12 +332,14 @@
           </div>
         </div>
         <div class="gallery-stage" id="gallery-stage">
-          <canvas id="primitive-canvas" aria-label="DailyFlora 16 类抽象花型、16 种具象单花、1 个已验收混合花型和 1 个候选花型 3D 总览"></canvas>
+          <canvas id="primitive-canvas" aria-label="DailyFlora 34 项共享花型画布：16 类核心抽象、R01-R16、H01 和 C01"></canvas>
           <div class="shape-labels" id="shape-labels"></div>
           <span class="stage-note">拖动花朵区域旋转 · drag a flower area to rotate</span>
         </div>
       </section>
     </main>
     <script type="module" src="/src/primitiveLab.ts"></script>
+
+    <footer class="docs-footer" aria-label="DailyFlora internal navigation"><div class="docs-footer-links"><a href="../">DailyFlora</a><a href="../admin/">Admin</a><a href="./development-log.html">开发日志</a><a href="./aesthetic-review-dashboard.html?debug=1">审美 Dashboard</a><a href="../how-to-use/">使用说明</a><a href="../legal/terms/">条款</a><a href="../legal/privacy/">隐私</a></div><span>0.74 · internal documentation</span></footer>
   </body>
 </html>

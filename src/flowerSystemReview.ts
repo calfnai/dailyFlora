@@ -124,6 +124,15 @@ function escapeHtml(value: string) {
   })[character] || character);
 }
 
+function labHref(entry: ReviewEntry) {
+  const targetId = entry.id.replace(/^[^:]+:/, '');
+  const anchorId = targetId.replace(/[^a-zA-Z0-9_-]/g, '-');
+  if (entry.layer === 'realistic') {
+    return `./realistic-flower-lab.html?flower=${encodeURIComponent(targetId)}#flower-${anchorId}`;
+  }
+  return `./primitive-lab.html?shape=${encodeURIComponent(targetId)}#shape-${anchorId}`;
+}
+
 function renderFilters() {
   const container = document.querySelector<HTMLDivElement>('#flower-filters');
   if (!container) return;
@@ -162,7 +171,7 @@ function renderFlowerGrid() {
       <h3>${escapeHtml(entry.cn)}</h3>
       <p class="english">${escapeHtml(entry.en)}</p>
       <p class="description">${escapeHtml(entry.description)}</p>
-      <a class="link" href="${entry.lab}" target="_blank" rel="noopener">打开对应 3D LAB</a>
+      <a class="link" href="${labHref(entry)}" target="_blank" rel="noopener">打开对应 3D 模型</a>
       <div class="review">
         <div class="decision-row" aria-label="${escapeHtml(entry.cn)} 验收状态">
           ${(['pass', 'reject', 'pending'] as Decision[]).map((choice) => {

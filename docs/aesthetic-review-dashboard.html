@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DailyFlora 审美复盘 Dashboard</title>
+    <title>DailyFlora 审美门禁 Dashboard</title>
     <style>
       :root {
         color-scheme: dark;
@@ -136,6 +136,14 @@
         color: var(--bad);
       }
 
+      .status.scifi-only {
+        color: var(--cool);
+      }
+
+      .status.display-bug {
+        color: var(--warn);
+      }
+
       .link-row,
       .section-actions,
       .filters,
@@ -237,6 +245,92 @@
 
       .shape-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .inventory-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .inventory-card {
+        display: grid;
+        gap: 6px;
+        min-height: 112px;
+        padding: 14px;
+      }
+
+      .inventory-card strong {
+        color: var(--warn);
+        font-size: 30px;
+        line-height: 1;
+      }
+
+      .inventory-card span,
+      .inventory-note {
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .acceptance-overview {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .acceptance-card {
+        display: grid;
+        align-content: start;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .acceptance-card h3 {
+        margin: 0;
+        font-size: 17px;
+        line-height: 1.2;
+      }
+
+      .acceptance-count {
+        color: var(--warn);
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .acceptance-list {
+        display: grid;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .acceptance-list li {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .acceptance-list a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .acceptance-list a:hover {
+        color: var(--text);
+      }
+
+      .acceptance-note {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
       }
 
       .panel {
@@ -447,6 +541,8 @@
         .rules-grid,
         .library-grid,
         .shape-grid,
+        .acceptance-overview,
+        .inventory-grid,
         .role-review,
         .surface-review-grid {
           grid-template-columns: 1fr;
@@ -476,6 +572,8 @@
         .role-grid,
         .primitive-grid,
         .library-grid,
+        .acceptance-overview,
+        .inventory-grid,
         .thumb-strip {
           grid-template-columns: 1fr;
         }
@@ -507,6 +605,7 @@
         line-height: 1.7;
       }
     </style>
+      <link rel="stylesheet" href="../docs-footer.css">
   </head>
   <body>
     <main class="shell">
@@ -515,7 +614,7 @@
           <p class="eyebrow">DailyFlora aesthetic review gate</p>
           <h1>审美复盘 Dashboard</h1>
           <p class="lead">
-            这页只做门禁和复盘：先确认参考图到底被读成了什么视觉规则，再决定哪些 Three.js primitive 可以承接。没有 dashboard 结论，不继续直接改主花束视觉。
+            这页只做门禁和复盘：先确认参考图到底被读成了什么视觉规则，再决定哪些 Three.js primitive 和写实花型可以承接。当前状态以本页的用户验收记录为准；没有 dashboard 结论，不继续直接改主花束视觉。
           </p>
         </div>
         <aside class="gate-card" id="gate-card"></aside>
@@ -538,17 +637,17 @@
           <a class="panel library-card" href="./primitive-lab.html">
             <em>花库罗列</em>
             <strong>Primitive Lab</strong>
-            <span>在一个共享 3D 画布中查看 16 类抽象词表、16 种具象单花、已验收的星环脉冲混合花型和 1 个候选；截图中的 9 种穗状与簇状花暂缓并入。</span>
+            <span>共享 3D 画布当前展示 34 项：16 类核心抽象、R01-R16 具象单花、C01 与 SciFi-only H01；其余 R17-R25 仍在独立的 25 种写实 LAB 中。普通花束只按本页门禁接入，未通过或显示异常的形态不自动进入。</span>
           </a>
           <a class="panel library-card" href="./realistic-flower-lab.html">
             <em>25 种具象花型</em>
             <strong>偏写实花型 LAB</strong>
-            <span>查看删除洋桔梗后的 25 种具体花材表达，以及面向 3D 打印的花托、花梗和实体分枝连接。</span>
+            <span>查看删除洋桔梗后的 25 种具体花材表达；其中 R01-R16 已通过本轮用户验收，R17-R25 仍保留在 LAB 中等待单独结论。</span>
           </a>
           <a class="panel library-card" href="./flower-system-review.html">
-            <em>43 项审核 · 25 种叶片进度</em>
+            <em>43 项审核 · 3 组花叶关系</em>
             <strong>花型与叶片系统验收</strong>
-            <span>逐项选择通过、不通过或待定，填写意见并导出；同时查看叶片接入主版本的范例、2/25 定稿进度和风信子待复验状态。</span>
+            <span>逐项选择通过、不通过或待定，填写意见并导出；当前搭配 LAB 已列出的洋水仙、狐尾百合、风信子三组关系可通过，覆盖仍然很少，后续继续增加。</span>
           </a>
           <a class="panel library-card" href="./scifi-flower-lab.html">
             <em>结构科幻 × 用户配色</em>
@@ -571,6 +670,22 @@
             <span>读取 DailyFlora 当前目标花束、反向约束、叶材规则、花库门禁、composition 经验和后续流程。</span>
           </a>
         </div>
+      </section>
+
+      <section class="section" aria-labelledby="flower-acceptance-title">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Current flower acceptance gate · 2026-08-16</p>
+            <h2 id="flower-acceptance-title">当前花型与花叶门禁</h2>
+            <p class="section-copy">这是正式源头当前的可见状态汇总。普通花束只接入“通过”；SciFi-only 只在 SciFi；不通过和显示 bug 不自动进入。R17-R25 仍在 25 种写实模型 LAB 中，但没有被本轮 R01-R16 通过结论替代。</p>
+          </div>
+          <div class="section-actions">
+            <a class="pill route" href="./realistic-flower-lab.html">R01-R16 写实 LAB</a>
+            <a class="pill route" href="./leaf-flower-pairing-lab.html">花叶搭配 LAB</a>
+            <a class="pill route" href="./primitive-lab.html">抽象花型 LAB</a>
+          </div>
+        </div>
+        <div class="acceptance-overview" id="flower-acceptance-overview"></div>
       </section>
 
       <section class="section">
@@ -645,13 +760,15 @@
         <div class="section-head">
           <div>
             <p class="kicker">Target shape vocabulary</p>
-            <h2>16 类目标形态词表</h2>
-            <p class="section-copy">这 16 类已经进入 Primitive Lab，并已达到用户确认的花库及格线。CosmosOpenFlower 是从山岗小花/热带丛林经验中补登记的小面花，旧 7 类只保留为历史粗分类和兼容别名。</p>
+            <h2>花型词表总览 · 43 项审核记录</h2>
+            <p class="section-copy">“16 类”只指 Primitive Lab 的核心抽象词表，不是 DailyFlora 的全部花型。当前完整审核库存分为 16 类核心抽象、25 种偏写实具名花型、1 个已验收混合花型 H01 和 1 个候选花型 C01；合计 43 条记录。旧 7 类只保留为历史粗分类和兼容别名。</p>
           </div>
           <div class="section-actions">
             <a class="pill route" href="./primitive-lab.html#candidate-title">Primitive LAB · /docs/primitive-lab.html</a>
           </div>
         </div>
+        <div class="inventory-grid" id="shape-inventory"></div>
+        <p class="inventory-note" id="shape-inventory-note"></p>
         <div class="shape-grid" id="shape-grid"></div>
       </section>
 
@@ -660,7 +777,7 @@
           <div>
             <p class="kicker">Accepted hybrid vocabulary</p>
             <h2 id="accepted-hybrid-title">已验收混合花型</h2>
-            <p class="section-copy">这里收纳已经通过用户验收、但不应被误归入核心抽象词表或真正结构科幻词表的稳定花型。分类边界和验收状态同样需要保留。</p>
+            <p class="section-copy">这里收纳已经通过用户验收、但不应被误归入核心抽象词表或真正结构科幻词表的稳定花型。H01 星环脉冲花型已通过，但仅保留在 SciFi，不进入普通花束。</p>
           </div>
           <div class="section-actions">
             <a class="pill route" href="./primitive-lab.html#candidate-title">混合花型 LAB · /docs/primitive-lab.html</a>
@@ -673,8 +790,8 @@
         <div class="section-head">
           <div>
             <p class="kicker">Candidate shape vocabulary</p>
-            <h2>未通过候选花型</h2>
-            <p class="section-copy">褶边副冠水仙型已在 2026-07-25 用户验收中明确不通过。它继续留在实验和回炉区，不进入正式词表，也不升级为第 17 类。</p>
+            <h2>C01 候选验收记录</h2>
+            <p class="section-copy">C01 褶边副冠水仙型已在 2026-08-16 用户截图验收中通过。它继续保留在候选/混合层，和 07 洋水仙管心型保持区分，不改写 16 类核心抽象词表。</p>
           </div>
           <div class="section-actions">
             <a class="pill route" href="./primitive-lab.html#candidate-title">候选回炉 LAB · /docs/primitive-lab.html</a>
@@ -688,7 +805,7 @@
           <div>
             <p class="kicker">Primitive gate</p>
             <h2>花库验收</h2>
-            <p class="section-copy">隐藏标签后，单个形态应能被用户判断为对应的花材/叶材类型。当前结论是花库验收达到及格线，可以作为下一阶段整束 composition 的基础。</p>
+            <p class="section-copy">隐藏标签后，单个形态应能被用户判断为对应的花材/叶材类型。当前逐项门禁已区分普通花束可用、SciFi-only、不采用和显示 bug；只有明确通过项才能作为整束 composition 的基础。</p>
           </div>
           <div class="section-actions">
             <a class="pill route" href="./primitive-lab.html">花库 LAB · /docs/primitive-lab.html</a>
@@ -722,7 +839,7 @@
         "gate": {
           "status": "pass",
           "title": "花库验收达到及格线",
-          "summary": "Primitive Lab 已扩展到 16 类，并已达到用户确认的花库及格线。",
+          "summary": "Primitive Lab 的 16 类核心抽象词表已达到用户确认的花库及格线；完整审核库存为 43 条。",
           "rules": ["先复盘参考图，不直接改主花束视觉。", "后续主视觉修改必须同步更新 dashboard。"],
           "links": [
             {"label": "参考图库", "href": "./dailyflora-reference-gallery.html"},
@@ -736,6 +853,7 @@
         "primitiveGate": [],
         "dailyBouquetCorrections": [],
         "reusableAestheticRules": [],
+        "shapeVocabularyInventory": {"reviewEntries": 43, "abstractCore": 16, "realisticConcrete": 25, "acceptedHybrid": 1, "candidate": 1, "note": "16 是核心抽象词表，不是全部花型数量。"},
         "targetShapeVocabulary": [],
         "reviewGroups": []
       }
@@ -765,7 +883,9 @@
         'needs-work': 'needs-work',
         'needs-owner-review': '待用户验收',
         reject: '不通过',
-        pass: 'pass'
+        pass: 'pass',
+        'scifi-only': 'SciFi only',
+        'display-bug': '显示 bug'
       };
 
       const roleLabels = {
@@ -800,6 +920,25 @@
         ClusterFlower: '簇花',
         BerryCluster: '果材',
         AirFiller: '空气填充'
+      };
+
+      const realisticFlowerNames = {
+        daisy: ['雏菊', 'Daisy'],
+        chamomile: ['洋甘菊', 'Chamomile'],
+        gerbera: ['非洲菊', 'Gerbera Daisy'],
+        sunflower: ['太阳花', 'Sunflower'],
+        anemone: ['银莲花', 'Anemone'],
+        cosmos: ['波斯菊', 'Cosmos'],
+        dahlia: ['大丽花', 'Dahlia'],
+        rose: ['玫瑰', 'Rose'],
+        ranunculus: ['花毛茛', 'Ranunculus'],
+        camellia: ['山茶', 'Camellia'],
+        peony: ['牡丹', 'Peony'],
+        'pompon-mum': ['乒乓菊', 'Pompon Chrysanthemum'],
+        tulip: ['郁金香', 'Tulip'],
+        narcissus: ['洋水仙', 'Narcissus'],
+        phalaenopsis: ['蝴蝶兰', 'Phalaenopsis Orchid'],
+        calla: ['马蹄莲', 'Calla Lily']
       };
 
       const targetPrimitiveByShapeId = {
@@ -859,6 +998,102 @@
 
       function statusBadge(status) {
         return `<span class="status ${escapeHtml(status)}">${escapeHtml(statusText[status] || status)}</span>`;
+      }
+
+      function renderAcceptanceList(items) {
+        if (!items.length) return '<p class="acceptance-note">暂无记录。</p>';
+        return `<ul class="acceptance-list">${items
+          .map((item) => `<li><a href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a>${item.status ? statusBadge(item.status) : ''}</li>`)
+          .join('')}</ul>`;
+      }
+
+      function renderFlowerAcceptanceGate(data) {
+        const realisticGate = data.acceptedRealisticFlowerGate || {};
+        const realisticItems = (realisticGate.flowerIds || []).map((id) => {
+          const [cn, en] = realisticFlowerNames[id] || [id, id];
+          return {
+            label: `${cn} · ${en}`,
+            href: `./realistic-flower-lab.html?flower=${encodeURIComponent(id)}#flower-${encodeURIComponent(id)}`,
+            status: 'pass'
+          };
+        });
+        const leafGate = data.leafFoliageGate || {};
+        const leafItems = (leafGate.confirmedMembers || []).map((member) => ({
+          label: `${member.cn} · ${member.en}`,
+          href: `./leaf-flower-pairing-lab.html#flower-${encodeURIComponent(member.id)}`,
+          status: 'pass'
+        }));
+        const primitiveGate = data.primitiveGate || [];
+        const primitiveShapeId = {
+          ...Object.fromEntries(Object.entries(targetPrimitiveByShapeId).map(([shapeId, primitive]) => [primitive, shapeId])),
+          OrbitalPulseFlower: 'orbital-pulse-flower'
+        };
+        const primitiveItems = (status) => primitiveGate
+          .filter((item) => item.status === status)
+          .map((item) => ({
+            label: item.humanName,
+            href: `./primitive-lab.html?shape=${encodeURIComponent(primitiveShapeId[item.primitive] || '')}#shape-${encodeURIComponent(primitiveShapeId[item.primitive] || '')}`,
+            status
+          }));
+        const candidateItems = (data.candidateShapeVocabulary || [])
+          .filter((item) => item.status === 'pass')
+          .map((item) => ({
+            label: `${item.name} · ${item.englishName}`,
+            href: `./primitive-lab.html?shape=${encodeURIComponent(item.id)}#shape-${encodeURIComponent(item.id)}`,
+            status: 'pass'
+          }));
+        const passItems = primitiveItems('pass');
+        const scifiItems = primitiveItems('scifi-only');
+        const rejectItems = primitiveItems('reject');
+        const displayBugItems = primitiveItems('display-bug');
+        const cards = [
+          {
+            title: 'R01-R16 写实花型',
+            count: `${realisticItems.length} / 16`,
+            note: realisticGate.ownerAcceptance || '本轮用户已确认。',
+            items: realisticItems
+          },
+          {
+            title: '普通花束可用 · C01 / 抽象',
+            count: `${candidateItems.length + passItems.length} 项`,
+            note: 'C01 与 primitive pass 可作为普通花束候选；只通过颜色不等于形态通过。',
+            items: [...candidateItems, ...passItems]
+          },
+          {
+            title: '花叶搭配',
+            count: leafGate.coverage || `${leafItems.length} 组`,
+            note: leafGate.ownerAcceptance || '当前只记录搭配 LAB 中明确列出的关系。',
+            items: leafItems
+          },
+          {
+            title: '仅 SciFi',
+            count: `${scifiItems.length} 项`,
+            note: 'H01 星环脉冲花型和 01 盘状花保留在 SciFi，不进入普通花束。',
+            items: scifiItems
+          },
+          {
+            title: '不采用',
+            count: `${rejectItems.length} 项`,
+            note: '用户明确不通过；普通花束不生成。',
+            items: rejectItems
+          },
+          {
+            title: '显示 bug · 暂不入束',
+            count: `${displayBugItems.length} 项`,
+            note: '13 绣球/云团型与 14 果材/荚果型先修复显示，再重新验收。',
+            items: displayBugItems
+          }
+        ];
+        document.querySelector('#flower-acceptance-overview').innerHTML = cards
+          .map((card) => `
+            <article class="panel acceptance-card">
+              <h3>${escapeHtml(card.title)}</h3>
+              <div class="acceptance-count">${escapeHtml(card.count)}</div>
+              ${renderAcceptanceList(card.items)}
+              <p class="acceptance-note">${escapeHtml(card.note)}</p>
+            </article>
+          `)
+          .join('');
       }
 
       async function loadData() {
@@ -995,6 +1230,31 @@
             }
           )
           .join('');
+      }
+
+      function renderShapeInventory(data) {
+        const inventory = data.shapeVocabularyInventory || {
+          reviewEntries: 43,
+          abstractCore: 16,
+          realisticConcrete: 25,
+          acceptedHybrid: 1,
+          candidate: 1,
+          note: '16 是核心抽象词表，不是全部花型数量。'
+        };
+        const items = [
+          ['reviewEntries', '审核记录'],
+          ['abstractCore', '核心抽象'],
+          ['realisticConcrete', '偏写实花型'],
+          ['acceptedHybrid', '已验收混合'],
+          ['candidate', '候选花型']
+        ];
+        document.querySelector('#shape-inventory').innerHTML = items.map(([key, label]) => `
+          <article class="panel inventory-card">
+            <strong>${escapeHtml(inventory[key])}</strong>
+            <span>${escapeHtml(label)}</span>
+          </article>
+        `).join('');
+        document.querySelector('#shape-inventory-note').textContent = inventory.note || '';
       }
 
       function renderAcceptedHybridShapes(data) {
@@ -1211,18 +1471,24 @@
 
       loadData().then((data) => {
         renderGate(data);
+        renderFlowerAcceptanceGate(data);
         renderRoles(data);
         renderReusableRules(data);
         renderDailyCorrections(data);
+        renderShapeInventory(data);
         renderTargetShapes(data);
         renderAcceptedHybridShapes(data);
         renderCandidateShapes(data);
-        initTargetShapePreviews();
-        animateTargetShapePreviews();
         renderPrimitiveGate(data);
         renderGroups(data);
         renderFilters();
         wireFilters();
+        try {
+          initTargetShapePreviews();
+          animateTargetShapePreviews();
+        } catch (error) {
+          console.warn('Dashboard 3D previews unavailable; text gate remains available.', error);
+        }
       });
     </script>
     <script>
@@ -1256,5 +1522,7 @@
         observer.observe(document.body, { childList: true, subtree: true });
       })();
     </script>
+
+    <footer class="docs-footer" aria-label="DailyFlora internal navigation"><div class="docs-footer-links"><a href="../">DailyFlora</a><a href="../admin/">Admin</a><a href="./development-log.html">开发日志</a><a href="./aesthetic-review-dashboard.html?debug=1">审美 Dashboard</a><a href="../how-to-use/">使用说明</a><a href="../legal/terms/">条款</a><a href="../legal/privacy/">隐私</a></div><span>0.74 · internal documentation</span></footer>
   </body>
 </html>

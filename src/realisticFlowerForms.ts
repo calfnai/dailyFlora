@@ -181,6 +181,8 @@ function stemAlong(points: THREE.Vector3[], radius: number, color: THREE.Color, 
   return { curve, mesh };
 }
 
+// Confirmed aesthetic: single-bloom forms keep the flower head and receptacle;
+// BouquetScene owns the visible tie-to-bloom stem and bouquet connection.
 function addPrintCore(group: THREE.Group, palette: string[], radius = 0.18) {
   const green = colorAt(palette, palette.length - 1, '#668857');
   const receptacle = new THREE.Mesh(

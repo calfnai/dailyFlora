@@ -224,14 +224,15 @@ h1, h2, h3, p { margin: 0; }
   .site-nav { gap: 12px; overflow-x: auto; }
 }
 
-.public-bouquet-shell { min-height: 100vh; display: grid; grid-template-rows: auto 1fr; }
+.public-bouquet-shell { min-height: 100vh; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
 .public-bouquet-header { min-height: 72px; display: flex; justify-content: space-between; align-items: center; padding: 14px clamp(18px, 4vw, 50px); }
-.public-bouquet-main { position: relative; min-height: calc(100vh - 72px); background: #030604; }
+.public-bouquet-main { position: relative; min-height: max(560px, calc(100vh - 170px)); background: #030604; }
 .public-bouquet-main iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .public-bouquet-state { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); }
 .public-bouquet-caption { position: absolute; z-index: 2; right: 22px; bottom: 22px; max-width: 420px; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: rgba(5, 10, 7, .75); backdrop-filter: blur(18px); }
 .public-bouquet-caption h1 { margin-top: 6px; font-family: var(--serif); font-size: 34px; font-weight: 400; }
 .public-bouquet-caption p:last-child { margin-top: 8px; color: var(--muted); font-size: 12px; }
+.public-bouquet-footer { background: #030604; }
 
 .about-hero {
   min-height: min(860px, calc(100vh - 80px));

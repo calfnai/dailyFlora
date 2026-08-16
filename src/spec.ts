@@ -169,8 +169,8 @@ export function readParams() {
   const params = new URLSearchParams(window.location.search);
   const date = params.get('date') || todayKey();
   const seed = params.get('seed') || date;
-  const density = params.get('density') || params.get('quality') || 'medium';
-  const render = params.get('render') || 'auto';
+  const density = params.get('density') || params.get('quality') || 'high';
+  const render = params.get('render') || 'high';
   const theme = params.get('theme') || defaultThemeId;
   return { date, seed, density, render, theme };
 }
