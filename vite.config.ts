@@ -92,6 +92,11 @@ export default defineConfig({
           resolve(__dirname, 'sites/worker.js'),
           resolve(__dirname, 'dist/server/index.js')
         );
+        mkdirSync(resolve(__dirname, 'dist/what-did-hubble-see-on-your-birthday'), { recursive: true });
+        copyFileSync(
+          resolve(__dirname, 'docs/what-did-hubble-see-on-your-birthday/index.html'),
+          resolve(__dirname, 'dist/what-did-hubble-see-on-your-birthday/index.html')
+        );
         const indexHtmlPath = resolve(__dirname, 'dist/index.html');
         if (existsSync(indexHtmlPath)) {
           const indexHtml = readFileSync(indexHtmlPath, 'utf8');
