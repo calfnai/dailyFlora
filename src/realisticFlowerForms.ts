@@ -181,9 +181,7 @@ function stemAlong(points: THREE.Vector3[], radius: number, color: THREE.Color, 
   return { curve, mesh };
 }
 
-// Confirmed aesthetic: single-bloom forms keep the flower head and receptacle;
-// BouquetScene owns the visible tie-to-bloom stem and bouquet connection.
-function addPrintCore(group: THREE.Group, palette: string[], radius = 0.18) {
+function addPrintCore(group: THREE.Group, palette: string[], radius = 0.18, stemLength = 0.72) {
   const green = colorAt(palette, palette.length - 1, '#668857');
   const receptacle = new THREE.Mesh(
     new THREE.SphereGeometry(radius, 18, 12),
@@ -191,7 +189,13 @@ function addPrintCore(group: THREE.Group, palette: string[], radius = 0.18) {
   );
   receptacle.position.z = -0.05;
   receptacle.scale.set(1, 0.88, 0.7);
-  group.add(receptacle);
+  const stem = cylinderBetween(
+    new THREE.Vector3(0, 0, -0.08),
+    new THREE.Vector3(0, 0, -stemLength),
+    Math.max(0.055, radius * 0.42),
+    green.clone().lerp(new THREE.Color('#365a39'), 0.28)
+  );
+  group.add(receptacle, stem);
 }
 
 type FaceConfig = {
@@ -211,7 +215,7 @@ type FaceConfig = {
 function createFaceFlower(options: BuildOptions, config: FaceConfig) {
   const rng = createRng(`${options.seed}:face`);
   const group = new THREE.Group();
-  addPrintCore(group, options.palette, 0.2);
+  addPrintCore(group, options.palette, 0.2, 0.74);
   let total = 0;
   for (let layer = 0; layer < config.layers; layer += 1) total += Math.max(6, config.petals - layer * 4);
   const petals = new THREE.InstancedMesh(
@@ -279,7 +283,7 @@ type LayeredConfig = {
 function createLayeredFlower(options: BuildOptions, config: LayeredConfig) {
   const rng = createRng(`${options.seed}:layered`);
   const group = new THREE.Group();
-  addPrintCore(group, options.palette, 0.22);
+  addPrintCore(group, options.palette, 0.22, 0.76);
   config.rings.forEach((ring, ringIndex) => {
     const petals = new THREE.InstancedMesh(
       petalGeometry(ring.length, ring.width, ring.cup, -ring.lift, config.pointed, config.ruffle),
@@ -313,7 +317,7 @@ function createLayeredFlower(options: BuildOptions, config: LayeredConfig) {
 function createTulip(options: BuildOptions) {
   const rng = createRng(`${options.seed}:tulip`);
   const group = new THREE.Group();
-  addPrintCore(group, options.palette, 0.19);
+  addPrintCore(group, options.palette, 0.19, 1.05);
   const petals = new THREE.InstancedMesh(
     petalGeometry(0.92, 0.3, 0.24, -0.08, 0.18, 0.01),
     flowerMaterial(colorAt(options.palette, 0), 0.82),
@@ -347,12 +351,14 @@ function createNarcissus(options: BuildOptions) {
     curvature: 0.55,
     role: 'hero'
   });
+  const green = colorAt(options.palette, options.palette.length - 1, '#6e995b');
+  group.add(cylinderBetween(new THREE.Vector3(0, 0, -0.25), new THREE.Vector3(0, 0, -0.95), 0.065, green));
   return group;
 }
 
 function createPhalaenopsis(options: BuildOptions) {
   const group = new THREE.Group();
-  addPrintCore(group, options.palette, 0.17);
+  addPrintCore(group, options.palette, 0.17, 0.72);
   const largePetals = new THREE.InstancedMesh(
     petalGeometry(0.76, 0.38, 0.13, 0.01, 0.12, 0.012),
     flowerMaterial(colorAt(options.palette, 0), 0.78),
@@ -393,6 +399,8 @@ function createCalla(options: BuildOptions) {
     curvature: 0.82,
     role: 'hero'
   });
+  const green = colorAt(options.palette, options.palette.length - 1, '#6d9458');
+  group.add(cylinderBetween(new THREE.Vector3(0, -0.28, -0.02), new THREE.Vector3(0, -1.05, -0.05), 0.072, green));
   return group;
 }
 
