@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="DailyFlora internal processing console." />
     <title>DailyFlora Admin</title>
-    <script type="module" crossorigin src="../assets/admin-BNHSvFzq.js"></script>
+    <script type="module" crossorigin src="../assets/admin-BZO438Bw.js"></script>
     <link rel="modulepreload" crossorigin href="../assets/modulepreload-polyfill-B5Qt9EMX.js">
-    <link rel="modulepreload" crossorigin href="../assets/dailyfloraCloud-CCB1fFRn.js">
-    <link rel="modulepreload" crossorigin href="../assets/accountHeader-D3Y_rfEk.js">
-    <link rel="stylesheet" crossorigin href="../assets/admin-Do4FGoXE.css">
-    <link rel="stylesheet" crossorigin href="../assets/marketing-CqL6LHVD.css">
+    <link rel="modulepreload" crossorigin href="../assets/dailyfloraCloud-DRcOVg2w.js">
+    <link rel="modulepreload" crossorigin href="../assets/accountHeader-CgO5qBiv.js">
+    <link rel="stylesheet" crossorigin href="../assets/admin-Cy2I5ZE3.css">
+    <link rel="stylesheet" crossorigin href="../assets/marketing-BEAgihMi.css">
+    <meta name="dailyflora-release" content="DF-20260816-2300-7d7836fa-dirty">
   </head>
   <body data-page="admin">
     <main class="admin-shell wrap">
       <header class="admin-header">
         <div>
-          <p class="eyebrow">DailyFlora / 0.73 Candidate / Internal</p>
+          <p class="eyebrow">DailyFlora / 0.72 Beta / Internal</p>
           <h1>Beta 任务后台</h1>
           <p>只连接 <code>dailyflora-api-beta</code> 与 Beta 集合；不会读写 0.71 正式账户。</p>
         </div>
@@ -28,24 +29,6 @@
       </header>
 
       <section class="admin-state garden-panel" id="admin-state" aria-live="polite">正在检查后台权限…</section>
-      <section class="admin-dev-entry garden-panel" id="admin-dev-entry">
-        <div class="panel-row">
-          <div>
-            <p class="eyebrow">Developer workspace</p>
-            <h2>开发工作台已并入 Admin</h2>
-          </div>
-          <a class="button primary" href="../docs/development-log.html">查看开发日志</a>
-        </div>
-        <p class="muted">这里是内部工具导航，不读取或展示用户数据。未登录时仍可看到开发入口；账户、任务和积分操作仍需要 Beta 后台权限。</p>
-        <div class="admin-dev-grid">
-          <a class="admin-dev-card" href="../docs/aesthetic-review-dashboard.html?debug=1"><strong>审美门禁 Dashboard</strong><span>43 项审核库存、R01-R16、C01、SciFi-only 与叶片门禁。</span></a>
-          <a class="admin-dev-card" href="../docs/flower-system-review.html"><strong>花型系统验收</strong><span>逐项通过/不通过/待定；点击对应模型会定位到具体花型。</span></a>
-          <a class="admin-dev-card" href="../docs/leaf-flower-pairing-lab.html"><strong>花叶搭配 LAB</strong><span>当前三组已通过关系，后续继续扩充，不用通用叶片补位。</span></a>
-          <a class="admin-dev-card" href="../docs/primitive-lab.html"><strong>Primitive Lab</strong><span>34 项共享画布：16 核心抽象、R01-R16、H01 和 C01。</span></a>
-          <a class="admin-dev-card" href="../docs/realistic-flower-lab.html"><strong>Realistic Flower LAB</strong><span>25 种写实花型总览，支持 query 定位。</span></a>
-          <a class="admin-dev-card" href="../docs/dev-index.html"><strong>开发组目录</strong><span>旧的快捷目录仍可用，但正式入口以当前 Admin 为准。</span></a>
-        </div>
-      </section>
       <section class="admin-content" id="admin-content" hidden>
         <div class="admin-runtime garden-panel" id="admin-runtime" aria-live="polite">正在检查 Beta API…</div>
         <div class="admin-metrics" id="admin-metrics"></div>
@@ -59,7 +42,6 @@
           <div class="admin-task-list" id="admin-tasks"></div>
         </section>
       </section>
-      <footer class="site-footer admin-site-footer"><div class="footer-main wrap"><p class="footer-statement">DailyFlora 内部工作台 · 0.73</p><nav class="footer-col" aria-label="公开入口"><strong>公开入口</strong><a href="../">今日花束</a><a href="../member/">个人花园</a><a href="../about/">关于 DailyFlora</a><a href="../downloads/">多端入口</a><a href="../how-to-use/">使用说明</a></nav><nav class="footer-col" aria-label="系统"><strong>系统</strong><a href="../version.json" data-release-code>读取发布标识</a><a href="../legal/terms/">使用条款</a><a href="../legal/privacy/">隐私政策</a><a href="../legal/copyright/">版权说明</a><a href="../legal/credits/">致谢与署名</a></nav></div><div class="footer-bottom wrap"><span>© 2026 CALFN LAU. All rights reserved.</span><span data-product-version>0.73</span></div></footer>
     </main>
     <script src="../dailyflora-config.js"></script>
   </body>
