@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DailyFlora 开发日志与网站路由</title>
+    <style>
+      :root{color-scheme:dark;--bg:#080a07;--surface:#11170f;--surface2:#182218;--text:#f7f0e3;--muted:rgb(247 240 227 / 70%);--line:rgb(247 240 227 / 15%);--gold:#f2cb62;--green:#87d486;--blue:#9fc6ff;--red:#ef8b73}
+      *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 12% 0%,rgb(242 203 98 / 13%),transparent 28%),radial-gradient(circle at 90% 8%,rgb(135 212 134 / 10%),transparent 26%),linear-gradient(180deg,#080a07,#0d110c 60%,#080a07)}a{color:inherit}.shell{width:min(1260px,100%);margin:0 auto;padding:24px}.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:18px;padding:28px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(145deg,rgb(16 21 15 / 96%),rgb(25 32 23 / 84%))}.eyebrow{margin:0 0 10px;color:var(--gold);font-size:12px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}h1,h2,h3,p{margin-top:0}h1{max-width:11ch;margin-bottom:16px;font-size:clamp(44px,7vw,88px);line-height:.94;letter-spacing:-.05em}.lead{max-width:76ch;margin:0;color:var(--muted);font-size:16px;line-height:1.75}.hero-side{display:grid;align-content:space-between;gap:14px;padding:18px;border:1px solid var(--line);border-radius:10px;background:rgb(8 10 7 / 58%)}.hero-side strong{color:var(--green);font-size:28px}.hero-side p{margin:0;color:var(--muted);line-height:1.6}.pill{display:inline-flex;min-height:34px;align-items:center;padding:0 11px;border:1px solid rgb(242 203 98 / 42%);border-radius:999px;color:var(--text);background:rgb(242 203 98 / 8%);font-size:12px;text-decoration:none}.link-row{display:flex;flex-wrap:wrap;gap:8px}.section{margin-top:24px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:12px}.section-head h2{margin:0;font-size:clamp(28px,4vw,48px);line-height:1.02}.copy{max-width:82ch;margin:8px 0 0;color:var(--muted);line-height:1.65}.timeline{display:grid;gap:10px}.entry{display:grid;grid-template-columns:150px minmax(0,1fr);gap:18px;padding:18px;border:1px solid var(--line);border-radius:10px;background:rgb(8 10 7 / 50%)}.entry-meta{color:var(--gold);font-size:12px;font-weight:800;line-height:1.55}.entry-meta small{display:block;margin-top:6px;color:var(--muted);font-weight:500}.entry h3{margin-bottom:8px;font-size:21px}.entry p,.entry li{color:var(--muted);line-height:1.65}.entry ul{margin:8px 0 0;padding-left:20px}.tag{display:inline-flex;margin-bottom:8px;padding:3px 8px;border:1px solid currentColor;border-radius:999px;color:var(--green);font-size:11px;font-weight:800}.route-grid,.guide-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.route-card,.guide-card{display:grid;gap:7px;padding:15px;border:1px solid var(--line);border-radius:10px;background:rgb(8 10 7 / 50%)}.route-card strong,.guide-card strong{font-size:18px}.route-card code{color:var(--gold);font-size:12px}.route-card p,.guide-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:16px;border:1px solid var(--line);border-radius:10px;background:rgb(8 10 7 / 50%)}.flow span{padding:9px 12px;border:1px solid rgb(159 198 255 / 42%);border-radius:8px;color:var(--blue);font-size:13px}.flow b{color:var(--gold)}.notice{padding:15px 18px;border-left:3px solid var(--gold);color:var(--muted);line-height:1.7;background:rgb(242 203 98 / 7%)}table{width:100%;border-collapse:collapse;border:1px solid var(--line);background:rgb(8 10 7 / 45%)}th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;line-height:1.55}th{color:var(--gold);font-size:12px}td{color:var(--muted);font-size:13px}code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--gold)}footer{padding:30px 0 10px;color:var(--muted);font-size:12px}@media(max-width:850px){.hero{grid-template-columns:1fr}.route-grid,.guide-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.entry{grid-template-columns:1fr;gap:8px}}@media(max-width:560px){.shell{padding:14px}.hero{padding:20px}.route-grid,.guide-grid{grid-template-columns:1fr}.entry{padding:14px}}
+    </style>
+    <meta name="dailyflora-release" content="DF-20260816-2005-9855718a">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">DailyFlora internal release history</p>
+          <h1>开发日志<br />与网站路由</h1>
+          <p class="lead">这里记录已经落到代码或正式页面的功能，而不是把设想写成已完成。日期来自仓库提交和现有 CHANGELOG；版本栏区分“首次实现线”和“正式发布线”。</p>
+        </div>
+        <aside class="hero-side">
+          <strong>0.73.0 candidate</strong>
+          <p>当前整合目标：把 0.15 已确认的花型/叶片门禁、43 项审核库存、开发日志和 Admin 开发工作台统一到正式 0.72 源头。</p>
+          <div class="link-row"><a class="pill" href="../admin/">打开正式 Admin</a><a class="pill" href="./dev-index.html">开发组目录</a><a class="pill" href="./aesthetic-review-dashboard.html?debug=1">审美 Dashboard</a></div>
+        </aside>
+      </header>
+
+      <section class="section" id="timeline">
+        <div class="section-head"><div><p class="eyebrow">When and what</p><h2>功能时间线</h2><p class="copy">手势、Clock UI 和网站引导的加入时间集中列在这里。早期开发线有 Unreleased 记录时，不把它冒充成已经发布的正式版本。</p></div></div>
+        <div class="timeline">
+          <article class="entry"><div class="entry-meta">2026-06-25<br />0.12.x<small>路由基础</small></div><div><span class="tag">foundation</span><h3>MVP 路由、日期、镜头和精度语义</h3><p>建立首页、日期参数、镜头路线和 render/density 的基本入口。用户可以从首页进入每日花束，再通过 URL 或界面切换日期、镜头和显示精度。</p><ul><li>每日花束：<code>/?date=YYYY-MM-DD</code></li><li>高精度验收：<code>?render=high&amp;density=high</code></li></ul></div></article>
+          <article class="entry"><div class="entry-meta">2026-06-26<br />0.13.x<small>花材库</small></div><div><span class="tag">shape vocabulary</span><h3>Primitive Lab 与核心抽象词表</h3><p>形成 16 类核心抽象目标形态。这里的 16 是一层词表，不是全部花型数量；后来新增 25 种偏写实花型、H01 和 C01 后，完整审核库存变成 43 条。</p><p>开发入口：<a href="./primitive-lab.html">Primitive Lab</a>、<a href="./realistic-flower-lab.html">偏写实花型 LAB</a>、<a href="./flower-system-review.html">43 项验收页</a>。</p></div></article>
+          <article class="entry"><div class="entry-meta">2026-07-03<br />0.14.0<small>公开结构</small></div><div><span class="tag">public routes</span><h3>公开网站与开发目录成形</h3><p>加入 About、Bouquet Shop、Member、Downloads、Special Bouquet、内部开发组目录和 mock 管理页面。之后用户侧与内部侧开始有明确边界，旧 docs 管理页只作为历史 mock。</p><p>正式用户入口：<code>/</code>、<code>/about/</code>、<code>/member/</code>、<code>/downloads/</code>、<code>/how-to-use/</code>。</p></div></article>
+          <article class="entry"><div class="entry-meta">2026-07-20<br />0.16 / 0.71<small>GUI v1</small></div><div><span class="tag">GUI + Clock UI</span><h3>GUI v1、VIEW 菜单和空闲时钟首次进入实现线</h3><p>黑色空间、左下花名、右上 INDEX、右下 VIEW、七语言选择器和反向括号动效进入主 GUI。Clock UI 以空闲时钟模式加入：时间、日期和名言在玻璃叠层中显示，设置留在 VIEW 菜单。</p><p>引导入口：用户从首页的 <code>INDEX</code> 进入说明和页面导航，从 <code>VIEW</code> 进入日期、精度、Clock mode 和手势设置。</p></div></article>
+          <article class="entry"><div class="entry-meta">2026-07-22—24<br />0.71<small>手势控制</small></div><div><span class="tag">gesture control</span><h3>浏览器手势从实验页进入可用控制</h3><p>07-22 建立隔离的浏览器手势预览；07-23 完成左右手通用、掌形总开关和停止手势；07-24 合并到浏览器控制线并标记 GUI/手势控制发布批准。普通首页按需加载，用户从 VIEW 菜单打开。</p><ul><li>测试入口：<code>?hand-control=1</code></li><li>用户说明：<a href="../how-to-use/">/how-to-use/</a> 的完整手势表、摄像头边界和全屏说明</li><li>实际功能：缩放、XY 构图移动、半合掌旋转、双手 spread、镜头/沉浸模式切换</li></ul></div></article>
+          <article class="entry"><div class="entry-meta">2026-07-27<br />0.71 / 0.72<small>Clock polish</small></div><div><span class="tag">clock behavior</span><h3>Clock UI 自动隐藏、镜头让位和手动边界</h3><p>修复时钟模式自动隐藏并恢复生产首页的时钟 chrome；花束在时钟出现前向左让位，VIEW 在时钟模式仍可打开。手动或自动 Clock overlay 只显示时间、日期和名言，不把设置按钮塞进叠层。</p></div></article>
+          <article class="entry"><div class="entry-meta">2026-08-03—14<br />0.72.0<small>正式网页线</small></div><div><span class="tag">formal release</span><h3>用户引导、法律页、Member 和正式 Admin</h3><p>0.72 正式网页线统一首页、注册、登录、个人花园、公开说明和 Downloads 的导航；<code>/how-to-use/</code> 补回手势表、Fullscreen 快捷键和 Clock mode 真实说明；正式 <code>/admin/</code> 接入 Beta 账户后台。</p><p>这一步把“开发页有功能”变成“用户能知道去哪里”：普通用户走公开导航，已登录用户走 Member，管理员走 Admin；开发 LAB 从 Admin 的开发工作台进入。</p></div></article>
+          <article class="entry"><div class="entry-meta">2026-08-16<br />0.73.0<small>整合候选</small></div><div><span class="tag">flower acceptance</span><h3>0.15 已确认花型/叶片门禁定向整合</h3><p>把 R01-R16、C01 和三组已通过花叶关系同步到正式源头；H01 与 01 盘状花保留 SciFi-only，08/09/10 不采用，13/14 先修显示 bug。花、茎、叶继续共享 <code>PlantStemInstance</code>，未确认叶片不自动生成。</p><p>完整库存显示为 16 核心抽象 + 25 写实 + H01 + C01 = 43 条审核记录；这次不将 0.15 的无关 GUI、账号或法律页面改动整体带入。</p></div></article>
+        </div>
+      </section>
+
+      <section class="section" id="routing">
+        <div class="section-head"><div><p class="eyebrow">How users are guided</p><h2>网站路由与引导</h2><p class="copy">用户不需要知道内部 LAB 文件名。公开页面负责解释和使用，Admin 负责权限后的内部工作台，直接 docs 链接只作为开发验收快捷入口。</p></div></div>
+        <div class="flow"><span><b>Home /</b><br />今天的花束</span><b>→</b><span><b>INDEX</b><br />了解产品、How to use、Member、Downloads</span><b>→</b><span><b>VIEW</b><br />日期、镜头、精度、Clock、手势</span><b>→</b><span><b>Member /</b><br />收藏、生成记录、账户</span></div>
+        <div class="route-grid" style="margin-top:10px">
+          <a class="route-card" href="../"><strong>公开首页</strong><code>/</code><p>每日花束、GUI、INDEX、VIEW；普通用户从这里开始。</p></a>
+          <a class="route-card" href="../how-to-use/"><strong>使用说明</strong><code>/how-to-use/</code><p>手势表、Clock mode、Fullscreen、精度/密度与操作边界。</p></a>
+          <a class="route-card" href="../member/"><strong>个人花园</strong><code>/member/</code><p>注册后进入收藏、生成记录和账户工作台；<code>/signup/</code> 是兼容入口。</p></a>
+          <a class="route-card" href="../downloads/"><strong>多端下载</strong><code>/downloads/</code><p>公开下载与平台说明，不从这里进入开发工具。</p></a>
+          <a class="route-card" href="../admin/"><strong>正式 Admin</strong><code>/admin/</code><p>Beta 权限后台；开发工作台已并入此页面，账户数据与 LAB 入口分区。</p></a>
+          <a class="route-card" href="./dev-index.html"><strong>开发组目录</strong><code>/docs/dev-index.html</code><p>内部快捷目录；可从 Admin 进入，保留直接打开 LAB 的便利。</p></a>
+        </div>
+      </section>
+
+      <section class="section" id="developer-workbench">
+        <div class="section-head"><div><p class="eyebrow">Admin → Developer workspace</p><h2>开发工作台入口</h2><p class="copy">正式 Admin 不再只有账户和任务列表。开发工作台是同一 Admin 页面内的内部导航层，不读取用户数据，也不把旧的静态 mock 当成正式后台。</p></div></div>
+        <div class="guide-grid">
+          <a class="guide-card" href="./aesthetic-review-dashboard.html?debug=1"><strong>审美门禁 Dashboard</strong><p>43 项审核库存、R01-R16、C01、SciFi-only、叶片门禁。</p></a>
+          <a class="guide-card" href="./flower-system-review.html"><strong>花型系统验收</strong><p>逐项通过/不通过/待定；点击对应模型后自动定位。</p></a>
+          <a class="guide-card" href="./leaf-flower-pairing-lab.html"><strong>花叶搭配 LAB</strong><p>当前三组已通过关系；未来继续增加，不用通用叶片补位。</p></a>
+          <a class="guide-card" href="./primitive-lab.html"><strong>Primitive Lab</strong><p>34 项共享画布：16 核心抽象、R01-R16、H01、C01。</p></a>
+          <a class="guide-card" href="./realistic-flower-lab.html"><strong>Realistic Flower LAB</strong><p>25 种写实花型总览，支持单项 query 定位。</p></a>
+          <a class="guide-card" href="./dailyflora-flower-plan-samples.html"><strong>固定花束样例</strong><p>实际运行页面的日期、seed、主题和 flowerPlan 检查入口。</p></a>
+        </div>
+      </section>
+
+      <section class="section" id="evidence">
+        <div class="section-head"><div><p class="eyebrow">Evidence map</p><h2>功能与证据对照</h2></div></div>
+        <table><thead><tr><th>功能</th><th>首次实现记录</th><th>正式用户入口</th><th>当前状态</th></tr></thead><tbody>
+          <tr><td>GUI v1 / INDEX / VIEW</td><td>2026-07-20，0.16/0.71 开发线</td><td><code>/</code></td><td>进入 0.72 正式网页线</td></tr>
+          <tr><td>Clock UI</td><td>2026-07-20 首次加入；07-27 修复自动隐藏和镜头让位</td><td><code>/</code> → VIEW；<code>/how-to-use/</code></td><td>0.72 保留并有用户说明</td></tr>
+          <tr><td>浏览器手势</td><td>2026-07-22—24；0.71 开发/验收线</td><td><code>/</code> → VIEW → 手势；<code>?hand-control=1</code> 为测试</td><td>0.72 正式网页可按需加载</td></tr>
+          <tr><td>开发者工具</td><td>早期在 <code>/docs/</code> 分散，0.73 整合到 Admin</td><td><code>/admin/</code> → 开发工作台</td><td>本轮完成入口整合</td></tr>
+          <tr><td>花型/叶片验收</td><td>0.15 验收版；0.73 定向移植</td><td><code>/admin/</code> → LAB；直接入口仍保留</td><td>R01-R16、C01、3 组花叶关系已确认</td></tr>
+        </tbody></table>
+      </section>
+
+      <p class="notice" style="margin-top:24px">版本边界：0.73.0 是当前正式源头的整合候选；本次只合并已确认的花型/叶片和开发入口，不自动把 0.15 的其它 GUI、账号、法律或未确认模型改动带入。DMG、EXE、ScreenSaver 和线上部署仍是后续独立发布门禁。</p>
+      <footer>DailyFlora internal documentation · source branch: <code>codex/dailyflora-integration</code></footer>
+    </main>
+  </body>
+</html>
