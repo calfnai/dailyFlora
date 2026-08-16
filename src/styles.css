@@ -2068,9 +2068,16 @@ body:not(.is-special) .site-menu-panel button {
 }
 
 body:not(.is-special) .site-menu-panel .site-menu-primary {
-  color: rgb(243 239 230 / 94%);
-  background: rgb(243 239 230 / 9%);
-  font-weight: 560;
+  color: #17120a;
+  background: #f4e681;
+  font-weight: 800;
+  box-shadow: 0 0 0 1px rgb(244 230 129 / 34%), 0 8px 22px rgb(244 230 129 / 12%);
+}
+
+body:not(.is-special) .site-menu-panel .site-menu-primary:hover,
+body:not(.is-special) .site-menu-panel .site-menu-primary:focus-visible {
+  color: #17120a;
+  background: #fff0a6;
 }
 
 body:not(.is-special) .site-menu-panel .site-menu-language-switcher {

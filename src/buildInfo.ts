@@ -1,4 +1,6 @@
 export type DailyFloraBuildInfo = {
+  version: string;
+  productVersion: string;
   releaseId: string;
   builtAt: string;
   timezone: string;

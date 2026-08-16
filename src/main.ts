@@ -243,7 +243,6 @@ const fullscreenShortcutContent = document.querySelector<HTMLElement>('#fullscre
 const gestureGuideContent = document.querySelector<HTMLElement>('#gesture-guide-content');
 const fullscreenHelpMore = document.querySelector<HTMLAnchorElement>('#fullscreen-help-more');
 const fullscreenHelpClose = document.querySelector<HTMLButtonElement>('#fullscreen-help-close');
-const releaseMark = document.querySelector<HTMLAnchorElement>('#release-mark');
 const clockExitHint = document.querySelector<HTMLElement>('#clock-exit-hint');
 const languageSwitcher = document.querySelector<HTMLElement>('#language-switcher');
 let interfaceLanguage: Locale = detectInitialLocale();
@@ -317,22 +316,8 @@ function syncInterfaceButtonAlignment() {
 
 window.requestAnimationFrame(syncInterfaceButtonAlignment);
 
-if (releaseMark) {
-  releaseMark.textContent = buildInfo.releaseId;
-  releaseMark.href = withBasePath('version.json');
-  releaseMark.title = [
-    `Release: ${buildInfo.releaseId}`,
-    `Commit: ${buildInfo.commitSha}`,
-    `Branch: ${buildInfo.branch}`,
-    `Built: ${buildInfo.builtAt}`,
-    buildInfo.deploymentId ? `Vercel: ${buildInfo.deploymentId}` : ''
-  ].filter(Boolean).join('\n');
-}
-document.querySelectorAll<HTMLElement>('[data-release-code]').forEach((node) => {
-  node.textContent = buildInfo.releaseId;
-});
 document.querySelectorAll<HTMLElement>('[data-product-version]').forEach((node) => {
-  node.textContent = buildInfo.releaseId;
+  node.textContent = buildInfo.productVersion || buildInfo.version;
 });
 
 const specialId = readSpecialId();

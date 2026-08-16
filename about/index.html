@@ -165,9 +165,7 @@
         <div class="footer-bottom wrap"><span data-i18n="common.copyright">© 2026 CALFN LAU. All rights reserved.</span><span data-product-version>0.73</span></div>
       </footer>
     </div>
-    <script>
-      fetch('../version.json').then((response) => response.ok ? response.json() : null).then((info) => { if (info?.releaseId) document.querySelectorAll('[data-release-code]').forEach((node) => { node.textContent = info.releaseId; }); }).catch(() => {});
-    </script>
+    <script src="../dailyflora-config.js"></script>
     <script type="module" src="../src/staticI18n.ts"></script>
   </body>
 </html>
