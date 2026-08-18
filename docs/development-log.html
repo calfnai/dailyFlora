@@ -15,7 +15,7 @@
         <div>
           <p class="eyebrow">DailyFlora internal release history</p>
           <h1>开发日志<br />与网站路由</h1>
-          <p class="lead">这里记录已经落到代码或正式页面的功能，而不是把设想写成已完成。日期来自仓库提交和现有 CHANGELOG；版本栏区分“首次实现线”和“正式发布线”。</p>
+          <p class="lead">这里记录已经落到代码或正式页面的功能，而不是把设想写成已完成。日期主要来自仓库提交和现有 CHANGELOG；5 月 pre-repo 项目方向来自 owner 本轮纠正，单独标注为前仓库记忆，不冒充 git 提交。</p>
         </div>
         <aside class="hero-side">
           <strong>0.74.0 release candidate</strong>
@@ -25,9 +25,10 @@
       </header>
 
       <section class="section" id="timeline">
-        <div class="section-head"><div><p class="eyebrow">When and what</p><h2>功能时间线</h2><p class="copy">手势、Clock UI 和网站引导的加入时间集中列在这里。早期开发线有 Unreleased 记录时，不把它冒充成已经发布的正式版本。</p></div></div>
+        <div class="section-head"><div><p class="eyebrow">When and what</p><h2>功能时间线</h2><p class="copy">手势、Clock UI、网站引导和早期项目方向集中列在这里。早期开发线有 Unreleased 或 pre-repo 记录时，不把它冒充成已经发布的正式版本。</p></div></div>
         <div class="timeline">
           <article class="entry"><div class="entry-meta">2026-08-19<br />0.74.0<small>版本登记</small></div><div><span class="tag">release operations</span><h3>0.74 重大版本边界与每日发布 runbook 补齐</h3><p>把 0.74 明确登记为基于完整 0.73 正式源头的发布候选，而不是单个 LAB 的局部修补。开发日志必须继续记录版本边界、用户能看到的入口、发布门禁和自动化流程，否则 GitHub 项目简介会显得只有代码堆叠、缺少产品演进证据。</p><p>新增 <code>docs/dailyflora-automation-runbook.md</code>，把每日发布的稳定 checklist 从长 prompt 迁入仓库。发布面重新写清：GitHub Pages 是主公开静态站，Vercel production 是 Git 集成生产验证面；日志精简适用于长文档、构建日志、GitHub API、Vercel deployment、curl 响应等所有噪声输出，不把项目表述成主要依赖 Vercel。</p></div></article>
+          <article class="entry"><div class="entry-meta">2026-06-15<br />0.1.0<small>仓库创立</small></div><div><span class="tag">first implementation</span><h3>DailyFlora 从项目方向落到 Three.js 每日花束屏保</h3><p>当前 git 证据从 2026-06-15 开始：初始化仓库、实现 DailyFlora screensaver、调整花束构图与控制，并把简单自转替换为 camera routes。这个阶段确定了后续所有每日花花的技术骨架：日期 seed、纯前端 3D 花束、密度/渲染控制、镜头路线和 GitHub Pages 静态发布。</p><ul><li><code>eae7851</code> Initialize DailyFlora repository</li><li><code>a738382</code> Implement DailyFlora screensaver</li><li><code>8cf7cf4</code> Tune bouquet composition and controls</li><li><code>5009813</code> Split density and render controls</li><li><code>a5f0c83</code> Replace rotation with camera routes</li></ul></div></article>
           <article class="entry"><div class="entry-meta">2026-06-25<br />0.12.x<small>路由基础</small></div><div><span class="tag">foundation</span><h3>MVP 路由、日期、镜头和精度语义</h3><p>建立首页、日期参数、镜头路线和 render/density 的基本入口。用户可以从首页进入每日花束，再通过 URL 或界面切换日期、镜头和显示精度。</p><ul><li>每日花束：<code>/?date=YYYY-MM-DD</code></li><li>高精度验收：<code>?render=high&amp;density=high</code></li></ul></div></article>
           <article class="entry"><div class="entry-meta">2026-06-26<br />0.13.x<small>花材库</small></div><div><span class="tag">shape vocabulary</span><h3>Primitive Lab 与核心抽象词表</h3><p>形成 16 类核心抽象目标形态。这里的 16 是一层词表，不是全部花型数量；后来新增 25 种偏写实花型、H01 和 C01 后，完整审核库存变成 43 条。</p><p>开发入口：<a href="./primitive-lab.html">Primitive Lab</a>、<a href="./realistic-flower-lab.html">偏写实花型 LAB</a>、<a href="./flower-system-review.html">43 项验收页</a>。</p></div></article>
           <article class="entry"><div class="entry-meta">2026-07-03<br />0.14.0<small>公开结构</small></div><div><span class="tag">public routes</span><h3>公开网站与开发目录成形</h3><p>加入 About、Bouquet Shop、Member、Downloads、Special Bouquet、内部开发组目录和 mock 管理页面。之后用户侧与内部侧开始有明确边界，旧 docs 管理页只作为历史 mock。</p><p>正式用户入口：<code>/</code>、<code>/about/</code>、<code>/member/</code>、<code>/downloads/</code>、<code>/how-to-use/</code>。</p></div></article>
@@ -37,6 +38,7 @@
           <article class="entry"><div class="entry-meta">2026-08-03—14<br />0.72.0<small>正式网页线</small></div><div><span class="tag">formal release</span><h3>用户引导、法律页、Member 和正式 Admin</h3><p>0.72 正式网页线统一首页、注册、登录、个人花园、公开说明和 Downloads 的导航；<code>/how-to-use/</code> 补回手势表、Fullscreen 快捷键和 Clock mode 真实说明；正式 <code>/admin/</code> 接入 Beta 账户后台。</p><p>这一步把“开发页有功能”变成“用户能知道去哪里”：普通用户走公开导航，已登录用户走 Member，管理员走 Admin；开发 LAB 从 Admin 的开发工作台进入。</p></div></article>
           <article class="entry"><div class="entry-meta">2026-08-17<br />0.74.0<small>发布候选</small></div><div><span class="tag">release gate</span><h3>0.73 全量源头与无长后茎审美规则合并</h3><p>以完整 0.73 integration 为底座，保留 R01-R16、C01、43 项审核库存、Admin 开发工作台和公开账户配置；把用户确认的“非长串花型不自带长后茎”回填正式 realistic flower source 与审美 Dashboard。</p><p>面花、层叠花、郁金香、洋水仙、蝴蝶兰、马蹄莲等单朵花只保留花头与必要花托；穗状花、果材/吊坠风铃果和叶材/枝条继续保留连接结构。正式导航、路由和 <code>special0629</code> 不在本候选范围内。</p></div></article>
           <article class="entry"><div class="entry-meta">2026-08-16<br />0.73.0<small>整合候选</small></div><div><span class="tag">flower acceptance</span><h3>0.15 已确认花型/叶片门禁定向整合</h3><p>把 R01-R16、C01 和三组已通过花叶关系同步到正式源头；H01 与 01 盘状花保留 SciFi-only，08/09/10 不采用，13/14 先修显示 bug。花、茎、叶继续共享 <code>PlantStemInstance</code>，未确认叶片不自动生成。</p><p>完整库存显示为 16 核心抽象 + 25 写实 + H01 + C01 = 43 条审核记录；这次不将 0.15 的无关 GUI、账号或法律页面改动整体带入。</p></div></article>
+          <article class="entry"><div class="entry-meta">2026-05<br />pre-repo<small>owner 记忆</small></div><div><span class="tag">project origin</span><h3>每日花花的产品方向先于仓库存在</h3><p>5 月阶段应作为 DailyFlora 的前仓库产品方向记录：核心不是“做一个花艺展示页”，而是每天打开就有一束由日期驱动、可长期迭代审美的花。当前仓库没有 2026-05 的 git commit 或可直接打开的远端代码证据，所以这里不写成已发布版本；它登记的是项目初心和后续评判标准。</p><ul><li>每日性：默认首页按当天日期生成，不靠人工每天换图。</li><li>屏保感：第一屏先是可看的花束空间，不是营销落地页。</li><li>可追溯：后续所有新花型、flowerPlan、URL 和发布日志都要能说明“今天是哪束花”。</li></ul></div></article>
         </div>
       </section>
 
