@@ -10,10 +10,12 @@
 
 在 0.73 integration 候选的完整源头上，补回并固化用户确认的“非长串花型不自带长后茎”规则，生成可审计的 0.74 发布候选。 / Built on the complete 0.73 integration candidate, restored and locked the user-confirmed rule that non-spike blooms do not carry a detached long rear stem, producing an auditable 0.74 release candidate.
 
+- 重大版本号更新登记：0.74 是在 0.73 完整正式源头之上的发布候选，不是只改单个 LAB；版本边界、开发日志和发布自动化 runbook 必须一起维护。 / Registered the major-version update: 0.74 is a release candidate on top of the full 0.73 formal source, not a single-LAB tweak; version boundaries, the development log, and the publish automation runbook must be maintained together.
 - 面花、层叠花和单朵雕塑花只保留花头与必要花托；花束连接由主枝细茎、共同扎口和绑点承担。
 - 穗状花、果材/吊坠风铃果和叶材/草线/枝条保留自身连续连接，不套用无长后茎规则。
 - Primitive Lab 明确标注 16 种无长后茎花型与 4 种保留茎/枝条形态，保留旋转、路由和正式导航边界。
 - 补齐公开运行配置、0.74 账户文案、Beta worker、法律/帮助页和开发文档版本标识；不修改 \`special0629\`。
+- 新增每日发布自动化 runbook，并明确 GitHub Pages 是主公开静态发布面，Vercel production 是 Git 集成生产验证面；输出纪律适用于长文档、构建日志、GitHub/Vercel/Curl 等所有噪声输出，不写成 Vercel 依赖中心。 / Added the daily publish automation runbook and clarified that GitHub Pages is the primary public static release surface while Vercel production is a Git-integration production verification surface; output discipline applies to all noisy long documents, build logs, GitHub/Vercel/curl output, not just Vercel.
 
 ## 0.73.0 - 2026-08-16 (formal integration candidate)
 
