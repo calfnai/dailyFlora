@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /login/
+Disallow: /signup/
+Disallow: /member/
+Disallow: /docs/
+
+Sitemap: https://dailyflora.calfn.com/sitemap.xml
