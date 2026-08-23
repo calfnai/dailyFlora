@@ -89,6 +89,7 @@
   "signup/index.html",
   "src/avatarLab.ts",
   "src/accountHeader.ts",
+  "src/analytics.ts",
   "src/admin.css",
   "src/admin.ts",
   "src/authPage.ts",
