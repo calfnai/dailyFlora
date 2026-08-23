@@ -1,15 +1,15 @@
 {
   "version": "0.73.0",
   "productVersion": "0.73",
-  "releaseId": "DF-20260822-0741-0a374d60",
-  "builtAt": "2026-08-22T00:45:43.364Z",
+  "releaseId": "DF-20260823-1204-297cdc33",
+  "builtAt": "2026-08-23T04:06:01.400Z",
   "timezone": "Asia/Shanghai",
-  "commitSha": "0a374d60cc17419a6209fe21d0d89d4677fa1cd7",
-  "shortSha": "0a374d60",
+  "commitSha": "297cdc3352bd80d280f8a164b9502ea4132bab3d",
+  "shortSha": "297cdc33",
   "branch": "codex/dailyflora-integration",
-  "commitMessage": "Merge PR #35 [DF-20260822-0741] Add resilient GA4 analytics foundation",
+  "commitMessage": "[DF-20260823-1204] Reuse existing GitHub deploy blobs",
   "dirty": false,
-  "buildSource": "vercel",
+  "buildSource": "local",
   "deploymentId": null,
   "deploymentUrl": null
 }
