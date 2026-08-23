@@ -334,20 +334,48 @@ function resolveMainFiles() {
   fail(`Unknown --main mode: ${mainMode}. Use manifest, tracked, or skip.`);
 }
 
-function treeEntries(gh, repo, files, stripPrefix = '') {
+function gitBlobSha(file) {
+  return run('git', ['hash-object', '--no-filters', file]).trim();
+}
+
+function branchBlobMap(gh, repo, branch) {
+  const ref = tryGhApiJson(gh, [`repos/${repo}/git/ref/heads/${branch}`]);
+  if (!ref.ok) return new Map();
+
+  const commit = ghApiJson(gh, [`repos/${repo}/git/commits/${ref.value.object.sha}`]);
+  const tree = ghApiJson(gh, [`repos/${repo}/git/trees/${commit.tree.sha}?recursive=1`]);
+  return new Map(
+    (tree.tree || [])
+      .filter((entry) => entry.type === 'blob' && entry.path && entry.sha)
+      .map((entry) => [entry.path, entry.sha])
+  );
+}
+
+function treeEntries(gh, repo, files, stripPrefix = '', existingBlobs = new Map()) {
   const snapshots = files.map((file) => {
     const repoPath = stripPrefix ? file.slice(stripPrefix.length).replace(/^\//, '') : file;
-    const content = dryRun ? '' : fs.readFileSync(path.join(repoRoot, file)).toString('base64');
-    return { repoPath, content };
+    const absolutePath = path.join(repoRoot, file);
+    const existingSha = existingBlobs.get(repoPath);
+    const localSha = dryRun ? null : gitBlobSha(file);
+    const content = dryRun || existingSha === localSha ? null : fs.readFileSync(absolutePath).toString('base64');
+    return { repoPath, content, existingSha, localSha };
   });
 
-  return snapshots.map(({ repoPath, content }) => {
+  return snapshots.map(({ repoPath, content, existingSha, localSha }) => {
     if (dryRun) {
       return {
         path: repoPath,
         mode: '100644',
         type: 'blob',
         content: ''
+      };
+    }
+    if (existingSha && existingSha === localSha) {
+      return {
+        path: repoPath,
+        mode: '100644',
+        type: 'blob',
+        sha: existingSha
       };
     }
     const blob = ghApiJson(gh, ['-X', 'POST', `repos/${repo}/git/blobs`, '--input', '-'], {
@@ -434,6 +462,8 @@ function main() {
 
   const repo = resolveRepo();
   const mainFiles = resolveMainFiles();
+  const mainBlobs = mainMode === 'skip' ? new Map() : branchBlobMap(gh, repo, 'main');
+  const pagesBlobs = branchBlobMap(gh, repo, 'gh-pages');
 
   if (!skipBuild) {
     log('Building site...');
@@ -454,7 +484,8 @@ function main() {
     gh,
     repo,
     filesUnder(pagesRoot).map((file) => path.relative(repoRoot, file)),
-    pagesPrefix
+    pagesPrefix,
+    pagesBlobs
   );
   pagesEntries.push({ path: '.nojekyll', mode: '100644', type: 'blob', content: '' });
 
@@ -469,7 +500,14 @@ function main() {
 
   let mainResult = null;
   if (mainMode !== 'skip') {
-    mainResult = updateBranchWithTree(gh, repo, 'main', treeEntries(gh, repo, mainFiles), 'Deploy DailyFlora source', true);
+    mainResult = updateBranchWithTree(
+      gh,
+      repo,
+      'main',
+      treeEntries(gh, repo, mainFiles, '', mainBlobs),
+      'Deploy DailyFlora source',
+      true
+    );
   }
   const pagesResult = updateBranchWithTree(gh, repo, 'gh-pages', pagesEntries, 'Deploy DailyFlora site', false);
   ensurePagesSource(gh, repo);
