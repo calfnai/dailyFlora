@@ -77,6 +77,7 @@
   "public/special/ladyfingers-lofi.mp3",
   "public/special/ngc-2787.jpg",
   "scripts/deploy-github-pages.mjs",
+  "scripts/dailyflora-guard.mjs",
   "scripts/deploy-source-files.json",
   "scripts/extract-special-palette.mjs",
   "scripts/ingest-lobster-inbox.mjs",
