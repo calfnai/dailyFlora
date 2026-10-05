@@ -30,7 +30,10 @@ button, input { font: inherit; }
 h1, h2, h3, p { margin: 0; }
 
 .site-header {
-  position: relative;
+  position: sticky;
+  top: 0;
+  background: rgba(7, 16, 12, .94);
+  backdrop-filter: blur(16px);
   z-index: 10;
   width: min(1440px, 100%);
   margin: 0 auto;
@@ -125,7 +128,7 @@ h1, h2, h3, p { margin: 0; }
   cursor: default;
 }
 
-.page-shell { overflow: hidden; }
+.page-shell { overflow: clip; }
 .wrap { width: min(1280px, 100%); margin: 0 auto; padding-inline: clamp(20px, 4vw, 64px); }
 .eyebrow {
   color: var(--sun);

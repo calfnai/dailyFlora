@@ -55,12 +55,12 @@ button { color: inherit; }
   transition: opacity 500ms ease, transform 500ms ease;
 }
 
-.is-idle .viewer-chrome:not(.palette-panel) { opacity: 0; pointer-events: none; }
-.is-idle .viewer-header { transform: translateY(-16px); }
+.is-idle .viewer-chrome:not(.palette-panel):not(.viewer-header):not(.scifi-index-menu) { opacity: 0; pointer-events: none; }
 .is-idle .viewer-controls, .is-idle .gesture-hint { transform: translateY(16px); }
 .is-idle .bouquet-caption { transform: translateX(-16px); }
 
 .viewer-header {
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -74,6 +74,7 @@ button { color: inherit; }
 .viewer-header .quality-mark { margin-right: 108px; }
 
 .scifi-index-menu {
+  position: fixed;
   top: max(28px, calc(env(safe-area-inset-top) + 16px));
   right: max(28px, calc(env(safe-area-inset-right) + 16px));
   display: grid;
