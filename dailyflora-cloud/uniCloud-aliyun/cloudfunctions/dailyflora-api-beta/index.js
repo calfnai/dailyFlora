@@ -15,7 +15,7 @@ const pointsLedger = db.collection('dailyflora-beta-points-ledger');
 const gardens = db.collection('dailyflora-beta-gardens');
 const passwordResets = db.collection('dailyflora-beta-resets');
 
-const VERSION = '0.72-beta.6';
+const VERSION = '0.74.0-20261001';
 const SESSION_DAYS = 30;
 const RESET_MINUTES = 30;
 const TASK_COST = 10;
@@ -31,7 +31,7 @@ function hash(value) { return crypto.createHash('sha256').update(String(value)).
 function randomId(prefix) { return `${prefix}-${crypto.randomBytes(18).toString('base64url')}`; }
 
 function jsonBody(event) {
-  let body = event && event.body;
+  let body = event && (event.body || (event.action ? event : null));
   if (event?.isBase64Encoded && typeof body === 'string') body = Buffer.from(body, 'base64').toString('utf8');
   if (!body) return {};
   if (typeof body === 'object') return body;
@@ -84,6 +84,7 @@ function publicGeneration(item) {
     source: item.source || '',
     status: item.status || 'completed',
     colors: Array.isArray(item.colors) ? item.colors : [],
+    renderParams: item.renderParams || {},
     createdAt: item.createdAt,
     updatedAt: item.updatedAt
   };
@@ -128,10 +129,10 @@ function sessionCookie(token, expiresAt) {
   return `dailyflora_beta_session=${encodeURIComponent(token)}; Max-Age=${maxAge}; Path=/; HttpOnly; Secure; SameSite=None`;
 }
 
-async function issueSession(userId) {
+async function issueSession(userId, authVersion = 0) {
   const token = crypto.randomBytes(32).toString('base64url');
   const expiresAt = new Date(Date.now() + SESSION_DAYS * 86400000);
-  await sessions.add({ userId, tokenHash: hash(token), createdAt: now(), expiresAt });
+  await sessions.add({ userId, authVersion, tokenHash: hash(token), createdAt: now(), expiresAt });
   return { token, tokenExpired: expiresAt.toISOString() };
 }
 
@@ -144,6 +145,7 @@ async function authenticated(event, body) {
   const result = await users.doc(session.userId).get();
   const user = result.data?.[0];
   if (!user || user.disabledAt) fail('账户不可用。', 403);
+  if ((session.authVersion || 0) !== (user.authVersion || 0)) fail('登录已过期，请重新登录。', 401);
   return { user, session };
 }
 
@@ -153,14 +155,14 @@ function adminEmails() {
 
 async function requireAdmin(event, body) {
   const auth = await authenticated(event, body);
-  if (auth.user.role !== 'admin' && !adminEmails().has(normalizeEmail(auth.user.email))) fail('没有 0.72 Beta 后台权限。', 403);
+  if (auth.user.role !== 'admin') fail('没有 0.72 Beta 后台权限。', 403);
   return auth;
 }
 
 async function ensurePointAccount(userId) {
   let result = await pointAccounts.where({ userId }).limit(1).get();
   if (result.data?.[0]) return result.data[0];
-  try { await pointAccounts.add({ userId, balance: 0, operations: {}, createdAt: now(), updatedAt: now() }); } catch {}
+  try { await pointAccounts.add({ _id: `POINTS-${hash(userId).slice(0, 40)}`, userId, balance: 0, operations: {}, createdAt: now(), updatedAt: now() }); } catch {}
   result = await pointAccounts.where({ userId }).limit(1).get();
   return result.data?.[0] || fail('积分账户初始化失败。', 503);
 }
@@ -181,7 +183,7 @@ async function applyPointOperation(userId, operationId, amount) {
 }
 
 async function writePointLedger(record) {
-  try { await pointsLedger.add(record); } catch (error) {
+  try { await pointsLedger.add({ ...record, _id: record.id }); } catch (error) {
     if (!(await pointsLedger.where({ id: record.id }).limit(1).get()).data?.length) throw error;
   }
 }
@@ -193,8 +195,8 @@ async function register(body) {
   if (!email.includes('@') || !name) fail('请填写有效的昵称和邮箱。');
   if ((await users.where({ email }).limit(1).get()).data?.length) fail('该邮箱已经注册，请直接登录。', 409);
   const current = now();
-  const created = await users.add({ email, name, nickname: name, ...passwordRecord(body.password), role: 'user', termsVersion: bounded(body.termsVersion, 40) || VERSION, termsAcceptedAt: current, createdAt: current, lastSeenAt: current });
-  await pointAccounts.add({ userId: created.id, balance: 0, operations: {}, createdAt: current, updatedAt: current });
+  const created = await users.add({ _id: `USER-${hash(email).slice(0, 40)}`, email, name, nickname: name, ...passwordRecord(body.password), role: 'user', termsVersion: bounded(body.termsVersion, 40) || VERSION, termsAcceptedAt: current, createdAt: current, lastSeenAt: current });
+  await pointAccounts.add({ _id: `POINTS-${hash(created.id).slice(0, 40)}`, userId: created.id, balance: 0, operations: {}, createdAt: current, updatedAt: current });
   const user = { _id: created.id, email, name, role: 'user', createdAt: current, lastSeenAt: current };
   return { user: publicUser(user), ...(await issueSession(created.id)) };
 }
@@ -204,10 +206,10 @@ async function login(body) {
   assertPassword(body.password);
   const result = await users.where({ email }).limit(1).get();
   const user = result.data?.[0];
-  if (!user || !passwordMatches(body.password, user)) fail('邮箱或密码不正确。', 401);
+  if (!user || user.disabledAt || !passwordMatches(body.password, user)) fail('邮箱或密码不正确。', 401);
   user.lastSeenAt = now();
   await users.doc(user._id).update({ lastSeenAt: user.lastSeenAt });
-  return { user: publicUser(user), ...(await issueSession(user._id)) };
+  return { user: publicUser(user), ...(await issueSession(user._id, user.authVersion || 0)) };
 }
 
 function favoriteInput(value) {
@@ -223,20 +225,28 @@ function parseWebp(dataUrl, maxBytes, label) {
   const match = String(dataUrl || '').match(/^data:image\/webp;base64,([A-Za-z0-9+/=\s]+)$/i);
   if (!match) fail(`${label} 必须是 WebP。`);
   const buffer = Buffer.from(match[1].replace(/\s/g, ''), 'base64');
-  if (!buffer.length) fail(`${label} 为空。`);
+  if (buffer.length < 20 || buffer.toString('ascii', 0, 4) !== 'RIFF' || buffer.toString('ascii', 8, 12) !== 'WEBP' || !['VP8 ', 'VP8L', 'VP8X'].includes(buffer.toString('ascii', 12, 16)) || buffer.readUInt32LE(4) + 8 !== buffer.length) fail(`${label} 不是有效的 WebP 图片。`);
   if (buffer.length > maxBytes) fail(`${label} 超过大小限制。`, 413);
   return buffer;
 }
 
-async function memberDashboard(auth) {
+async function recoverExpiredTasks(userId) {
+  const query = { status: 'processing', workerBatchExpiresAt: command.lt(now()), ...(userId ? { userId } : {}) };
+  const expired = (await tasks.where(query).limit(20).get()).data || [];
+  for (const task of expired) await failTask(task, '任务处理超时，积分已退回。', true);
+}
+
+async function memberDashboard(auth, body = {}) {
+  const offset = Math.max(0, Math.min(100000, Math.floor(Number(body.offset) || 0)));
+  await recoverExpiredTasks(auth.user._id);
   const [favoriteResult, generationResult, taskResult, account, pointResult] = await Promise.all([
-    favorites.where({ userId: auth.user._id }).orderBy('savedAt', 'desc').limit(100).get(),
-    generations.where({ userId: auth.user._id }).orderBy('updatedAt', 'desc').limit(100).get(),
-    tasks.where({ userId: auth.user._id }).orderBy('updatedAt', 'desc').limit(100).get(),
+    favorites.where({ userId: auth.user._id }).orderBy('savedAt', 'desc').skip(offset).limit(51).get(),
+    generations.where({ userId: auth.user._id, deletedAt: command.exists(false) }).orderBy('updatedAt', 'desc').skip(offset).limit(51).get(),
+    tasks.where({ userId: auth.user._id }).orderBy('updatedAt', 'desc').skip(offset).limit(51).get(),
     ensurePointAccount(auth.user._id),
-    pointsLedger.where({ userId: auth.user._id }).orderBy('createdAt', 'desc').limit(100).get()
+    pointsLedger.where({ userId: auth.user._id }).orderBy('createdAt', 'desc').skip(offset).limit(51).get()
   ]);
-  return { snapshot: { user: publicUser(auth.user), favorites: (favoriteResult.data || []).map(publicFavorite), generations: (generationResult.data || []).map(publicGeneration), tasks: (taskResult.data || []).map(publicTask), pointAccount: { balance: account.balance || 0, updatedAt: account.updatedAt }, points: pointResult.data || [] } };
+  return { snapshot: { offset, hasMore: [favoriteResult, generationResult, taskResult, pointResult].some(result => result.data?.length > 50), user: publicUser(auth.user), favorites: (favoriteResult.data || []).slice(0, 50).map(publicFavorite), generations: (generationResult.data || []).slice(0, 50).map(publicGeneration), tasks: (taskResult.data || []).slice(0, 50).map(publicTask), pointAccount: { balance: account.balance || 0, updatedAt: account.updatedAt }, points: (pointResult.data || []).slice(0, 50) } };
 }
 
 async function createReferenceTask(auth, body) {
@@ -245,57 +255,56 @@ async function createReferenceTask(auth, body) {
   const taskId = `DF-BETA-TASK-${hash(`${auth.user._id}:${key}`).slice(0, 32)}`;
   const existing = await tasks.where({ id: taskId, userId: auth.user._id }).limit(1).get();
   const existingTask = existing.data?.[0];
-  if (existingTask && existingTask.status !== 'preparing') return { task: publicTask(existingTask) };
+  if (existingTask) return { task: publicTask(existingTask) };
+  const referenceBuffer = parseWebp(body.referenceDataUrl, MAX_REFERENCE_BYTES, '主参考图');
+  const thumbnailBuffer = parseWebp(body.thumbnailDataUrl, MAX_THUMBNAIL_BYTES, '缩略图');
+  if ((await ensurePointAccount(auth.user._id)).balance < TASK_COST) fail('积分不足：创建参考图任务需要 10 分。', 402);
 
   const current = now();
   const referenceId = taskId.replace('TASK', 'REF');
   const reservation = existingTask || { id: taskId, userId: auth.user._id, referenceId, idempotencyKey: key, status: 'preparing', cost: TASK_COST, charged: false, input: { bouquetName: bounded(body.bouquetName, 120) || '我的参考图花束', style: bounded(body.style, 40) || 'auto', preference: bounded(body.preference, 500) }, createdAt: current, updatedAt: current };
   if (!existingTask) {
-    try { await tasks.add(reservation); } catch {
+    try { await tasks.add({ ...reservation, _id: taskId }); } catch {
       const duplicate = await tasks.where({ id: taskId, userId: auth.user._id }).limit(1).get();
-      if (duplicate.data?.[0]?.status !== 'preparing') return { task: publicTask(duplicate.data[0]) };
+      if (duplicate.data?.[0]) return { task: publicTask(duplicate.data[0]) };
       if (!duplicate.data?.[0]) throw new Error('任务预留失败。');
     }
   }
 
-  const referenceBuffer = parseWebp(body.referenceDataUrl, MAX_REFERENCE_BYTES, '主参考图');
-  const thumbnailBuffer = parseWebp(body.thumbnailDataUrl, MAX_THUMBNAIL_BYTES, '缩略图');
-  const base = `dailyflora/beta-072/private/${auth.user._id}/${referenceId}`;
+  const base = `dailyflora-private/${auth.user._id}/${referenceId}`;
   let uploaded = [];
-  let debitSucceeded = false;
   try {
-    const [referenceUpload, thumbnailUpload] = await Promise.all([
+    const uploads = await Promise.allSettled([
       uniCloud.uploadFile({ cloudPath: `${base}/reference.webp`, fileContent: referenceBuffer, cloudPathAsRealPath: true }),
       uniCloud.uploadFile({ cloudPath: `${base}/thumbnail.webp`, fileContent: thumbnailBuffer, cloudPathAsRealPath: true })
     ]);
-    uploaded = [referenceUpload?.fileID || referenceUpload?.fileId, thumbnailUpload?.fileID || thumbnailUpload?.fileId].filter(Boolean);
+    uploaded = uploads.filter(item => item.status === 'fulfilled').map(item => item.value?.fileID || item.value?.fileId).filter(Boolean);
     if (uploaded.length !== 2) fail('私有存储没有返回完整文件 ID。', 503);
 
     const referenceRecord = { id: referenceId, userId: auth.user._id, taskId, referenceFileId: uploaded[0], thumbnailFileId: uploaded[1], sourceFileName: bounded(body.sourceFileName, 180), reference: { ...(body.reference || {}), bytes: referenceBuffer.length, contentType: 'image/webp' }, thumbnail: { ...(body.thumbnail || {}), bytes: thumbnailBuffer.length, contentType: 'image/webp' }, storagePrefix: base, status: 'queued', updatedAt: now() };
     const existingReference = (await references.where({ id: referenceId, userId: auth.user._id }).limit(1).get()).data?.[0];
     if (existingReference) await references.doc(existingReference._id).update(referenceRecord);
-    else await references.add({ ...referenceRecord, createdAt: current });
+    else await references.add({ ...referenceRecord, _id: referenceId, createdAt: current });
 
-    const debit = await applyPointOperation(auth.user._id, `debit:${taskId}`, -TASK_COST);
-    if (!debit.ok) fail('积分不足：创建参考图任务需要 10 分。', 402);
-    debitSucceeded = true;
-    await writePointLedger({ id: `DF-BETA-DEBIT-${taskId}`, userId: auth.user._id, amount: -TASK_COST, type: 'generation-debit', reason: '参考图生成任务', taskId, balanceAfter: debit.balanceAfter, createdAt: now() });
+    const account = await ensurePointAccount(auth.user._id);
     const update = { status: 'queued', charged: true, updatedAt: now() };
-    const queued = await tasks.where({ id: taskId, userId: auth.user._id, status: 'preparing' }).update(update);
-    if (!queued.updated) fail('任务状态已变化，请刷新后重试。', 409);
+    await db.runTransaction(async tx => {
+      const taskDoc = tx.collection('dailyflora-beta-tasks').doc(taskId);
+      const savedTask = (await taskDoc.get()).data;
+      if (!savedTask || savedTask.status !== 'preparing') fail('任务状态已变化，请刷新后重试。', 409);
+      const accountDoc = tx.collection('dailyflora-beta-point-accounts').doc(account._id);
+      const savedAccount = (await accountDoc.get()).data;
+      if (!savedAccount || savedAccount.balance < TASK_COST) fail('积分不足：创建参考图任务需要 10 分。', 402);
+      const balance = savedAccount.balance - TASK_COST;
+      await accountDoc.update({ balance, updatedAt: now() });
+      await tx.collection('dailyflora-beta-points-ledger').add({ _id: `DF-BETA-DEBIT-${taskId}`, id: `DF-BETA-DEBIT-${taskId}`, userId: auth.user._id, amount: -TASK_COST, type: 'generation-debit', reason: '参考图生成任务', taskId, balanceAfter: balance, createdAt: now() });
+      await taskDoc.update(update);
+    });
     return { task: publicTask({ ...reservation, ...update }) };
   } catch (error) {
     if (uploaded.length) await uniCloud.deleteFile({ fileList: uploaded }).catch(() => {});
     await references.where({ id: referenceId, userId: auth.user._id }).remove().catch(() => {});
-    if (debitSucceeded) {
-      const refund = await applyPointOperation(auth.user._id, `create-refund:${taskId}`, TASK_COST).catch(() => null);
-      if (refund?.ok) await writePointLedger({ id: `DF-BETA-REFUND-${taskId}`, userId: auth.user._id, amount: TASK_COST, type: 'generation-refund', reason: '任务创建失败退款', taskId, balanceAfter: refund.balanceAfter, createdAt: now() }).catch(() => {});
-      const failedUpdate = { status: 'failed', charged: true, errorMessage: '任务创建失败，未进入处理队列。', updatedAt: now() };
-      if (refund?.ok) failedUpdate.refundedAt = now();
-      await tasks.where({ id: taskId, userId: auth.user._id }).update(failedUpdate).catch(() => {});
-    } else {
-      await tasks.where({ id: taskId, userId: auth.user._id, status: 'preparing' }).remove().catch(() => {});
-    }
+    await tasks.where({ id: taskId, userId: auth.user._id, status: 'preparing' }).remove().catch(() => {});
     throw error;
   }
 }
@@ -325,32 +334,46 @@ async function refundTask(task, reason) {
 }
 
 async function completeTask(task, resultValue) {
-  if (task.status === 'completed' && task.publicId) return publicTask(task);
   const result = processingResult(resultValue);
-  const current = now();
-  const generationId = task.generationId || randomId('DF-BETA-AI');
-  const publicId = task.publicId || crypto.randomBytes(24).toString('base64url');
-  const generation = { id: generationId, publicId, userId: task.userId, taskId: task.id, name: result.title || task.input?.bouquetName, seed: result.seed, themeId: result.themeId, date: current.toISOString().slice(0, 10), source: 'reference-codex', status: 'completed', colors: result.colors, renderParams: result.renderParams, createdAt: current, updatedAt: current };
-  const existing = await generations.where({ id: generationId, userId: task.userId }).limit(1).get();
-  if (existing.data?.[0]) await generations.doc(existing.data[0]._id).update(generation); else await generations.add(generation);
-  const update = { status: 'completed', result, generationId, publicId, completedAt: current, updatedAt: current, errorMessage: null };
-  await tasks.doc(task._id).update(update);
-  await references.where({ id: task.referenceId }).update({ status: 'completed', updatedAt: current });
-  const garden = (await gardens.where({ userId: task.userId }).limit(1).get()).data?.[0];
-  const entry = publicGeneration(generation);
-  if (garden) await gardens.doc(garden._id).update({ entries: [entry, ...(garden.entries || []).filter((item) => item.id !== entry.id)].slice(0, 100), updatedAt: current });
-  else await gardens.add({ userId: task.userId, entries: [entry], createdAt: current, updatedAt: current });
-  return publicTask({ ...task, ...update });
+  const taskDocId = task._id;
+  return db.runTransaction(async tx => {
+    const taskDoc = tx.collection('dailyflora-beta-tasks').doc(taskDocId);
+    const fresh = (await taskDoc.get()).data;
+    if (!fresh) fail('任务不存在。', 404);
+    if (fresh.status === 'completed') return publicTask(fresh);
+    if (fresh.status !== 'processing' || fresh.refundedAt) fail('任务已结束，不能再次完成。', 409);
+    const current = now();
+    const generationId = `DF-GEN-${hash(fresh.id).slice(0, 32)}`;
+    const publicId = hash(`public:${fresh.id}`).slice(0, 48);
+    const generation = { _id: generationId, id: generationId, publicId, userId: fresh.userId, taskId: fresh.id, name: fresh.input?.bouquetName || result.title, publicName: result.title, seed: result.seed, themeId: result.themeId, date: current.toISOString().slice(0, 10), source: 'reference', status: 'completed', colors: result.colors, renderParams: result.renderParams, createdAt: current, updatedAt: current };
+    await tx.collection('dailyflora-beta-generations').add(generation);
+    const update = { status: 'completed', result, generationId, publicId, completedAt: current, updatedAt: current, errorMessage: null };
+    await taskDoc.update(update);
+    return publicTask({ ...fresh, ...update });
+  });
 }
 
-async function failTask(task, message) {
-  if (task.status !== 'failed') {
-    await tasks.doc(task._id).update({ status: 'failed', errorMessage: bounded(message, 500) || 'Codex 处理失败。', completedAt: now(), updatedAt: now() });
-    await references.where({ id: task.referenceId }).update({ status: 'failed', updatedAt: now() });
-  }
-  await refundTask({ ...task, status: 'failed' }, '生成失败退款');
-  const refreshed = (await tasks.doc(task._id).get()).data?.[0];
-  return publicTask(refreshed || task);
+async function failTask(task, message, expiredOnly = false) {
+  const account = await ensurePointAccount(task.userId);
+  return db.runTransaction(async tx => {
+    const taskDoc = tx.collection('dailyflora-beta-tasks').doc(task._id);
+    const fresh = (await taskDoc.get()).data;
+    if (!fresh) fail('任务不存在。', 404);
+    if (fresh.status === 'completed' || fresh.status === 'failed') return publicTask(fresh);
+    if (expiredOnly && (!fresh.workerBatchExpiresAt || new Date(fresh.workerBatchExpiresAt) > now())) return publicTask(fresh);
+    const update = { status: 'failed', errorMessage: bounded(message, 500) || '处理失败，请重新提交。', completedAt: now(), updatedAt: now() };
+    if (fresh.charged && !fresh.refundedAt) {
+      const accountDoc = tx.collection('dailyflora-beta-point-accounts').doc(account._id);
+      const saved = (await accountDoc.get()).data;
+      const balance = saved.balance + fresh.cost;
+      await accountDoc.update({ balance, updatedAt: now() });
+      const id = `DF-BETA-REFUND-${fresh.id}`;
+      await tx.collection('dailyflora-beta-points-ledger').add({ _id: id, id, userId: fresh.userId, amount: fresh.cost, type: 'generation-refund', reason: '生成失败退款', taskId: fresh.id, balanceAfter: balance, createdAt: now() });
+      update.refundedAt = now();
+    }
+    await taskDoc.update(update);
+    return publicTask({ ...fresh, ...update });
+  });
 }
 
 async function adminSummary() {
@@ -358,25 +381,40 @@ async function adminSummary() {
   return { summary: { users: counts[0].total, favorites: counts[1].total, generations: counts[2].total, tasks: counts[3].total, pointAccounts: counts[4].total, version: VERSION } };
 }
 
-async function adminListUsers() {
-  const result = await users.orderBy('createdAt', 'desc').limit(100).get();
-  const accountResult = await pointAccounts.limit(200).get();
-  const balances = new Map((accountResult.data || []).map((item) => [item.userId, item.balance || 0]));
-  return { users: (result.data || []).map((item) => ({ ...publicUser(item), balance: balances.get(item._id) || 0 })) };
+async function adminListUsers(body = {}) {
+  const offset = Math.max(0, Math.floor(Number(body.offset) || 0));
+  const query = body.email ? { email: normalizeEmail(body.email) } : {};
+  const result = await users.where(query).orderBy('createdAt', 'desc').skip(offset).limit(50).get();
+  const rows = await Promise.all((result.data || []).map(async user => {
+    const account = (await pointAccounts.where({ userId: user._id }).limit(1).get()).data?.[0];
+    return { ...publicUser(user), balance: account?.balance || 0 };
+  }));
+  return { users: rows };
 }
 
-async function adminGrantPoints(body) {
+async function adminGrantPoints(body, operator) {
   const userId = bounded(body.userId, 160);
   const amount = Number(body.amount);
-  const reason = bounded(body.reason, 160) || 'Admin Beta 测试赠分';
+  const reason = bounded(body.reason, 160);
   const key = bounded(body.idempotencyKey, 120);
-  if (!userId || !Number.isInteger(amount) || amount <= 0 || amount > 10000 || !key) fail('赠分参数无效。');
-  const ledgerId = `DF-BETA-GRANT-${hash(`${userId}:${key}`).slice(0, 32)}`;
-  if ((await pointsLedger.where({ id: ledgerId }).limit(1).get()).data?.length) return { ok: true };
-  const grant = await applyPointOperation(userId, `grant:${ledgerId}`, amount);
-  if (!grant.ok) fail('赠分失败。', 503);
-  await writePointLedger({ id: ledgerId, userId, amount, type: 'admin-grant', reason, balanceAfter: grant.balanceAfter, createdAt: now() });
-  return { ok: true };
+  if (!userId || !Number.isInteger(amount) || amount <= 0 || amount > 10000 || !key || !reason) fail('请填写有效积分、原因和流水编号。');
+  if (!(await users.doc(userId).get()).data?.[0]) fail('用户不存在。', 404);
+  const account = await ensurePointAccount(userId);
+  const id = `DF-BETA-GRANT-${hash(`${operator._id}:${key}`).slice(0, 32)}`;
+  return db.runTransaction(async tx => {
+    const ledgerDoc = tx.collection('dailyflora-beta-points-ledger').doc(id);
+    const existing = (await ledgerDoc.get()).data;
+    if (existing) {
+      if (existing.userId !== userId || existing.amount !== amount || existing.reason !== reason) fail('流水编号已用于另一笔加分。', 409);
+      return { ok: true };
+    }
+    const accountDoc = tx.collection('dailyflora-beta-point-accounts').doc(account._id);
+    const saved = (await accountDoc.get()).data;
+    const balance = saved.balance + amount;
+    await accountDoc.update({ balance, updatedAt: now() });
+    await tx.collection('dailyflora-beta-points-ledger').add({ _id: id, id, userId, amount, type: 'admin-grant', reason, operatorId: operator._id, reference: key, balanceAfter: balance, createdAt: now() });
+    return { ok: true };
+  });
 }
 
 async function adminGetReference(body) {
@@ -390,12 +428,16 @@ async function adminGetReference(body) {
 }
 
 async function adminCreateWorkerBatch() {
-  const queued = (await tasks.where({ status: 'queued' }).orderBy('createdAt', 'asc').limit(5).get()).data || [];
+  await recoverExpiredTasks();
+  const queued = (await tasks.where({ status: 'queued' }).orderBy('createdAt', 'asc').limit(1).get()).data || [];
   const token = crypto.randomBytes(32).toString('base64url');
-  const tokenHash = hash(token);
   const expiresAt = new Date(Date.now() + BATCH_MINUTES * 60000);
-  for (const task of queued) await tasks.doc(task._id).update({ workerBatchHash: tokenHash, workerBatchExpiresAt: expiresAt, updatedAt: now() });
-  return { batch: { token, expiresAt: expiresAt.toISOString(), taskCount: queued.length } };
+  let taskCount = 0;
+  for (const task of queued) {
+    const claimed = await tasks.where({ _id: task._id, status: 'queued' }).update({ status: 'processing', workerBatchHash: hash(token), workerBatchExpiresAt: expiresAt, updatedAt: now() });
+    taskCount += claimed.updated || 0;
+  }
+  return { batch: { token, expiresAt: expiresAt.toISOString(), taskCount } };
 }
 
 async function batchTasks(body) {
@@ -421,19 +463,21 @@ async function workerFetchBatch(body) {
 }
 
 async function workerTask(body) {
-  const batch = await batchTasks(body);
-  const taskId = bounded(body.taskId, 180);
-  const task = batch.tasks.find((item) => item.id === taskId);
-  if (!task) fail('任务不属于当前批次。', 403);
+  const task = (await tasks.where({ id: bounded(body.taskId, 180), workerBatchHash: hash(bounded(body.batchToken, 200)) }).limit(1).get()).data?.[0];
+  if (!task || !body.batchToken) fail('任务不属于当前批次。', 403);
+  if (!['completed', 'failed'].includes(task.status) && new Date(task.workerBatchExpiresAt) < now()) {
+    await failTask(task, '任务处理超时，积分已退回。', true);
+    fail('任务处理超时，请创建新任务。', 409);
+  }
   return task;
 }
 
 async function publicGenerationById(body) {
   const publicId = bounded(body.publicId, 160);
-  const generation = (await generations.where({ publicId }).limit(1).get()).data?.[0];
+  const generation = (await generations.where({ publicId, deletedAt: command.exists(false) }).limit(1).get()).data?.[0];
   if (!generation) fail('这个公开花束不存在。', 404);
   const value = publicGeneration(generation);
-  return { generation: { id: value.id, publicId: value.publicId, name: value.name, seed: value.seed, themeId: value.themeId, date: value.date, status: value.status, colors: value.colors, createdAt: value.createdAt } };
+  return { generation: { id: value.id, publicId: value.publicId, name: 'DailyFlora 专属花束', seed: value.seed, themeId: value.themeId, date: value.date, status: value.status, colors: value.colors, renderParams: value.renderParams, createdAt: value.createdAt } };
 }
 
 async function sendResetEmail(user, token) {
@@ -441,7 +485,7 @@ async function sendResetEmail(user, token) {
   const accessKeySecret = process.env.DIRECTMAIL_ACCESS_KEY_SECRET;
   const accountName = process.env.DIRECTMAIL_ACCOUNT_NAME;
   if (!accessKeyId || !accessKeySecret || !accountName) fail('邮件服务尚未配置，请联系管理员。', 503);
-  const origin = (process.env.DAILYFLORA_BETA_PUBLIC_ORIGIN || 'https://static-mp-7937f272-ccea-46ee-ac33-3e23abb1fa49.next.bspapp.com/beta-072').replace(/\/$/, '');
+  const origin = (process.env.DAILYFLORA_BETA_PUBLIC_ORIGIN || 'https://env-00jy6xjkcayy-static.normal.cloudstatic.cn').replace(/\/$/, '');
   const params = { AccessKeyId: accessKeyId, AccountName: accountName, Action: 'SingleSendMail', AddressType: '1', Format: 'JSON', HtmlBody: `<p>请在 30 分钟内重置 DailyFlora 0.72 Beta 密码：</p><p><a href="${origin}/login/#reset?token=${encodeURIComponent(token)}">重置密码</a></p>`, ReplyToAddress: 'true', Subject: '重置 DailyFlora Beta 密码', ToAddress: user.email, SignatureMethod: 'HMAC-SHA1', SignatureNonce: crypto.randomBytes(16).toString('hex'), SignatureVersion: '1.0', Timestamp: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'), Version: '2015-11-23' };
   const encode = (value) => encodeURIComponent(String(value)).replace(/!/g, '%21').replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/\*/g, '%2A');
   const query = Object.keys(params).sort().map((key) => `${encode(key)}=${encode(params[key])}`).join('&');
@@ -472,10 +516,22 @@ async function resetPassword(body) {
   const reset = (await passwordResets.where({ tokenHash: hash(bounded(body.token, 200)), expiresAt: command.gt(now()) }).limit(1).get()).data?.[0];
   if (!reset) fail('重置链接无效或已过期。');
   const user = (await users.doc(reset.userId).get()).data?.[0];
-  if (!user) fail('账户不可用。', 403);
-  await users.doc(user._id).update({ ...passwordRecord(body.password), lastSeenAt: now() });
-  await passwordResets.doc(reset._id).remove();
-  return { user: publicUser(user), ...(await issueSession(user._id)) };
+  if (!user || user.disabledAt) fail('账户不可用。', 403);
+  let authVersion;
+  const nextPassword = passwordRecord(body.password);
+  await db.runTransaction(async tx => {
+    const resetDoc = tx.collection('dailyflora-beta-resets').doc(reset._id);
+    if (!(await resetDoc.get()).data) fail('重置链接已使用。', 409);
+    const userDoc = tx.collection('dailyflora-beta-users').doc(user._id);
+    const currentUser = (await userDoc.get()).data;
+    if (!currentUser || currentUser.disabledAt) fail('账户不可用。', 403);
+    authVersion = (currentUser.authVersion || 0) + 1;
+    await userDoc.update({ ...nextPassword, authVersion, lastSeenAt: now() });
+    await resetDoc.remove();
+  });
+  user.authVersion = authVersion;
+
+  return { user: publicUser(user), ...(await issueSession(user._id, user.authVersion || 0)) };
 }
 
 async function handle(action, body, event) {
@@ -492,13 +548,13 @@ async function handle(action, body, event) {
   const auth = await authenticated(event, body);
   if (action === 'me') return { user: publicUser(auth.user) };
   if (action === 'logout') { await sessions.doc(auth.session._id).remove(); return { ok: true }; }
-  if (action === 'memberDashboard') return memberDashboard(auth);
-  if (action === 'listFavorites') return { favorites: ((await favorites.where({ userId: auth.user._id }).orderBy('savedAt', 'desc').limit(100).get()).data || []).map(publicFavorite) };
+  if (action === 'memberDashboard') return memberDashboard(auth, body);
+  if (action === 'listFavorites') return { favorites: ((await favorites.where({ userId: auth.user._id }).orderBy('savedAt', 'desc').skip(Math.max(0, Math.floor(Number(body.offset) || 0))).limit(100).get()).data || []).map(publicFavorite) };
   if (action === 'saveFavorite') {
     const favorite = favoriteInput(body.favorite);
     const existing = (await favorites.where({ userId: auth.user._id, id: favorite.id }).limit(1).get()).data?.[0];
     const record = { ...favorite, userId: auth.user._id, updatedAt: now() };
-    if (existing) await favorites.doc(existing._id).update(record); else await favorites.add({ ...record, createdAt: now() });
+    if (existing) await favorites.doc(existing._id).update(record); else { try { await favorites.add({ ...record, _id: `FAV-${hash(`${auth.user._id}:${favorite.id}`).slice(0, 40)}`, createdAt: now() }); } catch (error) { const duplicate = (await favorites.where({ userId: auth.user._id, id: favorite.id }).limit(1).get()).data?.[0]; if (!duplicate) throw error; await favorites.doc(duplicate._id).update(record); } }
     return { favorite: publicFavorite(record) };
   }
   if (action === 'removeFavorite') { await favorites.where({ userId: auth.user._id, id: bounded(body.favoriteId, 180) }).remove(); return { ok: true }; }
@@ -509,29 +565,51 @@ async function handle(action, body, event) {
     const name = bounded(body.name, 120); if (!name) fail('名称不能为空。');
     await generations.doc(item._id).update({ name, updatedAt: now() }); return { generation: publicGeneration({ ...item, name }) };
   }
-  if (action === 'deleteGeneration') { await generations.where({ userId: auth.user._id, id: bounded(body.generationId, 180) }).remove(); return { ok: true }; }
+  if (action === 'deleteGeneration') {
+    const item = (await generations.where({ userId: auth.user._id, id: bounded(body.generationId, 180) }).limit(1).get()).data?.[0];
+    if (!item) return { ok: true };
+    await generations.doc(item._id).update({ deletedAt: now(), updatedAt: now() });
+    await tasks.where({ userId: auth.user._id, generationId: item.id }).update({ publicId: null, generationId: null, updatedAt: now() });
+    const garden = (await gardens.where({ userId: auth.user._id }).limit(1).get()).data?.[0];
+    if (garden) await gardens.doc(garden._id).update({ entries: (garden.entries || []).filter(entry => entry.id !== item.id), updatedAt: now() });
+    return { ok: true };
+  }
 
   if (action === 'adminSummary') { await requireAdmin(event, body); return adminSummary(); }
-  if (action === 'adminListUsers') { await requireAdmin(event, body); return adminListUsers(); }
-  if (action === 'adminListTasks') { await requireAdmin(event, body); const query = body.status ? { status: bounded(body.status, 30) } : {}; return { tasks: ((await tasks.where(query).orderBy('updatedAt', 'desc').limit(100).get()).data || []).map(publicTask) }; }
-  if (action === 'adminGrantPoints') { await requireAdmin(event, body); return adminGrantPoints(body); }
+  if (action === 'adminListUsers') { await requireAdmin(event, body); return adminListUsers(body); }
+  if (action === 'adminListTasks') { await requireAdmin(event, body); const query = body.status ? { status: bounded(body.status, 30) } : {}; return { tasks: ((await tasks.where(query).orderBy('updatedAt', 'desc').skip(Math.max(0, Math.floor(Number(body.offset) || 0))).limit(50).get()).data || []).map(publicTask) }; }
+  if (action === 'adminGrantPoints') { const admin = await requireAdmin(event, body); return adminGrantPoints(body, admin.user); }
+  if (action === 'adminFailTask') { await requireAdmin(event, body); const task = (await tasks.where({ id: bounded(body.taskId, 180) }).limit(1).get()).data?.[0]; if (!task) fail('任务不存在。', 404); return { task: await failTask(task, body.reason || '管理员取消任务，积分已退回。') }; }
   if (action === 'adminGetReference') { await requireAdmin(event, body); return adminGetReference(body); }
   if (action === 'adminCreateWorkerBatch') { await requireAdmin(event, body); return adminCreateWorkerBatch(); }
   fail('未知操作。');
 }
 
-exports.main = async (event) => {
-  if (event?.httpMethod === 'OPTIONS') return response(204, {});
+exports.main = async (event, context = {}) => {
+  const origin = event?.headers?.origin || event?.headers?.Origin || '';
+  const allowed = (process.env.DAILYFLORA_ALLOWED_ORIGINS || 'https://dailyflora.calfn.com,https://calfnai.github.io,https://env-00jy6xjkcayy-static.normal.cloudstatic.cn').split(',');
+  const cors = { 'Vary': 'Origin', 'Cache-Control': 'no-store', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization', ...(allowed.includes(origin) ? { 'Access-Control-Allow-Origin': origin } : {}) };
+  if (origin && !allowed.includes(origin)) return response(403, { code: 403, message: '来源未获准。' }, cors);
+  if (event?.httpMethod === 'OPTIONS') return response(204, {}, cors);
   const body = jsonBody(event);
   try {
     const action = bounded(body.action, 80);
+    // Only the authenticated provider management console may initialize a role.
+    if (action === 'initializeAdmin') {
+      if (context.SOURCE !== 'server') fail('仅限服务空间管理端初始化。', 403);
+      const userId = bounded(body.userId, 160);
+      const user = (await users.doc(userId).get()).data?.[0];
+      if (!user || user.disabledAt) fail('用户不存在或不可用。', 404);
+      await users.doc(userId).update({ role: 'admin', adminInitializedAt: now() });
+      return response(200, { code: 0, user: publicUser({ ...user, role: 'admin' }) }, cors);
+    }
     const result = await handle(action, body, event);
-    const headers = {};
+    const headers = { ...cors };
     if (result.token && result.tokenExpired) headers['Set-Cookie'] = sessionCookie(result.token, result.tokenExpired);
     if (action === 'logout') headers['Set-Cookie'] = 'dailyflora_beta_session=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=None';
     return response(200, { code: 0, ...result }, headers);
   } catch (error) {
     const statusCode = Number(error.statusCode) || 500;
-    return response(statusCode, { code: statusCode, message: error.message || '服务暂时不可用。' });
+    return response(statusCode, { code: statusCode, message: statusCode === 500 ? '服务暂时不可用，请稍后重试。' : error.message }, cors);
   }
 };

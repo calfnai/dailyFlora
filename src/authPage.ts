@@ -1,3 +1,4 @@
+import { accountMirrorKey, favoritesStorageKey, pendingFavoriteKey } from './dailyfloraCloud';
 import {
   dailyfloraCloudEnabled,
   listCloudFavorites,
@@ -11,8 +12,8 @@ import {
   type CloudFavorite
 } from './dailyfloraCloud';
 
-const accountKey = 'dailyflora.beta072.account.v1';
-const favoritesKey = 'dailyflora.beta072.favorites.v1';
+const accountKey = accountMirrorKey;
+const favoritesKey = favoritesStorageKey;
 const mode = document.body.dataset.authMode === 'login' ? 'login' : 'signup';
 
 const authForm = document.querySelector<HTMLFormElement>('#auth-form');
@@ -47,8 +48,25 @@ function showStatus(message: string, isError = false) {
 
 function destination() {
   const requested = new URLSearchParams(window.location.search).get('next');
-  if (!requested || requested.includes(':') || requested.startsWith('//')) return '../member/';
-  return requested;
+  const fallback = new URL('../member/', window.location.href);
+  if (!requested || /[\\\x00-\x20]/.test(requested)) return fallback.href;
+  try {
+    const target = new URL(requested, window.location.href);
+    const root = new URL('../', window.location.href).pathname;
+    return target.origin === location.origin && target.pathname.startsWith(root) ? target.href : fallback.href;
+  } catch { return fallback.href; }
+}
+
+const guestAccount = readJson<{ email?: string } | null>(accountKey, null);
+const guestFavorites = readJson<CloudFavorite[]>(favoritesKey, []);
+
+
+async function savePendingFavorite() {
+  const favorite = readJson<CloudFavorite | null>(pendingFavoriteKey, null);
+  if (favorite?.id) {
+    await saveCloudFavorite(favorite);
+    localStorage.removeItem(pendingFavoriteKey);
+  }
 }
 
 function resetToken() {
@@ -68,8 +86,8 @@ function syncLoginView() {
 }
 
 async function mergeGuestFavorites(user: CloudAccount) {
-  const localAccount = readJson<{ email?: string } | null>(accountKey, null);
-  const localFavorites = readJson<CloudFavorite[]>(favoritesKey, []);
+  const localAccount = guestAccount;
+  const localFavorites = guestFavorites;
   let remote = await listCloudFavorites();
   const shouldOfferMerge = !localAccount?.email && localFavorites.length > 0;
   if (shouldOfferMerge && window.confirm(`发现本机有 ${localFavorites.length} 条未同步收藏，是否合并到 ${user.email}？`)) {
@@ -107,6 +125,7 @@ authForm?.addEventListener('submit', async (event) => {
           password,
           termsVersion: '0.73.0'
         });
+    await savePendingFavorite();
     await mergeGuestFavorites(user);
     saveAccount(user);
     window.location.href = destination();
@@ -166,8 +185,9 @@ window.addEventListener('hashchange', syncLoginView);
 syncLoginView();
 
 if (dailyfloraCloudEnabled) {
-  void restoreAccount().then((user) => {
+  void restoreAccount().then(async (user) => {
     if (user) {
+      await savePendingFavorite();
       saveAccount(user);
       window.location.href = destination();
     }

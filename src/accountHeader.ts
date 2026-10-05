@@ -48,7 +48,13 @@ function render(next: AccountUiState) {
       profile.href = existingMemberHref || (container.id === 'site-menu-panel' ? './member/' : '../member/');
       container.append(profile);
     }
-    profile.innerHTML = `<span class="account-nav-avatar" aria-hidden="true">${initials(next.user.name)}</span><span>${next.user.name}</span>`;
+    const avatar = document.createElement('span');
+    avatar.className = 'account-nav-avatar';
+    avatar.setAttribute('aria-hidden', 'true');
+    avatar.textContent = initials(next.user.name);
+    const name = document.createElement('span');
+    name.textContent = next.user.name;
+    profile.replaceChildren(avatar, name);
     profile.title = next.user.email;
   });
 }

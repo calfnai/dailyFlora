@@ -1898,3 +1898,14 @@ html[data-locale="ja"] .about-page .colour-line {
   html[data-locale="pt"] .about-page .hero-copy .display,
   html[data-locale="it"] .about-page .hero-copy .display { font-size: clamp(47px, 14.2vw, 66px); }
 }
+
+/* Keep all navigation destinations reachable on narrow screens. */
+@media (max-width: 760px) {
+  .site-header { flex-wrap: wrap; }
+  .site-nav { order: 3; flex: 1 0 100%; justify-content: flex-start; overflow-x: auto; padding: 8px 0; gap: 18px; }
+  .site-nav a:not(.nav-cta) { display: inline-flex; }
+  .site-nav a { flex-shrink: 0; min-height: 44px; align-items: center; }
+  .member-account-actions { flex-wrap: wrap; }
+  .member-card strong { overflow-wrap: anywhere; }
+}
+#member-status { position: sticky; top: 12px; z-index: 5; background: #fff8e9; padding: 12px 16px; border-radius: 12px; }

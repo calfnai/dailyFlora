@@ -29,6 +29,7 @@ export type CloudGeneration = {
   source: string;
   status: string;
   colors: string[];
+  renderParams?: Record<string, number | string | boolean>;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -70,6 +71,8 @@ export type PointEntry = {
 };
 
 export type AccountSnapshot = {
+  offset?: number;
+  hasMore?: boolean;
   user: CloudAccount;
   favorites: CloudFavorite[];
   generations: CloudGeneration[];
@@ -109,6 +112,7 @@ declare global {
     __DAILYFLORA_CONFIG__?: {
       apiUrl?: string;
       releaseChannel?: string;
+      generationEnabled?: boolean;
       workerBridgeUrl?: string;
       dailyContentUrl?: string;
       dailyContentUrls?: string[];
@@ -132,9 +136,12 @@ export const dailyfloraApiBase = configuredApiBase.trim().replace(/\/$/, '');
 export const dailyfloraCloudEnabled = Boolean(dailyfloraApiBase);
 export const workerBridgeUrl = (typeof window !== 'undefined' ? window.__DAILYFLORA_CONFIG__?.workerBridgeUrl : '') || 'http://127.0.0.1:43172';
 
-const tokenKey = 'dailyflora.beta072.cloud.token.v1';
-const tokenExpiryKey = 'dailyflora.beta072.cloud.token-expired.v1';
-export const accountMirrorKey = 'dailyflora.beta072.account.v1';
+export const accountStoragePrefix = `dailyflora.${encodeURIComponent(dailyfloraApiBase || 'offline')}.`;
+export const pendingFavoriteKey = `${accountStoragePrefix}pending-favorite.v1`;
+export const favoritesStorageKey = `${accountStoragePrefix}favorites.v1`;
+const tokenKey = `${accountStoragePrefix}cloud.token.v1`;
+const tokenExpiryKey = `${accountStoragePrefix}cloud.token-expired.v1`;
+export const accountMirrorKey = `${accountStoragePrefix}account.v1`;
 
 function readToken() {
   return typeof window === 'undefined' ? '' : window.localStorage.getItem(tokenKey) || '';
@@ -175,7 +182,9 @@ export function readAccountMirror(): CloudAccount | null {
 export async function cloudRequest<T>(action: string, payload: Record<string, unknown> = {}): Promise<CloudResponse<T>> {
   if (!dailyfloraApiBase) throw new Error('0.73 Beta 云端账户尚未配置。');
   const token = readToken();
-  const response = await fetch(dailyfloraApiBase, {
+  let response: Response;
+  try { response = await fetch(dailyfloraApiBase, {
+    signal: AbortSignal.timeout(30_000),
     method: 'POST',
     credentials: 'omit',
     headers: {
@@ -183,12 +192,13 @@ export async function cloudRequest<T>(action: string, payload: Record<string, un
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     },
     body: JSON.stringify({ action, token, ...payload })
-  });
+  }); } catch { throw new Error('暂时无法连接账户服务，请检查网络后重试。你的本地花束仍可浏览。'); }
   const result = (await response.json().catch(() => ({}))) as CloudResponse<T>;
   const providerCode = String(result.error?.code || '');
   const providerMessage = result.error?.message || '';
   if (!response.ok || result.code || result.error) {
-    if (response.status === 401 || result.code === 401 || providerCode === '401') clearCloudSession();
+    if (response.status === 401 || result.code === 401 || providerCode === '401') { clearCloudSession(); throw new Error('登录已过期，请重新登录。'); }
+    if (providerCode === 'InvalidSpace.NotInService') throw new Error('账户服务暂时不可用，请稍后重试或联系管理员。');
     if (providerCode === 'PrePayResourceExhausted') {
       throw new Error('云端账户服务暂时达到 UniCloud 平台额度，请恢复按量资源后重试。');
     }
@@ -232,16 +242,21 @@ export async function logoutAccount() {
   }
 }
 
-export async function getMemberSnapshot() {
-  const result = await cloudRequest<AccountSnapshot>('memberDashboard');
+export async function getMemberSnapshot(offset = 0) {
+  const result = await cloudRequest<AccountSnapshot>('memberDashboard', { offset });
   if (!result.snapshot) throw new Error('个人中心响应不完整。');
   saveAccountMirror(result.snapshot.user);
   return result.snapshot;
 }
 
 export async function listCloudFavorites() {
-  const result = await cloudRequest<CloudFavorite[]>('listFavorites');
-  return result.favorites || [];
+  const favorites: CloudFavorite[] = [];
+  for (let offset = 0; ; offset += 100) {
+    const result = await cloudRequest<CloudFavorite[]>('listFavorites', { offset });
+    const page = result.favorites || [];
+    favorites.push(...page);
+    if (page.length < 100) return favorites;
+  }
 }
 
 export async function saveCloudFavorite(favorite: CloudFavorite) {
@@ -307,13 +322,13 @@ export async function getCloudHealth() {
   return { service: result.service || 'dailyflora-api-beta', version: result.version || 'unknown', isolated: result.isolated !== false };
 }
 
-export async function listAdminUsers() {
-  const result = await cloudRequest<Array<CloudAccount & { balance?: number }>>('adminListUsers');
+export async function listAdminUsers(offset = 0, email = '') {
+  const result = await cloudRequest<Array<CloudAccount & { balance?: number }>>('adminListUsers', { offset, email });
   return result.users || [];
 }
 
-export async function listAdminTasks(status = '') {
-  const result = await cloudRequest<CloudTask[]>('adminListTasks', status ? { status } : {});
+export async function listAdminTasks(status = '', offset = 0) {
+  const result = await cloudRequest<CloudTask[]>('adminListTasks', { status, offset });
   return result.tasks || [];
 }
 
@@ -330,4 +345,8 @@ export async function createWorkerBatch() {
   const result = await cloudRequest<{ token: string; expiresAt: string; taskCount: number }>('adminCreateWorkerBatch');
   if (!result.batch) throw new Error('批次创建响应不完整。');
   return result.batch;
+}
+
+export async function cancelAdminTask(taskId: string) {
+  return cloudRequest<CloudTask>('adminFailTask', { taskId });
 }

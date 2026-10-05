@@ -1,3 +1,5 @@
+import { accountMirrorKey, favoritesStorageKey, pendingFavoriteKey } from './dailyfloraCloud';
+import { applyGeneratedBouquet } from './generatedBouquet';
 import './styles.css';
 import { buildInfo } from './buildInfo';
 import type { DensityName, RenderQualityName } from './types';
@@ -75,8 +77,7 @@ const renderLabels: Record<Exclude<RenderQualityName, 'auto'>, string> = {
   medium: '清',
   high: '精'
 };
-const accountStorageKey = 'dailyflora.beta072.account.v1';
-const favoritesStorageKey = 'dailyflora.beta072.favorites.v1';
+const accountStorageKey = accountMirrorKey;
 const themeEnglishNames: Record<string, string> = {
   'tropical-forest': 'Tropical Forest',
   'moon-white': 'Moon White Hand-Tied',
@@ -363,6 +364,7 @@ let spec = specialReference
   ? createSpecialSpec(specialReference, searchParams.get('date') ? clampedRequestedDate : undefined)
   : createDailySpec(params.date, params.seed, selectedTheme);
 let followsToday = !specialReference && !searchParams.has('date') && !searchParams.has('seed');
+spec = applyGeneratedBouquet(spec, searchParams);
 let scene = new BouquetScene(ui.canvas, spec, quality);
 (window as Window & {
   __dailyFloraAudit?: () => ReturnType<BouquetScene['getDebugStats']>;
@@ -834,6 +836,7 @@ function setMainAuthMode(nextMode: 'signup' | 'login') {
 
 async function toggleFavorite() {
   if (!accountState) {
+    localStorage.setItem(pendingFavoriteKey, JSON.stringify(createFavorite()));
     window.location.href = './signup/?intent=favorite';
     return;
   }
@@ -911,10 +914,10 @@ function renderCollectionList() {
   collectionList.innerHTML = favoriteBouquets
     .map(
       (favorite) => `
-        <button class="collection-item" type="button" data-favorite-id="${favorite.id}">
-          <span class="collection-item-date">${publicFavoriteCode(favorite)} · ${favorite.date}</span>
-          <span class="collection-item-title">${favorite.themeName}</span>
-          <span class="collection-item-meta">${favorite.flowerPlanName} · ${favorite.themeEnglishName}</span>
+        <button class="collection-item" type="button" data-favorite-id="${escapeFavorite(favorite.id)}">
+          <span class="collection-item-date">${publicFavoriteCode(favorite)} · ${escapeFavorite(favorite.date)}</span>
+          <span class="collection-item-title">${escapeFavorite(favorite.themeName)}</span>
+          <span class="collection-item-meta">${escapeFavorite(favorite.flowerPlanName)} · ${escapeFavorite(favorite.themeEnglishName)}</span>
         </button>
       `
     )
@@ -1484,6 +1487,7 @@ function openDate(dateKey: string) {
 
 function rebuild(date: string, seed: string) {
   spec = specialReference ? createSpecialSpec(specialReference, date) : createDailySpec(date, seed, selectedTheme);
+  spec = applyGeneratedBouquet(spec, searchParams);
   if (!manualRotation) {
     rotationSpeed = THREEClamp(spec.rotationSpeed, minRotationSpeed, maxRotationSpeed);
     cameraRouteMode = 'orbit';
@@ -2453,4 +2457,8 @@ if (tutorialValue === 'gesture') {
 } else if (tutorialValue === 'clock') {
   setControlsExpanded(true);
   window.setTimeout(() => showInlineTutorial('clock'), 0);
+}
+
+function escapeFavorite(value: unknown) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c] || c));
 }

@@ -8,7 +8,7 @@ test('beta API uses only beta collections and storage prefix', () => {
   for (const name of ['users', 'sessions', 'favorites', 'generations', 'tasks', 'refs', 'point-accounts', 'points-ledger', 'gardens', 'resets']) {
     assert.match(source, new RegExp(`dailyflora-beta-${name}`));
   }
-  assert.match(source, /dailyflora\/beta-072\/private\/\$\{auth\.user\._id\}/);
+  assert.match(source, /dailyflora-private\/\$\{auth\.user\._id\}/);
   assert.doesNotMatch(source, /db\.collection\('uni-id-users'\)/);
 });
 
@@ -24,7 +24,7 @@ test('task charging, idempotency and refund are server side', () => {
 
 test('public generation endpoint returns an explicit public projection', () => {
   assert.match(source, /getPublicGeneration/);
-  assert.match(source, /generation: \{ id: value\.id, publicId: value\.publicId, name: value\.name/);
+  assert.match(source, /generation: \{ id: value\.id, publicId: value\.publicId, name: 'DailyFlora 专属花束'/);
   const projection = source.slice(source.indexOf('async function publicGenerationById'), source.indexOf('async function sendResetEmail'));
   assert.doesNotMatch(projection, /email|referenceFileId|thumbnailFileId|point/);
 });
