@@ -19,14 +19,14 @@
         <section class="member-guest garden-panel" id="member-auth-gate" hidden>
           <p class="eyebrow">DailyFlora ID</p>
           <h1>登录后打开你的个人花园。</h1>
-          <p>已有账户可直接登录；第一次使用可创建 Beta 账户。0.73 Beta 与 0.71 正式账户隔离。</p>
+          <p>已有账户可直接登录；第一次使用可创建 Beta 账户。</p>
           <div class="button-row"><a class="button primary" href="../login/?next=../member/" data-i18n="common.signInExisting">登录已有账户</a><a class="button" href="../signup/?next=../member/" data-i18n="common.createAccount">创建 Beta 账户</a></div>
         </section>
 
         <div id="member-workspace" hidden>
           <header class="member-hero">
             <div><p class="eyebrow">DailyFlora ID / 0.73 Beta</p><h1 id="member-title">我的花园</h1><p id="member-email" class="muted"></p></div>
-            <div class="member-account-actions"><span class="member-avatar" id="member-avatar">花</span><button class="button" id="member-logout" type="button">退出</button></div>
+            <div class="member-account-actions"><span class="member-avatar" id="member-avatar">花</span><button class="button" id="member-refresh" type="button">刷新</button><button class="button" id="member-logout" type="button">退出</button></div>
           </header>
 
           <p class="account-form-error" id="member-status" role="status" aria-live="polite" hidden></p>
@@ -46,7 +46,7 @@
             <div class="member-task-layout">
               <form class="garden-panel member-upload-card" id="reference-form">
                 <h3>上传参考图生成花束</h3>
-                <p>每次任务扣 10 积分。图片会在浏览器压缩为私有 WebP，不进入 GitHub。</p>
+                <p>每次生成需要 10 积分，失败后自动退回。参考图片仅用于处理你的任务。当前余额：<strong data-upload-balance>0</strong> 分。</p>
                 <label class="member-upload-zone" id="upload-zone"><input id="reference-file" type="file" accept="image/*" required /><img id="reference-preview" alt="参考图缩略预览" hidden /><span><strong>选择图片</strong><small>源文件最多 20MB；主图压缩后最多 1.5MB</small></span></label>
                 <div class="form-grid"><label><span>私人名称</span><input id="bouquet-name" maxlength="80" value="我的参考图花束" required /></label><label><span>方向</span><select id="style-select"><option value="auto">自动</option><option value="air">空气感</option><option value="rainbow">彩虹多色</option><option value="fruit">果材与浆果</option><option value="warm">暖色饱满</option></select></label></div>
                 <label><span>偏好备注</span><textarea id="preference-input" maxlength="500" placeholder="例如：更轻、更冷一点，保留枝条感"></textarea></label>
@@ -61,7 +61,7 @@
             <div class="member-section-head"><div><p class="eyebrow">Account & points</p><h2>账户与积分</h2></div><strong class="point-balance"><span id="point-balance">0</span> 分</strong></div>
             <div class="member-account-grid">
               <article class="garden-panel"><h3>积分记录</h3><div class="point-ledger" id="point-ledger"></div></article>
-              <article class="garden-panel"><h3>付费购买</h3><p class="muted">Under construction</p><p>0.73 Beta 不接入真实支付，积分没有现金价值。</p></article>
+              <article class="garden-panel"><h3>申请充值</h3><p>请通过邮件向管理员申请付款二维码，说明账户邮箱和希望增加的积分。管理员确认收款后手动加分，到账记录会显示在这里。</p><a class="button" id="recharge-request" href="mailto:find@calfn.com?subject=DailyFlora%20充值申请">邮件申请充值</a><p class="muted">请先与管理员确认金额，勿重复付款。</p></article>
             </div>
           </section>
         </div>

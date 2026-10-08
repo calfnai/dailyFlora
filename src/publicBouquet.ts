@@ -18,15 +18,22 @@ async function load() {
     render: 'high',
     density: 'high'
   });
+  params.set('colors', generation.colors.join(','));
+  for (const key of ['density', 'render', 'spread', 'height', 'airiness']) {
+    const value = generation.renderParams?.[key];
+    if (value !== undefined) params.set(key, String(value));
+  }
   if (frame) {
     frame.src = `../?${params.toString()}`;
     frame.hidden = false;
   }
   if (title) title.textContent = generation.name;
-  if (summary) summary.textContent = `${generation.status} · seed=${generation.seed}`;
+  if (summary) summary.textContent = '专属花束 · 可收藏此链接再次欣赏';
   if (caption) caption.hidden = false;
   if (state) state.hidden = true;
   document.title = `${generation.name} — DailyFlora`;
+  const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+  if (description) description.content = `${generation.name}，一束专属的 DailyFlora 数字花束。`;
 }
 
 void load().catch((error) => {

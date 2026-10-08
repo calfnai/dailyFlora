@@ -26,10 +26,22 @@ const referenceForm = document.querySelector<HTMLFormElement>('#reference-form')
 const referenceFile = document.querySelector<HTMLInputElement>('#reference-file');
 const referencePreview = document.querySelector<HTMLImageElement>('#reference-preview');
 const preparedMeta = document.querySelector<HTMLElement>('#prepared-image-meta');
+const generationEnabled = window.__DAILYFLORA_CONFIG__?.generationEnabled !== false;
+
+if (!generationEnabled && referenceForm) {
+  referenceForm.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement>('input, select, textarea, button').forEach((control) => { control.disabled = true; });
+  const note = document.createElement('p');
+  note.className = 'muted';
+  note.textContent = '云端参考图处理尚未接通。此测试入口暂不创建扣积分任务；已有记录仍可查看。';
+  referenceForm.prepend(note);
+}
 
 let snapshot: AccountSnapshot | null = null;
 let preparedAssets: PreparedUserReferenceAssets | null = null;
 let previewUrl = '';
+let submissionKey = '';
+let refreshInFlight = false;
+let selectedFileVersion = 0;
 
 function escapeHtml(value: unknown) {
   return String(value ?? '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character] || character);
@@ -62,13 +74,13 @@ function renderFavorites(items: CloudFavorite[]) {
   if (count) count.textContent = String(items.length);
   if (!favoriteList) return;
   if (!items.length) {
-    favoriteList.innerHTML = emptyState('还没有收藏', '回到今日花束，点击爱心或“收藏这束花”。这里不会显示虚构数据。');
+    favoriteList.innerHTML = emptyState('还没有收藏', '回到今日花束，点击爱心或“收藏这束花”。');
     return;
   }
   favoriteList.innerHTML = items.map((favorite) => `<article class="member-card" data-favorite-card="${escapeHtml(favorite.id)}">
     <a class="member-card-link" href="${escapeHtml(bouquetHref(favorite))}">
       <span>${escapeHtml(favorite.date)}</span><strong>${escapeHtml(favorite.themeName || 'DailyFlora Bouquet')}</strong>
-      <small>seed=${escapeHtml(favorite.seed)} · ${escapeHtml(favorite.flowerPlanName || '')}</small>
+      <small>${escapeHtml(favorite.flowerPlanName || '')}</small>
     </a>
     <button class="member-card-action" type="button" data-remove-favorite="${escapeHtml(favorite.id)}">取消收藏</button>
   </article>`).join('');
@@ -83,12 +95,13 @@ function renderGenerations(items: CloudGeneration[]) {
     return;
   }
   generationList.innerHTML = items.map((item) => `<article class="member-card generation-card" data-generation-card="${escapeHtml(item.id)}">
-    <a class="member-card-link" href="../bouquet/?id=${encodeURIComponent(item.publicId)}"><span>${escapeHtml(item.status)}</span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(formatDate(item.createdAt))} · seed=${escapeHtml(item.seed)}</small></a>
+    <a class="member-card-link" href="../bouquet/?id=${encodeURIComponent(item.publicId)}"><span>${escapeHtml(item.status)}</span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(formatDate(item.createdAt))}</small></a>
     <div class="member-card-buttons"><button type="button" data-rename-generation="${escapeHtml(item.id)}">修改名称</button><button type="button" data-delete-generation="${escapeHtml(item.id)}">删除</button></div>
   </article>`).join('');
 }
 
 function taskLabel(task: CloudTask) {
+  if (task.status === 'preparing') return '正在准备';
   if (task.status === 'completed') return '已完成';
   if (task.status === 'failed') return task.refunded ? '失败 · 已退款' : '失败';
   if (task.status === 'processing') return '处理中';
@@ -106,13 +119,14 @@ function renderTasks(items: CloudTask[]) {
   taskList.innerHTML = items.map((task) => `<article class="member-card task-card">
     <span>${escapeHtml(taskLabel(task))}</span><strong>${escapeHtml(task.input?.bouquetName || '参考图花束')}</strong>
     <small>${escapeHtml(formatDate(task.createdAt))} · ${escapeHtml(task.id)}</small>
-    <p>${escapeHtml(task.result?.summary || task.errorMessage || '等待 Admin 本机 Codex 处理')}</p>
+    <p>${escapeHtml(task.result?.summary || task.errorMessage || '已进入队列，处理完成后会自动更新')}</p>
     ${task.publicId ? `<a class="button" href="../bouquet/?id=${encodeURIComponent(task.publicId)}">打开唯一链接</a>` : ''}
   </article>`).join('');
 }
 
 function renderPoints(data: AccountSnapshot) {
   const balance = document.querySelector<HTMLElement>('#point-balance');
+  document.querySelectorAll<HTMLElement>('[data-upload-balance]').forEach(node => { node.textContent = String(data.pointAccount.balance || 0); });
   if (balance) balance.textContent = String(data.pointAccount.balance || 0);
   if (!ledger) return;
   ledger.innerHTML = data.points.length
@@ -122,6 +136,7 @@ function renderPoints(data: AccountSnapshot) {
 
 function render(data: AccountSnapshot) {
   snapshot = data;
+  more.hidden = !data.hasMore;
   const title = document.querySelector<HTMLElement>('#member-title');
   const email = document.querySelector<HTMLElement>('#member-email');
   const avatar = document.querySelector<HTMLElement>('#member-avatar');
@@ -132,9 +147,13 @@ function render(data: AccountSnapshot) {
   renderGenerations(data.generations);
   renderTasks(data.tasks);
   renderPoints(data);
+  const recharge = document.querySelector<HTMLAnchorElement>('#recharge-request');
+  if (recharge) recharge.href = `mailto:find@calfn.com?subject=${encodeURIComponent('DailyFlora 充值申请')}&body=${encodeURIComponent(`账户邮箱：${data.user.email}\n希望增加的积分：\n请提供付款二维码及对应金额。`)}`;
 }
 
 async function refresh() {
+  if (refreshInFlight) return;
+  refreshInFlight = true;
   try {
     const data = await getMemberSnapshot();
     render(data);
@@ -151,7 +170,7 @@ async function refresh() {
     }
     showStatus(message, true);
     if (loading) loading.textContent = message;
-  }
+  } finally { refreshInFlight = false; }
 }
 
 document.querySelector<HTMLButtonElement>('#member-logout')?.addEventListener('click', async () => {
@@ -207,11 +226,18 @@ generationList?.addEventListener('click', async (event) => {
 
 referenceFile?.addEventListener('change', async () => {
   const file = referenceFile.files?.[0];
+  const selection = ++selectedFileVersion;
   preparedAssets = null;
+  submissionKey = '';
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
+  if (referencePreview) referencePreview.hidden = true;
+  if (preparedMeta) preparedMeta.textContent = '';
   if (!file) return;
   showStatus('正在浏览器内压缩图片…');
   try {
-    preparedAssets = await prepareUserReferenceAssets(file);
+    const assets = await prepareUserReferenceAssets(file);
+    if (selection !== selectedFileVersion) return;
+    preparedAssets = assets;
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     previewUrl = URL.createObjectURL(preparedAssets.thumbnail.blob);
     if (referencePreview) { referencePreview.src = previewUrl; referencePreview.hidden = false; }
@@ -225,10 +251,13 @@ referenceFile?.addEventListener('change', async () => {
 
 referenceForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
+  if (!generationEnabled) { showStatus('云端参考图处理尚未接通，此入口暂不创建任务。', true); return; }
   if (!preparedAssets || !referenceFile?.files?.[0]) {
     showStatus('请先选择并完成图片压缩。', true);
     return;
   }
+  if (!referenceForm.reportValidity()) return;
+  if ((snapshot?.pointAccount.balance || 0) < 10) { showStatus('积分不足，需要 10 积分。可通过账户与积分中的邮件入口申请充值。', true); return; }
   const submit = referenceForm.querySelector<HTMLButtonElement>('button[type="submit"]');
   if (submit) submit.disabled = true;
   showStatus('正在上传私有图片并创建任务…');
@@ -238,7 +267,7 @@ referenceForm?.addEventListener('submit', async (event) => {
       blobToDataUrl(preparedAssets.thumbnail.blob)
     ]);
     const task = await createReferenceTask({
-      idempotencyKey: crypto.randomUUID(),
+      idempotencyKey: submissionKey ||= crypto.randomUUID(),
       referenceDataUrl,
       thumbnailDataUrl,
       sourceFileName: referenceFile.files[0].name,
@@ -249,6 +278,7 @@ referenceForm?.addEventListener('submit', async (event) => {
       preference: (document.querySelector<HTMLTextAreaElement>('#preference-input')?.value || '').trim()
     });
     showStatus(`任务 ${task.id} 已排队，扣除 10 积分。`);
+    submissionKey = '';
     referenceForm.reset();
     preparedAssets = null;
     if (referencePreview) referencePreview.hidden = true;
@@ -262,3 +292,28 @@ referenceForm?.addEventListener('submit', async (event) => {
 });
 
 void restoreAccount().then((user) => user ? refresh() : refresh()).catch(() => refresh());
+
+window.setInterval(() => {
+  if (!document.hidden && snapshot?.tasks.some(task => ['preparing', 'queued', 'processing'].includes(task.status))) void refresh();
+}, 10_000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && snapshot) void refresh(); });
+document.querySelector('#member-refresh')?.addEventListener('click', () => void refresh());
+
+const more = document.createElement('button');
+more.className = 'button';
+more.textContent = '加载更早记录';
+more.hidden = true;
+document.querySelector('#member-workspace')?.append(more);
+more.addEventListener('click', async () => {
+  if (!snapshot) return;
+  more.disabled = true;
+  try {
+    const next = await getMemberSnapshot((snapshot.offset || 0) + 50);
+    for (const key of ['favorites', 'generations', 'tasks', 'points'] as const) {
+      const seen = new Set(snapshot[key].map(item => item.id));
+      (next[key] as unknown[]) = [...snapshot[key], ...next[key].filter(item => !seen.has(item.id))];
+    }
+    render(next);
+  } catch (error) { showStatus(error instanceof Error ? error.message : '读取失败。', true); }
+  finally { more.disabled = false; }
+});

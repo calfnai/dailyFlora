@@ -1,5 +1,6 @@
 import {
   createWorkerBatch,
+  cancelAdminTask,
   getAdminReference,
   getCloudHealth,
   getAdminSummary,
@@ -21,10 +22,18 @@ const users = document.querySelector<HTMLTableSectionElement>('#admin-users');
 const tasks = document.querySelector<HTMLElement>('#admin-tasks');
 const filter = document.querySelector<HTMLSelectElement>('#admin-task-filter');
 const workerState = document.querySelector<HTMLElement>('#admin-worker-state');
+if (window.__DAILYFLORA_CONFIG__?.generationEnabled === false) {
+  const processButton = document.querySelector<HTMLButtonElement>('#admin-process-queue');
+  if (processButton) processButton.disabled = true;
+  if (workerState) workerState.textContent = '云端参考图处理尚未接通；此测试入口不调用本机桥接器。';
+}
 const runtime = document.querySelector<HTMLElement>('#admin-runtime');
 const identity = document.querySelector<HTMLElement>('#admin-identity');
 
 let loadSequence = 0;
+let userOffset = 0;
+let taskOffset = 0;
+const userSearch = document.querySelector<HTMLInputElement>('#admin-user-search');
 
 function escapeHtml(value: unknown) {
   return String(value ?? '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character] || character);
@@ -50,7 +59,7 @@ function renderMetrics(summary: Record<string, unknown>) {
 
 function renderUsers(items: Array<CloudAccount & { balance?: number }>) {
   if (!users) return;
-  users.innerHTML = items.map((user) => `<tr><td>${escapeHtml(user.name)}</td><td>${escapeHtml(user.email)}</td><td>${escapeHtml(user.balance || 0)}</td><td>${escapeHtml(formatDate(user.createdAt))}</td><td><button class="button admin-grant-button" type="button" data-grant-user="${escapeHtml(user.id)}" data-grant-name="${escapeHtml(user.name)}">赠送 20 分</button></td></tr>`).join('');
+  users.innerHTML = items.map((user) => `<tr><td>${escapeHtml(user.name)}</td><td>${escapeHtml(user.email)}</td><td>${escapeHtml(user.balance || 0)}</td><td>${escapeHtml(formatDate(user.createdAt))}</td><td><button class="button admin-grant-button" type="button" data-grant-user="${escapeHtml(user.id)}" data-grant-name="${escapeHtml(user.name)}">手动加积分</button></td></tr>`).join('');
 }
 
 function renderTasks(items: CloudTask[]) {
@@ -60,7 +69,7 @@ function renderTasks(items: CloudTask[]) {
     <div class="admin-task-head"><strong>${escapeHtml(task.input?.bouquetName || '参考图任务')}</strong><span>${escapeHtml(task.status)} · ${escapeHtml(task.id)}</span></div>
     <small>创建：${escapeHtml(formatDate(task.createdAt))} · 费用：${escapeHtml(task.cost || 10)} 分${task.refunded ? ' · 已退款' : ''}</small>
     <p>${escapeHtml(task.result?.summary || task.errorMessage || '等待本机 Codex 处理')}</p>
-    <div class="button-row"><button class="button" type="button" data-reference-task="${escapeHtml(task.id)}">读取私有参考图</button>${task.publicId ? `<a class="button" href="../bouquet/?id=${encodeURIComponent(task.publicId)}">公开链接</a>` : ''}<span data-reference-result></span></div>
+    <div class="button-row"><button class="button" type="button" data-reference-task="${escapeHtml(task.id)}">读取私有参考图</button>${task.publicId ? `<a class="button" href="../bouquet/?id=${encodeURIComponent(task.publicId)}">公开链接</a>` : ''}${['preparing', 'queued', 'processing'].includes(task.status) ? `<button class="button" type="button" data-cancel-task="${escapeHtml(task.id)}">取消并退回积分</button>` : ''}<span data-reference-result></span></div>
   </article>`).join('');
 }
 
@@ -70,20 +79,25 @@ async function load() {
     const account = await restoreAccount();
     if (!account) { showState('请先登录 Beta 账户，再访问后台。', true); if (content) content.hidden = true; return; }
     if (identity) identity.textContent = `${account.name} · ${account.email}`;
-    const [health, summary, adminUsers, adminTasks] = await Promise.all([getCloudHealth(), getAdminSummary(), listAdminUsers(), listAdminTasks(filter?.value || '')]);
+    const [health, summary, adminUsers, adminTasks] = await Promise.all([getCloudHealth(), getAdminSummary(), listAdminUsers(userOffset, userSearch?.value || ''), listAdminTasks(filter?.value || '', taskOffset)]);
     if (sequence !== loadSequence) return;
     if (runtime) runtime.textContent = `${health.service} · ${health.version} · ${health.isolated ? 'Beta 数据隔离已开启' : '请检查数据隔离配置'}`;
     renderMetrics(summary); renderUsers(adminUsers); renderTasks(adminTasks);
+    (document.querySelector('#admin-users-next') as HTMLButtonElement).disabled = adminUsers.length < 50;
+    (document.querySelector('#admin-users-prev') as HTMLButtonElement).disabled = userOffset === 0;
+    (document.querySelector('#admin-tasks-next') as HTMLButtonElement).disabled = adminTasks.length < 50;
+    (document.querySelector('#admin-tasks-prev') as HTMLButtonElement).disabled = taskOffset === 0;
     if (content) content.hidden = false;
     showState(`已验证 0.73 Beta 后台账户：${account.email}`);
   } catch (error) {
+    if (content) content.hidden = true;
     if (runtime) runtime.textContent = 'Beta API 状态读取失败。';
     showState(error instanceof Error ? error.message : '后台暂时不可用。', true);
   }
 }
 
 document.querySelector<HTMLButtonElement>('#admin-refresh')?.addEventListener('click', () => void load());
-filter?.addEventListener('change', () => void load());
+filter?.addEventListener('change', () => { taskOffset = 0; void load(); });
 
 document.querySelector<HTMLButtonElement>('#admin-logout')?.addEventListener('click', async (event) => {
   const button = event.currentTarget as HTMLButtonElement;
@@ -102,15 +116,32 @@ users?.addEventListener('click', async (event) => {
   if (!button) return;
   button.disabled = true;
   try {
-    await grantPoints(button.dataset.grantUser || '', 20, `Admin 赠送 20 分给 ${button.dataset.grantName || 'Beta 用户'}`, crypto.randomUUID());
+    const amountText = window.prompt(`给 ${button.dataset.grantName || '用户'} 增加多少积分？`);
+    if (amountText === null) return;
+    const amount = Number(amountText);
+    if (!Number.isInteger(amount) || amount < 1 || amount > 10000) throw new Error('请输入 1–10000 的整数积分。');
+    const reason = window.prompt('请输入充值备注（已核实付款金额、方式等）：')?.trim();
+    if (!reason) return;
+    const reference = window.prompt('请输入唯一付款流水号；重复处理同笔付款请使用相同流水号：')?.trim();
+    if (!reference) return;
+    if (!window.confirm(`确认已收款，并给 ${button.dataset.grantName || '用户'} 增加 ${amount} 积分？\n流水号：${reference}`)) return;
+    await grantPoints(button.dataset.grantUser || '', amount, reason, reference);
     await load();
   } catch (error) {
     showState(error instanceof Error ? error.message : '赠分失败。', true);
     button.disabled = false;
-  }
+  } finally { button.disabled = false; }
 });
 
 tasks?.addEventListener('click', async (event) => {
+  const cancel = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-cancel-task]') : null;
+  if (cancel) {
+    if (!window.confirm('取消此任务并退回已扣积分？')) return;
+    cancel.disabled = true;
+    try { await cancelAdminTask(cancel.dataset.cancelTask || ''); await load(); }
+    catch (error) { showState(error instanceof Error ? error.message : '取消失败。', true); cancel.disabled = false; }
+    return;
+  }
   const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-reference-task]') : null;
   if (!button) return;
   const result = button.closest<HTMLElement>('.admin-task')?.querySelector<HTMLElement>('[data-reference-result]');
@@ -146,3 +177,11 @@ document.querySelector<HTMLButtonElement>('#admin-process-queue')?.addEventListe
 });
 
 void load();
+
+for (const [id, action] of [
+  ['admin-users-prev', () => { userOffset = Math.max(0, userOffset - 50); }],
+  ['admin-users-next', () => { userOffset += 50; }],
+  ['admin-tasks-prev', () => { taskOffset = Math.max(0, taskOffset - 50); }],
+  ['admin-tasks-next', () => { taskOffset += 50; }],
+  ['admin-user-search-submit', () => { userOffset = 0; }]
+] as const) document.getElementById(id)?.addEventListener('click', () => { action(); void load(); });

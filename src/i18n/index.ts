@@ -64,8 +64,8 @@ export const translations: Record<Locale, TranslationTree> = {
       brandHome: 'DailyFlora home'
     },
     index: {
-      index: 'INDEX',
-      view: 'VIEW',
+      index: 'MENU',
+      view: 'SETTINGS',
       hideView: 'CLOSE',
       siteMenu: 'DailyFlora site menu',
       currentBouquet: "Today's bouquet",
@@ -403,8 +403,8 @@ export const translations: Record<Locale, TranslationTree> = {
       brandHome: 'DailyFlora 首页'
     },
     index: {
-      index: 'INDEX',
-      view: 'VIEW',
+      index: '菜单',
+      view: '视图设置',
       hideView: 'CLOSE',
       siteMenu: 'DailyFlora 站点菜单',
       currentBouquet: '今日花束',
