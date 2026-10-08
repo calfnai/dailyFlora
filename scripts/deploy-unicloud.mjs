@@ -35,10 +35,10 @@ if (!cli) throw new Error('Missing HBUILDERX_CLI');
 function hx(args, marker) {
   const result = execFileSync(cli, args, { encoding: 'utf8', timeout: 1200000, maxBuffer: 8 * 1024 * 1024 });
   console.log(result);
-  if (!result.includes(`0:${marker}:OK`)) throw new Error(`HBuilderX did not confirm ${marker}`);
+  if (!result.includes(marker)) throw new Error(`HBuilderX did not confirm ${marker}`);
 }
-hx(['project', 'open', '--path', project], 'project open');
-hx(['hosting', 'deploy', '--prj', basename(project), '--space', 'env-00jy6xjkcayy', '--provider', 'alipay', '--source', 'site'], 'hosting deploy');
+hx(['project', 'open', '--path', project], 'Project imported successfully');
+hx(['hosting', 'deploy', '--prj', basename(project), '--space', 'env-00jy6xjkcayy', '--provider', 'alipay', '--source', 'site'], '0:hosting deploy:OK');
 const origin = 'https://env-00jy6xjkcayy-static.normal.cloudstatic.cn';
 let verified = false;
 for (let attempt = 0; attempt < 12; attempt++) {
