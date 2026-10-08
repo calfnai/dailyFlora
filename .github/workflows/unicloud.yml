@@ -1,0 +1,66 @@
+name: UniCloud frontend
+on:
+  push:
+    branches: [codex/dailyflora-integration]
+  pull_request:
+    branches: [codex/dailyflora-integration]
+permissions:
+  contents: read
+concurrency:
+  group: unicloud-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Set integration branch identity
+        if: github.event_name == 'push'
+        run: git switch -c codex/dailyflora-integration
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+      - run: npm run build:vercel
+      - run: node scripts/deploy-unicloud.mjs --prepare-only
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unicloud-${{ github.sha }}
+          path: .codex/runtime/unicloud-publish/site
+          retention-days: 7
+      - name: Check deployment credentials
+        if: github.event_name == 'push'
+        env:
+          HX_USER: ${{ secrets.HBUILDERX_USERNAME }}
+          HX_PASSWORD: ${{ secrets.HBUILDERX_PASSWORD }}
+        run: |
+          test -n "$HX_USER" && test -n "$HX_PASSWORD" || { echo 'Add HBUILDERX_USERNAME and HBUILDERX_PASSWORD to repository Actions secrets'; exit 1; }
+      - name: Install official HBuilderX CLI
+        if: github.event_name == 'push'
+        run: |
+          mkdir -p "$RUNNER_TEMP/hbuilderx"
+          curl --fail --location --retry 3 'https://download1.dcloud.net.cn/download/HBuilderX.5.26.2026091802.linux_x64.full.tar.gz' -o "$RUNNER_TEMP/hbuilderx.tar.gz"
+          tar -xzf "$RUNNER_TEMP/hbuilderx.tar.gz" -C "$RUNNER_TEMP/hbuilderx"
+          HX_CLI=$(find "$RUNNER_TEMP/hbuilderx" -type f -name cli -print -quit)
+          test -n "$HX_CLI"
+          echo "HBUILDERX_CLI=$HX_CLI" >> "$GITHUB_ENV"
+          cd "$(dirname "$HX_CLI")"
+          "$HX_CLI" open
+      - name: Authenticate and publish
+        if: github.event_name == 'push'
+        env:
+          HX_USER: ${{ secrets.HBUILDERX_USERNAME }}
+          HX_PASSWORD: ${{ secrets.HBUILDERX_PASSWORD }}
+        run: |
+          "$HBUILDERX_CLI" user login --username "$HX_USER" --password "$HX_PASSWORD"
+          "$HBUILDERX_CLI" hosting list --space env-00jy6xjkcayy --provider alipay
+          node scripts/deploy-unicloud.mjs
+      - name: Log out
+        if: always() && github.event_name == 'push' && env.HBUILDERX_CLI != ''
+        run: '"$HBUILDERX_CLI" user logout'

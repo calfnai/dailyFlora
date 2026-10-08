@@ -2,6 +2,10 @@
 
 > 自 `0.14.10` 起，新增版本记录使用中英文双语。 / Starting with `0.14.10`, all new release notes are written in both Chinese and English.
 
+## Unreleased - 2026-10-09
+
+- 增加 GitHub 推送触发的 UniCloud 前端发布流程、构建身份校验和线上版本校验；等待配置 Actions 登录 Secrets 后验收云端自动发布。 / Added push-triggered UniCloud frontend deployment with build identity and live version checks; cloud automation remains pending Actions credentials and verification.
+
 ## Unreleased - 2026-08-16
 
 - 恢复 GitHub Pages 发布门禁需要的 docs/LAB 页面为 Vite 构建入口，确保审美复盘 Dashboard、Primitive Lab、固定花束样例库和相关花型/叶片 LAB 随正式构建产出。 / Restored the docs/LAB pages required by the GitHub Pages release gate as Vite build inputs, ensuring the aesthetic review Dashboard, Primitive Lab, fixed bouquet sample library, and related flower/leaf LAB pages are emitted by the formal build.
